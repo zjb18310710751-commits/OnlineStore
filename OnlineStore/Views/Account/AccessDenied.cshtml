@@ -1,0 +1,8 @@
+@{
+    ViewData["Title"] = Loc["AccessDenied"].Value;
+}
+<div class="container text-center py-5">
+    <h1 class="display-5 fw-bold text-brand">403</h1>
+    <p class="lead">@Loc["AccessDeniedMessage"]</p>
+    <a class="btn btn-primary" asp-controller="Home" asp-action="Index">@Loc["BackHome"]</a>
+</div>

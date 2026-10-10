@@ -1,0 +1,37 @@
+@model Product
+@{
+    ViewData["Title"] = Loc["ProductDetails"].Value;
+}
+<h1 class="h4 mb-3">@Loc["ProductDetails"]</h1>
+<div class="card card-body shadow-sm">
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="product-detail-thumb d-flex align-items-center justify-content-center">
+                @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                {
+                    <img src="@Model.ImageUrl" class="img-fluid" alt="@Model.Name" />
+                }
+                else
+                {
+                    <i class="bi bi-image product-thumb-placeholder"></i>
+                }
+            </div>
+        </div>
+        <div class="col-md-8">
+            <dl class="row mb-0">
+                <dt class="col-sm-3 text-muted">@Loc["Name"]</dt><dd class="col-sm-9">@Model.Name</dd>
+                <dt class="col-sm-3 text-muted">@Loc["Category"]</dt><dd class="col-sm-9">@Model.Category?.Name</dd>
+                <dt class="col-sm-3 text-muted">@Loc["Sku"]</dt><dd class="col-sm-9">@(Model.Sku ?? "—")</dd>
+                <dt class="col-sm-3 text-muted">@Loc["Price"]</dt><dd class="col-sm-9">¥@Model.Price.ToString("F2")</dd>
+                <dt class="col-sm-3 text-muted">@Loc["Stock"]</dt><dd class="col-sm-9">@Model.Stock</dd>
+                <dt class="col-sm-3 text-muted">@Loc["Status"]</dt><dd class="col-sm-9">@(Model.IsActive ? Loc["Active"].Value : Loc["Inactive"].Value)</dd>
+                <dt class="col-sm-3 text-muted">@Loc["Description"]</dt><dd class="col-sm-9">@Model.Description</dd>
+                <dt class="col-sm-3 text-muted">@Loc["CreatedAt"]</dt><dd class="col-sm-9">@Model.CreatedAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</dd>
+            </dl>
+            <div class="mt-3">
+                <a asp-area="Admin" asp-controller="Products" asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary btn-sm">@Loc["Edit"]</a>
+                <a asp-area="Admin" asp-controller="Products" asp-action="Index" class="btn btn-outline-secondary btn-sm">@Loc["Back"]</a>
+            </div>
+        </div>
+    </div>
+</div>

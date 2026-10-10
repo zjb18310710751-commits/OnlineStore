@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <data name="Brand" xml:space="preserve"><value>在线商店</value></data>
+  <data name="Home" xml:space="preserve"><value>首页</value></data>
+  <data name="AllProducts" xml:space="preserve"><value>全部商品</value></data>
+  <data name="Categories" xml:space="preserve"><value>商品分类</value></data>
+  <data name="SearchPlaceholder" xml:space="preserve"><value>搜索商品…</value></data>
+  <data name="AdminPanel" xml:space="preserve"><value>后台管理</value></data>
+  <data name="Logout" xml:space="preserve"><value>登出</value></data>
+  <data name="Login" xml:space="preserve"><value>登录</value></data>
+  <data name="Language" xml:space="preserve"><value>语言</value></data>
+  <data name="NoCategories" xml:space="preserve"><value>暂无分类</value></data>
+  <data name="FooterCopyright" xml:space="preserve"><value>在线商店 · ASP.NET Core MVC</value></data>
+  <data name="FooterQualities" xml:space="preserve"><value>可用性 · 可修改性 · 安全性 · 易用性</value></data>
+  <data name="HeroTitle" xml:space="preserve"><value>发现好物，尽在在线商店</value></data>
+  <data name="HeroSubtitle" xml:space="preserve"><value>精选商品 · 分类清晰 · 便捷筛选</value></data>
+  <data name="StartShopping" xml:space="preserve"><value>开始逛</value></data>
+  <data name="NewArrivals" xml:space="preserve"><value>最新上架</value></data>
+  <data name="ViewAll" xml:space="preserve"><value>查看全部</value></data>
+  <data name="NoProducts" xml:space="preserve"><value>暂无商品。</value></data>
+  <data name="PriceRange" xml:space="preserve"><value>价格区间</value></data>
+  <data name="MinPrice" xml:space="preserve"><value>最低价</value></data>
+  <data name="MaxPrice" xml:space="preserve"><value>最高价</value></data>
+  <data name="Filter" xml:space="preserve"><value>筛选</value></data>
+  <data name="All" xml:space="preserve"><value>全部</value></data>
+  <data name="ItemsCount" xml:space="preserve"><value>共 {0} 件商品</value></data>
+  <data name="SortBy" xml:space="preserve"><value>排序</value></data>
+  <data name="SortNewest" xml:space="preserve"><value>最新上架</value></data>
+  <data name="SortPriceAsc" xml:space="preserve"><value>价格从低到高</value></data>
+  <data name="SortPriceDesc" xml:space="preserve"><value>价格从高到低</value></data>
+  <data name="SortName" xml:space="preserve"><value>名称</value></data>
+  <data name="NoResults" xml:space="preserve"><value>没有找到符合条件的商品。</value></data>
+  <data name="Previous" xml:space="preserve"><value>上一页</value></data>
+  <data name="Next" xml:space="preserve"><value>下一页</value></data>
+  <data name="InStock" xml:space="preserve"><value>有货</value></data>
+  <data name="OutOfStock" xml:space="preserve"><value>缺货</value></data>
+  <data name="Products" xml:space="preserve"><value>商品</value></data>
+  <data name="Category" xml:space="preserve"><value>分类</value></data>
+  <data name="Sku" xml:space="preserve"><value>SKU</value></data>
+  <data name="Stock" xml:space="preserve"><value>库存</value></data>
+  <data name="InStockCount" xml:space="preserve"><value>有货（{0} 件）</value></data>
+  <data name="Cart" xml:space="preserve"><value>购物车</value></data>
+  <data name="AddToCart" xml:space="preserve"><value>加入购物车</value></data>
+  <data name="ShoppingCart" xml:space="preserve"><value>购物车</value></data>
+  <data name="EmptyCart" xml:space="preserve"><value>购物车是空的，快去挑选心仪的商品吧。</value></data>
+  <data name="ContinueShopping" xml:space="preserve"><value>继续购物</value></data>
+  <data name="UnitPrice" xml:space="preserve"><value>单价</value></data>
+  <data name="Quantity" xml:space="preserve"><value>数量</value></data>
+  <data name="Subtotal" xml:space="preserve"><value>小计</value></data>
+  <data name="Total" xml:space="preserve"><value>合计</value></data>
+  <data name="Remove" xml:space="preserve"><value>移除</value></data>
+  <data name="Update" xml:space="preserve"><value>更新</value></data>
+  <data name="ClearCart" xml:space="preserve"><value>清空购物车</value></data>
+  <data name="ConfirmClearCart" xml:space="preserve"><value>确定要清空购物车吗？</value></data>
+  <data name="CheckoutSoon" xml:space="preserve"><value>去结算（即将上线）</value></data>
+  <data name="StockLimit" xml:space="preserve"><value>库存上限 {0} 件</value></data>
+  <data name="OrderSummary" xml:space="preserve"><value>订单摘要</value></data>
+  <data name="CartItemCount" xml:space="preserve"><value>商品件数</value></data>
+  <data name="AdminLogin" xml:space="preserve"><value>管理员登录</value></data>
+  <data name="Email" xml:space="preserve"><value>邮箱</value></data>
+  <data name="Password" xml:space="preserve"><value>密码</value></data>
+  <data name="RememberMe" xml:space="preserve"><value>记住我</value></data>
+  <data name="LoginHint" xml:space="preserve"><value>默认账号见 README.md（首次登录后请修改密码）</value></data>
+  <data name="AccessDenied" xml:space="preserve"><value>无权访问</value></data>
+  <data name="AccessDeniedMessage" xml:space="preserve"><value>您没有权限访问此页面。</value></data>
+  <data name="BackHome" xml:space="preserve"><value>返回首页</value></data>
+  <data name="PageNotFound" xml:space="preserve"><value>页面不存在</value></data>
+  <data name="ErrorOccurred" xml:space="preserve"><value>出错了</value></data>
+  <data name="PageNotFoundMessage" xml:space="preserve"><value>您访问的页面不存在或已被移除。</value></data>
+  <data name="ErrorOccurredMessage" xml:space="preserve"><value>系统处理请求时发生错误，请稍后再试。</value></data>
+  <data name="RequestId" xml:space="preserve"><value>请求 ID：</value></data>
+  <data name="ManagementConsole" xml:space="preserve"><value>管理后台</value></data>
+  <data name="Dashboard" xml:space="preserve"><value>仪表盘</value></data>
+  <data name="ProductManagement" xml:space="preserve"><value>商品管理</value></data>
+  <data name="CategoryManagement" xml:space="preserve"><value>分类管理</value></data>
+  <data name="BackToStore" xml:space="preserve"><value>返回前台</value></data>
+  <data name="TotalProducts" xml:space="preserve"><value>商品总数</value></data>
+  <data name="ActiveProducts" xml:space="preserve"><value>在售商品</value></data>
+  <data name="LowStock" xml:space="preserve"><value>低库存（&lt;5）</value></data>
+  <data name="CategoryCount" xml:space="preserve"><value>分类数</value></data>
+  <data name="QuickActions" xml:space="preserve"><value>快捷操作</value></data>
+  <data name="AddProduct" xml:space="preserve"><value>新增商品</value></data>
+  <data name="AddCategory" xml:space="preserve"><value>新增分类</value></data>
+  <data name="ManageProducts" xml:space="preserve"><value>管理商品</value></data>
+  <data name="TotalItems" xml:space="preserve"><value>共 {0} 件</value></data>
+  <data name="SearchPlaceholderAdmin" xml:space="preserve"><value>按名称 / SKU 搜索</value></data>
+  <data name="AllCategories" xml:space="preserve"><value>全部分类</value></data>
+  <data name="Image" xml:space="preserve"><value>图片</value></data>
+  <data name="Name" xml:space="preserve"><value>名称</value></data>
+  <data name="Price" xml:space="preserve"><value>价格</value></data>
+  <data name="Status" xml:space="preserve"><value>状态</value></data>
+  <data name="Actions" xml:space="preserve"><value>操作</value></data>
+  <data name="Active" xml:space="preserve"><value>上架</value></data>
+  <data name="Inactive" xml:space="preserve"><value>下架</value></data>
+  <data name="View" xml:space="preserve"><value>查看</value></data>
+  <data name="Edit" xml:space="preserve"><value>编辑</value></data>
+  <data name="Delete" xml:space="preserve"><value>删除</value></data>
+  <data name="ConfirmDeleteProduct" xml:space="preserve"><value>确定删除该商品吗？</value></data>
+  <data name="ConfirmDeleteCategory" xml:space="preserve"><value>确定删除该分类吗？若分类下仍有商品将删除失败。</value></data>
+  <data name="ProductName" xml:space="preserve"><value>商品名称</value></data>
+  <data name="SelectCategory" xml:space="preserve"><value>请选择分类</value></data>
+  <data name="ImageUrl" xml:space="preserve"><value>图片地址</value></data>
+  <data name="Description" xml:space="preserve"><value>商品描述</value></data>
+  <data name="IsActive" xml:space="preserve"><value>上架</value></data>
+  <data name="Save" xml:space="preserve"><value>保存</value></data>
+  <data name="Cancel" xml:space="preserve"><value>取消</value></data>
+  <data name="Back" xml:space="preserve"><value>返回</value></data>
+  <data name="CreateProduct" xml:space="preserve"><value>新增商品</value></data>
+  <data name="EditProduct" xml:space="preserve"><value>编辑商品</value></data>
+  <data name="ProductDetails" xml:space="preserve"><value>商品详情</value></data>
+  <data name="CreatedAt" xml:space="preserve"><value>创建时间</value></data>
+  <data name="DisplayOrder" xml:space="preserve"><value>排序</value></data>
+  <data name="CategoryName" xml:space="preserve"><value>分类名称</value></data>
+  <data name="CategoryDescription" xml:space="preserve"><value>分类描述</value></data>
+  <data name="CreateCategory" xml:space="preserve"><value>新增分类</value></data>
+  <data name="EditCategory" xml:space="preserve"><value>编辑分类</value></data>
+</root>

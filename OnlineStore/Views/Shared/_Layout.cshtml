@@ -1,0 +1,127 @@
+@inject ICategoryService CategoryService
+@{
+    var categories = (await CategoryService.GetAllAsync()).ToList();
+    var isAdmin = User.IsInRole("Admin");
+    var isZh = CultureInfo.CurrentUICulture.Name.StartsWith("zh", StringComparison.OrdinalIgnoreCase);
+    var returnUrl = $"{Context.Request.Path}{Context.Request.QueryString}";
+}
+<!DOCTYPE html>
+<html lang="@CultureInfo.CurrentUICulture.Name">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@(ViewData["Title"] is null ? Loc["Brand"].Value : $"{ViewData["Title"]} - {Loc["Brand"].Value}")</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body class="d-flex flex-column min-vh-100">
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-brand sticky-top">
+            <div class="container">
+                <a class="navbar-brand fw-bold" asp-controller="Home" asp-action="Index">
+                    <i class="bi bi-bag-heart-fill me-1"></i>@Loc["Brand"]
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="mainNav">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item"><a class="nav-link" asp-controller="Home" asp-action="Index">@Loc["Home"]</a></li>
+                        <li class="nav-item"><a class="nav-link" asp-controller="Products" asp-action="Index">@Loc["AllProducts"]</a></li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">@Loc["Categories"]</a>
+                            <ul class="dropdown-menu">
+                                @foreach (var c in categories)
+                                {
+                                    <li><a class="dropdown-item" asp-controller="Products" asp-action="Index" asp-route-categoryId="@c.Id">@c.Name</a></li>
+                                }
+                                @if (categories.Count == 0)
+                                {
+                                    <li><span class="dropdown-item text-muted">@Loc["NoCategories"]</span></li>
+                                }
+                            </ul>
+                        </li>
+                    </ul>
+                    <form asp-controller="Products" asp-action="Index" method="get" class="d-flex me-3 my-2 my-lg-0" role="search">
+                        <input class="form-control me-2" type="search" name="searchTerm" placeholder="@Loc["SearchPlaceholder"]" aria-label="Search" value="@Context.Request.Query["searchTerm"]" />
+                        <button class="btn btn-outline-light" type="submit"><i class="bi bi-search"></i></button>
+                    </form>
+                    <ul class="navbar-nav">
+                        <li class="nav-item d-flex align-items-center me-2">
+                            @await Component.InvokeAsync("CartSummary")
+                        </li>
+                        <li class="nav-item d-flex align-items-center me-2">
+                            <form asp-controller="Language" asp-action="Set" method="post" class="d-inline me-1">
+                                <input type="hidden" name="culture" value="zh-CN" />
+                                <input type="hidden" name="returnUrl" value="@returnUrl" />
+                                <button type="submit" class="btn btn-sm @(isZh ? "btn-light" : "btn-outline-light")" title="中文">中文</button>
+                            </form>
+                            <form asp-controller="Language" asp-action="Set" method="post" class="d-inline">
+                                <input type="hidden" name="culture" value="en" />
+                                <input type="hidden" name="returnUrl" value="@returnUrl" />
+                                <button type="submit" class="btn btn-sm @(isZh ? "btn-outline-light" : "btn-light")" title="English">EN</button>
+                            </form>
+                        </li>
+                        @if (User.Identity?.IsAuthenticated == true)
+                        {
+                            @if (isAdmin)
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-area="Admin" asp-controller="Dashboard" asp-action="Index">
+                                        <i class="bi bi-speedometer2 me-1"></i>@Loc["AdminPanel"]
+                                    </a>
+                                </li>
+                            }
+                            <li class="nav-item">
+                                <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
+                                    <button type="submit" class="btn btn-link nav-link border-0">@Loc["Logout"]</button>
+                                </form>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Account" asp-action="Login"><i class="bi bi-person me-1"></i>@Loc["Login"]</a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="flex-grow-1">
+        @if (TempData["Success"] is string success)
+        {
+            <div class="container mt-3">
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    @success
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            </div>
+        }
+        @if (TempData["Error"] is string error)
+        {
+            <div class="container mt-3">
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    @error
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            </div>
+        }
+        @RenderBody()
+    </main>
+
+    <footer class="footer bg-dark text-light py-4">
+        <div class="container text-center">
+            <p class="mb-1">&copy; @DateTime.Now.Year @Loc["FooterCopyright"]</p>
+            <small class="text-secondary">@Loc["FooterQualities"]</small>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

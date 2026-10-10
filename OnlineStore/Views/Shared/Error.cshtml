@@ -1,0 +1,19 @@
+@model ErrorViewModel
+@{
+    ViewData["Title"] = Loc["ErrorOccurred"].Value;
+    var status = Model.StatusCode;
+    var title = status == 404 ? Loc["PageNotFound"].Value : Loc["ErrorOccurred"].Value;
+    var message = status == 404 ? Loc["PageNotFoundMessage"].Value : Loc["ErrorOccurredMessage"].Value;
+}
+<div class="container text-center py-5">
+    <div class="py-5">
+        <h1 class="display-3 fw-bold text-brand">@(status?.ToString() ?? "Error")</h1>
+        <p class="lead">@title</p>
+        <p class="text-muted">@message</p>
+        <a class="btn btn-primary mt-2" asp-controller="Home" asp-action="Index">@Loc["BackHome"]</a>
+        @if (Model.ShowRequestId)
+        {
+            <p class="small text-muted mt-4">@Loc["RequestId"]@Model.RequestId</p>
+        }
+    </div>
+</div>

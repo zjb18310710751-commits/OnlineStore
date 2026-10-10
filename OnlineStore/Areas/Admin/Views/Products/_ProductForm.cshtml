@@ -1,0 +1,45 @@
+@model ProductFormViewModel
+<div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+<div class="mb-3">
+    <label asp-for="Name" class="form-label">@Loc["ProductName"]</label>
+    <input asp-for="Name" class="form-control" />
+    <span asp-validation-for="Name" class="text-danger small"></span>
+</div>
+<div class="mb-3">
+    <label asp-for="CategoryId" class="form-label">@Loc["Category"]</label>
+    <select asp-for="CategoryId" asp-items="Model.Categories" class="form-select">
+        <option value="">@Loc["SelectCategory"]</option>
+    </select>
+    <span asp-validation-for="CategoryId" class="text-danger small"></span>
+</div>
+<div class="row g-3">
+    <div class="col-md-6 mb-3">
+        <label asp-for="Price" class="form-label">@Loc["Price"]</label>
+        <input asp-for="Price" class="form-control" />
+        <span asp-validation-for="Price" class="text-danger small"></span>
+    </div>
+    <div class="col-md-6 mb-3">
+        <label asp-for="Stock" class="form-label">@Loc["Stock"]</label>
+        <input asp-for="Stock" class="form-control" />
+        <span asp-validation-for="Stock" class="text-danger small"></span>
+    </div>
+</div>
+<div class="mb-3">
+    <label asp-for="Sku" class="form-label">@Loc["Sku"]</label>
+    <input asp-for="Sku" class="form-control" />
+    <span asp-validation-for="Sku" class="text-danger small"></span>
+</div>
+<div class="mb-3">
+    <label asp-for="ImageUrl" class="form-label">@Loc["ImageUrl"]</label>
+    <input asp-for="ImageUrl" class="form-control" placeholder="https://…" />
+    <span asp-validation-for="ImageUrl" class="text-danger small"></span>
+</div>
+<div class="mb-3">
+    <label asp-for="Description" class="form-label">@Loc["Description"]</label>
+    <textarea asp-for="Description" class="form-control" rows="4"></textarea>
+    <span asp-validation-for="Description" class="text-danger small"></span>
+</div>
+<div class="form-check mb-3">
+    <input asp-for="IsActive" class="form-check-input" />
+    <label asp-for="IsActive" class="form-check-label">@Loc["IsActive"]</label>
+</div>

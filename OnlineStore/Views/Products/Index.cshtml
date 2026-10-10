@@ -1,0 +1,111 @@
+@model ProductListViewModel
+@{
+    ViewData["Title"] = Loc["AllProducts"].Value;
+    var q = Model.Query;
+}
+<div class="container py-4">
+    <div class="row">
+        <aside class="col-lg-3 mb-4">
+            <div class="card shadow-sm mb-3">
+                <div class="card-header fw-semibold">@Loc["Categories"]</div>
+                <div class="list-group list-group-flush">
+                    <a class="list-group-item list-group-item-action @(q.CategoryId is null ? "active" : "")"
+                       asp-controller="Products" asp-action="Index"
+                       asp-route-searchTerm="@q.SearchTerm"
+                       asp-route-sortBy="@q.SortBy">@Loc["All"]</a>
+                    @foreach (var c in Model.Categories)
+                    {
+                        <a class="list-group-item list-group-item-action @(q.CategoryId == c.Id ? "active" : "")"
+                           asp-controller="Products" asp-action="Index"
+                           asp-route-categoryId="@c.Id"
+                           asp-route-searchTerm="@q.SearchTerm"
+                           asp-route-sortBy="@q.SortBy">@c.Name</a>
+                    }
+                </div>
+            </div>
+
+            <div class="card shadow-sm">
+                <div class="card-header fw-semibold">@Loc["PriceRange"]</div>
+                <div class="card-body">
+                    <form method="get" asp-controller="Products" asp-action="Index">
+                        <input type="hidden" name="categoryId" value="@q.CategoryId" />
+                        <input type="hidden" name="searchTerm" value="@q.SearchTerm" />
+                        <input type="hidden" name="sortBy" value="@q.SortBy" />
+                        <div class="row g-2 align-items-center">
+                            <div class="col-5">
+                                <input type="number" name="minPrice" class="form-control form-control-sm" placeholder="@Loc["MinPrice"]" value="@q.MinPrice" />
+                            </div>
+                            <div class="col-2 text-center text-muted">—</div>
+                            <div class="col-5">
+                                <input type="number" name="maxPrice" class="form-control form-control-sm" placeholder="@Loc["MaxPrice"]" value="@q.MaxPrice" />
+                            </div>
+                        </div>
+                        <button class="btn btn-primary btn-sm w-100 mt-2" type="submit">@Loc["Filter"]</button>
+                    </form>
+                </div>
+            </div>
+        </aside>
+
+        <div class="col-lg-9">
+            <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                <h1 class="h4 mb-0">@Loc["ItemsCount", Model.TotalItems]</h1>
+                <form method="get" asp-controller="Products" asp-action="Index" class="d-flex align-items-center gap-2">
+                    <input type="hidden" name="categoryId" value="@q.CategoryId" />
+                    <input type="hidden" name="searchTerm" value="@q.SearchTerm" />
+                    <input type="hidden" name="minPrice" value="@q.MinPrice" />
+                    <input type="hidden" name="maxPrice" value="@q.MaxPrice" />
+                    <label class="text-muted small text-nowrap" for="sortBy">@Loc["SortBy"]</label>
+                    <select id="sortBy" name="sortBy" class="form-select form-select-sm" onchange="this.form.submit()">
+                        <option value="newest" selected="@(q.SortBy == "newest" || q.SortBy is null)">@Loc["SortNewest"]</option>
+                        <option value="price_asc" selected="@(q.SortBy == "price_asc")">@Loc["SortPriceAsc"]</option>
+                        <option value="price_desc" selected="@(q.SortBy == "price_desc")">@Loc["SortPriceDesc"]</option>
+                        <option value="name" selected="@(q.SortBy == "name")">@Loc["SortName"]</option>
+                    </select>
+                </form>
+            </div>
+
+            @if (Model.Items.Count == 0)
+            {
+                <div class="alert alert-light border text-center py-5">@Loc["NoResults"]</div>
+            }
+            else
+            {
+                <div class="row row-cols-2 row-cols-md-3 row-cols-xl-4 g-3">
+                    @foreach (var product in Model.Items)
+                    {
+                        <partial name="_ProductCard" model="@product" />
+                    }
+                </div>
+            }
+
+            @if (Model.TotalPages > 1)
+            {
+                <nav class="mt-4">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item @(Model.HasPrevious ? "" : "disabled")">
+                            <a class="page-link" asp-controller="Products" asp-action="Index"
+                               asp-route-categoryId="@q.CategoryId" asp-route-searchTerm="@q.SearchTerm"
+                               asp-route-minPrice="@q.MinPrice" asp-route-maxPrice="@q.MaxPrice"
+                               asp-route-sortBy="@q.SortBy" asp-route-page="@(Model.Page - 1)">@Loc["Previous"]</a>
+                        </li>
+                        @for (var i = 1; i <= Model.TotalPages; i++)
+                        {
+                            <li class="page-item @(i == Model.Page ? "active" : "")">
+                                <a class="page-link" asp-controller="Products" asp-action="Index"
+                                   asp-route-categoryId="@q.CategoryId" asp-route-searchTerm="@q.SearchTerm"
+                                   asp-route-minPrice="@q.MinPrice" asp-route-maxPrice="@q.MaxPrice"
+                                   asp-route-sortBy="@q.SortBy" asp-route-page="@i">@i</a>
+                            </li>
+                        }
+                        <li class="page-item @(Model.HasNext ? "" : "disabled")">
+                            <a class="page-link" asp-controller="Products" asp-action="Index"
+                               asp-route-categoryId="@q.CategoryId" asp-route-searchTerm="@q.SearchTerm"
+                               asp-route-minPrice="@q.MinPrice" asp-route-maxPrice="@q.MaxPrice"
+                               asp-route-sortBy="@q.SortBy" asp-route-page="@(Model.Page + 1)">@Loc["Next"]</a>
+                        </li>
+                    </ul>
+                </nav>
+            }
+        </div>
+    </div>
+</div>

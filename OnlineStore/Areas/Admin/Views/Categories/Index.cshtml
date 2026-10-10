@@ -1,0 +1,41 @@
+@model IReadOnlyList<Category>
+@{
+    ViewData["Title"] = Loc["CategoryManagement"].Value;
+}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h4 mb-0">@Loc["CategoryManagement"]</h1>
+    <a asp-area="Admin" asp-controller="Categories" asp-action="Create" class="btn btn-primary btn-sm"><i class="bi bi-plus-lg me-1"></i>@Loc["AddCategory"]</a>
+</div>
+
+<div class="card shadow-sm">
+    <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+            <tr>
+                <th style="width:80px">@Loc["DisplayOrder"]</th>
+                <th>@Loc["Name"]</th>
+                <th>@Loc["Description"]</th>
+                <th class="text-end">@Loc["Actions"]</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.Count == 0)
+            {
+                <tr><td colspan="4" class="text-center text-muted py-4">@Loc["NoCategories"]</td></tr>
+            }
+            @foreach (var c in Model)
+            {
+                <tr>
+                    <td>@c.DisplayOrder</td>
+                    <td class="fw-semibold">@c.Name</td>
+                    <td class="text-muted">@c.Description</td>
+                    <td class="text-end text-nowrap">
+                        <a asp-area="Admin" asp-controller="Categories" asp-action="Edit" asp-route-id="@c.Id" class="btn btn-sm btn-outline-primary" title="@Loc["Edit"]"><i class="bi bi-pencil"></i></a>
+                        <form asp-area="Admin" asp-controller="Categories" asp-action="Delete" asp-route-id="@c.Id" method="post" class="d-inline" onsubmit="return confirm('@Loc["ConfirmDeleteCategory"]');">
+                            <button type="submit" class="btn btn-sm btn-outline-danger" title="@Loc["Delete"]"><i class="bi bi-trash"></i></button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
