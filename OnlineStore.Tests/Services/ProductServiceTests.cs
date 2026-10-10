@@ -22,15 +22,15 @@ public class ProductServiceTests
 
     private static async Task SeedAsync(ApplicationDbContext context)
     {
-        context.Categories.AddRange(
-            new Category { Id = 1, Name = "电子产品", DisplayOrder = 1 },
-            new Category { Id = 2, Name = "图书", DisplayOrder = 2 });
+        var c1 = new Category { Id = 1, Name = "电子产品", DisplayOrder = 1 };
+        var c2 = new Category { Id = 2, Name = "图书", DisplayOrder = 2 };
+        context.Categories.AddRange(c1, c2);
 
         context.Products.AddRange(
-            new Product { Id = 1, Name = "无线耳机", Price = 299m, Stock = 10, IsActive = true, CategoryId = 1 },
-            new Product { Id = 2, Name = "机械键盘", Price = 459m, Stock = 5, IsActive = true, CategoryId = 1 },
-            new Product { Id = 3, Name = "百年孤独", Price = 55m, Stock = 0, IsActive = true, CategoryId = 2 },
-            new Product { Id = 4, Name = "已下架商品", Price = 999m, Stock = 5, IsActive = false, CategoryId = 1 });
+            new Product { Id = 1, Name = "无线耳机", Price = 299m, Stock = 10, IsActive = true, ShopId = 1, Categories = new List<Category> { c1 } },
+            new Product { Id = 2, Name = "机械键盘", Price = 459m, Stock = 5, IsActive = true, ShopId = 1, Categories = new List<Category> { c1 } },
+            new Product { Id = 3, Name = "百年孤独", Price = 55m, Stock = 0, IsActive = true, ShopId = 1, Categories = new List<Category> { c2 } },
+            new Product { Id = 4, Name = "已下架商品", Price = 999m, Stock = 5, IsActive = false, ShopId = 1, Categories = new List<Category> { c1 } });
 
         await context.SaveChangesAsync();
     }
@@ -58,7 +58,7 @@ public class ProductServiceTests
         var result = await service.GetPagedAsync(new ProductQuery { CategoryId = 1 });
 
         Assert.Equal(2, result.TotalItems);
-        Assert.All(result.Items, p => Assert.Equal(1, p.CategoryId));
+        Assert.All(result.Items, p => Assert.Contains(p.Categories, c => c.Id == 1));
     }
 
     [Fact]

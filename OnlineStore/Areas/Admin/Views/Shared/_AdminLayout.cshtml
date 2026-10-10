@@ -27,19 +27,21 @@
                 <a asp-area="Admin" asp-controller="Dashboard" asp-action="Index" class="admin-nav-link @Active("Dashboard")"><i class="bi bi-speedometer2 me-2"></i>@Loc["Dashboard"]</a>
                 <a asp-area="Admin" asp-controller="Products" asp-action="Index" class="admin-nav-link @Active("Products")"><i class="bi bi-box-seam me-2"></i>@Loc["ProductManagement"]</a>
                 <a asp-area="Admin" asp-controller="Categories" asp-action="Index" class="admin-nav-link @Active("Categories")"><i class="bi bi-tags me-2"></i>@Loc["CategoryManagement"]</a>
+                <a asp-area="Admin" asp-controller="Shops" asp-action="Index" class="admin-nav-link @Active("Shops")"><i class="bi bi-shop me-2"></i>@Loc["ShopManagement"]</a>
+                <a asp-area="Admin" asp-controller="Reviews" asp-action="Index" class="admin-nav-link @Active("Reviews")"><i class="bi bi-chat-square-text me-2"></i>@Loc["ReviewManagement"]</a>
                 <hr />
-                <a asp-controller="Home" asp-action="Index" class="admin-nav-link"><i class="bi bi-shop me-2"></i>@Loc["BackToStore"]</a>
-                <form asp-controller="Account" asp-action="Logout" method="post">
+                <a asp-area="" asp-controller="Home" asp-action="Index" class="admin-nav-link"><i class="bi bi-shop me-2"></i>@Loc["BackToStore"]</a>
+                <form asp-area="Admin" asp-controller="Account" asp-action="Logout" method="post">
                     <button type="submit" class="admin-nav-link w-100 text-start border-0 bg-transparent"><i class="bi bi-box-arrow-right me-2"></i>@Loc["Logout"]</button>
                 </form>
                 <hr />
                 <div class="d-flex gap-1 px-1">
-                    <form asp-controller="Language" asp-action="Set" method="post" class="flex-fill">
+                    <form asp-area="" asp-controller="Language" asp-action="Set" method="post" class="flex-fill">
                         <input type="hidden" name="culture" value="zh-CN" />
                         <input type="hidden" name="returnUrl" value="@returnUrl" />
                         <button type="submit" class="btn btn-sm w-100 @(isZh ? "btn-primary" : "btn-outline-secondary")">中文</button>
                     </form>
-                    <form asp-controller="Language" asp-action="Set" method="post" class="flex-fill">
+                    <form asp-area="" asp-controller="Language" asp-action="Set" method="post" class="flex-fill">
                         <input type="hidden" name="culture" value="en" />
                         <input type="hidden" name="returnUrl" value="@returnUrl" />
                         <button type="submit" class="btn btn-sm w-100 @(isZh ? "btn-outline-secondary" : "btn-primary")">EN</button>

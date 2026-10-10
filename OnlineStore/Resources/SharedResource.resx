@@ -61,6 +61,16 @@
   <data name="Password" xml:space="preserve"><value>密码</value></data>
   <data name="RememberMe" xml:space="preserve"><value>记住我</value></data>
   <data name="LoginHint" xml:space="preserve"><value>默认账号见 README.md（首次登录后请修改密码）</value></data>
+  <data name="Register" xml:space="preserve"><value>注册</value></data>
+  <data name="RegisterTitle" xml:space="preserve"><value>创建账户</value></data>
+  <data name="ConfirmPassword" xml:space="preserve"><value>确认密码</value></data>
+  <data name="FirstName" xml:space="preserve"><value>名</value></data>
+  <data name="LastName" xml:space="preserve"><value>姓</value></data>
+  <data name="Address" xml:space="preserve"><value>地址</value></data>
+  <data name="PhoneNumber" xml:space="preserve"><value>电话号码</value></data>
+  <data name="RegisterHint" xml:space="preserve"><value>密码至少 6 位，须包含大小写字母、数字与特殊字符。</value></data>
+  <data name="NoAccount" xml:space="preserve"><value>还没有账号？</value></data>
+  <data name="HaveAccount" xml:space="preserve"><value>已有账号？</value></data>
   <data name="AccessDenied" xml:space="preserve"><value>无权访问</value></data>
   <data name="AccessDeniedMessage" xml:space="preserve"><value>您没有权限访问此页面。</value></data>
   <data name="BackHome" xml:space="preserve"><value>返回首页</value></data>
@@ -116,4 +126,56 @@
   <data name="CategoryDescription" xml:space="preserve"><value>分类描述</value></data>
   <data name="CreateCategory" xml:space="preserve"><value>新增分类</value></data>
   <data name="EditCategory" xml:space="preserve"><value>编辑分类</value></data>
+  <data name="Shop" xml:space="preserve"><value>店铺</value></data>
+  <data name="SelectShop" xml:space="preserve"><value>请选择店铺</value></data>
+  <data name="ShippingFrom" xml:space="preserve"><value>发货地</value></data>
+  <data name="ShippingFee" xml:space="preserve"><value>邮费</value></data>
+  <data name="DeliveryTime" xml:space="preserve"><value>发货时效</value></data>
+  <data name="MultiSelectHint" xml:space="preserve"><value>按住 Ctrl 键可多选</value></data>
+  <data name="ShopManagement" xml:space="preserve"><value>店铺管理</value></data>
+  <data name="AddShop" xml:space="preserve"><value>新增店铺</value></data>
+  <data name="CreateShop" xml:space="preserve"><value>新增店铺</value></data>
+  <data name="EditShop" xml:space="preserve"><value>编辑店铺</value></data>
+  <data name="NoShops" xml:space="preserve"><value>暂无店铺。</value></data>
+  <data name="ShopName" xml:space="preserve"><value>店铺名称</value></data>
+  <data name="ShopRating" xml:space="preserve"><value>店铺评分</value></data>
+  <data name="SalesCount" xml:space="preserve"><value>销量</value></data>
+  <data name="ShopDescription" xml:space="preserve"><value>店铺简介</value></data>
+  <data name="ConfirmDeleteShop" xml:space="preserve"><value>确定删除该店铺吗？若店铺下仍有商品将删除失败。</value></data>
+  <data name="SkuManagement" xml:space="preserve"><value>规格管理</value></data>
+  <data name="Color" xml:space="preserve"><value>颜色</value></data>
+  <data name="Spec" xml:space="preserve"><value>规格</value></data>
+  <data name="AddSku" xml:space="preserve"><value>添加规格</value></data>
+  <data name="EditSku" xml:space="preserve"><value>编辑规格</value></data>
+  <data name="NoSkus" xml:space="preserve"><value>暂无规格，去添加第一个吧。</value></data>
+  <data name="ConfirmDeleteSku" xml:space="preserve"><value>确定删除该规格吗？</value></data>
+  <data name="SpecManagement" xml:space="preserve"><value>参数管理</value></data>
+  <data name="ParamName" xml:space="preserve"><value>参数名</value></data>
+  <data name="ParamValue" xml:space="preserve"><value>参数值</value></data>
+  <data name="AddSpec" xml:space="preserve"><value>添加参数</value></data>
+  <data name="EditSpec" xml:space="preserve"><value>编辑参数</value></data>
+  <data name="NoSpecs" xml:space="preserve"><value>暂无参数。</value></data>
+  <data name="ConfirmDeleteSpec" xml:space="preserve"><value>确定删除该参数吗？</value></data>
+  <data name="ReviewManagement" xml:space="preserve"><value>评价管理</value></data>
+  <data name="Reviews" xml:space="preserve"><value>用户评价</value></data>
+  <data name="Rating" xml:space="preserve"><value>评分</value></data>
+  <data name="LoginToReview" xml:space="preserve"><value>后可发表评价</value></data>
+  <data name="UserName" xml:space="preserve"><value>昵称</value></data>
+  <data name="NoReviews" xml:space="preserve"><value>暂无评价。</value></data>
+  <data name="ConfirmDeleteReview" xml:space="preserve"><value>确定删除该评价吗？</value></data>
+  <data name="Parameters" xml:space="preserve"><value>产品参数</value></data>
+  <data name="WriteReview" xml:space="preserve"><value>写评价</value></data>
+  <data name="SubmitReview" xml:space="preserve"><value>提交评价</value></data>
+  <data name="ReviewComment" xml:space="preserve"><value>评价内容</value></data>
+  <data name="YourRating" xml:space="preserve"><value>您的评分</value></data>
+  <data name="BackToProduct" xml:space="preserve"><value>返回商品</value></data>
+  <data name="StockLeft" xml:space="preserve"><value>库存 {0} 件</value></data>
+  <data name="Delivery" xml:space="preserve"><value>发货</value></data>
+  <data name="SoldCount" xml:space="preserve"><value>已售 {0} 件</value></data>
+  <data name="VisitShop" xml:space="preserve"><value>进店逛逛</value></data>
+  <data name="BuyNow" xml:space="preserve"><value>立即购买</value></data>
+  <data name="SelectSku" xml:space="preserve"><value>请选择规格</value></data>
+  <data name="ProductCount" xml:space="preserve"><value>{0} 件商品</value></data>
+  <data name="ManageSku" xml:space="preserve"><value>规格</value></data>
+  <data name="ManageSpec" xml:space="preserve"><value>参数</value></data>
 </root>

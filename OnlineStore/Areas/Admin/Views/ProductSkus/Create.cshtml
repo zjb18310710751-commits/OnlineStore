@@ -1,0 +1,13 @@
+@model ProductSku
+@{
+    var product = (Product)ViewBag.Product;
+    ViewData["Title"] = Loc["AddSku"].Value;
+}
+<h1 class="h5 mb-4">@Loc["AddSku"] <span class="text-muted">· @product.Name</span></h1>
+<form asp-action="Create" method="post" class="card card-body shadow-sm">
+    <partial name="_SkuForm" model="Model" />
+    <div>
+        <button type="submit" class="btn btn-primary">@Loc["Save"]</button>
+        <a asp-action="Index" asp-route-productId="@product.Id" class="btn btn-outline-secondary">@Loc["Cancel"]</a>
+    </div>
+</form>

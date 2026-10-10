@@ -21,26 +21,26 @@ public class CartController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Add(int productId, int quantity = 1, string? returnUrl = null)
+    public async Task<IActionResult> Add(int productId, int quantity = 1, int? skuId = null, string? returnUrl = null)
     {
-        await _cartService.AddAsync(productId, quantity);
+        await _cartService.AddAsync(productId, quantity, skuId);
         TempData["Success"] = "已加入购物车。";
         return RedirectToLocal(returnUrl) ?? RedirectToAction("Index", "Products");
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Update(int productId, int quantity)
+    public async Task<IActionResult> Update(int productId, int? skuId, int quantity)
     {
-        await _cartService.UpdateAsync(productId, quantity);
+        await _cartService.UpdateAsync(productId, skuId, quantity);
         return RedirectToAction(nameof(Index));
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Remove(int productId)
+    public async Task<IActionResult> Remove(int productId, int? skuId)
     {
-        await _cartService.RemoveAsync(productId);
+        await _cartService.RemoveAsync(productId, skuId);
         return RedirectToAction(nameof(Index));
     }
 

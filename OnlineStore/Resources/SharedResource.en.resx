@@ -61,6 +61,16 @@
   <data name="Password" xml:space="preserve"><value>Password</value></data>
   <data name="RememberMe" xml:space="preserve"><value>Remember me</value></data>
   <data name="LoginHint" xml:space="preserve"><value>Default account: see README.md (change password after first login)</value></data>
+  <data name="Register" xml:space="preserve"><value>Register</value></data>
+  <data name="RegisterTitle" xml:space="preserve"><value>Create Account</value></data>
+  <data name="ConfirmPassword" xml:space="preserve"><value>Confirm password</value></data>
+  <data name="FirstName" xml:space="preserve"><value>First name</value></data>
+  <data name="LastName" xml:space="preserve"><value>Last name</value></data>
+  <data name="Address" xml:space="preserve"><value>Address</value></data>
+  <data name="PhoneNumber" xml:space="preserve"><value>Phone number</value></data>
+  <data name="RegisterHint" xml:space="preserve"><value>Password: at least 6 chars with upper/lowercase letters, a digit and a symbol.</value></data>
+  <data name="NoAccount" xml:space="preserve"><value>Don't have an account?</value></data>
+  <data name="HaveAccount" xml:space="preserve"><value>Already have an account?</value></data>
   <data name="AccessDenied" xml:space="preserve"><value>Access Denied</value></data>
   <data name="AccessDeniedMessage" xml:space="preserve"><value>You do not have permission to access this page.</value></data>
   <data name="BackHome" xml:space="preserve"><value>Back to Home</value></data>
@@ -116,4 +126,56 @@
   <data name="CategoryDescription" xml:space="preserve"><value>Category Description</value></data>
   <data name="CreateCategory" xml:space="preserve"><value>Create Category</value></data>
   <data name="EditCategory" xml:space="preserve"><value>Edit Category</value></data>
+  <data name="Shop" xml:space="preserve"><value>Shop</value></data>
+  <data name="SelectShop" xml:space="preserve"><value>Select a shop</value></data>
+  <data name="ShippingFrom" xml:space="preserve"><value>Ships from</value></data>
+  <data name="ShippingFee" xml:space="preserve"><value>Shipping fee</value></data>
+  <data name="DeliveryTime" xml:space="preserve"><value>Delivery time</value></data>
+  <data name="MultiSelectHint" xml:space="preserve"><value>Hold Ctrl to select multiple</value></data>
+  <data name="ShopManagement" xml:space="preserve"><value>Shops</value></data>
+  <data name="AddShop" xml:space="preserve"><value>Add shop</value></data>
+  <data name="CreateShop" xml:space="preserve"><value>Create shop</value></data>
+  <data name="EditShop" xml:space="preserve"><value>Edit shop</value></data>
+  <data name="NoShops" xml:space="preserve"><value>No shops yet.</value></data>
+  <data name="ShopName" xml:space="preserve"><value>Shop name</value></data>
+  <data name="ShopRating" xml:space="preserve"><value>Rating</value></data>
+  <data name="SalesCount" xml:space="preserve"><value>Sales</value></data>
+  <data name="ShopDescription" xml:space="preserve"><value>Description</value></data>
+  <data name="ConfirmDeleteShop" xml:space="preserve"><value>Delete this shop? It will fail if products still exist.</value></data>
+  <data name="SkuManagement" xml:space="preserve"><value>Variants</value></data>
+  <data name="Color" xml:space="preserve"><value>Color</value></data>
+  <data name="Spec" xml:space="preserve"><value>Spec</value></data>
+  <data name="AddSku" xml:space="preserve"><value>Add variant</value></data>
+  <data name="EditSku" xml:space="preserve"><value>Edit variant</value></data>
+  <data name="NoSkus" xml:space="preserve"><value>No variants yet.</value></data>
+  <data name="ConfirmDeleteSku" xml:space="preserve"><value>Delete this variant?</value></data>
+  <data name="SpecManagement" xml:space="preserve"><value>Specifications</value></data>
+  <data name="ParamName" xml:space="preserve"><value>Name</value></data>
+  <data name="ParamValue" xml:space="preserve"><value>Value</value></data>
+  <data name="AddSpec" xml:space="preserve"><value>Add spec</value></data>
+  <data name="EditSpec" xml:space="preserve"><value>Edit spec</value></data>
+  <data name="NoSpecs" xml:space="preserve"><value>No specifications yet.</value></data>
+  <data name="ConfirmDeleteSpec" xml:space="preserve"><value>Delete this specification?</value></data>
+  <data name="ReviewManagement" xml:space="preserve"><value>Reviews</value></data>
+  <data name="Reviews" xml:space="preserve"><value>Reviews</value></data>
+  <data name="Rating" xml:space="preserve"><value>Rating</value></data>
+  <data name="LoginToReview" xml:space="preserve"><value>to write a review</value></data>
+  <data name="UserName" xml:space="preserve"><value>User</value></data>
+  <data name="NoReviews" xml:space="preserve"><value>No reviews yet.</value></data>
+  <data name="ConfirmDeleteReview" xml:space="preserve"><value>Delete this review?</value></data>
+  <data name="Parameters" xml:space="preserve"><value>Specifications</value></data>
+  <data name="WriteReview" xml:space="preserve"><value>Write a review</value></data>
+  <data name="SubmitReview" xml:space="preserve"><value>Submit</value></data>
+  <data name="ReviewComment" xml:space="preserve"><value>Comment</value></data>
+  <data name="YourRating" xml:space="preserve"><value>Your rating</value></data>
+  <data name="BackToProduct" xml:space="preserve"><value>Back to product</value></data>
+  <data name="StockLeft" xml:space="preserve"><value>{0} in stock</value></data>
+  <data name="Delivery" xml:space="preserve"><value>Delivery</value></data>
+  <data name="SoldCount" xml:space="preserve"><value>{0} sold</value></data>
+  <data name="VisitShop" xml:space="preserve"><value>Visit shop</value></data>
+  <data name="BuyNow" xml:space="preserve"><value>Buy now</value></data>
+  <data name="SelectSku" xml:space="preserve"><value>Select a variant</value></data>
+  <data name="ProductCount" xml:space="preserve"><value>{0} products</value></data>
+  <data name="ManageSku" xml:space="preserve"><value>Variants</value></data>
+  <data name="ManageSpec" xml:space="preserve"><value>Specs</value></data>
 </root>

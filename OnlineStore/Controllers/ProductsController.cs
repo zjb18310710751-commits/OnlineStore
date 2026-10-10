@@ -22,7 +22,7 @@ public class ProductsController : Controller
 
     public async Task<IActionResult> Details(int id)
     {
-        var product = await _productService.GetByIdWithCategoryAsync(id);
+        var product = await _productService.GetByIdWithDetailsAsync(id);
         if (product is null || !product.IsActive)
         {
             return NotFound();

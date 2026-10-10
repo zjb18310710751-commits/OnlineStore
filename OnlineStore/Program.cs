@@ -41,6 +41,10 @@ builder.Services.ConfigureApplicationCookie(options =>
 // 业务服务（通过接口注入，便于替换与测试 —— 可修改性）
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<IShopService, ShopService>();
+builder.Services.AddScoped<IProductSkuService, ProductSkuService>();
+builder.Services.AddScoped<IProductSpecService, ProductSpecService>();
+builder.Services.AddScoped<IReviewService, ReviewService>();
 builder.Services.AddScoped<ICartStore, SessionCartStore>();
 builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<IImageStorageService, ImageStorageService>();

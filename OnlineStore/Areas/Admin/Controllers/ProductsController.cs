@@ -15,15 +15,18 @@ public class ProductsController : Controller
 
     private readonly IProductService _productService;
     private readonly ICategoryService _categoryService;
+    private readonly IShopService _shopService;
     private readonly IImageStorageService _imageStorage;
 
     public ProductsController(
         IProductService productService,
         ICategoryService categoryService,
+        IShopService shopService,
         IImageStorageService imageStorage)
     {
         _productService = productService;
         _categoryService = categoryService;
+        _shopService = shopService;
         _imageStorage = imageStorage;
     }
 
@@ -46,7 +49,7 @@ public class ProductsController : Controller
     public async Task<IActionResult> Create()
     {
         var vm = new ProductFormViewModel { IsActive = true };
-        await PopulateCategoriesAsync(vm);
+        await PopulateFormAsync(vm);
         return View(vm);
     }
 
@@ -56,7 +59,7 @@ public class ProductsController : Controller
     {
         if (!ModelState.IsValid)
         {
-            await PopulateCategoriesAsync(vm);
+            await PopulateFormAsync(vm);
             return View(vm);
         }
 
@@ -70,7 +73,10 @@ public class ProductsController : Controller
             Sku = vm.Sku,
             ImageUrl = vm.ImageUrl,
             IsActive = vm.IsActive,
-            CategoryId = vm.CategoryId
+            ShopId = vm.ShopId,
+            ShippingFrom = vm.ShippingFrom,
+            ShippingFee = vm.ShippingFee,
+            DeliveryTime = vm.DeliveryTime
         };
 
         // 若上传了图片，则覆盖表单中的图片地址
@@ -83,11 +89,12 @@ public class ProductsController : Controller
             catch (InvalidOperationException ex)
             {
                 ModelState.AddModelError(nameof(vm.ImageFile), ex.Message);
-                await PopulateCategoriesAsync(vm);
+                await PopulateFormAsync(vm);
                 return View(vm);
             }
         }
 
+        await _productService.SetCategoriesAsync(product, vm.CategoryIds);
         await _productService.CreateAsync(product);
         TempData["Success"] = "商品已创建。";
         return RedirectToAction(nameof(Index));
@@ -102,6 +109,7 @@ public class ProductsController : Controller
             return NotFound();
         }
 
+        var categories = await _productService.GetCategoriesAsync(id);
         var vm = new ProductFormViewModel
         {
             Id = product.Id,
@@ -112,10 +120,14 @@ public class ProductsController : Controller
             Sku = product.Sku,
             ImageUrl = product.ImageUrl,
             IsActive = product.IsActive,
-            CategoryId = product.CategoryId
+            ShopId = product.ShopId,
+            CategoryIds = categories.Select(c => c.Id).ToList(),
+            ShippingFrom = product.ShippingFrom,
+            ShippingFee = product.ShippingFee,
+            DeliveryTime = product.DeliveryTime
         };
 
-        await PopulateCategoriesAsync(vm);
+        await PopulateFormAsync(vm);
         return View(vm);
     }
 
@@ -136,7 +148,7 @@ public class ProductsController : Controller
 
         if (!ModelState.IsValid)
         {
-            await PopulateCategoriesAsync(vm);
+            await PopulateFormAsync(vm);
             return View(vm);
         }
 
@@ -148,7 +160,10 @@ public class ProductsController : Controller
         product.Sku = vm.Sku;
         product.ImageUrl = vm.ImageUrl;
         product.IsActive = vm.IsActive;
-        product.CategoryId = vm.CategoryId;
+        product.ShopId = vm.ShopId;
+        product.ShippingFrom = vm.ShippingFrom;
+        product.ShippingFee = vm.ShippingFee;
+        product.DeliveryTime = vm.DeliveryTime;
 
         // 若上传了新图片，保存成功后清理被替换的旧本地图片
         if (vm.ImageFile is { Length: > 0 })
@@ -162,11 +177,12 @@ public class ProductsController : Controller
             catch (InvalidOperationException ex)
             {
                 ModelState.AddModelError(nameof(vm.ImageFile), ex.Message);
-                await PopulateCategoriesAsync(vm);
+                await PopulateFormAsync(vm);
                 return View(vm);
             }
         }
 
+        await _productService.SetCategoriesAsync(product, vm.CategoryIds);
         await _productService.UpdateAsync(product);
         TempData["Success"] = "商品已更新。";
         return RedirectToAction(nameof(Index));
@@ -183,7 +199,7 @@ public class ProductsController : Controller
 
     public async Task<IActionResult> Details(int id)
     {
-        var product = await _productService.GetByIdWithCategoryAsync(id);
+        var product = await _productService.GetByIdWithDetailsAsync(id);
         if (product is null)
         {
             return NotFound();
@@ -192,8 +208,11 @@ public class ProductsController : Controller
         return View(product);
     }
 
-    private async Task PopulateCategoriesAsync(ProductFormViewModel vm)
+    private async Task PopulateFormAsync(ProductFormViewModel vm)
     {
+        var shops = await _shopService.GetAllAsync();
+        vm.Shops = shops.Select(s => new SelectListItem(s.Name, s.Id.ToString()));
+
         var categories = await _categoryService.GetAllAsync();
         vm.Categories = categories.Select(c => new SelectListItem(c.Name, c.Id.ToString()));
     }

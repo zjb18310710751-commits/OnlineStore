@@ -12,7 +12,7 @@
             }
         </a>
         <div class="card-body d-flex flex-column">
-            <span class="category-badge text-uppercase">@Model.Category?.Name</span>
+            <span class="category-badge text-uppercase">@(Model.Categories.FirstOrDefault()?.Name)</span>
             <h5 class="card-title fs-6">
                 <a asp-controller="Products" asp-action="Details" asp-route-id="@Model.Id" class="product-link">@Model.Name</a>
             </h5>

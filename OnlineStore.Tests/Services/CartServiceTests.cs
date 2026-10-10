@@ -45,7 +45,7 @@ public class CartServiceTests
     public async Task AddAsync_AddsNewItem_WithCorrectTotals()
     {
         using var context = await CreateSeededContextAsync();
-        var cartService = new CartService(new FakeCartStore(), new ProductService(context));
+        var cartService = new CartService(new FakeCartStore(), new ProductService(context), new ProductSkuService(context));
 
         await cartService.AddAsync(1, 2);
 
@@ -61,7 +61,7 @@ public class CartServiceTests
     public async Task AddAsync_IncrementsExistingItem_AndRespectsStock()
     {
         using var context = await CreateSeededContextAsync();
-        var cartService = new CartService(new FakeCartStore(), new ProductService(context));
+        var cartService = new CartService(new FakeCartStore(), new ProductService(context), new ProductSkuService(context));
 
         await cartService.AddAsync(1, 3); // 库存 5，加 3
         await cartService.AddAsync(1, 3); // 再累加应被库存上限截断
@@ -75,7 +75,7 @@ public class CartServiceTests
     public async Task AddAsync_IgnoresOutOfStockOrInactiveProduct()
     {
         using var context = await CreateSeededContextAsync();
-        var cartService = new CartService(new FakeCartStore(), new ProductService(context));
+        var cartService = new CartService(new FakeCartStore(), new ProductService(context), new ProductSkuService(context));
 
         await cartService.AddAsync(2); // 缺货
         await cartService.AddAsync(3); // 已下架
@@ -87,10 +87,10 @@ public class CartServiceTests
     public async Task UpdateAsync_UpdatesQuantity()
     {
         using var context = await CreateSeededContextAsync();
-        var cartService = new CartService(new FakeCartStore(), new ProductService(context));
+        var cartService = new CartService(new FakeCartStore(), new ProductService(context), new ProductSkuService(context));
 
         await cartService.AddAsync(1, 1);
-        await cartService.UpdateAsync(1, 4);
+        await cartService.UpdateAsync(1, null, 4);
 
         var cart = await cartService.GetCartAsync();
         Assert.Equal(4, cart.Items[0].Quantity);
@@ -100,10 +100,10 @@ public class CartServiceTests
     public async Task UpdateAsync_RemovesItem_WhenQuantityIsZero()
     {
         using var context = await CreateSeededContextAsync();
-        var cartService = new CartService(new FakeCartStore(), new ProductService(context));
+        var cartService = new CartService(new FakeCartStore(), new ProductService(context), new ProductSkuService(context));
 
         await cartService.AddAsync(1, 1);
-        await cartService.UpdateAsync(1, 0);
+        await cartService.UpdateAsync(1, null, 0);
 
         Assert.Empty((await cartService.GetCartAsync()).Items);
     }
@@ -112,10 +112,10 @@ public class CartServiceTests
     public async Task RemoveAsync_RemovesItem()
     {
         using var context = await CreateSeededContextAsync();
-        var cartService = new CartService(new FakeCartStore(), new ProductService(context));
+        var cartService = new CartService(new FakeCartStore(), new ProductService(context), new ProductSkuService(context));
 
         await cartService.AddAsync(1, 1);
-        await cartService.RemoveAsync(1);
+        await cartService.RemoveAsync(1, null);
 
         Assert.Empty((await cartService.GetCartAsync()).Items);
     }
@@ -124,7 +124,7 @@ public class CartServiceTests
     public async Task ClearAsync_EmptiesCart()
     {
         using var context = await CreateSeededContextAsync();
-        var cartService = new CartService(new FakeCartStore(), new ProductService(context));
+        var cartService = new CartService(new FakeCartStore(), new ProductService(context), new ProductSkuService(context));
 
         await cartService.AddAsync(1, 2);
         await cartService.ClearAsync();

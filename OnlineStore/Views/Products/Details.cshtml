@@ -1,62 +1,256 @@
 @model Product
 @{
     ViewData["Title"] = Model.Name;
+    var skus = Model.Skus.Where(s => s.IsActive).ToList();
+    var colors = skus.Select(s => s.Color).Where(c => !string.IsNullOrWhiteSpace(c)).Distinct().ToList();
+    var specs = skus.Select(s => s.Spec).Where(s => !string.IsNullOrWhiteSpace(s)).Distinct().ToList();
+    var reviews = Model.Reviews.OrderByDescending(r => r.CreatedAt).ToList();
+    var avgRating = reviews.Count > 0 ? Math.Round(reviews.Average(r => r.Rating), 1) : 0;
+    var hasSku = skus.Count > 0;
+    var skusJson = System.Text.Json.JsonSerializer.Serialize(
+        skus.Select(s => new { s.Id, s.Color, s.Spec, s.Price, s.Stock, s.ImageUrl }));
 }
 <div class="container py-4">
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb mb-0">
             <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">@Loc["Home"]</a></li>
             <li class="breadcrumb-item"><a asp-controller="Products" asp-action="Index">@Loc["Products"]</a></li>
-            @if (Model.Category is not null)
+            @foreach (var c in Model.Categories)
             {
-                <li class="breadcrumb-item"><a asp-controller="Products" asp-action="Index" asp-route-categoryId="@Model.Category.Id">@Model.Category.Name</a></li>
+                <li class="breadcrumb-item"><a asp-controller="Products" asp-action="Index" asp-route-categoryId="@c.Id">@c.Name</a></li>
             }
             <li class="breadcrumb-item active" aria-current="page">@Model.Name</li>
         </ol>
     </nav>
 
     <div class="row g-4">
-        <div class="col-md-6">
-            <div class="product-detail-thumb d-flex align-items-center justify-content-center">
-                @if (!string.IsNullOrEmpty(Model.ImageUrl))
-                {
-                    <img src="@Model.ImageUrl" class="img-fluid" alt="@Model.Name" />
-                }
-                else
-                {
-                    <i class="bi bi-image product-thumb-placeholder"></i>
-                }
+        <div class="col-lg-4 order-lg-2">
+            <div class="card shadow-sm mb-3">
+                <div class="card-body">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="shop-avatar"><i class="bi bi-shop"></i></div>
+                        <div>
+                            <div class="fw-semibold">@(Model.Shop?.Name ?? "—")</div>
+                            <div class="text-warning small">
+                                @(new string('★', (int)Math.Round(Model.Shop?.Rating ?? 0)))
+                                <span class="text-dark ms-1">@(Model.Shop?.Rating.ToString("0.0") ?? "—")</span>
+                            </div>
+                            <div class="text-muted small">@Loc["SoldCount", Model.Shop?.SalesCount ?? 0]</div>
+                        </div>
+                    </div>
+                    @if (!string.IsNullOrEmpty(Model.Shop?.Description))
+                    {
+                        <p class="text-muted small mt-2 mb-2">@Model.Shop.Description</p>
+                    }
+                    <button class="btn btn-sm btn-outline-primary w-100" disabled>@Loc["VisitShop"]</button>
+                </div>
+            </div>
+
+            <div class="card shadow-sm">
+                <div class="card-header bg-white fw-semibold">@Loc["Parameters"]</div>
+                <div class="card-body">
+                    @if (Model.Specs.Count == 0)
+                    {
+                        <span class="text-muted small">@Loc["NoSpecs"]</span>
+                    }
+                    else
+                    {
+                        <dl class="mb-0">
+                            @foreach (var s in Model.Specs.OrderBy(x => x.DisplayOrder))
+                            {
+                                <div class="spec-row"><dt>@s.Name</dt><dd>@s.Value</dd></div>
+                            }
+                        </dl>
+                    }
+                </div>
             </div>
         </div>
-        <div class="col-md-6">
-            <h1 class="h3">@Model.Name</h1>
-            <p class="text-muted">@Loc["Category"]：@Model.Category?.Name · @Loc["Sku"]：@(Model.Sku ?? "—")</p>
-            <div class="price fs-2 fw-bold my-3">¥@Model.Price.ToString("F2")</div>
-            <p class="mb-1">
-                @Loc["Stock"]：
-                <span class="badge @(Model.Stock > 0 ? "bg-success-subtle text-success" : "bg-danger-subtle text-danger")">
-                    @(Model.Stock > 0 ? Loc["InStockCount", Model.Stock].Value : Loc["OutOfStock"].Value)
-                </span>
-            </p>
-            <hr />
-            <p class="text-secondary">@Model.Description</p>
-            @if (Model.Stock > 0)
-            {
-                <form asp-controller="Cart" asp-action="Add" method="post" class="d-flex flex-wrap gap-2 align-items-stretch">
-                    <input type="hidden" name="productId" value="@Model.Id" />
-                    <input type="hidden" name="returnUrl" value="@($"{Context.Request.Path}{Context.Request.QueryString}")" />
-                    <div class="input-group" style="max-width: 150px;">
-                        <button type="button" class="btn btn-outline-secondary" onclick="stepQty(this, -1)"><i class="bi bi-dash"></i></button>
-                        <input type="number" name="quantity" id="detailQty" class="form-control text-center" value="1" min="1" max="@Model.Stock" aria-label="@Loc["Quantity"].Value" />
-                        <button type="button" class="btn btn-outline-secondary" onclick="stepQty(this, 1)"><i class="bi bi-plus"></i></button>
+
+        <div class="col-lg-8 order-lg-1">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <div class="product-detail-thumb d-flex align-items-center justify-content-center">
+                                @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                                {
+                                    <img id="mainImage" src="@Model.ImageUrl" alt="@Model.Name" />
+                                }
+                                else
+                                {
+                                    <i class="bi bi-image" style="font-size:5rem;color:#cbd2dc"></i>
+                                }
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h1 class="h5 mb-2">@Model.Name</h1>
+                            <div class="d-flex align-items-baseline gap-2 mb-1">
+                                <span class="fs-3 fw-bold text-danger">¥<span id="priceText">@Model.Price.ToString("F2")</span></span>
+                                <span class="text-muted small">@Loc["SoldCount", Model.Shop?.SalesCount ?? 0]</span>
+                            </div>
+                            <div class="text-muted small mb-3" id="stockText">@Loc["StockLeft", Model.Stock]</div>
+
+                            <div class="mb-2">
+                                @foreach (var c in Model.Categories)
+                                {
+                                    <a asp-controller="Products" asp-action="Index" asp-route-categoryId="@c.Id" class="badge bg-light text-dark text-decoration-none me-1">@c.Name</a>
+                                }
+                            </div>
+
+                            <div class="shipping-box small text-muted mb-3">
+                                <i class="bi bi-truck me-1"></i>@Loc["Delivery"]：@(Model.ShippingFrom ?? "—") · @(Model.ShippingFee ?? "—") · @(Model.DeliveryTime ?? "—")
+                            </div>
+
+                            @if (hasSku)
+                            {
+                                <div class="mb-2">
+                                    <div class="sku-label">@Loc["Color"]</div>
+                                    <div class="d-flex flex-wrap gap-2">
+                                        @foreach (var c in colors)
+                                        {
+                                            <button type="button" class="sku-chip" data-dim="color" data-value="@c">@c</button>
+                                        }
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <div class="sku-label">@Loc["Spec"]</div>
+                                    <div class="d-flex flex-wrap gap-2">
+                                        @foreach (var s in specs)
+                                        {
+                                            <button type="button" class="sku-chip" data-dim="spec" data-value="@s">@s</button>
+                                        }
+                                    </div>
+                                </div>
+                            }
+
+                            <div class="mb-3">
+                                <div class="sku-label">@Loc["Quantity"]</div>
+                                <div class="input-group" style="max-width:150px;">
+                                    <button type="button" class="btn btn-outline-secondary" onclick="stepQty(this,-1)"><i class="bi bi-dash"></i></button>
+                                    <input id="qty" type="number" class="form-control text-center" value="1" min="1" max="@Model.Stock" aria-label="@Loc["Quantity"].Value" />
+                                    <button type="button" class="btn btn-outline-secondary" onclick="stepQty(this,1)"><i class="bi bi-plus"></i></button>
+                                </div>
+                            </div>
+
+                            <form asp-controller="Cart" asp-action="Add" method="post" class="d-flex gap-2">
+                                <input type="hidden" name="productId" value="@Model.Id" />
+                                <input type="hidden" name="skuId" id="skuIdInput" value="" />
+                                <input type="hidden" name="returnUrl" value="@($"{Context.Request.Path}{Context.Request.QueryString}")" />
+                                <button type="submit" class="btn btn-danger btn-lg flex-grow-1"><i class="bi bi-cart-plus me-1"></i>@Loc["AddToCart"]</button>
+                                <button type="button" class="btn btn-outline-danger btn-lg" disabled>@Loc["BuyNow"]</button>
+                            </form>
+                        </div>
                     </div>
-                    <button type="submit" class="btn btn-primary btn-lg flex-grow-1"><i class="bi bi-cart-plus me-1"></i>@Loc["AddToCart"]</button>
-                </form>
-            }
-            else
-            {
-                <button class="btn btn-secondary btn-lg" disabled>@Loc["OutOfStock"]</button>
-            }
+                </div>
+            </div>
+
+            <div class="card shadow-sm">
+                <div class="card-header bg-white fw-semibold">
+                    @Loc["Reviews"]
+                    @if (reviews.Count > 0)
+                    {
+                        <span class="text-warning ms-1">@(new string('★', (int)Math.Round(avgRating)))</span>
+                        <span class="text-muted small ms-1">@avgRating.ToString("0.0")（@reviews.Count）</span>
+                    }
+                </div>
+                <div class="card-body">
+                    @if (reviews.Count == 0)
+                    {
+                        <p class="text-muted mb-0">@Loc["NoReviews"]</p>
+                    }
+                    else
+                    {
+                        <ul class="list-unstyled mb-0">
+                            @foreach (var r in reviews)
+                            {
+                                <li class="review-item py-3 @(r != reviews.First() ? "border-top" : "")">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span class="fw-semibold">@r.UserName</span>
+                                        <span class="text-muted small">@r.CreatedAt.ToLocalTime().ToString("yyyy-MM-dd")</span>
+                                    </div>
+                                    <div class="text-warning small">@(new string('★', r.Rating))</div>
+                                    @if (!string.IsNullOrEmpty(r.Comment))
+                                    {
+                                        <p class="mb-0 text-secondary">@r.Comment</p>
+                                    }
+                                </li>
+                            }
+                        </ul>
+                    }
+
+                    @if (User.Identity?.IsAuthenticated == true)
+                    {
+                        <form asp-controller="Reviews" asp-action="Create" method="post" class="border-top pt-3 mt-3">
+                            <input type="hidden" name="productId" value="@Model.Id" />
+                            <div class="mb-2">
+                                <label class="form-label small fw-semibold">@Loc["YourRating"]</label>
+                                <select name="rating" class="form-select form-select-sm" style="max-width:140px;">
+                                    <option value="5">★★★★★</option>
+                                    <option value="4">★★★★</option>
+                                    <option value="3">★★★</option>
+                                    <option value="2">★★</option>
+                                    <option value="1">★</option>
+                                </select>
+                            </div>
+                            <div class="mb-2">
+                                <textarea name="comment" class="form-control" rows="3" placeholder="说说你的使用感受…"></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-sm">@Loc["SubmitReview"]</button>
+                        </form>
+                    }
+                    else
+                    {
+                        <p class="text-muted small mb-0 mt-3"><a asp-controller="Account" asp-action="Login">@Loc["Login"]</a> @Loc["LoginToReview"]</p>
+                    }
+                </div>
+            </div>
         </div>
     </div>
 </div>
+
+@section Scripts {
+    @if (hasSku)
+    {
+        <script>
+            (function () {
+                const skus = @Html.Raw(skusJson);
+                const stockTemplate = '@Loc["StockLeft"].Value';
+                let selectedColor = null, selectedSpec = null;
+
+                const priceEl = document.getElementById('priceText');
+                const stockEl = document.getElementById('stockText');
+                const mainImg = document.getElementById('mainImage');
+                const skuInput = document.getElementById('skuIdInput');
+                const qtyInput = document.getElementById('qty');
+
+                function findSku() {
+                    return skus.find(s => s.Color === selectedColor && s.Spec === selectedSpec) || null;
+                }
+                function refresh() {
+                    const sku = findSku();
+                    if (sku) {
+                        priceEl.textContent = sku.Price.toFixed(2);
+                        stockEl.textContent = stockTemplate.replace('{0}', sku.Stock);
+                        skuInput.value = sku.Id;
+                        qtyInput.max = sku.Stock;
+                        if (sku.ImageUrl && mainImg) mainImg.src = sku.ImageUrl;
+                    }
+                }
+                document.querySelectorAll('.sku-chip').forEach(chip => {
+                    chip.addEventListener('click', () => {
+                        const dim = chip.dataset.dim, val = chip.dataset.value;
+                        if (dim === 'color') selectedColor = val; else selectedSpec = val;
+                        document.querySelectorAll('.sku-chip[data-dim="' + dim + '"]').forEach(c => c.classList.remove('active'));
+                        chip.classList.add('active');
+                        refresh();
+                    });
+                });
+                // 默认选中第一组颜色+规格
+                const firstColor = document.querySelector('.sku-chip[data-dim="color"]');
+                const firstSpec = document.querySelector('.sku-chip[data-dim="spec"]');
+                if (firstColor) firstColor.click();
+                if (firstSpec) firstSpec.click();
+            })();
+        </script>
+    }
+}

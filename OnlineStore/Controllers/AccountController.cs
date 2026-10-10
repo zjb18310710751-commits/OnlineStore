@@ -26,6 +26,13 @@ public class AccountController : Controller
             return RedirectToAction("Index", "Home");
         }
 
+        // 后台地址的登录请求，引导到后台专属登录页（管理员/用户两套入口分离）
+        if (!string.IsNullOrEmpty(returnUrl) &&
+            returnUrl.StartsWith("/Admin", StringComparison.OrdinalIgnoreCase))
+        {
+            return RedirectToAction("Login", "Account", new { area = "Admin", returnUrl });
+        }
+
         ViewData["ReturnUrl"] = returnUrl;
         return View();
     }
@@ -54,7 +61,8 @@ public class AccountController : Controller
 
         if (result.Succeeded)
         {
-            return LocalRedirect(returnUrl ?? "/Admin");
+            // 前台登录面向普通用户，默认回到首页（不再跳后台）
+            return RedirectToLocal(returnUrl) ?? RedirectToAction("Index", "Home");
         }
 
         if (result.IsLockedOut)
@@ -77,4 +85,69 @@ public class AccountController : Controller
 
     [HttpGet]
     public IActionResult AccessDenied() => View();
+
+    [HttpGet]
+    public IActionResult Register()
+    {
+        if (User.Identity?.IsAuthenticated == true)
+        {
+            return RedirectToAction("Index", "Home");
+        }
+
+        return View();
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Register(RegisterViewModel model)
+    {
+        if (!ModelState.IsValid)
+        {
+            return View(model);
+        }
+
+        // 邮箱唯一性校验（统一提示，避免泄露账号是否已存在）
+        if (await _userManager.FindByEmailAsync(model.Email) is not null)
+        {
+            ModelState.AddModelError(nameof(model.Email), "该邮箱已被注册。");
+            return View(model);
+        }
+
+        var user = new ApplicationUser
+        {
+            UserName = model.Email,
+            Email = model.Email,
+            EmailConfirmed = true, // 演示环境无邮件服务，直接标记邮箱已验证
+            FirstName = model.FirstName,
+            LastName = model.LastName,
+            Address = model.Address,
+            PhoneNumber = model.PhoneNumber
+        };
+
+        var result = await _userManager.CreateAsync(user, model.Password);
+        if (!result.Succeeded)
+        {
+            foreach (var error in result.Errors)
+            {
+                ModelState.AddModelError(string.Empty, error.Description);
+            }
+
+            return View(model);
+        }
+
+        // 注册成功后自动登录并跳转首页
+        await _signInManager.SignInAsync(user, isPersistent: false);
+        TempData["Success"] = "注册成功，欢迎使用！";
+        return RedirectToAction("Index", "Home");
+    }
+
+    private IActionResult? RedirectToLocal(string? returnUrl)
+    {
+        if (!string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl))
+        {
+            return LocalRedirect(returnUrl);
+        }
+
+        return null;
+    }
 }

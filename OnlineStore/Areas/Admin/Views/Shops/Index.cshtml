@@ -1,0 +1,44 @@
+@model IReadOnlyList<Shop>
+@{
+    ViewData["Title"] = Loc["ShopManagement"].Value;
+}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h4 mb-0">@Loc["ShopManagement"]</h1>
+    <a asp-action="Create" class="btn btn-primary btn-sm"><i class="bi bi-plus-lg me-1"></i>@Loc["AddShop"]</a>
+</div>
+<div class="card shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>@Loc["ShopName"]</th>
+                    <th>@Loc["ShopRating"]</th>
+                    <th>@Loc["SalesCount"]</th>
+                    <th>@Loc["ShopDescription"]</th>
+                    <th class="text-end">@Loc["Actions"]</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Count == 0)
+                {
+                    <tr><td colspan="5" class="text-center text-muted py-4">@Loc["NoShops"]</td></tr>
+                }
+                @foreach (var s in Model)
+                {
+                    <tr>
+                        <td class="fw-semibold">@s.Name</td>
+                        <td><span class="text-warning">★</span> @s.Rating.ToString("0.0")</td>
+                        <td>@s.SalesCount</td>
+                        <td class="text-muted">@s.Description</td>
+                        <td class="text-end text-nowrap">
+                            <a asp-action="Edit" asp-route-id="@s.Id" class="btn btn-sm btn-outline-primary" title="@Loc["Edit"]"><i class="bi bi-pencil"></i></a>
+                            <form asp-action="Delete" asp-route-id="@s.Id" method="post" class="d-inline" onsubmit="return confirm('@Loc["ConfirmDeleteShop"]');">
+                                <button type="submit" class="btn btn-sm btn-outline-danger" title="@Loc["Delete"]"><i class="bi bi-trash"></i></button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

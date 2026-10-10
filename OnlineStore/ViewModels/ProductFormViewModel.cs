@@ -29,7 +29,7 @@ public class ProductFormViewModel
     public int Stock { get; set; }
 
     [StringLength(100)]
-    [Display(Name = "SKU")]
+    [Display(Name = "SKU 编码")]
     public string? Sku { get; set; }
 
     [StringLength(500)]
@@ -42,9 +42,27 @@ public class ProductFormViewModel
     [Display(Name = "上架")]
     public bool IsActive { get; set; } = true;
 
-    [Required(ErrorMessage = "请选择分类")]
+    [Required(ErrorMessage = "请选择店铺")]
+    [Display(Name = "店铺")]
+    public int ShopId { get; set; }
+
+    [MinLength(1, ErrorMessage = "请至少选择一个分类")]
     [Display(Name = "分类")]
-    public int CategoryId { get; set; }
+    public List<int> CategoryIds { get; set; } = new();
+
+    [StringLength(100)]
+    [Display(Name = "发货地")]
+    public string? ShippingFrom { get; set; }
+
+    [StringLength(50)]
+    [Display(Name = "邮费")]
+    public string? ShippingFee { get; set; }
+
+    [StringLength(100)]
+    [Display(Name = "发货时效")]
+    public string? DeliveryTime { get; set; }
+
+    public IEnumerable<SelectListItem>? Shops { get; set; }
 
     public IEnumerable<SelectListItem>? Categories { get; set; }
 }

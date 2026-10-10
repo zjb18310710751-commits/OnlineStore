@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace OnlineStore.Models;
 
-/// <summary>商品/产品。</summary>
+/// <summary>商品/产品。归属一个店铺，可属于多个分类，含规格变体、参数与评价。</summary>
 public class Product
 {
     public int Id { get; set; }
@@ -26,7 +26,7 @@ public class Product
     public int Stock { get; set; }
 
     [StringLength(100)]
-    [Display(Name = "SKU")]
+    [Display(Name = "SKU 编码")]
     public string? Sku { get; set; }
 
     [StringLength(500)]
@@ -36,9 +36,33 @@ public class Product
     [Display(Name = "上架")]
     public bool IsActive { get; set; } = true;
 
-    public int CategoryId { get; set; }
+    // 店铺
+    public int ShopId { get; set; }
 
-    public Category? Category { get; set; }
+    public Shop? Shop { get; set; }
+
+    // 多分类（多对多）
+    public ICollection<Category> Categories { get; set; } = new List<Category>();
+
+    // 快递信息
+    [StringLength(100)]
+    [Display(Name = "发货地")]
+    public string? ShippingFrom { get; set; }
+
+    [StringLength(50)]
+    [Display(Name = "邮费")]
+    public string? ShippingFee { get; set; }
+
+    [StringLength(100)]
+    [Display(Name = "发货时效")]
+    public string? DeliveryTime { get; set; }
+
+    // 规格变体 / 参数 / 评价
+    public ICollection<ProductSku> Skus { get; set; } = new List<ProductSku>();
+
+    public ICollection<ProductSpec> Specs { get; set; } = new List<ProductSpec>();
+
+    public ICollection<Review> Reviews { get; set; } = new List<Review>();
 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 

@@ -1,0 +1,42 @@
+@model IReadOnlyList<Review>
+@{
+    ViewData["Title"] = Loc["ReviewManagement"].Value;
+}
+<h1 class="h4 mb-3">@Loc["ReviewManagement"] <small class="text-muted fs-6">@Loc["TotalItems", Model.Count]</small></h1>
+<div class="card shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>@Loc["Name"]</th>
+                    <th>@Loc["UserName"]</th>
+                    <th>@Loc["Rating"]</th>
+                    <th>@Loc["ReviewComment"]</th>
+                    <th>@Loc["CreatedAt"]</th>
+                    <th class="text-end">@Loc["Actions"]</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Count == 0)
+                {
+                    <tr><td colspan="6" class="text-center text-muted py-4">@Loc["NoReviews"]</td></tr>
+                }
+                @foreach (var r in Model)
+                {
+                    <tr>
+                        <td class="fw-semibold">@r.Product?.Name</td>
+                        <td>@r.UserName</td>
+                        <td><span class="text-warning">@(new string('★', r.Rating))</span></td>
+                        <td class="text-muted">@(r.Comment is { Length: > 30 } ? r.Comment[..30] + "…" : r.Comment)</td>
+                        <td class="text-muted small">@r.CreatedAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</td>
+                        <td class="text-end">
+                            <form asp-action="Delete" asp-route-id="@r.Id" method="post" class="d-inline" onsubmit="return confirm('@Loc["ConfirmDeleteReview"]');">
+                                <button type="submit" class="btn btn-sm btn-outline-danger" title="@Loc["Delete"]"><i class="bi bi-trash"></i></button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

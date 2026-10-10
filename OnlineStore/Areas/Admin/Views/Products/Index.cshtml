@@ -38,6 +38,7 @@
                 <tr>
                     <th style="width:60px">@Loc["Image"]</th>
                     <th>@Loc["Name"]</th>
+                    <th>@Loc["Shop"]</th>
                     <th>@Loc["Category"]</th>
                     <th>@Loc["Price"]</th>
                     <th>@Loc["Stock"]</th>
@@ -48,7 +49,7 @@
             <tbody>
                 @if (Model.Count == 0)
                 {
-                    <tr><td colspan="7" class="text-center text-muted py-4">@Loc["NoProducts"]</td></tr>
+                    <tr><td colspan="8" class="text-center text-muted py-4">@Loc["NoProducts"]</td></tr>
                 }
                 @foreach (var p in Model)
                 {
@@ -67,7 +68,8 @@
                             <div class="fw-semibold">@p.Name</div>
                             <small class="text-muted">@p.Sku</small>
                         </td>
-                        <td>@p.Category?.Name</td>
+                        <td>@p.Shop?.Name</td>
+                        <td>@string.Join(" / ", p.Categories.Select(c => c.Name))</td>
                         <td>¥@p.Price.ToString("F2")</td>
                         <td>@p.Stock</td>
                         <td>
@@ -76,6 +78,8 @@
                         <td class="text-end text-nowrap">
                             <a asp-area="Admin" asp-controller="Products" asp-action="Details" asp-route-id="@p.Id" class="btn btn-sm btn-outline-secondary" title="@Loc["View"]"><i class="bi bi-eye"></i></a>
                             <a asp-area="Admin" asp-controller="Products" asp-action="Edit" asp-route-id="@p.Id" class="btn btn-sm btn-outline-primary" title="@Loc["Edit"]"><i class="bi bi-pencil"></i></a>
+                            <a asp-area="Admin" asp-controller="ProductSkus" asp-action="Index" asp-route-productId="@p.Id" class="btn btn-sm btn-outline-info" title="@Loc["SkuManagement"]"><i class="bi bi-palette"></i></a>
+                            <a asp-area="Admin" asp-controller="ProductSpecs" asp-action="Index" asp-route-productId="@p.Id" class="btn btn-sm btn-outline-info" title="@Loc["SpecManagement"]"><i class="bi bi-list-ul"></i></a>
                             <form asp-area="Admin" asp-controller="Products" asp-action="Delete" asp-route-id="@p.Id" method="post" class="d-inline" onsubmit="return confirm('@Loc["ConfirmDeleteProduct"]');">
                                 <button type="submit" class="btn btn-sm btn-outline-danger" title="@Loc["Delete"]"><i class="bi bi-trash"></i></button>
                             </form>

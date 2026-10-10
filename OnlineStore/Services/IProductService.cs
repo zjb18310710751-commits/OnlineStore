@@ -11,7 +11,8 @@ public interface IProductService
 
     Task<Product?> GetByIdAsync(int id);
 
-    Task<Product?> GetByIdWithCategoryAsync(int id);
+    /// <summary>商品详情：含店铺、多分类、规格、参数、评价。</summary>
+    Task<Product?> GetByIdWithDetailsAsync(int id);
 
     /// <summary>后台列表：包含下架商品，支持搜索与分类筛选。</summary>
     Task<(IReadOnlyList<Product> Items, int Total)> GetAdminPagedAsync(
@@ -22,6 +23,12 @@ public interface IProductService
     Task UpdateAsync(Product product);
 
     Task DeleteAsync(int id);
+
+    /// <summary>读取商品当前所属分类（用于编辑回显）。</summary>
+    Task<IReadOnlyList<Category>> GetCategoriesAsync(int productId);
+
+    /// <summary>设置商品所属分类（多选）。</summary>
+    Task SetCategoriesAsync(Product product, IEnumerable<int> categoryIds);
 
     Task<int> CountAsync();
 

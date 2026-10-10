@@ -45,12 +45,17 @@
                                     </div>
                                     <div class="col">
                                         <a asp-controller="Products" asp-action="Details" asp-route-id="@item.ProductId" class="fw-semibold text-decoration-none text-dark">@item.Name</a>
+                                        @if (!string.IsNullOrEmpty(item.Color) || !string.IsNullOrEmpty(item.Spec))
+                                        {
+                                            <div class="text-muted small">@item.Color @item.Spec</div>
+                                        }
                                         <div class="text-muted small">@Loc["UnitPrice"]：¥@item.Price.ToString("F2")</div>
                                         <div class="text-muted small">@Loc["StockLimit", item.Stock]</div>
                                     </div>
                                     <div class="col-12 col-md-4">
                                         <form asp-controller="Cart" asp-action="Update" method="post" class="d-flex align-items-center gap-2">
                                             <input type="hidden" name="productId" value="@item.ProductId" />
+                                            <input type="hidden" name="skuId" value="@item.SkuId" />
                                             <div class="input-group input-group-sm" style="max-width: 130px;">
                                                 <input type="number" name="quantity" class="form-control text-center" value="@item.Quantity" min="1" max="@item.Stock" />
                                             </div>

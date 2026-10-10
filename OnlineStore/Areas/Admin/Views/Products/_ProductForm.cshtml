@@ -5,12 +5,20 @@
     <input asp-for="Name" class="form-control" />
     <span asp-validation-for="Name" class="text-danger small"></span>
 </div>
-<div class="mb-3">
-    <label asp-for="CategoryId" class="form-label">@Loc["Category"]</label>
-    <select asp-for="CategoryId" asp-items="Model.Categories" class="form-select">
-        <option value="">@Loc["SelectCategory"]</option>
-    </select>
-    <span asp-validation-for="CategoryId" class="text-danger small"></span>
+<div class="row g-3">
+    <div class="col-md-6 mb-3">
+        <label asp-for="ShopId" class="form-label">@Loc["Shop"]</label>
+        <select asp-for="ShopId" asp-items="Model.Shops" class="form-select">
+            <option value="">@Loc["SelectShop"]</option>
+        </select>
+        <span asp-validation-for="ShopId" class="text-danger small"></span>
+    </div>
+    <div class="col-md-6 mb-3">
+        <label asp-for="CategoryIds" class="form-label">@Loc["Category"]</label>
+        <select asp-for="CategoryIds" asp-items="Model.Categories" class="form-select" multiple size="5"></select>
+        <div class="form-text">@Loc["MultiSelectHint"]</div>
+        <span asp-validation-for="CategoryIds" class="text-danger small"></span>
+    </div>
 </div>
 <div class="row g-3">
     <div class="col-md-6 mb-3">
@@ -46,6 +54,23 @@
         <img src="@Model.ImageUrl" alt="@Loc["Image"]" class="img-thumbnail" style="max-height: 120px;" />
     </div>
 }
+<div class="row g-3">
+    <div class="col-md-4 mb-3">
+        <label asp-for="ShippingFrom" class="form-label">@Loc["ShippingFrom"]</label>
+        <input asp-for="ShippingFrom" class="form-control" placeholder="如：广东深圳" />
+        <span asp-validation-for="ShippingFrom" class="text-danger small"></span>
+    </div>
+    <div class="col-md-4 mb-3">
+        <label asp-for="ShippingFee" class="form-label">@Loc["ShippingFee"]</label>
+        <input asp-for="ShippingFee" class="form-control" placeholder="如：包邮 / 运费 ¥8" />
+        <span asp-validation-for="ShippingFee" class="text-danger small"></span>
+    </div>
+    <div class="col-md-4 mb-3">
+        <label asp-for="DeliveryTime" class="form-label">@Loc["DeliveryTime"]</label>
+        <input asp-for="DeliveryTime" class="form-control" placeholder="如：48小时内发货" />
+        <span asp-validation-for="DeliveryTime" class="text-danger small"></span>
+    </div>
+</div>
 <div class="mb-3">
     <label asp-for="Description" class="form-label">@Loc["Description"]</label>
     <textarea asp-for="Description" class="form-control" rows="4"></textarea>

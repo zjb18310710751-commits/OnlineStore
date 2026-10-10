@@ -1,0 +1,12 @@
+@model Shop
+@{
+    ViewData["Title"] = Loc["CreateShop"].Value;
+}
+<h1 class="h4 mb-4">@Loc["CreateShop"]</h1>
+<form asp-action="Create" method="post" class="card card-body shadow-sm">
+    <partial name="_ShopForm" model="Model" />
+    <div>
+        <button type="submit" class="btn btn-primary">@Loc["Save"]</button>
+        <a asp-action="Index" class="btn btn-outline-secondary">@Loc["Cancel"]</a>
+    </div>
+</form>

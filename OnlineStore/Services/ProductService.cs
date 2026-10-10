@@ -20,7 +20,7 @@ public class ProductService : IProductService
 
         if (query.CategoryId.HasValue)
         {
-            q = q.Where(p => p.CategoryId == query.CategoryId.Value);
+            q = q.Where(p => p.Categories.Any(c => c.Id == query.CategoryId.Value));
         }
 
         if (!string.IsNullOrWhiteSpace(query.SearchTerm))
@@ -55,7 +55,7 @@ public class ProductService : IProductService
         var page = Math.Clamp(query.Page, 1, Math.Max(1, totalPages));
 
         var items = await q
-            .Include(p => p.Category)
+            .Include(p => p.Categories)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();
@@ -81,13 +81,20 @@ public class ProductService : IProductService
     public Task<Product?> GetByIdAsync(int id) =>
         _context.Products.FirstOrDefaultAsync(p => p.Id == id);
 
-    public Task<Product?> GetByIdWithCategoryAsync(int id) =>
-        _context.Products.Include(p => p.Category).FirstOrDefaultAsync(p => p.Id == id);
+    public Task<Product?> GetByIdWithDetailsAsync(int id) =>
+        _context.Products
+            .AsNoTracking()
+            .Include(p => p.Shop)
+            .Include(p => p.Categories)
+            .Include(p => p.Skus)
+            .Include(p => p.Specs)
+            .Include(p => p.Reviews)
+            .FirstOrDefaultAsync(p => p.Id == id);
 
     public async Task<(IReadOnlyList<Product> Items, int Total)> GetAdminPagedAsync(
         string? search, int? categoryId, int page, int pageSize)
     {
-        var q = _context.Products.AsNoTracking().Include(p => p.Category).AsQueryable();
+        var q = _context.Products.AsNoTracking().Include(p => p.Shop).Include(p => p.Categories).AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(search))
         {
@@ -97,7 +104,7 @@ public class ProductService : IProductService
 
         if (categoryId.HasValue)
         {
-            q = q.Where(p => p.CategoryId == categoryId.Value);
+            q = q.Where(p => p.Categories.Any(c => c.Id == categoryId.Value));
         }
 
         var total = await q.CountAsync();
@@ -133,6 +140,32 @@ public class ProductService : IProductService
         {
             _context.Products.Remove(product);
             await _context.SaveChangesAsync();
+        }
+    }
+
+    public async Task<IReadOnlyList<Category>> GetCategoriesAsync(int productId) =>
+        await _context.Products
+            .Where(p => p.Id == productId)
+            .SelectMany(p => p.Categories)
+            .AsNoTracking()
+            .ToListAsync();
+
+    public async Task SetCategoriesAsync(Product product, IEnumerable<int> categoryIds)
+    {
+        var ids = categoryIds.Distinct().ToList();
+        var categories = await _context.Categories.Where(c => ids.Contains(c.Id)).ToListAsync();
+
+        // 已跟踪的实体先加载现有分类，再 Clear+Add，EF 才能正确计算多对多联结表差异
+        var nav = _context.Entry(product).Collection(p => p.Categories);
+        if (!nav.IsLoaded && nav.CurrentValue is null)
+        {
+            await nav.LoadAsync();
+        }
+
+        product.Categories.Clear();
+        foreach (var c in categories)
+        {
+            product.Categories.Add(c);
         }
     }
 
