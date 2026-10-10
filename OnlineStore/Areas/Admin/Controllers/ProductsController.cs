@@ -15,11 +15,16 @@ public class ProductsController : Controller
 
     private readonly IProductService _productService;
     private readonly ICategoryService _categoryService;
+    private readonly IImageStorageService _imageStorage;
 
-    public ProductsController(IProductService productService, ICategoryService categoryService)
+    public ProductsController(
+        IProductService productService,
+        ICategoryService categoryService,
+        IImageStorageService imageStorage)
     {
         _productService = productService;
         _categoryService = categoryService;
+        _imageStorage = imageStorage;
     }
 
     public async Task<IActionResult> Index(string? search, int? categoryId, int page = 1)
@@ -67,6 +72,21 @@ public class ProductsController : Controller
             IsActive = vm.IsActive,
             CategoryId = vm.CategoryId
         };
+
+        // 若上传了图片，则覆盖表单中的图片地址
+        if (vm.ImageFile is { Length: > 0 })
+        {
+            try
+            {
+                product.ImageUrl = await _imageStorage.SaveAsync(vm.ImageFile);
+            }
+            catch (InvalidOperationException ex)
+            {
+                ModelState.AddModelError(nameof(vm.ImageFile), ex.Message);
+                await PopulateCategoriesAsync(vm);
+                return View(vm);
+            }
+        }
 
         await _productService.CreateAsync(product);
         TempData["Success"] = "商品已创建。";
@@ -129,6 +149,23 @@ public class ProductsController : Controller
         product.ImageUrl = vm.ImageUrl;
         product.IsActive = vm.IsActive;
         product.CategoryId = vm.CategoryId;
+
+        // 若上传了新图片，保存成功后清理被替换的旧本地图片
+        if (vm.ImageFile is { Length: > 0 })
+        {
+            var previousImageUrl = product.ImageUrl;
+            try
+            {
+                product.ImageUrl = await _imageStorage.SaveAsync(vm.ImageFile);
+                _imageStorage.Delete(previousImageUrl);
+            }
+            catch (InvalidOperationException ex)
+            {
+                ModelState.AddModelError(nameof(vm.ImageFile), ex.Message);
+                await PopulateCategoriesAsync(vm);
+                return View(vm);
+            }
+        }
 
         await _productService.UpdateAsync(product);
         TempData["Success"] = "商品已更新。";

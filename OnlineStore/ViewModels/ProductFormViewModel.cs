@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace OnlineStore.ViewModels;
@@ -32,9 +33,11 @@ public class ProductFormViewModel
     public string? Sku { get; set; }
 
     [StringLength(500)]
-    [Url(ErrorMessage = "图片地址格式不正确")]
     [Display(Name = "图片地址")]
     public string? ImageUrl { get; set; }
+
+    [Display(Name = "上传图片")]
+    public IFormFile? ImageFile { get; set; }
 
     [Display(Name = "上架")]
     public bool IsActive { get; set; } = true;

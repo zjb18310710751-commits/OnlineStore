@@ -3,7 +3,7 @@
     ViewData["Title"] = Loc["EditProduct"].Value;
 }
 <h1 class="h4 mb-4">@Loc["EditProduct"]</h1>
-<form asp-area="Admin" asp-controller="Products" asp-action="Edit" asp-route-id="@Model.Id" method="post" class="card card-body shadow-sm">
+<form asp-area="Admin" asp-controller="Products" asp-action="Edit" asp-route-id="@Model.Id" method="post" enctype="multipart/form-data" class="card card-body shadow-sm">
     <partial name="_ProductForm" model="Model" />
     <div>
         <button type="submit" class="btn btn-primary">@Loc["Save"]</button>

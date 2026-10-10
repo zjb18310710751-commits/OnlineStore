@@ -100,6 +100,8 @@
   <data name="ProductName" xml:space="preserve"><value>Product Name</value></data>
   <data name="SelectCategory" xml:space="preserve"><value>Select category</value></data>
   <data name="ImageUrl" xml:space="preserve"><value>Image URL</value></data>
+  <data name="UploadImage" xml:space="preserve"><value>Upload image</value></data>
+  <data name="UploadImageHint" xml:space="preserve"><value>jpg / png / webp / gif, up to 5MB. Takes precedence over the URL field.</value></data>
   <data name="Description" xml:space="preserve"><value>Description</value></data>
   <data name="IsActive" xml:space="preserve"><value>Active</value></data>
   <data name="Save" xml:space="preserve"><value>Save</value></data>

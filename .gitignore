@@ -19,6 +19,9 @@
 # 运行日志
 *.log
 
+# 用户上传的图片（运行时内容，由 ImageStorageService 自动创建目录）
+OnlineStore/wwwroot/uploads/
+
 # 用户机密
 appsettings.*.local.json
 secrets.json

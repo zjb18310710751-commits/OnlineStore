@@ -100,6 +100,8 @@
   <data name="ProductName" xml:space="preserve"><value>商品名称</value></data>
   <data name="SelectCategory" xml:space="preserve"><value>请选择分类</value></data>
   <data name="ImageUrl" xml:space="preserve"><value>图片地址</value></data>
+  <data name="UploadImage" xml:space="preserve"><value>上传图片</value></data>
+  <data name="UploadImageHint" xml:space="preserve"><value>支持 jpg / png / webp / gif，最大 5MB；上传后优先于地址框。</value></data>
   <data name="Description" xml:space="preserve"><value>商品描述</value></data>
   <data name="IsActive" xml:space="preserve"><value>上架</value></data>
   <data name="Save" xml:space="preserve"><value>保存</value></data>

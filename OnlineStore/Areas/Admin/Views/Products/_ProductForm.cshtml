@@ -31,9 +31,21 @@
 </div>
 <div class="mb-3">
     <label asp-for="ImageUrl" class="form-label">@Loc["ImageUrl"]</label>
-    <input asp-for="ImageUrl" class="form-control" placeholder="https://…" />
+    <input asp-for="ImageUrl" class="form-control" placeholder="/uploads/… 或 https://…" />
     <span asp-validation-for="ImageUrl" class="text-danger small"></span>
 </div>
+<div class="mb-3">
+    <label asp-for="ImageFile" class="form-label">@Loc["UploadImage"]</label>
+    <input asp-for="ImageFile" type="file" class="form-control" accept=".jpg,.jpeg,.png,.webp,.gif" />
+    <div class="form-text">@Loc["UploadImageHint"]</div>
+    <span asp-validation-for="ImageFile" class="text-danger small"></span>
+</div>
+@if (!string.IsNullOrEmpty(Model.ImageUrl))
+{
+    <div class="mb-3">
+        <img src="@Model.ImageUrl" alt="@Loc["Image"]" class="img-thumbnail" style="max-height: 120px;" />
+    </div>
+}
 <div class="mb-3">
     <label asp-for="Description" class="form-label">@Loc["Description"]</label>
     <textarea asp-for="Description" class="form-control" rows="4"></textarea>
