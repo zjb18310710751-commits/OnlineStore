@@ -11,9 +11,9 @@
   <data name="Language" xml:space="preserve"><value>语言</value></data>
   <data name="NoCategories" xml:space="preserve"><value>暂无分类</value></data>
   <data name="FooterCopyright" xml:space="preserve"><value>在线商店 · ASP.NET Core MVC</value></data>
-  <data name="FooterQualities" xml:space="preserve"><value>可用性 · 可修改性 · 安全性 · 易用性</value></data>
-  <data name="HeroTitle" xml:space="preserve"><value>发现好物，尽在在线商店</value></data>
-  <data name="HeroSubtitle" xml:space="preserve"><value>精选商品 · 分类清晰 · 便捷筛选</value></data>
+  <data name="FooterQualities" xml:space="preserve"><value>正品保障 · 极速发货 · 售后无忧</value></data>
+  <data name="HeroTitle" xml:space="preserve"><value>好物不贵，生活不将就</value></data>
+  <data name="HeroSubtitle" xml:space="preserve"><value>数码 · 服饰 · 图书 · 家居 · 户外，慢慢逛</value></data>
   <data name="StartShopping" xml:space="preserve"><value>开始逛</value></data>
   <data name="NewArrivals" xml:space="preserve"><value>最新上架</value></data>
   <data name="ViewAll" xml:space="preserve"><value>查看全部</value></data>

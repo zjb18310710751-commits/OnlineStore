@@ -346,7 +346,7 @@ public static class DbInitializer
                 DeliveryTime = PickOne("24小时内发货", "48小时内发货", "72小时内发货"),
                 Specs = BuildExtraSpecs(category.Name),
                 Reviews = BuildExtraReviews(),
-                Skus = ShouldHaveSku(category.Name) ? BuildExtraSkus(price, stock) : new List<ProductSku>()
+                Skus = ShouldHaveSku(category.Name) ? BuildExtraSkus(category.Name, price, stock) : new List<ProductSku>()
             });
         }
 
@@ -360,6 +360,13 @@ public static class DbInitializer
                 new() { ImageUrl = $"https://picsum.photos/seed/{p.Sku}-b/600/400", SortOrder = 1 },
                 new() { ImageUrl = $"https://picsum.photos/seed/{p.Sku}-c/600/400", SortOrder = 2 }
             };
+
+            // 每个 SKU 配一张不同图，选择颜色/规格时主图随之切换
+            var skuIndex = 0;
+            foreach (var sku in p.Skus)
+            {
+                sku.ImageUrl = $"https://picsum.photos/seed/{p.Sku}-s{skuIndex++}/600/400";
+            }
         }
 
         context.Shops.AddRange(shops);
@@ -378,15 +385,20 @@ public static class DbInitializer
             $"{name}，实用耐用，日常必备。",
             $"{name}，口碑很好，回购率高。");
 
-    private static List<ProductSpec> BuildExtraSpecs(string categoryName) =>
-        categoryName switch
+    private static List<ProductSpec> BuildExtraSpecs(string categoryName)
+    {
+        var pool = categoryName switch
         {
-            "电子产品" => Specs(("品牌", "知名品牌"), ("质保", "一年"), ("接口", "通用")),
-            "服装服饰" => Specs(("材质", "舒适面料"), ("版型", "标准"), ("洗涤", "可机洗")),
-            "图书" => Specs(("装帧", "平装"), ("语言", "中文"), ("出版", "正规出版")),
-            "家居生活" => Specs(("材质", "优质耐用"), ("风格", "简约"), ("清洁", "易清洁")),
-            _ => Specs(("材质", "耐磨耐用"), ("场景", "户外/室内"), ("重量", "轻便"))
+            "电子产品" => new (string, string)[] { ("品牌", "知名品牌"), ("质保", "一年"), ("接口", "USB-C"), ("续航", "长续航"), ("兼容", "全兼容"), ("材质", "铝合金") },
+            "服装服饰" => new (string, string)[] { ("面料", "纯棉"), ("版型", "标准"), ("洗涤", "可机洗"), ("季节", "四季"), ("弹性", "微弹"), ("领型", "圆领") },
+            "图书" => new (string, string)[] { ("装帧", "平装"), ("语言", "中文"), ("出版社", "正规出版"), ("版次", "第 1 版"), ("纸张", "胶版纸"), ("页数", "300 页左右") },
+            "家居生活" => new (string, string)[] { ("材质", "优质耐用"), ("风格", "简约"), ("清洁", "易清洁"), ("容量", "适中"), ("尺寸", "标准"), ("产地", "中国") },
+            _ => new (string, string)[] { ("材质", "耐磨耐用"), ("重量", "轻便"), ("场景", "户外"), ("防水", "防泼水"), ("防滑", "防滑设计"), ("承重", "承重强") }
         };
+
+        var picked = pool.OrderBy(_ => Random.Shared.Next()).Take(Random.Shared.Next(3, 5)).ToArray();
+        return Specs(picked);
+    }
 
     private static List<Review> BuildExtraReviews()
     {
@@ -415,25 +427,40 @@ public static class DbInitializer
     }
 
     private static bool ShouldHaveSku(string categoryName) =>
-        categoryName is "电子产品" or "服装服饰" or "运动户外"
-            && Random.Shared.NextDouble() < 0.6;
-
-    private static List<ProductSku> BuildExtraSkus(decimal basePrice, int stock)
-    {
-        var colors = new[] { "黑色", "白色", "灰色", "蓝色", "粉色", "绿色", "橙色" };
-        var specs = new[] { "标准版", "升级版", "均码", "M", "L" };
-        var count = Random.Shared.Next(2, 4);
-        var skus = new List<ProductSku>();
-        for (var i = 0; i < count; i++)
+        categoryName switch
         {
-            var delta = Random.Shared.Next(-5, 11);
-            skus.Add(new ProductSku
+            "图书" => false,
+            "家居生活" => Random.Shared.NextDouble() < 0.3,
+            _ => Random.Shared.NextDouble() < 0.6
+        };
+
+    private static List<ProductSku> BuildExtraSkus(string categoryName, decimal basePrice, int stock)
+    {
+        var (colors, specs) = categoryName switch
+        {
+            "电子产品" => (new[] { "黑色", "白色", "银色", "深空灰" }, new[] { "标配", "高配" }),
+            "服装服饰" => (new[] { "黑色", "白色", "灰色", "藏青", "卡其" }, new[] { "S", "M", "L", "XL" }),
+            "运动户外" => (new[] { "黑色", "军绿", "橙色", "蓝色" }, new[] { "标准", "加大" }),
+            _ => (new[] { "米白", "雾灰", "深灰" }, new[] { "标准款" })
+        };
+
+        var usedColors = colors.OrderBy(_ => Random.Shared.Next()).Take(Random.Shared.Next(2, 4)).ToArray();
+        var usedSpecs = specs.OrderBy(_ => Random.Shared.Next()).Take(Random.Shared.Next(1, 3)).ToArray();
+
+        var skus = new List<ProductSku>();
+        foreach (var color in usedColors)
+        {
+            foreach (var spec in usedSpecs)
             {
-                Color = colors[Random.Shared.Next(colors.Length)],
-                Spec = specs[Random.Shared.Next(specs.Length)],
-                Price = Math.Max(1m, basePrice + delta),
-                Stock = Math.Max(5, stock / count)
-            });
+                var delta = Random.Shared.Next(-5, 11);
+                skus.Add(new ProductSku
+                {
+                    Color = color,
+                    Spec = spec,
+                    Price = Math.Max(1m, basePrice + delta),
+                    Stock = Math.Max(3, stock / (usedColors.Length * usedSpecs.Length))
+                });
+            }
         }
 
         return skus;

@@ -11,9 +11,9 @@
   <data name="Language" xml:space="preserve"><value>Language</value></data>
   <data name="NoCategories" xml:space="preserve"><value>No categories</value></data>
   <data name="FooterCopyright" xml:space="preserve"><value>Online Store · ASP.NET Core MVC</value></data>
-  <data name="FooterQualities" xml:space="preserve"><value>Availability · Modifiability · Security · Usability</value></data>
-  <data name="HeroTitle" xml:space="preserve"><value>Discover great products</value></data>
-  <data name="HeroSubtitle" xml:space="preserve"><value>Curated products · Clear categories · Easy filtering</value></data>
+  <data name="FooterQualities" xml:space="preserve"><value>Genuine · Fast shipping · Easy returns</value></data>
+  <data name="HeroTitle" xml:space="preserve"><value>Good things, fair prices</value></data>
+  <data name="HeroSubtitle" xml:space="preserve"><value>Gadgets · Fashion · Books · Home · Outdoors</value></data>
   <data name="StartShopping" xml:space="preserve"><value>Start Shopping</value></data>
   <data name="NewArrivals" xml:space="preserve"><value>New Arrivals</value></data>
   <data name="ViewAll" xml:space="preserve"><value>View All</value></data>

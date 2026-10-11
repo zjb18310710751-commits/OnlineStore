@@ -1,13 +1,41 @@
 :root {
-    --brand: #2563eb;
-    --brand-dark: #1d4ed8;
-    --brand-light: #dbeafe;
+    --brand: #111111;
+    --brand-dark: #000000;
+    --brand-light: #ececec;
+    --bs-primary: #111111;
+    --bs-primary-rgb: 17, 17, 17;
+    --bs-link-color: #111111;
+    --bs-link-color-rgb: 17, 17, 17;
+    --bs-link-hover-color: #444444;
 }
 
 body {
     font-family: -apple-system, "Segoe UI", "Microsoft YaHei", Roboto, sans-serif;
-    background-color: #f7f8fa;
+    background-color: #f6f4f1;
     color: #212529;
+}
+
+/* 统一主色调为黑色，去除 Bootstrap 默认蓝 */
+.btn-primary {
+    --bs-btn-bg: var(--brand);
+    --bs-btn-border-color: var(--brand);
+    --bs-btn-hover-bg: var(--brand-dark);
+    --bs-btn-hover-border-color: var(--brand-dark);
+    --bs-btn-active-bg: var(--brand-dark);
+    --bs-btn-active-border-color: var(--brand-dark);
+    --bs-btn-disabled-bg: var(--brand);
+    --bs-btn-disabled-border-color: var(--brand);
+}
+
+.btn-outline-primary {
+    --bs-btn-color: var(--brand);
+    --bs-btn-border-color: var(--brand);
+    --bs-btn-hover-bg: var(--brand);
+    --bs-btn-hover-border-color: var(--brand);
+    --bs-btn-hover-color: #fff;
+    --bs-btn-active-bg: var(--brand);
+    --bs-btn-active-border-color: var(--brand);
+    --bs-btn-active-color: #fff;
 }
 
 .bg-brand {
@@ -20,7 +48,7 @@ body {
 
 /* 首页 Hero */
 .hero {
-    background: linear-gradient(135deg, #2563eb 0%, #6d28d9 100%);
+    background: linear-gradient(135deg, #111111 0%, #4a4a4a 100%);
 }
 
 /* 商品卡片 */
@@ -85,6 +113,7 @@ body {
 .product-detail-thumb img {
     max-height: 420px;
     object-fit: contain;
+    transition: opacity .2s ease;
 }
 
 .product-detail-thumb .product-thumb-placeholder {

@@ -20,12 +20,31 @@ function stepQty(btn, delta) {
     input.value = Math.min(Math.max(next, min), max);
 }
 
+// 平滑切换主图：预加载目标图，再淡出→换图→淡入，避免白屏闪烁
+function setMainImage(url) {
+    var main = document.getElementById('mainImage');
+    if (!main) {
+        return;
+    }
+    if (main.getAttribute('data-current') === url) {
+        return;
+    }
+    main.setAttribute('data-current', url);
+
+    var preload = new Image();
+    preload.onload = function () {
+        main.style.opacity = '0';
+        setTimeout(function () {
+            main.src = url;
+            main.style.opacity = '1';
+        }, 130);
+    };
+    preload.src = url;
+}
+
 // 详情页多图画廊：点击缩略图切换主图
 function switchImage(btn, url) {
-    var main = document.getElementById('mainImage');
-    if (main) {
-        main.src = url;
-    }
+    setMainImage(url);
     document.querySelectorAll('.gallery-thumb').forEach(function (t) {
         t.classList.remove('active');
     });
