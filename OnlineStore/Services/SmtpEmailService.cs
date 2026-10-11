@@ -61,7 +61,7 @@ public class SmtpEmailService : IEmailService
         catch (Exception ex)
         {
             _logger.LogError(ex, "发送验证码邮件失败：{To}", to);
-            throw new InvalidOperationException("验证码发送失败，请稍后再试。", ex);
+            throw new InvalidOperationException($"验证码发送失败：{ex.Message}", ex);
         }
         finally
         {
