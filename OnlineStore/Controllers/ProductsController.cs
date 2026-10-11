@@ -1,4 +1,6 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using OnlineStore.Models;
 using OnlineStore.Services;
 using OnlineStore.ViewModels;
 
@@ -8,10 +10,17 @@ namespace OnlineStore.Controllers;
 public class ProductsController : Controller
 {
     private readonly IProductService _productService;
+    private readonly IFavoriteService _favoriteService;
+    private readonly UserManager<ApplicationUser> _userManager;
 
-    public ProductsController(IProductService productService)
+    public ProductsController(
+        IProductService productService,
+        IFavoriteService favoriteService,
+        UserManager<ApplicationUser> userManager)
     {
         _productService = productService;
+        _favoriteService = favoriteService;
+        _userManager = userManager;
     }
 
     public async Task<IActionResult> Index(ProductQuery query)
@@ -26,6 +35,15 @@ public class ProductsController : Controller
         if (product is null || !product.IsActive)
         {
             return NotFound();
+        }
+
+        if (User.Identity?.IsAuthenticated == true)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user is not null)
+            {
+                ViewData["IsFavorite"] = await _favoriteService.IsFavoriteAsync(user.Id, id);
+            }
         }
 
         return View(product);

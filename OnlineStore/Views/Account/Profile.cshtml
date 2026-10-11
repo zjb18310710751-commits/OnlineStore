@@ -1,0 +1,45 @@
+@model ProfileViewModel
+@{
+    ViewData["Title"] = Loc["Profile"].Value;
+}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white fw-semibold">@Loc["Profile"]</div>
+                <div class="card-body">
+                    <form method="post" asp-controller="Account" asp-action="Profile">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                        <div class="row g-3">
+                            <div class="col-6 mb-3">
+                                <label asp-for="LastName" class="form-label">@Loc["LastName"]</label>
+                                <input asp-for="LastName" class="form-control" />
+                                <span asp-validation-for="LastName" class="text-danger small"></span>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <label asp-for="FirstName" class="form-label">@Loc["FirstName"]</label>
+                                <input asp-for="FirstName" class="form-control" />
+                                <span asp-validation-for="FirstName" class="text-danger small"></span>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="Email" class="form-label">@Loc["Email"]</label>
+                            <input asp-for="Email" class="form-control" disabled />
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="PhoneNumber" class="form-label">@Loc["PhoneNumber"]</label>
+                            <input asp-for="PhoneNumber" class="form-control" />
+                            <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="Address" class="form-label">@Loc["Address"]</label>
+                            <textarea asp-for="Address" class="form-control" rows="3"></textarea>
+                            <span asp-validation-for="Address" class="text-danger small"></span>
+                        </div>
+                        <button type="submit" class="btn btn-primary">@Loc["Save"]</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

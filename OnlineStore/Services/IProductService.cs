@@ -30,6 +30,9 @@ public interface IProductService
     /// <summary>设置商品所属分类（多选）。</summary>
     Task SetCategoriesAsync(Product product, IEnumerable<int> categoryIds);
 
+    /// <summary>读取某店铺的在售商品（用于店铺主页）。</summary>
+    Task<IReadOnlyList<Product>> GetByShopAsync(int shopId);
+
     Task<int> CountAsync();
 
     Task<int> CountActiveAsync();

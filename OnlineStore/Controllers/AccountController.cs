@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using OnlineStore.Models;
@@ -139,6 +140,53 @@ public class AccountController : Controller
         await _signInManager.SignInAsync(user, isPersistent: false);
         TempData["Success"] = "注册成功，欢迎使用！";
         return RedirectToAction("Index", "Home");
+    }
+
+    [HttpGet]
+    [Authorize]
+    public async Task<IActionResult> Profile()
+    {
+        var user = await _userManager.GetUserAsync(User);
+        if (user is null)
+        {
+            return RedirectToAction(nameof(Login));
+        }
+
+        return View(new ProfileViewModel
+        {
+            FirstName = user.FirstName,
+            LastName = user.LastName,
+            Email = user.Email ?? string.Empty,
+            PhoneNumber = user.PhoneNumber ?? string.Empty,
+            Address = user.Address ?? string.Empty
+        });
+    }
+
+    [HttpPost]
+    [Authorize]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Profile(ProfileViewModel vm)
+    {
+        var user = await _userManager.GetUserAsync(User);
+        if (user is null)
+        {
+            return RedirectToAction(nameof(Login));
+        }
+
+        if (!ModelState.IsValid)
+        {
+            vm.Email = user.Email ?? string.Empty;
+            return View(vm);
+        }
+
+        user.FirstName = vm.FirstName;
+        user.LastName = vm.LastName;
+        user.PhoneNumber = vm.PhoneNumber;
+        user.Address = vm.Address;
+        await _userManager.UpdateAsync(user);
+
+        TempData["Success"] = "资料已保存。";
+        return RedirectToAction(nameof(Profile));
     }
 
     private IActionResult? RedirectToLocal(string? returnUrl)

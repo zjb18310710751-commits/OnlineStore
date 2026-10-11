@@ -22,4 +22,7 @@ public class ProductListViewModel
     public bool HasPrevious => Page > 1;
 
     public bool HasNext => Page < TotalPages;
+
+    /// <summary>搜索无结果时的「猜你喜欢」推荐。</summary>
+    public IReadOnlyList<Product> Recommendations { get; set; } = new List<Product>();
 }

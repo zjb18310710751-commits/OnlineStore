@@ -64,9 +64,30 @@
                 </form>
             </div>
 
+            @if (string.IsNullOrWhiteSpace(q.SearchTerm) && q.CategoryId is null && q.MinPrice is null && q.MaxPrice is null)
+            {
+                <div class="mb-3">
+                    <span class="text-muted small me-2"><i class="bi bi-fire"></i>@Loc["HotKeywords"]</span>
+                    @foreach (var kw in new[] { "耳机", "键盘", "帐篷", "T恤", "图书" })
+                    {
+                        <a asp-controller="Products" asp-action="Index" asp-route-searchTerm="@kw" class="badge bg-light text-dark text-decoration-none me-1">@kw</a>
+                    }
+                </div>
+            }
+
             @if (Model.Items.Count == 0)
             {
                 <div class="alert alert-light border text-center py-5">@Loc["NoResults"]</div>
+                @if (Model.Recommendations.Count > 0)
+                {
+                    <h2 class="h6 mt-4 mb-3">@Loc["GuessYouLike"]</h2>
+                    <div class="row row-cols-2 row-cols-md-3 row-cols-xl-4 g-3">
+                        @foreach (var p in Model.Recommendations)
+                        {
+                            <partial name="_ProductCard" model="@p" />
+                        }
+                    </div>
+                }
             }
             else
             {

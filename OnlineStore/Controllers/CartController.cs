@@ -21,9 +21,15 @@ public class CartController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Add(int productId, int quantity = 1, int? skuId = null, string? returnUrl = null)
+    public async Task<IActionResult> Add(int productId, int quantity = 1, int? skuId = null, string? returnUrl = null, bool buyNow = false)
     {
         await _cartService.AddAsync(productId, quantity, skuId);
+
+        if (buyNow)
+        {
+            return RedirectToAction("Checkout", "Orders");
+        }
+
         TempData["Success"] = "已加入购物车。";
         return RedirectToLocal(returnUrl) ?? RedirectToAction("Index", "Products");
     }

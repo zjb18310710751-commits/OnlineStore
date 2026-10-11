@@ -160,6 +160,22 @@
   <data name="Reviews" xml:space="preserve"><value>Reviews</value></data>
   <data name="Rating" xml:space="preserve"><value>Rating</value></data>
   <data name="LoginToReview" xml:space="preserve"><value>to write a review</value></data>
+  <data name="Checkout" xml:space="preserve"><value>Checkout</value></data>
+  <data name="Receiver" xml:space="preserve"><value>Receiver</value></data>
+  <data name="SubmitOrder" xml:space="preserve"><value>Place order</value></data>
+  <data name="OrderPlaced" xml:space="preserve"><value>Order placed</value></data>
+  <data name="OrderNo" xml:space="preserve"><value>Order no.</value></data>
+  <data name="OrderStatus" xml:space="preserve"><value>Status</value></data>
+  <data name="MyOrders" xml:space="preserve"><value>My orders</value></data>
+  <data name="Profile" xml:space="preserve"><value>Profile</value></data>
+  <data name="HotKeywords" xml:space="preserve"><value>Hot searches</value></data>
+  <data name="GuessYouLike" xml:space="preserve"><value>You may also like</value></data>
+  <data name="Favorite" xml:space="preserve"><value>Favorite</value></data>
+  <data name="Favorited" xml:space="preserve"><value>Favorited</value></data>
+  <data name="MyFavorites" xml:space="preserve"><value>My favorites</value></data>
+  <data name="NoFavorites" xml:space="preserve"><value>No favorites yet.</value></data>
+  <data name="ReviewsCount" xml:space="preserve"><value>reviews</value></data>
+  <data name="NoOrders" xml:space="preserve"><value>No orders yet.</value></data>
   <data name="UserName" xml:space="preserve"><value>User</value></data>
   <data name="NoReviews" xml:space="preserve"><value>No reviews yet.</value></data>
   <data name="ConfirmDeleteReview" xml:space="preserve"><value>Delete this review?</value></data>

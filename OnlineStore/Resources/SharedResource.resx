@@ -160,6 +160,22 @@
   <data name="Reviews" xml:space="preserve"><value>用户评价</value></data>
   <data name="Rating" xml:space="preserve"><value>评分</value></data>
   <data name="LoginToReview" xml:space="preserve"><value>后可发表评价</value></data>
+  <data name="Checkout" xml:space="preserve"><value>去结算</value></data>
+  <data name="Receiver" xml:space="preserve"><value>收货人</value></data>
+  <data name="SubmitOrder" xml:space="preserve"><value>提交订单</value></data>
+  <data name="OrderPlaced" xml:space="preserve"><value>下单成功</value></data>
+  <data name="OrderNo" xml:space="preserve"><value>订单号</value></data>
+  <data name="OrderStatus" xml:space="preserve"><value>订单状态</value></data>
+  <data name="MyOrders" xml:space="preserve"><value>我的订单</value></data>
+  <data name="Profile" xml:space="preserve"><value>个人中心</value></data>
+  <data name="HotKeywords" xml:space="preserve"><value>热门搜索</value></data>
+  <data name="GuessYouLike" xml:space="preserve"><value>猜你喜欢</value></data>
+  <data name="Favorite" xml:space="preserve"><value>收藏</value></data>
+  <data name="Favorited" xml:space="preserve"><value>已收藏</value></data>
+  <data name="MyFavorites" xml:space="preserve"><value>我的收藏</value></data>
+  <data name="NoFavorites" xml:space="preserve"><value>暂无收藏，去逛逛吧。</value></data>
+  <data name="ReviewsCount" xml:space="preserve"><value>条评价</value></data>
+  <data name="NoOrders" xml:space="preserve"><value>暂无订单，快去逛逛吧。</value></data>
   <data name="UserName" xml:space="preserve"><value>昵称</value></data>
   <data name="NoReviews" xml:space="preserve"><value>暂无评价。</value></data>
   <data name="ConfirmDeleteReview" xml:space="preserve"><value>确定删除该评价吗？</value></data>

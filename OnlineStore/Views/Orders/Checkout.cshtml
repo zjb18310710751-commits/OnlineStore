@@ -1,0 +1,62 @@
+@model CheckoutViewModel
+@{
+    ViewData["Title"] = Loc["Checkout"].Value;
+}
+<div class="container py-4">
+    <h1 class="h4 mb-4">@Loc["Checkout"]</h1>
+    <div class="row g-4">
+        <div class="col-lg-7">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white fw-semibold">@Loc["Receiver"]</div>
+                <div class="card-body">
+                    <form asp-controller="Orders" asp-action="Checkout" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                        <div class="mb-3">
+                            <label asp-for="UserName" class="form-label">@Loc["Receiver"]</label>
+                            <input asp-for="UserName" class="form-control" autocomplete="name" />
+                            <span asp-validation-for="UserName" class="text-danger small"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="Phone" class="form-label">@Loc["PhoneNumber"]</label>
+                            <input asp-for="Phone" class="form-control" autocomplete="tel" />
+                            <span asp-validation-for="Phone" class="text-danger small"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="Address" class="form-label">@Loc["Address"]</label>
+                            <textarea asp-for="Address" class="form-control" rows="3" autocomplete="street-address"></textarea>
+                            <span asp-validation-for="Address" class="text-danger small"></span>
+                        </div>
+                        <button type="submit" class="btn btn-danger btn-lg"><i class="bi bi-bag-check me-1"></i>@Loc["SubmitOrder"]</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-5">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white fw-semibold">@Loc["OrderSummary"]</div>
+                <div class="card-body">
+                    <ul class="list-unstyled mb-3">
+                        @foreach (var item in Model.Items)
+                        {
+                            <li class="d-flex justify-content-between py-2 border-bottom">
+                                <div>
+                                    <div>@item.Name</div>
+                                    @if (!string.IsNullOrEmpty(item.Color) || !string.IsNullOrEmpty(item.Spec))
+                                    {
+                                        <small class="text-muted">@item.Color @item.Spec</small>
+                                    }
+                                    <small class="text-muted d-block">× @item.Quantity</small>
+                                </div>
+                                <div>¥@item.LineTotal.ToString("F2")</div>
+                            </li>
+                        }
+                    </ul>
+                    <div class="d-flex justify-content-between border-top pt-3">
+                        <span class="fw-semibold">@Loc["Total"]</span>
+                        <span class="text-danger fw-bold fs-5">¥@Model.Total.ToString("F2")</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

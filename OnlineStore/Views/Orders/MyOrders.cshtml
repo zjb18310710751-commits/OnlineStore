@@ -1,0 +1,51 @@
+@model IReadOnlyList<Order>
+@{
+    ViewData["Title"] = Loc["MyOrders"].Value;
+}
+<div class="container py-4">
+    <h1 class="h4 mb-4">@Loc["MyOrders"]</h1>
+    @if (Model.Count == 0)
+    {
+        <div class="alert alert-light border text-center py-5">
+            <i class="bi bi-inbox display-5 d-block mb-3 text-muted"></i>
+            <p class="mb-3">@Loc["NoOrders"]</p>
+            <a asp-controller="Products" asp-action="Index" class="btn btn-primary">@Loc["ContinueShopping"]</a>
+        </div>
+    }
+    else
+    {
+        <div class="card shadow-sm">
+            <div class="list-group list-group-flush">
+                @foreach (var o in Model)
+                {
+                    <div class="list-group-item py-3">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div>
+                                <span class="text-muted small me-2">@Loc["OrderNo"]：@o.OrderNo</span>
+                                <span class="text-muted small">@o.CreatedAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</span>
+                            </div>
+                            <span class="badge bg-warning-subtle text-warning">@o.Status</span>
+                        </div>
+                        <ul class="list-unstyled mb-2">
+                            @foreach (var i in o.Items)
+                            {
+                                <li class="d-flex justify-content-between py-1">
+                                    <span>
+                                        @i.ProductName
+                                        @if (!string.IsNullOrEmpty(i.Color) || !string.IsNullOrEmpty(i.Spec))
+                                        {
+                                            <small class="text-muted">@i.Color @i.Spec</small>
+                                        }
+                                        <small class="text-muted">× @i.Quantity</small>
+                                    </span>
+                                    <span>¥@i.LineTotal.ToString("F2")</span>
+                                </li>
+                            }
+                        </ul>
+                        <div class="text-end fw-semibold">@Loc["Total"]：<span class="text-danger">¥@o.Total.ToString("F2")</span></div>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>

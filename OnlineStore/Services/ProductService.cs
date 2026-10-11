@@ -60,6 +60,19 @@ public class ProductService : IProductService
             .Take(pageSize)
             .ToListAsync();
 
+        // 搜索无结果时，给一组「猜你喜欢」推荐
+        var recommendations = new List<Product>();
+        if (total == 0 && !string.IsNullOrWhiteSpace(query.SearchTerm))
+        {
+            recommendations = await _context.Products
+                .AsNoTracking()
+                .Where(p => p.IsActive)
+                .Include(p => p.Categories)
+                .OrderByDescending(p => p.CreatedAt)
+                .Take(8)
+                .ToListAsync();
+        }
+
         var categories = await _context.Categories
             .AsNoTracking()
             .OrderBy(c => c.DisplayOrder)
@@ -74,7 +87,8 @@ public class ProductService : IProductService
             Page = page,
             PageSize = pageSize,
             TotalItems = total,
-            TotalPages = totalPages
+            TotalPages = totalPages,
+            Recommendations = recommendations
         };
     }
 
@@ -89,6 +103,7 @@ public class ProductService : IProductService
             .Include(p => p.Skus)
             .Include(p => p.Specs)
             .Include(p => p.Reviews)
+            .Include(p => p.Images)
             .FirstOrDefaultAsync(p => p.Id == id);
 
     public async Task<(IReadOnlyList<Product> Items, int Total)> GetAdminPagedAsync(
@@ -168,6 +183,14 @@ public class ProductService : IProductService
             product.Categories.Add(c);
         }
     }
+
+    public async Task<IReadOnlyList<Product>> GetByShopAsync(int shopId) =>
+        await _context.Products
+            .AsNoTracking()
+            .Where(p => p.ShopId == shopId && p.IsActive)
+            .Include(p => p.Categories)
+            .OrderByDescending(p => p.CreatedAt)
+            .ToListAsync();
 
     public Task<int> CountAsync() => _context.Products.CountAsync();
 

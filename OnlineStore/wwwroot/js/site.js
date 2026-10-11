@@ -20,3 +20,15 @@ function stepQty(btn, delta) {
     input.value = Math.min(Math.max(next, min), max);
 }
 
+// 详情页多图画廊：点击缩略图切换主图
+function switchImage(btn, url) {
+    var main = document.getElementById('mainImage');
+    if (main) {
+        main.src = url;
+    }
+    document.querySelectorAll('.gallery-thumb').forEach(function (t) {
+        t.classList.remove('active');
+    });
+    btn.classList.add('active');
+}
+

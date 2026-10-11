@@ -184,6 +184,28 @@ body {
     border-color: #f1f3f6 !important;
 }
 
+/* 多图画廊缩略图 */
+.gallery-thumb {
+    width: 64px;
+    height: 64px;
+    border: 2px solid transparent;
+    border-radius: .5rem;
+    overflow: hidden;
+    padding: 0;
+    background: #fff;
+    cursor: pointer;
+}
+
+.gallery-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.gallery-thumb.active {
+    border-color: var(--brand);
+}
+
 /* 后台布局 */
 .admin-wrapper {
     display: flex;

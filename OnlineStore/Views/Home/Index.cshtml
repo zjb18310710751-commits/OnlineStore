@@ -6,6 +6,10 @@
     <div class="container py-5 text-center">
         <h1 class="display-5 fw-bold">@Loc["HeroTitle"]</h1>
         <p class="lead mb-4">@Loc["HeroSubtitle"]</p>
+        <form asp-controller="Products" asp-action="Index" method="get" class="d-flex mb-4" style="max-width:480px;margin:0 auto;">
+            <input class="form-control form-control-lg me-2" type="search" name="searchTerm" placeholder="@Loc["SearchPlaceholder"]" aria-label="Search" />
+            <button class="btn btn-light btn-lg" type="submit"><i class="bi bi-search"></i></button>
+        </form>
         <a class="btn btn-light btn-lg px-4" asp-controller="Products" asp-action="Index">@Loc["StartShopping"]</a>
     </div>
 </section>

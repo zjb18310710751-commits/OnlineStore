@@ -64,6 +64,8 @@ public class Product
 
     public ICollection<Review> Reviews { get; set; } = new List<Review>();
 
+    public ICollection<ProductImage> Images { get; set; } = new List<ProductImage>();
+
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;

@@ -45,6 +45,8 @@ builder.Services.AddScoped<IShopService, ShopService>();
 builder.Services.AddScoped<IProductSkuService, ProductSkuService>();
 builder.Services.AddScoped<IProductSpecService, ProductSpecService>();
 builder.Services.AddScoped<IReviewService, ReviewService>();
+builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<IFavoriteService, FavoriteService>();
 builder.Services.AddScoped<ICartStore, SessionCartStore>();
 builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<IImageStorageService, ImageStorageService>();

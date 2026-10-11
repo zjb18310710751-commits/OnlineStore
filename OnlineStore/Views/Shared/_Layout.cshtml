@@ -74,6 +74,15 @@
                                 </li>
                             }
                             <li class="nav-item">
+                                <a class="nav-link" asp-controller="Account" asp-action="Profile"><i class="bi bi-person-circle me-1"></i>@Loc["Profile"]</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Favorites" asp-action="Index"><i class="bi bi-heart me-1"></i>@Loc["MyFavorites"]</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Orders" asp-action="MyOrders"><i class="bi bi-receipt me-1"></i>@Loc["MyOrders"]</a>
+                            </li>
+                            <li class="nav-item">
                                 <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
                                     <button type="submit" class="btn btn-link nav-link border-0">@Loc["Logout"]</button>
                                 </form>

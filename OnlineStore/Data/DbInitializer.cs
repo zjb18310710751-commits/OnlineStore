@@ -278,10 +278,165 @@ public static class DbInitializer
             }
         };
 
+        // 追加 88 件商品：覆盖各类目、价格从低到高，模拟真实商城
+        var extraItems = new (string Name, Category Category, Shop Shop, decimal Price)[]
+        {
+            ("手机支架", electronics, digital, 19.90m), ("三合一数据线", electronics, digital, 29.00m),
+            ("蓝牙自拍杆", electronics, digital, 39.00m), ("无线充电器", electronics, digital, 89.00m),
+            ("移动电源 20000mAh", electronics, digital, 129.00m), ("键鼠套装", electronics, digital, 129.00m),
+            ("显示器支架", electronics, digital, 149.00m), ("蓝牙音箱", electronics, digital, 159.00m),
+            ("电竞鼠标", electronics, digital, 199.00m), ("路由器", electronics, digital, 199.00m),
+            ("游戏手柄", electronics, digital, 269.00m), ("智能音箱", electronics, digital, 299.00m),
+            ("机械硬盘 2TB", electronics, digital, 499.00m), ("智能手表", electronics, digital, 599.00m),
+            ("固态硬盘 1TB", electronics, digital, 699.00m), ("电纸书阅读器", electronics, digital, 899.00m),
+            ("投影仪", electronics, digital, 1899.00m), ("平板电脑", electronics, digital, 2499.00m),
+            ("无人机", electronics, digital, 2999.00m), ("微单相机", electronics, digital, 3999.00m),
+            ("棉袜五双装", fashion, clothing, 29.00m), ("棒球帽", fashion, clothing, 39.00m),
+            ("围巾", fashion, clothing, 49.00m), ("短裤", fashion, clothing, 59.00m),
+            ("皮带", fashion, clothing, 69.00m), ("睡衣", fashion, clothing, 89.00m),
+            ("帆布鞋", fashion, clothing, 99.00m), ("泳衣", fashion, clothing, 99.00m),
+            ("衬衫", fashion, clothing, 129.00m), ("双肩包", fashion, clothing, 129.00m),
+            ("牛仔裤", fashion, clothing, 159.00m), ("毛衣", fashion, clothing, 179.00m),
+            ("连衣裙", fashion, clothing, 199.00m), ("运动鞋", fashion, clothing, 299.00m),
+            ("皮鞋", fashion, clothing, 299.00m), ("风衣", fashion, clothing, 399.00m),
+            ("冲锋衣", fashion, clothing, 499.00m), ("羽绒服", fashion, clothing, 599.00m),
+            ("《小王子》", books, bookstore, 19.00m), ("英语词汇书", books, bookstore, 35.00m),
+            ("《活着》", books, bookstore, 39.00m), ("《白夜行》", books, bookstore, 39.50m),
+            ("《时间简史》", books, bookstore, 45.00m), ("《红楼梦》", books, bookstore, 49.00m),
+            ("《平凡的世界》", books, bookstore, 59.00m), ("《人类简史》", books, bookstore, 68.00m),
+            ("《经济学原理》", books, bookstore, 98.00m), ("《算法导论》", books, bookstore, 128.00m),
+            ("儿童绘本套装", books, bookstore, 129.00m), ("《三体》全集", books, bookstore, 168.00m),
+            ("花瓶", home, homeStore, 29.00m), ("香薰蜡烛", home, homeStore, 39.00m),
+            ("抱枕", home, homeStore, 39.00m), ("毛巾三件套", home, homeStore, 49.00m),
+            ("收纳箱三件套", home, homeStore, 59.00m), ("挂钟", home, homeStore, 69.00m),
+            ("保温杯", home, homeStore, 89.00m), ("电热水壶", home, homeStore, 99.00m),
+            ("落地灯", home, homeStore, 159.00m), ("刀具套装", home, homeStore, 159.00m),
+            ("不锈钢锅", home, homeStore, 199.00m), ("窗帘", home, homeStore, 199.00m),
+            ("床品四件套", home, homeStore, 299.00m), ("电饭煲", home, homeStore, 299.00m),
+            ("地毯", home, homeStore, 399.00m), ("咖啡机", home, homeStore, 599.00m),
+            ("空气净化器", home, homeStore, 899.00m), ("吸尘器", home, homeStore, 1299.00m),
+            ("扫地机器人", home, homeStore, 1499.00m), ("智能马桶盖", home, homeStore, 1999.00m),
+            ("跳绳", sports, outdoor, 19.00m), ("冰袖", sports, outdoor, 19.00m),
+            ("泳镜", sports, outdoor, 29.00m), ("护膝", sports, outdoor, 39.00m),
+            ("帐篷灯", sports, outdoor, 39.00m), ("野餐垫", sports, outdoor, 49.00m),
+            ("瑜伽球", sports, outdoor, 59.00m), ("登山杖", sports, outdoor, 59.00m),
+            ("折叠椅", sports, outdoor, 79.00m), ("篮球", sports, outdoor, 89.00m),
+            ("足球", sports, outdoor, 99.00m), ("羽毛球拍", sports, outdoor, 99.00m),
+            ("骑行头盔", sports, outdoor, 129.00m), ("哑铃", sports, outdoor, 129.00m),
+            ("望远镜", sports, outdoor, 259.00m), ("筋膜枪", sports, outdoor, 399.00m),
+            ("山地自行车", sports, outdoor, 1299.00m), ("跑步机", sports, outdoor, 1999.00m)
+        };
+
+        for (var i = 0; i < extraItems.Length; i++)
+        {
+            var (name, category, shop, price) = extraItems[i];
+            var stock = Random.Shared.Next(30, 500);
+            products.Add(new Product
+            {
+                Name = name,
+                Slug = name,
+                Description = BuildDescription(name),
+                Price = price,
+                Stock = stock,
+                Sku = $"EXT-{i + 1:000}",
+                Shop = shop,
+                Categories = new List<Category> { category },
+                ShippingFrom = PickOne("广东深圳", "浙江杭州", "江苏苏州", "上海", "北京"),
+                ShippingFee = "包邮",
+                DeliveryTime = PickOne("24小时内发货", "48小时内发货", "72小时内发货"),
+                Specs = BuildExtraSpecs(category.Name),
+                Reviews = BuildExtraReviews(),
+                Skus = ShouldHaveSku(category.Name) ? BuildExtraSkus(price, stock) : new List<ProductSku>()
+            });
+        }
+
+        // 为种子商品配占位图（每件商品固定一张，可随后台图片上传替换为真实商品图）
+        foreach (var p in products)
+        {
+            p.ImageUrl = $"https://picsum.photos/seed/{p.Sku}/600/400";
+            p.Images = new List<ProductImage>
+            {
+                new() { ImageUrl = p.ImageUrl, SortOrder = 0 },
+                new() { ImageUrl = $"https://picsum.photos/seed/{p.Sku}-b/600/400", SortOrder = 1 },
+                new() { ImageUrl = $"https://picsum.photos/seed/{p.Sku}-c/600/400", SortOrder = 2 }
+            };
+        }
+
         context.Shops.AddRange(shops);
         context.Categories.AddRange(categories);
         context.Products.AddRange(products);
         await context.SaveChangesAsync();
+    }
+
+    private static string PickOne(params string[] options) =>
+        options[Random.Shared.Next(options.Length)];
+
+    private static string BuildDescription(string name) =>
+        PickOne(
+            $"{name}，精选好物，品质有保证。",
+            $"{name}，人气之选，买了不后悔。",
+            $"{name}，实用耐用，日常必备。",
+            $"{name}，口碑很好，回购率高。");
+
+    private static List<ProductSpec> BuildExtraSpecs(string categoryName) =>
+        categoryName switch
+        {
+            "电子产品" => Specs(("品牌", "知名品牌"), ("质保", "一年"), ("接口", "通用")),
+            "服装服饰" => Specs(("材质", "舒适面料"), ("版型", "标准"), ("洗涤", "可机洗")),
+            "图书" => Specs(("装帧", "平装"), ("语言", "中文"), ("出版", "正规出版")),
+            "家居生活" => Specs(("材质", "优质耐用"), ("风格", "简约"), ("清洁", "易清洁")),
+            _ => Specs(("材质", "耐磨耐用"), ("场景", "户外/室内"), ("重量", "轻便"))
+        };
+
+    private static List<Review> BuildExtraReviews()
+    {
+        var count = Random.Shared.Next(1, 3);
+        var reviews = new List<Review>();
+        for (var i = 0; i < count; i++)
+        {
+            reviews.Add(Review(
+                PickOne("老王", "小美", "阿杰", "静静", "大熊", "路过的风", "阿蓝", "小鹿", "爱吃鱼", "老张头"),
+                Random.Shared.Next(4, 6),
+                PickOne(
+                    "质量不错，做工精细，值得回购。",
+                    "性价比很高，用了几天很满意。",
+                    "物流快，包装严实，没有破损。",
+                    "和描述一致，用起来很顺手。",
+                    "已经第二次买了，家里人都说好。",
+                    "客服态度很好，有问题及时解决。",
+                    "价格实惠，日常用足够了。",
+                    "做工可以，就是发货稍慢，总体满意。",
+                    "买来送人的，对方很喜欢。",
+                    "东西是好东西，就是包装简单了点。"),
+                Random.Shared.Next(1, 60)));
+        }
+
+        return reviews;
+    }
+
+    private static bool ShouldHaveSku(string categoryName) =>
+        categoryName is "电子产品" or "服装服饰" or "运动户外"
+            && Random.Shared.NextDouble() < 0.6;
+
+    private static List<ProductSku> BuildExtraSkus(decimal basePrice, int stock)
+    {
+        var colors = new[] { "黑色", "白色", "灰色", "蓝色", "粉色", "绿色", "橙色" };
+        var specs = new[] { "标准版", "升级版", "均码", "M", "L" };
+        var count = Random.Shared.Next(2, 4);
+        var skus = new List<ProductSku>();
+        for (var i = 0; i < count; i++)
+        {
+            var delta = Random.Shared.Next(-5, 11);
+            skus.Add(new ProductSku
+            {
+                Color = colors[Random.Shared.Next(colors.Length)],
+                Spec = specs[Random.Shared.Next(specs.Length)],
+                Price = Math.Max(1m, basePrice + delta),
+                Stock = Math.Max(5, stock / count)
+            });
+        }
+
+        return skus;
     }
 
     private static List<ProductSpec> Specs(params (string Name, string Value)[] items)

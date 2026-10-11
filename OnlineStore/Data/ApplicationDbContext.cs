@@ -17,6 +17,10 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<ProductSku> ProductSkus => Set<ProductSku>();
     public DbSet<ProductSpec> ProductSpecs => Set<ProductSpec>();
     public DbSet<Review> Reviews => Set<Review>();
+    public DbSet<Order> Orders => Set<Order>();
+    public DbSet<OrderItem> OrderItems => Set<OrderItem>();
+    public DbSet<ProductImage> ProductImages => Set<ProductImage>();
+    public DbSet<Favorite> Favorites => Set<Favorite>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -90,6 +94,41 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
             entity.HasOne(r => r.Product)
                   .WithMany(p => p.Reviews)
                   .HasForeignKey(r => r.ProductId)
+                  .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        builder.Entity<Order>(entity =>
+        {
+            entity.HasIndex(o => o.UserId);
+            entity.Property(o => o.Total).HasConversion<double>();
+            entity.HasMany(o => o.Items)
+                  .WithOne(i => i.Order)
+                  .HasForeignKey(i => i.OrderId)
+                  .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        builder.Entity<OrderItem>(entity =>
+        {
+            entity.HasIndex(i => i.OrderId);
+            entity.Property(i => i.Price).HasConversion<double>();
+        });
+
+        builder.Entity<ProductImage>(entity =>
+        {
+            entity.HasIndex(i => i.ProductId);
+            entity.Property(i => i.ImageUrl).HasMaxLength(500);
+            entity.HasOne(i => i.Product)
+                  .WithMany(p => p.Images)
+                  .HasForeignKey(i => i.ProductId)
+                  .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        builder.Entity<Favorite>(entity =>
+        {
+            entity.HasIndex(f => new { f.UserId, f.ProductId }).IsUnique();
+            entity.HasOne(f => f.Product)
+                  .WithMany()
+                  .HasForeignKey(f => f.ProductId)
                   .OnDelete(DeleteBehavior.Cascade);
         });
     }

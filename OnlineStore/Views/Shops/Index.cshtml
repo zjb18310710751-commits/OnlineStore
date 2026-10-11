@@ -1,0 +1,40 @@
+@model ShopViewModel
+@{
+    ViewData["Title"] = Model.Shop.Name;
+}
+<div class="container py-4">
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <div class="d-flex align-items-center gap-3">
+                <div class="shop-avatar" style="width:64px;height:64px;font-size:1.8rem;"><i class="bi bi-shop"></i></div>
+                <div>
+                    <h1 class="h5 mb-1">@Model.Shop.Name</h1>
+                    <div class="text-warning">
+                        @(new string('★', (int)Math.Round(Model.Shop.Rating)))
+                        <span class="text-dark ms-1">@Model.Shop.Rating.ToString("0.0")</span>
+                    </div>
+                    <div class="text-muted small">@Loc["SoldCount", Model.Shop.SalesCount] · @Loc["ProductCount", Model.Products.Count]</div>
+                </div>
+            </div>
+            @if (!string.IsNullOrEmpty(Model.Shop.Description))
+            {
+                <div class="border-top mt-3 pt-2 text-muted small">@Model.Shop.Description</div>
+            }
+        </div>
+    </div>
+
+    <h2 class="h6 mb-3">@Loc["Products"]</h2>
+    @if (Model.Products.Count == 0)
+    {
+        <div class="alert alert-light border text-center py-5">@Loc["NoProducts"]</div>
+    }
+    else
+    {
+        <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3">
+            @foreach (var p in Model.Products)
+            {
+                <partial name="_ProductCard" model="@p" />
+            }
+        </div>
+    }
+</div>
