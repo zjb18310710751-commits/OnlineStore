@@ -235,4 +235,11 @@
   <data name="InvalidVerificationCode" xml:space="preserve"><value>验证码错误或已过期</value></data>
   <data name="VerificationEmailSubject" xml:space="preserve"><value>您的注册验证码</value></data>
   <data name="VerificationEmailBody" xml:space="preserve"><value>&lt;p&gt;您的验证码是：&lt;strong&gt;{0}&lt;/strong&gt;，10 分钟内有效。&lt;/p&gt;</value></data>
+  <data name="OrderManagement" xml:space="preserve"><value>订单管理</value></data>
+  <data name="Ship" xml:space="preserve"><value>发货</value></data>
+  <data name="Complete" xml:space="preserve"><value>完成</value></data>
+  <data name="CancelOrder" xml:space="preserve"><value>取消订单</value></data>
+  <data name="Refund" xml:space="preserve"><value>退款</value></data>
+  <data name="ConfirmCancelOrder" xml:space="preserve"><value>确定取消该订单吗？</value></data>
+  <data name="ConfirmRefundOrder" xml:space="preserve"><value>确定退款该订单吗？</value></data>
 </root>

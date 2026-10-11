@@ -26,6 +26,13 @@ public class OrderService : IOrderService
             .OrderByDescending(o => o.CreatedAt)
             .ToListAsync();
 
+    public async Task<IReadOnlyList<Order>> GetAllAsync() =>
+        await _context.Orders
+            .AsNoTracking()
+            .Include(o => o.Items)
+            .OrderByDescending(o => o.CreatedAt)
+            .ToListAsync();
+
     public async Task<Order> CreateAsync(Order order)
     {
         order.CreatedAt = DateTime.UtcNow;
@@ -34,5 +41,79 @@ public class OrderService : IOrderService
         return order;
     }
 
+    public async Task<bool> CancelAsync(int id)
+    {
+        var order = await GetByIdAsync(id);
+        if (order is null || order.Status != OrderStatus.PendingShipment)
+        {
+            return false;
+        }
+
+        order.Status = OrderStatus.Cancelled;
+        await RestoreStockAsync(order);
+        await _context.SaveChangesAsync();
+        return true;
+    }
+
+    public async Task<bool> RefundAsync(int id)
+    {
+        var order = await GetByIdAsync(id);
+        if (order is null || (order.Status != OrderStatus.Shipped && order.Status != OrderStatus.Completed))
+        {
+            return false;
+        }
+
+        order.Status = OrderStatus.Refunded;
+        await RestoreStockAsync(order);
+        await _context.SaveChangesAsync();
+        return true;
+    }
+
+    public async Task<bool> ShipAsync(int id)
+    {
+        var order = await GetByIdAsync(id);
+        if (order is null || order.Status != OrderStatus.PendingShipment)
+        {
+            return false;
+        }
+
+        order.Status = OrderStatus.Shipped;
+        await _context.SaveChangesAsync();
+        return true;
+    }
+
+    public async Task<bool> CompleteAsync(int id)
+    {
+        var order = await GetByIdAsync(id);
+        if (order is null || order.Status != OrderStatus.Shipped)
+        {
+            return false;
+        }
+
+        order.Status = OrderStatus.Completed;
+        await _context.SaveChangesAsync();
+        return true;
+    }
+
     public Task<int> CountAsync() => _context.Orders.CountAsync();
+
+    /// <summary>取消/退款时把商品库存加回（商品级，不精确到 SKU）。</summary>
+    private async Task RestoreStockAsync(Order order)
+    {
+        var productIds = order.Items.Select(i => i.ProductId).Distinct().ToList();
+        if (productIds.Count == 0)
+        {
+            return;
+        }
+
+        var products = await _context.Products.Where(p => productIds.Contains(p.Id)).ToListAsync();
+        foreach (var item in order.Items)
+        {
+            var product = products.FirstOrDefault(p => p.Id == item.ProductId);
+            if (product is not null)
+            {
+                product.Stock += item.Quantity;
+            }
+        }
+    }
 }

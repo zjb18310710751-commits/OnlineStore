@@ -1,0 +1,83 @@
+@model IReadOnlyList<Order>
+@{
+    ViewData["Title"] = Loc["OrderManagement"].Value;
+}
+<h1 class="h4 mb-4">@Loc["OrderManagement"]</h1>
+<div class="card shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>@Loc["OrderNo"]</th>
+                    <th>@Loc["Receiver"]</th>
+                    <th class="text-end">@Loc["Total"]</th>
+                    <th>@Loc["OrderStatus"]</th>
+                    <th>@Loc["CreatedAt"]</th>
+                    <th class="text-end">@Loc["Actions"]</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Count == 0)
+                {
+                    <tr><td colspan="6" class="text-center text-muted py-4">@Loc["NoOrders"]</td></tr>
+                }
+                @foreach (var o in Model)
+                {
+                    <tr>
+                        <td class="fw-semibold">@o.OrderNo</td>
+                        <td class="small">
+                            @o.UserName<br />
+                            <span class="text-muted">@o.Phone</span>
+                        </td>
+                        <td class="text-end">
+                            @if (o.DiscountAmount > 0)
+                            {
+                                <span class="text-muted small text-decoration-line-through">¥@((o.Total + o.DiscountAmount).ToString("F2"))</span>
+                            }
+                            <span class="text-danger fw-semibold ms-1">¥@o.Total.ToString("F2")</span>
+                        </td>
+                        <td><span class="badge @StatusBadge(o.Status)">@o.Status</span></td>
+                        <td class="text-muted small">@o.CreatedAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</td>
+                        <td class="text-end text-nowrap">
+                            @if (o.Status == OrderStatus.PendingShipment)
+                            {
+                                <form asp-action="Ship" asp-route-id="@o.Id" method="post" class="d-inline">
+                                    <button type="submit" class="btn btn-sm btn-outline-primary">@Loc["Ship"]</button>
+                                </form>
+                                <form asp-action="Cancel" asp-route-id="@o.Id" method="post" class="d-inline" onsubmit="return confirm('@Loc["ConfirmCancelOrder"]');">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">@Loc["CancelOrder"]</button>
+                                </form>
+                            }
+                            else if (o.Status == OrderStatus.Shipped)
+                            {
+                                <form asp-action="Complete" asp-route-id="@o.Id" method="post" class="d-inline">
+                                    <button type="submit" class="btn btn-sm btn-outline-success">@Loc["Complete"]</button>
+                                </form>
+                                <form asp-action="Refund" asp-route-id="@o.Id" method="post" class="d-inline" onsubmit="return confirm('@Loc["ConfirmRefundOrder"]');">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">@Loc["Refund"]</button>
+                                </form>
+                            }
+                            else if (o.Status == OrderStatus.Completed)
+                            {
+                                <form asp-action="Refund" asp-route-id="@o.Id" method="post" class="d-inline" onsubmit="return confirm('@Loc["ConfirmRefundOrder"]');">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">@Loc["Refund"]</button>
+                                </form>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@functions {
+    string StatusBadge(string status) => status switch
+    {
+        OrderStatus.PendingShipment => "bg-warning-subtle text-warning",
+        OrderStatus.Shipped => "bg-info-subtle text-info",
+        OrderStatus.Completed => "bg-success-subtle text-success",
+        OrderStatus.Refunded => "bg-danger-subtle text-danger",
+        _ => "bg-secondary-subtle text-secondary"
+    };
+}

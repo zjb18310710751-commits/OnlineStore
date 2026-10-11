@@ -142,6 +142,22 @@ public class OrdersController : Controller
         return View(orders);
     }
 
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Cancel(int id)
+    {
+        var user = await _userManager.GetUserAsync(User);
+        var order = await _orderService.GetByIdAsync(id);
+        if (order is null || order.UserId != user?.Id)
+        {
+            return NotFound();
+        }
+
+        var ok = await _orderService.CancelAsync(id);
+        TempData[ok ? "Success" : "Error"] = ok ? "订单已取消。" : "取消失败：当前状态不可取消。";
+        return RedirectToAction(nameof(MyOrders));
+    }
+
     private static string GenerateOrderNo() =>
         $"OS{DateTime.UtcNow:yyyyMMddHHmmss}{Random.Shared.Next(100, 999)}";
 }

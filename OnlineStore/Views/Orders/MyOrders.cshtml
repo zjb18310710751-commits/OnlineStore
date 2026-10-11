@@ -2,6 +2,16 @@
 @{
     ViewData["Title"] = Loc["MyOrders"].Value;
 }
+@functions {
+    string StatusBadge(string status) => status switch
+    {
+        OrderStatus.PendingShipment => "bg-warning-subtle text-warning",
+        OrderStatus.Shipped => "bg-info-subtle text-info",
+        OrderStatus.Completed => "bg-success-subtle text-success",
+        OrderStatus.Refunded => "bg-danger-subtle text-danger",
+        _ => "bg-secondary-subtle text-secondary"
+    };
+}
 <div class="container py-4">
     <h1 class="h4 mb-4">@Loc["MyOrders"]</h1>
     @if (Model.Count == 0)
@@ -24,7 +34,7 @@
                                 <span class="text-muted small me-2">@Loc["OrderNo"]：@o.OrderNo</span>
                                 <span class="text-muted small">@o.CreatedAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</span>
                             </div>
-                            <span class="badge bg-warning-subtle text-warning">@o.Status</span>
+                            <span class="badge @StatusBadge(o.Status)">@o.Status</span>
                         </div>
                         <ul class="list-unstyled mb-2">
                             @foreach (var i in o.Items)
@@ -46,7 +56,19 @@
                         {
                             <div class="text-end small text-success">@Loc["Discount"]（@o.CouponCode）：-¥@o.DiscountAmount.ToString("F2")</div>
                         }
-                        <div class="text-end fw-semibold">@Loc["Total"]：<span class="text-danger">¥@o.Total.ToString("F2")</span></div>
+                        <div class="d-flex justify-content-between align-items-center mt-2">
+                            @if (o.Status == OrderStatus.PendingShipment)
+                            {
+                                <form asp-controller="Orders" asp-action="Cancel" asp-route-id="@o.Id" method="post" onsubmit="return confirm('@Loc["ConfirmCancelOrder"]');">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">@Loc["CancelOrder"]</button>
+                                </form>
+                            }
+                            else
+                            {
+                                <span></span>
+                            }
+                            <span class="fw-semibold">@Loc["Total"]：<span class="text-danger">¥@o.Total.ToString("F2")</span></span>
+                        </div>
                     </div>
                 }
             </div>

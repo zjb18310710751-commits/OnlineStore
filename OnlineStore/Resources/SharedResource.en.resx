@@ -235,4 +235,11 @@
   <data name="InvalidVerificationCode" xml:space="preserve"><value>Invalid or expired code</value></data>
   <data name="VerificationEmailSubject" xml:space="preserve"><value>Your verification code</value></data>
   <data name="VerificationEmailBody" xml:space="preserve"><value>&lt;p&gt;Your verification code is: &lt;strong&gt;{0}&lt;/strong&gt;. It expires in 10 minutes.&lt;/p&gt;</value></data>
+  <data name="OrderManagement" xml:space="preserve"><value>Orders</value></data>
+  <data name="Ship" xml:space="preserve"><value>Ship</value></data>
+  <data name="Complete" xml:space="preserve"><value>Complete</value></data>
+  <data name="CancelOrder" xml:space="preserve"><value>Cancel Order</value></data>
+  <data name="Refund" xml:space="preserve"><value>Refund</value></data>
+  <data name="ConfirmCancelOrder" xml:space="preserve"><value>Cancel this order?</value></data>
+  <data name="ConfirmRefundOrder" xml:space="preserve"><value>Refund this order?</value></data>
 </root>
