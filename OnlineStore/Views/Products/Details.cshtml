@@ -216,6 +216,10 @@
                                     {
                                         <p class="mb-0 text-secondary">@r.Comment</p>
                                     }
+                                    @if (!string.IsNullOrEmpty(r.ImageUrl))
+                                    {
+                                        <img src="@r.ImageUrl" class="review-img mt-2" alt="@r.UserName" loading="lazy" />
+                                    }
                                 </li>
                             }
                         </ul>
@@ -223,7 +227,7 @@
 
                     @if (User.Identity?.IsAuthenticated == true)
                     {
-                        <form asp-controller="Reviews" asp-action="Create" method="post" class="border-top pt-3 mt-3">
+                        <form asp-controller="Reviews" asp-action="Create" method="post" enctype="multipart/form-data" class="border-top pt-3 mt-3">
                             <input type="hidden" name="productId" value="@Model.Id" />
                             <div class="mb-2">
                                 <label class="form-label small fw-semibold">@Loc["YourRating"]</label>
@@ -238,6 +242,10 @@
                             <div class="mb-2">
                                 <textarea name="comment" class="form-control" rows="3" placeholder="说说你的使用感受…"></textarea>
                             </div>
+                            <div class="mb-2">
+                                <label class="form-label small fw-semibold">@Loc["ReviewImage"]</label>
+                                <input type="file" name="image" class="form-control form-control-sm" accept=".jpg,.jpeg,.png,.webp,.gif" />
+                            </div>
                             <button type="submit" class="btn btn-primary btn-sm">@Loc["SubmitReview"]</button>
                         </form>
                     }
@@ -247,6 +255,19 @@
                     }
                 </div>
             </div>
+        </div>
+    </div>
+    <div class="card shadow-sm mt-4">
+        <div class="card-header bg-white fw-semibold">@Loc["DetailIntro"]</div>
+        <div class="card-body">
+            @if (!string.IsNullOrEmpty(Model.DetailHtml))
+            {
+                @Html.Raw(Model.DetailHtml)
+            }
+            else
+            {
+                <p class="text-muted mb-0">@Model.Description</p>
+            }
         </div>
     </div>
 </div>

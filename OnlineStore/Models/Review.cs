@@ -27,5 +27,9 @@ public class Review
     [Display(Name = "评价内容")]
     public string? Comment { get; set; }
 
+    [StringLength(500)]
+    [Display(Name = "图片")]
+    public string? ImageUrl { get; set; }
+
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 }

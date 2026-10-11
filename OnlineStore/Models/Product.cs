@@ -57,6 +57,10 @@ public class Product
     [Display(Name = "发货时效")]
     public string? DeliveryTime { get; set; }
 
+    [StringLength(10000)]
+    [Display(Name = "图文介绍")]
+    public string? DetailHtml { get; set; }
+
     // 规格变体 / 参数 / 评价
     public ICollection<ProductSku> Skus { get; set; } = new List<ProductSku>();
 

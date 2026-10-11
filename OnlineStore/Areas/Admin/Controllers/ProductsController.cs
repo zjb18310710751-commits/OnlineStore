@@ -76,7 +76,8 @@ public class ProductsController : Controller
             ShopId = vm.ShopId,
             ShippingFrom = vm.ShippingFrom,
             ShippingFee = vm.ShippingFee,
-            DeliveryTime = vm.DeliveryTime
+            DeliveryTime = vm.DeliveryTime,
+            DetailHtml = vm.DetailHtml
         };
 
         // 若上传了图片，则覆盖表单中的图片地址
@@ -124,7 +125,8 @@ public class ProductsController : Controller
             CategoryIds = categories.Select(c => c.Id).ToList(),
             ShippingFrom = product.ShippingFrom,
             ShippingFee = product.ShippingFee,
-            DeliveryTime = product.DeliveryTime
+            DeliveryTime = product.DeliveryTime,
+            DetailHtml = product.DetailHtml
         };
 
         await PopulateFormAsync(vm);
@@ -164,6 +166,7 @@ public class ProductsController : Controller
         product.ShippingFrom = vm.ShippingFrom;
         product.ShippingFee = vm.ShippingFee;
         product.DeliveryTime = vm.DeliveryTime;
+        product.DetailHtml = vm.DetailHtml;
 
         // 若上传了新图片，保存成功后清理被替换的旧本地图片
         if (vm.ImageFile is { Length: > 0 })

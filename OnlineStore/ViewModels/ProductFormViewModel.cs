@@ -62,6 +62,10 @@ public class ProductFormViewModel
     [Display(Name = "发货时效")]
     public string? DeliveryTime { get; set; }
 
+    [StringLength(10000)]
+    [Display(Name = "图文介绍")]
+    public string? DetailHtml { get; set; }
+
     public IEnumerable<SelectListItem>? Shops { get; set; }
 
     public IEnumerable<SelectListItem>? Categories { get; set; }

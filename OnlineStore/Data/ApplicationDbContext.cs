@@ -53,6 +53,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
             entity.Property(p => p.Price).HasConversion<double>();
             entity.Property(p => p.Sku).HasMaxLength(100);
             entity.Property(p => p.ImageUrl).HasMaxLength(500);
+            entity.Property(p => p.DetailHtml).HasMaxLength(10000);
 
             // 多分类（多对多，自动生成 ProductCategory 联结表）
             entity.HasMany(p => p.Categories)
@@ -91,6 +92,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
         builder.Entity<Review>(entity =>
         {
             entity.HasIndex(r => r.ProductId);
+            entity.Property(r => r.ImageUrl).HasMaxLength(500);
             entity.HasOne(r => r.Product)
                   .WithMany(p => p.Reviews)
                   .HasForeignKey(r => r.ProductId)

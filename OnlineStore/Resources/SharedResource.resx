@@ -175,6 +175,10 @@
   <data name="MyFavorites" xml:space="preserve"><value>我的收藏</value></data>
   <data name="NoFavorites" xml:space="preserve"><value>暂无收藏，去逛逛吧。</value></data>
   <data name="ReviewsCount" xml:space="preserve"><value>条评价</value></data>
+  <data name="DetailIntro" xml:space="preserve"><value>图文详情</value></data>
+  <data name="DetailIntroHint" xml:space="preserve"><value>文字直接输入，图片可直接粘贴（Ctrl+V）上传。</value></data>
+  <data name="DetailIntroPlaceholder" xml:space="preserve"><value>输入商品图文介绍，图片可直接粘贴…</value></data>
+  <data name="ReviewImage" xml:space="preserve"><value>上传图片（选填）</value></data>
   <data name="NoOrders" xml:space="preserve"><value>暂无订单，快去逛逛吧。</value></data>
   <data name="UserName" xml:space="preserve"><value>昵称</value></data>
   <data name="NoReviews" xml:space="preserve"><value>暂无评价。</value></data>

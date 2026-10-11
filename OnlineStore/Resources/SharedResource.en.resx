@@ -175,6 +175,10 @@
   <data name="MyFavorites" xml:space="preserve"><value>My favorites</value></data>
   <data name="NoFavorites" xml:space="preserve"><value>No favorites yet.</value></data>
   <data name="ReviewsCount" xml:space="preserve"><value>reviews</value></data>
+  <data name="DetailIntro" xml:space="preserve"><value>Details</value></data>
+  <data name="DetailIntroHint" xml:space="preserve"><value>Type text directly; paste images directly (Ctrl+V).</value></data>
+  <data name="DetailIntroPlaceholder" xml:space="preserve"><value>Type details; paste images directly…</value></data>
+  <data name="ReviewImage" xml:space="preserve"><value>Upload image (optional)</value></data>
   <data name="NoOrders" xml:space="preserve"><value>No orders yet.</value></data>
   <data name="UserName" xml:space="preserve"><value>User</value></data>
   <data name="NoReviews" xml:space="preserve"><value>No reviews yet.</value></data>

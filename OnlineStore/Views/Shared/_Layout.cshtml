@@ -43,49 +43,47 @@
                             </ul>
                         </li>
                     </ul>
-                    <form asp-controller="Products" asp-action="Index" method="get" class="d-flex me-3 my-2 my-lg-0" role="search">
-                        <input class="form-control me-2" type="search" name="searchTerm" placeholder="@Loc["SearchPlaceholder"]" aria-label="Search" value="@Context.Request.Query["searchTerm"]" />
-                        <button class="btn btn-outline-light" type="submit"><i class="bi bi-search"></i></button>
+                    <form asp-controller="Products" asp-action="Index" method="get" class="d-flex my-2 my-lg-0 me-lg-3" style="width: 240px;" role="search">
+                        <div class="input-group">
+                            <input class="form-control" type="search" name="searchTerm" placeholder="@Loc["SearchPlaceholder"]" aria-label="Search" value="@Context.Request.Query["searchTerm"]" />
+                            <button class="btn btn-light" type="submit"><i class="bi bi-search"></i></button>
+                        </div>
                     </form>
-                    <ul class="navbar-nav">
+                    <ul class="navbar-nav align-items-lg-center">
                         <li class="nav-item d-flex align-items-center me-2">
                             @await Component.InvokeAsync("CartSummary")
                         </li>
                         <li class="nav-item d-flex align-items-center me-2">
-                            <form asp-controller="Language" asp-action="Set" method="post" class="d-inline me-1">
-                                <input type="hidden" name="culture" value="zh-CN" />
+                            <form asp-controller="Language" asp-action="Set" method="post">
+                                <input type="hidden" name="culture" value="@(isZh ? "en" : "zh-CN")" />
                                 <input type="hidden" name="returnUrl" value="@returnUrl" />
-                                <button type="submit" class="btn btn-sm @(isZh ? "btn-light" : "btn-outline-light")" title="中文">中文</button>
-                            </form>
-                            <form asp-controller="Language" asp-action="Set" method="post" class="d-inline">
-                                <input type="hidden" name="culture" value="en" />
-                                <input type="hidden" name="returnUrl" value="@returnUrl" />
-                                <button type="submit" class="btn btn-sm @(isZh ? "btn-outline-light" : "btn-light")" title="English">EN</button>
+                                <button type="submit" class="btn btn-sm btn-outline-light" title="@Loc["Language"]">
+                                    <i class="bi bi-translate me-1"></i>@(isZh ? "EN" : "中文")
+                                </button>
                             </form>
                         </li>
                         @if (User.Identity?.IsAuthenticated == true)
                         {
-                            @if (isAdmin)
-                            {
-                                <li class="nav-item">
-                                    <a class="nav-link" asp-area="Admin" asp-controller="Dashboard" asp-action="Index">
-                                        <i class="bi bi-speedometer2 me-1"></i>@Loc["AdminPanel"]
-                                    </a>
-                                </li>
-                            }
-                            <li class="nav-item">
-                                <a class="nav-link" asp-controller="Account" asp-action="Profile"><i class="bi bi-person-circle me-1"></i>@Loc["Profile"]</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" asp-controller="Favorites" asp-action="Index"><i class="bi bi-heart me-1"></i>@Loc["MyFavorites"]</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" asp-controller="Orders" asp-action="MyOrders"><i class="bi bi-receipt me-1"></i>@Loc["MyOrders"]</a>
-                            </li>
-                            <li class="nav-item">
-                                <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
-                                    <button type="submit" class="btn btn-link nav-link border-0">@Loc["Logout"]</button>
-                                </form>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="bi bi-person-circle me-1"></i>@Loc["Profile"]
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li><a class="dropdown-item" asp-controller="Account" asp-action="Profile"><i class="bi bi-person me-2"></i>@Loc["Profile"]</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Favorites" asp-action="Index"><i class="bi bi-heart me-2"></i>@Loc["MyFavorites"]</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Orders" asp-action="MyOrders"><i class="bi bi-receipt me-2"></i>@Loc["MyOrders"]</a></li>
+                                    @if (isAdmin)
+                                    {
+                                        <li><hr class="dropdown-divider" /></li>
+                                        <li><a class="dropdown-item" asp-area="Admin" asp-controller="Dashboard" asp-action="Index"><i class="bi bi-speedometer2 me-2"></i>@Loc["AdminPanel"]</a></li>
+                                    }
+                                    <li><hr class="dropdown-divider" /></li>
+                                    <li>
+                                        <form asp-controller="Account" asp-action="Logout" method="post" class="m-0">
+                                            <button type="submit" class="dropdown-item"><i class="bi bi-box-arrow-right me-2"></i>@Loc["Logout"]</button>
+                                        </form>
+                                    </li>
+                                </ul>
                             </li>
                         }
                         else

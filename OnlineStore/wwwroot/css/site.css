@@ -213,6 +213,43 @@ body {
     border-color: #f1f3f6 !important;
 }
 
+/* 买家秀图片 */
+.review-img {
+    max-width: 120px;
+    max-height: 120px;
+    object-fit: cover;
+    border-radius: .375rem;
+    cursor: pointer;
+}
+
+/* 后台图文编辑器 */
+.detail-editor {
+    min-height: 180px;
+    max-height: 420px;
+    overflow-y: auto;
+    border: 1px solid #ced4da;
+    border-radius: .375rem;
+    padding: .75rem;
+    background: #fff;
+    line-height: 1.7;
+}
+
+.detail-editor:focus {
+    border-color: var(--brand);
+    outline: 0;
+    box-shadow: 0 0 0 .2rem rgba(0, 0, 0, .08);
+}
+
+.detail-editor:empty::before {
+    content: attr(data-placeholder);
+    color: #9aa4b2;
+}
+
+.detail-editor img {
+    max-width: 100%;
+    height: auto;
+}
+
 /* 多图画廊缩略图 */
 .gallery-thumb {
     width: 64px;

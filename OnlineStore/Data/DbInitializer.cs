@@ -271,7 +271,7 @@ public static class DbInitializer
                 Specs = Specs(("材质", "210T 涤纶"), ("防水", "PU2000mm"), ("人数", "3-6 人"), ("重量", "3.2kg"), ("搭建", "速开")),
                 Reviews = new List<Review>
                 {
-                    Review("露营新手", 5, "周末露营用了一次，搭起来很快，空间也够大。", 2),
+                    Review("露营新手", 5, "周末露营用了一次，搭起来很快，空间也够大。", 2, "https://picsum.photos/seed/SPORT-003-review/400/400"),
                     Review("户外老张", 4, "防水不错，就是收起来要费点劲。", 10),
                     Review("一家三口", 5, "客服很耐心，教我怎么搭，孩子很喜欢。", 18)
                 }
@@ -331,6 +331,7 @@ public static class DbInitializer
         {
             var (name, category, shop, price) = extraItems[i];
             var stock = Random.Shared.Next(30, 500);
+            var sku = $"EXT-{i + 1:000}";
             products.Add(new Product
             {
                 Name = name,
@@ -338,14 +339,14 @@ public static class DbInitializer
                 Description = BuildDescription(name),
                 Price = price,
                 Stock = stock,
-                Sku = $"EXT-{i + 1:000}",
+                Sku = sku,
                 Shop = shop,
                 Categories = new List<Category> { category },
                 ShippingFrom = PickOne("广东深圳", "浙江杭州", "江苏苏州", "上海", "北京"),
                 ShippingFee = "包邮",
                 DeliveryTime = PickOne("24小时内发货", "48小时内发货", "72小时内发货"),
                 Specs = BuildExtraSpecs(category.Name),
-                Reviews = BuildExtraReviews(),
+                Reviews = BuildExtraReviews(sku),
                 Skus = ShouldHaveSku(category.Name) ? BuildExtraSkus(category.Name, price, stock) : new List<ProductSku>()
             });
         }
@@ -354,12 +355,14 @@ public static class DbInitializer
         foreach (var p in products)
         {
             p.ImageUrl = $"https://picsum.photos/seed/{p.Sku}/600/400";
-            p.Images = new List<ProductImage>
+            var images = new List<ProductImage>
             {
                 new() { ImageUrl = p.ImageUrl, SortOrder = 0 },
                 new() { ImageUrl = $"https://picsum.photos/seed/{p.Sku}-b/600/400", SortOrder = 1 },
                 new() { ImageUrl = $"https://picsum.photos/seed/{p.Sku}-c/600/400", SortOrder = 2 }
             };
+            p.Images = images;
+            p.DetailHtml = BuildDetailHtml(p.Name, p.Description ?? "", images[0].ImageUrl, images[1].ImageUrl);
 
             // 每个 SKU 配一张不同图，选择颜色/规格时主图随之切换
             var skuIndex = 0;
@@ -385,6 +388,12 @@ public static class DbInitializer
             $"{name}，实用耐用，日常必备。",
             $"{name}，口碑很好，回购率高。");
 
+    private static string BuildDetailHtml(string name, string description, string img1, string img2) =>
+        $"<p>{description}</p>" +
+        $"<p><img src=\"{img1}\" class=\"img-fluid rounded\" alt=\"{name}\" /></p>" +
+        "<p>精选材质，做工扎实，细节到位。支持七天无理由退换，买得放心。</p>" +
+        $"<p><img src=\"{img2}\" class=\"img-fluid rounded\" alt=\"{name}\" /></p>";
+
     private static List<ProductSpec> BuildExtraSpecs(string categoryName)
     {
         var pool = categoryName switch
@@ -400,12 +409,13 @@ public static class DbInitializer
         return Specs(picked);
     }
 
-    private static List<Review> BuildExtraReviews()
+    private static List<Review> BuildExtraReviews(string sku)
     {
         var count = Random.Shared.Next(1, 3);
         var reviews = new List<Review>();
         for (var i = 0; i < count; i++)
         {
+            var hasImage = Random.Shared.NextDouble() < 0.4;
             reviews.Add(Review(
                 PickOne("老王", "小美", "阿杰", "静静", "大熊", "路过的风", "阿蓝", "小鹿", "爱吃鱼", "老张头"),
                 Random.Shared.Next(4, 6),
@@ -420,7 +430,8 @@ public static class DbInitializer
                     "做工可以，就是发货稍慢，总体满意。",
                     "买来送人的，对方很喜欢。",
                     "东西是好东西，就是包装简单了点。"),
-                Random.Shared.Next(1, 60)));
+                Random.Shared.Next(1, 60),
+                hasImage ? $"https://picsum.photos/seed/{sku}-r{i}/400/400" : null));
         }
 
         return reviews;
@@ -469,6 +480,6 @@ public static class DbInitializer
     private static List<ProductSpec> Specs(params (string Name, string Value)[] items)
         => items.Select((s, i) => new ProductSpec { Name = s.Name, Value = s.Value, DisplayOrder = i }).ToList();
 
-    private static Review Review(string userName, int rating, string comment, int daysAgo = 0)
-        => new() { UserName = userName, Rating = rating, Comment = comment, CreatedAt = DateTime.UtcNow.AddDays(-daysAgo) };
+    private static Review Review(string userName, int rating, string comment, int daysAgo = 0, string? imageUrl = null)
+        => new() { UserName = userName, Rating = rating, Comment = comment, ImageUrl = imageUrl, CreatedAt = DateTime.UtcNow.AddDays(-daysAgo) };
 }

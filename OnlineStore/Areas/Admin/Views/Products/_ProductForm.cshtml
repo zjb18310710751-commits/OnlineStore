@@ -76,6 +76,66 @@
     <textarea asp-for="Description" class="form-control" rows="4"></textarea>
     <span asp-validation-for="Description" class="text-danger small"></span>
 </div>
+<div class="mb-3">
+    <label asp-for="DetailHtml" class="form-label">@Loc["DetailIntro"]</label>
+    <div id="detailEditor" class="detail-editor" contenteditable="true"
+         data-placeholder="@Loc["DetailIntroPlaceholder"]"
+         data-upload-url="@Url.Action("Upload", "Images", new { area = "Admin" })">@Html.Raw(Model.DetailHtml)</div>
+    <input type="hidden" asp-for="DetailHtml" id="DetailHtmlInput" />
+    <div class="form-text">@Loc["DetailIntroHint"]</div>
+    <span asp-validation-for="DetailHtml" class="text-danger small"></span>
+</div>
+<script>
+    (function () {
+        var editor = document.getElementById('detailEditor');
+        var hidden = document.getElementById('DetailHtmlInput');
+        if (!editor || !hidden) return;
+
+        // 提交前把编辑器内容写回隐藏字段
+        var form = editor.closest('form');
+        if (form) {
+            form.addEventListener('submit', function () {
+                hidden.value = editor.innerHTML;
+            });
+        }
+
+        // 粘贴图片：拦截后上传，再插入 <img>
+        editor.addEventListener('paste', function (e) {
+            var items = (e.clipboardData || window.clipboardData).items;
+            if (!items) return;
+            for (var i = 0; i < items.length; i++) {
+                if (items[i].type.indexOf('image') === 0) {
+                    e.preventDefault();
+                    uploadImage(items[i].getAsFile());
+                    return;
+                }
+            }
+        });
+
+        function uploadImage(file) {
+            if (!file) return;
+            var fd = new FormData();
+            fd.append('file', file);
+            var token = document.querySelector('input[name="__RequestVerificationToken"]');
+            fetch(editor.getAttribute('data-upload-url'), {
+                method: 'POST',
+                body: fd,
+                headers: { 'RequestVerificationToken': token ? token.value : '' }
+            })
+            .then(function (r) { return r.json(); })
+            .then(function (data) {
+                if (data.url) {
+                    var img = document.createElement('img');
+                    img.src = data.url;
+                    img.className = 'img-fluid rounded my-1';
+                    editor.appendChild(img);
+                    editor.appendChild(document.createElement('br'));
+                }
+            })
+            .catch(function () { /* 上传失败静默处理 */ });
+        }
+    })();
+</script>
 <div class="form-check mb-3">
     <input asp-for="IsActive" class="form-check-input" />
     <label asp-for="IsActive" class="form-check-label">@Loc["IsActive"]</label>
