@@ -1,0 +1,13 @@
+# 排除版本控制、构建产物与本地数据，缩小构建上下文
+.git/
+.gitignore
+**/bin/
+**/obj/
+**/.vs/
+*.db
+*.db-shm
+*.db-wal
+*.docx
+*.doc
+~$*
+*.log

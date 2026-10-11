@@ -85,7 +85,13 @@ else
 
 app.UseStatusCodePagesWithReExecute("/Home/Error", "?code={0}");
 
-app.UseHttpsRedirection();
+// 云托管平台（如 Render）在边缘已终止 TLS，再向容器转发 HTTP；
+// 此时若仍强制 HTTPS 重定向会导致重定向死循环，故仅本地开发环境启用。
+if (app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
+
 app.UseStaticFiles();
 
 // 请求本地化：根据 Query 参数(?culture=en) 或 Cookie 决定语言，默认中文
