@@ -50,7 +50,7 @@ builder.Services.AddScoped<IFavoriteService, FavoriteService>();
 builder.Services.AddScoped<ICartStore, SessionCartStore>();
 builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<IImageStorageService, ImageStorageService>();
-builder.Services.AddScoped<IEmailService, SmtpEmailService>();
+builder.Services.AddScoped<IEmailService, BrevoApiEmailService>();
 builder.Services.AddScoped<IVerificationCodeService, VerificationCodeService>();
 builder.Services.AddScoped<ICouponService, CouponService>();
 
@@ -70,6 +70,8 @@ builder.Services.AddHealthChecks()
 
 // 本地化（多语言）：资源文件位于 Resources/ 目录
 builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
+
+builder.Services.AddHttpClient();
 
 builder.Services.AddControllersWithViews();
 
