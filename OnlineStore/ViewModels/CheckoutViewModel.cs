@@ -10,6 +10,14 @@ public class CheckoutViewModel
 
     public decimal Total { get; set; }
 
+    [StringLength(50)]
+    public string? CouponCode { get; set; }
+
+    public decimal DiscountAmount { get; set; }
+
+    /// <summary>实付金额 = 商品总额 - 优惠。</summary>
+    public decimal PayableTotal => Total - DiscountAmount;
+
     [Required(ErrorMessage = "请输入收货人姓名")]
     [StringLength(50)]
     [Display(Name = "收货人")]

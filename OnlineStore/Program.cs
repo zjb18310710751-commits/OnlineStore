@@ -50,6 +50,9 @@ builder.Services.AddScoped<IFavoriteService, FavoriteService>();
 builder.Services.AddScoped<ICartStore, SessionCartStore>();
 builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<IImageStorageService, ImageStorageService>();
+builder.Services.AddScoped<IEmailService, SmtpEmailService>();
+builder.Services.AddScoped<IVerificationCodeService, VerificationCodeService>();
+builder.Services.AddScoped<ICouponService, CouponService>();
 
 // 购物车会话存储：内存缓存 + Session（无需外部服务；生产可替换为 Redis —— 可修改性）
 builder.Services.AddDistributedMemoryCache();

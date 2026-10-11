@@ -38,4 +38,7 @@ public interface IProductService
     Task<int> CountActiveAsync();
 
     Task<int> CountLowStockAsync(int threshold = 5);
+
+    /// <summary>读取促销中的商品（原价高于现价），用于首页「限时折扣」专区。</summary>
+    Task<IReadOnlyList<Product>> GetSaleItemsAsync(int count = 8);
 }

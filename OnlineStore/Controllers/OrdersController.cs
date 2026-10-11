@@ -13,15 +13,18 @@ public class OrdersController : Controller
 {
     private readonly IOrderService _orderService;
     private readonly ICartService _cartService;
+    private readonly ICouponService _couponService;
     private readonly UserManager<ApplicationUser> _userManager;
 
     public OrdersController(
         IOrderService orderService,
         ICartService cartService,
+        ICouponService couponService,
         UserManager<ApplicationUser> userManager)
     {
         _orderService = orderService;
         _cartService = cartService;
+        _couponService = couponService;
         _userManager = userManager;
     }
 
@@ -64,6 +67,21 @@ public class OrdersController : Controller
             return View(vm);
         }
 
+        // 校验并应用优惠码
+        decimal discount = 0;
+        Coupon? applied = null;
+        if (!string.IsNullOrWhiteSpace(vm.CouponCode))
+        {
+            var result = await _couponService.ValidateAsync(vm.CouponCode, cart.Total);
+            if (!result.Success)
+            {
+                ModelState.AddModelError(nameof(vm.CouponCode), result.Error!);
+                return View(vm);
+            }
+            discount = result.DiscountAmount;
+            applied = result.Coupon;
+        }
+
         var user = await _userManager.GetUserAsync(User);
 
         var order = new Order
@@ -73,7 +91,9 @@ public class OrdersController : Controller
             UserName = vm.UserName,
             Phone = vm.Phone,
             Address = vm.Address,
-            Total = cart.Total,
+            Total = cart.Total - discount,
+            CouponCode = applied?.Code,
+            DiscountAmount = discount,
             Status = "待发货",
             Items = cart.Items.Select(i => new OrderItem
             {
@@ -87,6 +107,10 @@ public class OrdersController : Controller
         };
 
         await _orderService.CreateAsync(order);
+        if (applied is not null)
+        {
+            await _couponService.IncrementUsageAsync(applied.Id);
+        }
         await _cartService.ClearAsync();
 
         return RedirectToAction(nameof(Confirmation), new { id = order.Id });

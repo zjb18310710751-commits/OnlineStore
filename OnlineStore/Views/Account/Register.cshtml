@@ -12,8 +12,17 @@
                         <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
                         <div class="mb-3">
                             <label asp-for="Email" class="form-label">@Loc["Email"]</label>
-                            <input asp-for="Email" class="form-control" autocomplete="username" />
+                            <div class="input-group">
+                                <input asp-for="Email" class="form-control" autocomplete="username" />
+                                <button type="button" class="btn btn-outline-primary" id="sendCodeBtn">@Loc["SendVerificationCode"]</button>
+                            </div>
+                            <div id="sendCodeStatus" class="form-text"></div>
                             <span asp-validation-for="Email" class="text-danger small"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="VerificationCode" class="form-label">@Loc["VerificationCode"]</label>
+                            <input asp-for="VerificationCode" class="form-control" autocomplete="one-time-code" />
+                            <span asp-validation-for="VerificationCode" class="text-danger small"></span>
                         </div>
                         <div class="row g-3 mb-1">
                             <div class="col-6">
@@ -61,4 +70,66 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script>
+        (function () {
+            var btn = document.getElementById('sendCodeBtn');
+            var emailInput = document.querySelector('input[name="Email"]');
+            var status = document.getElementById('sendCodeStatus');
+            if (!btn || !emailInput) return;
+
+            var url = '@Url.Action("SendCode", "Account")';
+            var successMsg = '@Loc["SendCodeSuccess"].Value';
+            var cooldown = 60;
+
+            btn.addEventListener('click', function () {
+                var email = emailInput.value.trim();
+                if (!email) {
+                    status.textContent = '@Loc["InvalidEmail"].Value';
+                    return;
+                }
+
+                var token = document.querySelector('input[name="__RequestVerificationToken"]');
+                btn.disabled = true;
+
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': token ? token.value : ''
+                    },
+                    body: JSON.stringify({ email: email })
+                })
+                .then(function (r) { return r.json(); })
+                .then(function (data) {
+                    if (data.ok) {
+                        status.textContent = successMsg;
+                        startCountdown();
+                    } else {
+                        status.textContent = data.error || '@Loc["SendCodeFailed"].Value';
+                        btn.disabled = false;
+                    }
+                })
+                .catch(function () {
+                    status.textContent = '@Loc["SendCodeFailed"].Value';
+                    btn.disabled = false;
+                });
+            });
+
+            function startCountdown() {
+                var left = cooldown;
+                btn.disabled = true;
+                btn.textContent = left + 's';
+                var timer = setInterval(function () {
+                    left--;
+                    if (left <= 0) {
+                        clearInterval(timer);
+                        btn.disabled = false;
+                        btn.textContent = '@Loc["SendVerificationCode"].Value';
+                    } else {
+                        btn.textContent = left + 's';
+                    }
+                }, 1000);
+            }
+        })();
+    </script>
 }

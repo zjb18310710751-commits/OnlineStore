@@ -1,0 +1,79 @@
+using System.Security.Cryptography;
+using System.Text;
+using Microsoft.EntityFrameworkCore;
+using OnlineStore.Data;
+using OnlineStore.Models;
+
+namespace OnlineStore.Services;
+
+public class VerificationCodeService : IVerificationCodeService
+{
+    private static readonly TimeSpan Cooldown = TimeSpan.FromSeconds(60);
+    private static readonly TimeSpan Validity = TimeSpan.FromMinutes(10);
+
+    private readonly ApplicationDbContext _context;
+
+    public VerificationCodeService(ApplicationDbContext context)
+    {
+        _context = context;
+    }
+
+    public async Task<string> GenerateAsync(string email)
+    {
+        var normalized = email.Trim().ToLowerInvariant();
+
+        var latest = await _context.EmailVerificationCodes
+            .Where(c => c.Email == normalized)
+            .OrderByDescending(c => c.CreatedAt)
+            .FirstOrDefaultAsync();
+
+        if (latest is not null && latest.CreatedAt > DateTime.UtcNow - Cooldown)
+        {
+            throw new InvalidOperationException("验证码发送过于频繁，请稍后再试。");
+        }
+
+        // 删除该邮箱的旧验证码（load+RemoveRange，兼容 InMemory 测试）
+        var olds = await _context.EmailVerificationCodes.Where(c => c.Email == normalized).ToListAsync();
+        if (olds.Count > 0)
+        {
+            _context.EmailVerificationCodes.RemoveRange(olds);
+        }
+
+        var code = RandomNumberGenerator.GetInt32(0, 1_000_000).ToString("D6");
+        _context.EmailVerificationCodes.Add(new EmailVerificationCode
+        {
+            Email = normalized,
+            Code = code,
+            ExpiresAt = DateTime.UtcNow.Add(Validity)
+        });
+        await _context.SaveChangesAsync();
+
+        return code;
+    }
+
+    public async Task<bool> VerifyAsync(string email, string code)
+    {
+        var normalized = email.Trim().ToLowerInvariant();
+        var record = await _context.EmailVerificationCodes
+            .Where(c => c.Email == normalized)
+            .OrderByDescending(c => c.CreatedAt)
+            .FirstOrDefaultAsync();
+
+        if (record is null || record.ExpiresAt <= DateTime.UtcNow)
+        {
+            return false;
+        }
+
+        var expected = Encoding.UTF8.GetBytes(record.Code);
+        var actual = Encoding.UTF8.GetBytes(code);
+        if (!CryptographicOperations.FixedTimeEquals(expected, actual))
+        {
+            return false;
+        }
+
+        // 验证通过后消费该码（一次性）
+        _context.EmailVerificationCodes.Remove(record);
+        await _context.SaveChangesAsync();
+        return true;
+    }
+}

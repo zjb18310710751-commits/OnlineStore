@@ -201,4 +201,38 @@
   <data name="ProductCount" xml:space="preserve"><value>{0} 件商品</value></data>
   <data name="ManageSku" xml:space="preserve"><value>规格</value></data>
   <data name="ManageSpec" xml:space="preserve"><value>参数</value></data>
+  <data name="OriginalPrice" xml:space="preserve"><value>原价</value></data>
+  <data name="LimitedTimeDiscount" xml:space="preserve"><value>限时折扣</value></data>
+  <data name="DiscountPercent" xml:space="preserve"><value>-{0}%</value></data>
+  <data name="CouponManagement" xml:space="preserve"><value>优惠券管理</value></data>
+  <data name="AddCoupon" xml:space="preserve"><value>新增优惠券</value></data>
+  <data name="CreateCoupon" xml:space="preserve"><value>新建优惠券</value></data>
+  <data name="EditCoupon" xml:space="preserve"><value>编辑优惠券</value></data>
+  <data name="NoCoupons" xml:space="preserve"><value>暂无优惠券</value></data>
+  <data name="CouponCode" xml:space="preserve"><value>优惠码</value></data>
+  <data name="CouponType" xml:space="preserve"><value>优惠类型</value></data>
+  <data name="CouponValue" xml:space="preserve"><value>优惠值</value></data>
+  <data name="MinOrderAmount" xml:space="preserve"><value>最低订单金额</value></data>
+  <data name="StartDate" xml:space="preserve"><value>开始日期</value></data>
+  <data name="EndDate" xml:space="preserve"><value>结束日期</value></data>
+  <data name="UsageLimit" xml:space="preserve"><value>使用上限</value></data>
+  <data name="UsedCount" xml:space="preserve"><value>已用次数</value></data>
+  <data name="PercentDiscount" xml:space="preserve"><value>百分比折扣</value></data>
+  <data name="FixedDiscount" xml:space="preserve"><value>固定金额</value></data>
+  <data name="Unlimited" xml:space="preserve"><value>不限</value></data>
+  <data name="EnterCoupon" xml:space="preserve"><value>输入优惠码</value></data>
+  <data name="Discount" xml:space="preserve"><value>优惠</value></data>
+  <data name="ConfirmDeleteCoupon" xml:space="preserve"><value>确定删除该优惠券？</value></data>
+  <data name="CouponValidity" xml:space="preserve"><value>有效期</value></data>
+  <data name="Enabled" xml:space="preserve"><value>启用</value></data>
+  <data name="Disabled" xml:space="preserve"><value>停用</value></data>
+  <data name="SendVerificationCode" xml:space="preserve"><value>发送验证码</value></data>
+  <data name="VerificationCode" xml:space="preserve"><value>验证码</value></data>
+  <data name="SendCodeSuccess" xml:space="preserve"><value>验证码已发送，请查收邮箱</value></data>
+  <data name="SendCodeFailed" xml:space="preserve"><value>验证码发送失败，请稍后再试</value></data>
+  <data name="InvalidEmail" xml:space="preserve"><value>请输入有效的邮箱地址</value></data>
+  <data name="EmailAlreadyRegistered" xml:space="preserve"><value>该邮箱已被注册</value></data>
+  <data name="InvalidVerificationCode" xml:space="preserve"><value>验证码错误或已过期</value></data>
+  <data name="VerificationEmailSubject" xml:space="preserve"><value>您的注册验证码</value></data>
+  <data name="VerificationEmailBody" xml:space="preserve"><value>&lt;p&gt;您的验证码是：&lt;strong&gt;{0}&lt;/strong&gt;，10 分钟内有效。&lt;/p&gt;</value></data>
 </root>

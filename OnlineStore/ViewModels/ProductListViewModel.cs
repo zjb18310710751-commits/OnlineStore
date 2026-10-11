@@ -25,4 +25,7 @@ public class ProductListViewModel
 
     /// <summary>搜索无结果时的「猜你喜欢」推荐。</summary>
     public IReadOnlyList<Product> Recommendations { get; set; } = new List<Product>();
+
+    /// <summary>首页「限时折扣」专区商品。</summary>
+    public IReadOnlyList<Product> SaleItems { get; set; } = new List<Product>();
 }

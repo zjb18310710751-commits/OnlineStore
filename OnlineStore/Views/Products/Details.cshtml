@@ -100,6 +100,13 @@
                             <h1 class="h5 mb-2">@Model.Name</h1>
                             <div class="d-flex align-items-baseline gap-2 mb-1">
                                 <span class="fs-3 fw-bold text-danger">¥<span id="priceText">@Model.Price.ToString("F2")</span></span>
+                                @if (Model.IsOnSale)
+                                {
+                                    <span id="originalPriceBox" class="d-flex align-items-baseline gap-1">
+                                        <span class="text-muted text-decoration-line-through">¥@Model.OriginalPrice!.Value.ToString("F2")</span>
+                                        <span class="badge bg-danger">@Loc["DiscountPercent", Model.DiscountPercent ?? 0]</span>
+                                    </span>
+                                }
                                 <span class="text-muted small">@Loc["SoldCount", Model.Shop?.SalesCount ?? 0]</span>
                             </div>
                             <div class="text-muted small mb-3" id="stockText">@Loc["StockLeft", Model.Stock]</div>
@@ -283,6 +290,7 @@
 
                 const priceEl = document.getElementById('priceText');
                 const stockEl = document.getElementById('stockText');
+                const originalBox = document.getElementById('originalPriceBox');
                 const mainImg = document.getElementById('mainImage');
                 const skuInput = document.getElementById('skuIdInput');
                 const qtyInput = document.getElementById('qty');
@@ -299,6 +307,7 @@
                         stockEl.textContent = stockTemplate.replace('{0}', sku.Stock);
                         skuInput.value = sku.Id;
                         qtyInput.max = sku.Stock;
+                        if (originalBox) originalBox.classList.add('d-none');
                         if (sku.ImageUrl) {
                             setMainImage(sku.ImageUrl);
                             if (galleryStrip) {

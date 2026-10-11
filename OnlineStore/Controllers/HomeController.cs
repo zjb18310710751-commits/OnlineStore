@@ -22,6 +22,7 @@ public class HomeController : Controller
             PageSize = 8,
             SortBy = "newest"
         });
+        vm.SaleItems = await _productService.GetSaleItemsAsync(8);
         return View(vm);
     }
 

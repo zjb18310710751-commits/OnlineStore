@@ -21,12 +21,17 @@
     </div>
 </div>
 <div class="row g-3">
-    <div class="col-md-6 mb-3">
+    <div class="col-md-4 mb-3">
         <label asp-for="Price" class="form-label">@Loc["Price"]</label>
         <input asp-for="Price" class="form-control" />
         <span asp-validation-for="Price" class="text-danger small"></span>
     </div>
-    <div class="col-md-6 mb-3">
+    <div class="col-md-4 mb-3">
+        <label asp-for="OriginalPrice" class="form-label">@Loc["OriginalPrice"]</label>
+        <input asp-for="OriginalPrice" class="form-control" placeholder="选填，用于划线原价" />
+        <span asp-validation-for="OriginalPrice" class="text-danger small"></span>
+    </div>
+    <div class="col-md-4 mb-3">
         <label asp-for="Stock" class="form-label">@Loc["Stock"]</label>
         <input asp-for="Stock" class="form-control" />
         <span asp-validation-for="Stock" class="text-danger small"></span>

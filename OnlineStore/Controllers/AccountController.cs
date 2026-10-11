@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 using OnlineStore.Models;
+using OnlineStore.Services;
 using OnlineStore.ViewModels;
 
 namespace OnlineStore.Controllers;
@@ -10,13 +12,22 @@ public class AccountController : Controller
 {
     private readonly SignInManager<ApplicationUser> _signInManager;
     private readonly UserManager<ApplicationUser> _userManager;
+    private readonly IEmailService _emailService;
+    private readonly IVerificationCodeService _verificationCodeService;
+    private readonly IStringLocalizer<SharedResource> _loc;
 
     public AccountController(
         SignInManager<ApplicationUser> signInManager,
-        UserManager<ApplicationUser> userManager)
+        UserManager<ApplicationUser> userManager,
+        IEmailService emailService,
+        IVerificationCodeService verificationCodeService,
+        IStringLocalizer<SharedResource> localizer)
     {
         _signInManager = signInManager;
         _userManager = userManager;
+        _emailService = emailService;
+        _verificationCodeService = verificationCodeService;
+        _loc = localizer;
     }
 
     [HttpGet]
@@ -100,6 +111,34 @@ public class AccountController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
+    public async Task<IActionResult> SendCode([FromBody] SendCodeViewModel model)
+    {
+        if (model is null || !ModelState.IsValid)
+        {
+            return Json(new { ok = false, error = _loc["InvalidEmail"].Value });
+        }
+
+        if (await _userManager.FindByEmailAsync(model.Email) is not null)
+        {
+            return Json(new { ok = false, error = _loc["EmailAlreadyRegistered"].Value });
+        }
+
+        try
+        {
+            var code = await _verificationCodeService.GenerateAsync(model.Email);
+            var subject = _loc["VerificationEmailSubject"].Value;
+            var body = string.Format(_loc["VerificationEmailBody"].Value, code);
+            await _emailService.SendAsync(model.Email, subject, body);
+            return Json(new { ok = true });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Json(new { ok = false, error = ex.Message });
+        }
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Register(RegisterViewModel model)
     {
         if (!ModelState.IsValid)
@@ -114,11 +153,18 @@ public class AccountController : Controller
             return View(model);
         }
 
+        // 校验邮箱验证码
+        if (!await _verificationCodeService.VerifyAsync(model.Email, model.VerificationCode))
+        {
+            ModelState.AddModelError(nameof(model.VerificationCode), _loc["InvalidVerificationCode"].Value);
+            return View(model);
+        }
+
         var user = new ApplicationUser
         {
             UserName = model.Email,
             Email = model.Email,
-            EmailConfirmed = true, // 演示环境无邮件服务，直接标记邮箱已验证
+            EmailConfirmed = true, // 通过验证码校验即视为邮箱已验证
             FirstName = model.FirstName,
             LastName = model.LastName,
             Address = model.Address,

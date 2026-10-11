@@ -69,6 +69,7 @@ public class ProductsController : Controller
             Slug = SlugHelper.ToSlug(vm.Name),
             Description = vm.Description,
             Price = vm.Price,
+            OriginalPrice = vm.OriginalPrice,
             Stock = vm.Stock,
             Sku = vm.Sku,
             ImageUrl = vm.ImageUrl,
@@ -117,6 +118,7 @@ public class ProductsController : Controller
             Name = product.Name,
             Description = product.Description,
             Price = product.Price,
+            OriginalPrice = product.OriginalPrice,
             Stock = product.Stock,
             Sku = product.Sku,
             ImageUrl = product.ImageUrl,
@@ -158,6 +160,7 @@ public class ProductsController : Controller
         product.Slug = SlugHelper.ToSlug(vm.Name);
         product.Description = vm.Description;
         product.Price = vm.Price;
+        product.OriginalPrice = vm.OriginalPrice;
         product.Stock = vm.Stock;
         product.Sku = vm.Sku;
         product.ImageUrl = vm.ImageUrl;

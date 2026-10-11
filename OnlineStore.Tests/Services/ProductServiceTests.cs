@@ -112,4 +112,21 @@ public class ProductServiceTests
 
         Assert.Equal(new[] { 55m, 299m, 459m }, result.Items.Select(p => p.Price).ToArray());
     }
+
+    [Fact]
+    public async Task GetSaleItemsAsync_ReturnsOnlyOnSaleProducts()
+    {
+        using var context = CreateContext();
+        await SeedAsync(context);
+        var onSale = await context.Products.FindAsync(1);
+        onSale!.OriginalPrice = 399m;
+        await context.SaveChangesAsync();
+
+        var service = new ProductService(context);
+        var result = await service.GetSaleItemsAsync(8);
+
+        Assert.Single(result);
+        Assert.Equal(1, result[0].Id);
+        Assert.True(result[0].IsOnSale);
+    }
 }

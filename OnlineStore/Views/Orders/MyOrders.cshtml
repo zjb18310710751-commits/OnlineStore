@@ -42,6 +42,10 @@
                                 </li>
                             }
                         </ul>
+                        @if (o.DiscountAmount > 0)
+                        {
+                            <div class="text-end small text-success">@Loc["Discount"]（@o.CouponCode）：-¥@o.DiscountAmount.ToString("F2")</div>
+                        }
                         <div class="text-end fw-semibold">@Loc["Total"]：<span class="text-danger">¥@o.Total.ToString("F2")</span></div>
                     </div>
                 }

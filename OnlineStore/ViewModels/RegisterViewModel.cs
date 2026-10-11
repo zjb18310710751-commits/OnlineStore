@@ -20,6 +20,12 @@ public class RegisterViewModel
     [Display(Name = "邮箱")]
     public string Email { get; set; } = string.Empty;
 
+    [Required(ErrorMessage = "请输入验证码")]
+    [StringLength(6, MinimumLength = 6, ErrorMessage = "验证码为 6 位数字")]
+    [RegularExpression(@"^\d{6}$", ErrorMessage = "验证码为 6 位数字")]
+    [Display(Name = "验证码")]
+    public string VerificationCode { get; set; } = string.Empty;
+
     [Required(ErrorMessage = "请输入地址")]
     [StringLength(500)]
     [Display(Name = "地址")]

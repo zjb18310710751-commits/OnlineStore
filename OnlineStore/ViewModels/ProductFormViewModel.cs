@@ -23,6 +23,10 @@ public class ProductFormViewModel
     [Display(Name = "价格")]
     public decimal Price { get; set; }
 
+    [Range(0, 9999999, ErrorMessage = "原价不能为负")]
+    [Display(Name = "原价")]
+    public decimal? OriginalPrice { get; set; }
+
     [Required(ErrorMessage = "请输入库存")]
     [Range(0, int.MaxValue, ErrorMessage = "库存不能为负")]
     [Display(Name = "库存")]

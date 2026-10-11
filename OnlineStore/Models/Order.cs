@@ -29,6 +29,13 @@ public class Order
     [Display(Name = "订单金额")]
     public decimal Total { get; set; }
 
+    /// <summary>使用的优惠码（如有）。</summary>
+    [StringLength(50)]
+    public string? CouponCode { get; set; }
+
+    /// <summary>优惠金额（无优惠为 0）。</summary>
+    public decimal DiscountAmount { get; set; }
+
     [StringLength(20)]
     [Display(Name = "订单状态")]
     public string Status { get; set; } = "待发货";

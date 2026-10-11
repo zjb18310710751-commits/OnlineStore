@@ -22,6 +22,16 @@ public class Product
     [Display(Name = "价格")]
     public decimal Price { get; set; }
 
+    [Display(Name = "原价")]
+    public decimal? OriginalPrice { get; set; }
+
+    /// <summary>是否促销中（原价高于现价）。</summary>
+    public bool IsOnSale => OriginalPrice.HasValue && OriginalPrice.Value > Price;
+
+    /// <summary>折扣百分比（促销时），如 30 表示 -30%。</summary>
+    public int? DiscountPercent =>
+        IsOnSale ? (int)Math.Round((1m - Price / OriginalPrice!.Value) * 100m) : null;
+
     [Display(Name = "库存")]
     public int Stock { get; set; }
 

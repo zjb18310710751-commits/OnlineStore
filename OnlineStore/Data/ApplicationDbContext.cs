@@ -21,6 +21,8 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<OrderItem> OrderItems => Set<OrderItem>();
     public DbSet<ProductImage> ProductImages => Set<ProductImage>();
     public DbSet<Favorite> Favorites => Set<Favorite>();
+    public DbSet<Coupon> Coupons => Set<Coupon>();
+    public DbSet<EmailVerificationCode> EmailVerificationCodes => Set<EmailVerificationCode>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -51,6 +53,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
             entity.Property(p => p.Slug).HasMaxLength(150);
             entity.Property(p => p.Description).HasMaxLength(2000);
             entity.Property(p => p.Price).HasConversion<double>();
+            entity.Property(p => p.OriginalPrice).HasConversion<double?>();
             entity.Property(p => p.Sku).HasMaxLength(100);
             entity.Property(p => p.ImageUrl).HasMaxLength(500);
             entity.Property(p => p.DetailHtml).HasMaxLength(10000);
@@ -103,6 +106,8 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
         {
             entity.HasIndex(o => o.UserId);
             entity.Property(o => o.Total).HasConversion<double>();
+            entity.Property(o => o.DiscountAmount).HasConversion<double>();
+            entity.Property(o => o.CouponCode).HasMaxLength(50);
             entity.HasMany(o => o.Items)
                   .WithOne(i => i.Order)
                   .HasForeignKey(i => i.OrderId)
@@ -132,6 +137,21 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
                   .WithMany()
                   .HasForeignKey(f => f.ProductId)
                   .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        builder.Entity<Coupon>(entity =>
+        {
+            entity.HasIndex(c => c.Code).IsUnique();
+            entity.Property(c => c.Code).HasMaxLength(50).IsRequired();
+            entity.Property(c => c.DiscountValue).HasConversion<double>();
+            entity.Property(c => c.MinOrderAmount).HasConversion<double?>();
+        });
+
+        builder.Entity<EmailVerificationCode>(entity =>
+        {
+            entity.HasIndex(v => v.Email);
+            entity.Property(v => v.Email).HasMaxLength(256).IsRequired();
+            entity.Property(v => v.Code).HasMaxLength(6).IsRequired();
         });
     }
 }

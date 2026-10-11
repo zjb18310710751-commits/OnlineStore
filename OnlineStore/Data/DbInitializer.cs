@@ -83,7 +83,7 @@ public static class DbInitializer
             {
                 Name = "无线蓝牙耳机", Slug = "无线蓝牙耳机",
                 Description = "主动降噪，30 小时续航，支持快充，通勤运动都好用。",
-                Price = 299.00m, Stock = 130, Sku = "ELEC-001", Shop = digital,
+                Price = 299.00m, OriginalPrice = 399.00m, Stock = 130, Sku = "ELEC-001", Shop = digital,
                 Categories = new List<Category> { electronics },
                 ShippingFrom = "广东深圳", ShippingFee = "包邮", DeliveryTime = "48小时内发货",
                 Skus = new List<ProductSku>
@@ -103,7 +103,7 @@ public static class DbInitializer
             {
                 Name = "机械键盘 87 键", Slug = "机械键盘-87-键",
                 Description = "热插拔轴体，RGB 背光，PBT 键帽，办公游戏两相宜。",
-                Price = 459.00m, Stock = 90, Sku = "ELEC-002", Shop = digital,
+                Price = 459.00m, OriginalPrice = 549.00m, Stock = 90, Sku = "ELEC-002", Shop = digital,
                 Categories = new List<Category> { electronics },
                 ShippingFrom = "江苏苏州", ShippingFee = "包邮", DeliveryTime = "24小时内发货",
                 Skus = new List<ProductSku>
@@ -120,7 +120,7 @@ public static class DbInitializer
             {
                 Name = "27 英寸 2K 显示器", Slug = "27-英寸-2k-显示器",
                 Description = "IPS 面板，144Hz 刷新率，广色域，办公游戏都合适。",
-                Price = 1299.00m, Stock = 35, Sku = "ELEC-003", Shop = digital,
+                Price = 1299.00m, OriginalPrice = 1599.00m, Stock = 35, Sku = "ELEC-003", Shop = digital,
                 Categories = new List<Category> { electronics },
                 ShippingFrom = "广东惠州", ShippingFee = "包邮", DeliveryTime = "48小时内发货",
                 Specs = Specs(("尺寸", "27 英寸"), ("分辨率", "2560×1440"), ("刷新率", "144Hz"), ("面板", "IPS")),
@@ -134,7 +134,7 @@ public static class DbInitializer
             {
                 Name = "纯棉基础款 T 恤", Slug = "纯棉基础款-t-恤",
                 Description = "100% 精梳棉，多色可选，透气舒适，一年四季都能穿。",
-                Price = 79.00m, Stock = 300, Sku = "CLOTH-001", Shop = clothing,
+                Price = 79.00m, OriginalPrice = 99.00m, Stock = 300, Sku = "CLOTH-001", Shop = clothing,
                 Categories = new List<Category> { fashion },
                 ShippingFrom = "浙江杭州", ShippingFee = "包邮", DeliveryTime = "24小时内发货",
                 Skus = new List<ProductSku>
@@ -157,7 +157,7 @@ public static class DbInitializer
             {
                 Name = "休闲运动卫衣", Slug = "休闲运动卫衣",
                 Description = "宽松版型，加绒加厚，秋冬百搭，运动休闲都合适。",
-                Price = 199.00m, Stock = 150, Sku = "CLOTH-002", Shop = clothing,
+                Price = 199.00m, OriginalPrice = 259.00m, Stock = 150, Sku = "CLOTH-002", Shop = clothing,
                 Categories = new List<Category> { fashion, sports },
                 ShippingFrom = "浙江杭州", ShippingFee = "包邮", DeliveryTime = "24小时内发货",
                 Skus = new List<ProductSku>
@@ -196,7 +196,7 @@ public static class DbInitializer
             {
                 Name = "北欧风陶瓷马克杯", Slug = "北欧风陶瓷马克杯",
                 Description = "简约设计，450ml 大容量，可微波加热，日常喝水很合适。",
-                Price = 39.90m, Stock = 500, Sku = "HOME-001", Shop = homeStore,
+                Price = 39.90m, OriginalPrice = 49.90m, Stock = 500, Sku = "HOME-001", Shop = homeStore,
                 Categories = new List<Category> { home },
                 ShippingFrom = "江西景德镇", ShippingFee = "包邮", DeliveryTime = "48小时内发货",
                 Skus = new List<ProductSku>
@@ -211,7 +211,7 @@ public static class DbInitializer
             {
                 Name = "记忆棉护颈枕", Slug = "记忆棉护颈枕",
                 Description = "慢回弹，符合人体工学，改善睡眠，枕套可拆洗。",
-                Price = 129.00m, Stock = 90, Sku = "HOME-002", Shop = homeStore,
+                Price = 129.00m, OriginalPrice = 159.00m, Stock = 90, Sku = "HOME-002", Shop = homeStore,
                 Categories = new List<Category> { home },
                 ShippingFrom = "江苏南通", ShippingFee = "包邮", DeliveryTime = "48小时内发货",
                 Specs = Specs(("填充", "记忆棉"), ("尺寸", "50×30×10cm"), ("枕套", "可拆洗")),
@@ -256,7 +256,7 @@ public static class DbInitializer
             {
                 Name = "户外露营帐篷", Slug = "户外露营帐篷",
                 Description = "双层防雨，速开设计，3-6 人空间，周末露营首选。",
-                Price = 389.00m, Stock = 59, Sku = "SPORT-003", Shop = outdoor,
+                Price = 389.00m, OriginalPrice = 499.00m, Stock = 59, Sku = "SPORT-003", Shop = outdoor,
                 Categories = new List<Category> { sports },
                 ShippingFrom = "浙江宁波", ShippingFee = "包邮", DeliveryTime = "48小时内发货",
                 Skus = new List<ProductSku>
@@ -332,12 +332,16 @@ public static class DbInitializer
             var (name, category, shop, price) = extraItems[i];
             var stock = Random.Shared.Next(30, 500);
             var sku = $"EXT-{i + 1:000}";
+            var originalPrice = Random.Shared.NextDouble() < 0.25
+                ? Math.Round(price * (decimal)(1.1 + Random.Shared.NextDouble() * 0.4), 2)
+                : (decimal?)null;
             products.Add(new Product
             {
                 Name = name,
                 Slug = name,
                 Description = BuildDescription(name),
                 Price = price,
+                OriginalPrice = originalPrice,
                 Stock = stock,
                 Sku = sku,
                 Shop = shop,

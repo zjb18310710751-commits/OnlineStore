@@ -201,4 +201,38 @@
   <data name="ProductCount" xml:space="preserve"><value>{0} products</value></data>
   <data name="ManageSku" xml:space="preserve"><value>Variants</value></data>
   <data name="ManageSpec" xml:space="preserve"><value>Specs</value></data>
+  <data name="OriginalPrice" xml:space="preserve"><value>Original Price</value></data>
+  <data name="LimitedTimeDiscount" xml:space="preserve"><value>Limited-Time Deals</value></data>
+  <data name="DiscountPercent" xml:space="preserve"><value>-{0}%</value></data>
+  <data name="CouponManagement" xml:space="preserve"><value>Coupons</value></data>
+  <data name="AddCoupon" xml:space="preserve"><value>Add Coupon</value></data>
+  <data name="CreateCoupon" xml:space="preserve"><value>Create Coupon</value></data>
+  <data name="EditCoupon" xml:space="preserve"><value>Edit Coupon</value></data>
+  <data name="NoCoupons" xml:space="preserve"><value>No coupons yet</value></data>
+  <data name="CouponCode" xml:space="preserve"><value>Coupon Code</value></data>
+  <data name="CouponType" xml:space="preserve"><value>Type</value></data>
+  <data name="CouponValue" xml:space="preserve"><value>Value</value></data>
+  <data name="MinOrderAmount" xml:space="preserve"><value>Min. Order</value></data>
+  <data name="StartDate" xml:space="preserve"><value>Start Date</value></data>
+  <data name="EndDate" xml:space="preserve"><value>End Date</value></data>
+  <data name="UsageLimit" xml:space="preserve"><value>Usage Limit</value></data>
+  <data name="UsedCount" xml:space="preserve"><value>Used</value></data>
+  <data name="PercentDiscount" xml:space="preserve"><value>Percent</value></data>
+  <data name="FixedDiscount" xml:space="preserve"><value>Fixed Amount</value></data>
+  <data name="Unlimited" xml:space="preserve"><value>Unlimited</value></data>
+  <data name="EnterCoupon" xml:space="preserve"><value>Enter coupon code</value></data>
+  <data name="Discount" xml:space="preserve"><value>Discount</value></data>
+  <data name="ConfirmDeleteCoupon" xml:space="preserve"><value>Delete this coupon?</value></data>
+  <data name="CouponValidity" xml:space="preserve"><value>Validity</value></data>
+  <data name="Enabled" xml:space="preserve"><value>Enabled</value></data>
+  <data name="Disabled" xml:space="preserve"><value>Disabled</value></data>
+  <data name="SendVerificationCode" xml:space="preserve"><value>Send Code</value></data>
+  <data name="VerificationCode" xml:space="preserve"><value>Verification Code</value></data>
+  <data name="SendCodeSuccess" xml:space="preserve"><value>Code sent. Check your inbox.</value></data>
+  <data name="SendCodeFailed" xml:space="preserve"><value>Failed to send code. Try again later.</value></data>
+  <data name="InvalidEmail" xml:space="preserve"><value>Enter a valid email address</value></data>
+  <data name="EmailAlreadyRegistered" xml:space="preserve"><value>This email is already registered</value></data>
+  <data name="InvalidVerificationCode" xml:space="preserve"><value>Invalid or expired code</value></data>
+  <data name="VerificationEmailSubject" xml:space="preserve"><value>Your verification code</value></data>
+  <data name="VerificationEmailBody" xml:space="preserve"><value>&lt;p&gt;Your verification code is: &lt;strong&gt;{0}&lt;/strong&gt;. It expires in 10 minutes.&lt;/p&gt;</value></data>
 </root>

@@ -192,6 +192,15 @@ public class ProductService : IProductService
             .OrderByDescending(p => p.CreatedAt)
             .ToListAsync();
 
+    public async Task<IReadOnlyList<Product>> GetSaleItemsAsync(int count = 8) =>
+        await _context.Products
+            .AsNoTracking()
+            .Where(p => p.IsActive && p.OriginalPrice != null && p.OriginalPrice > p.Price)
+            .Include(p => p.Categories)
+            .OrderByDescending(p => p.UpdatedAt)
+            .Take(count)
+            .ToListAsync();
+
     public Task<int> CountAsync() => _context.Products.CountAsync();
 
     public Task<int> CountActiveAsync() => _context.Products.CountAsync(p => p.IsActive);

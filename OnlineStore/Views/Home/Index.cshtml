@@ -14,6 +14,21 @@
     </div>
 </section>
 
+@if (Model.SaleItems.Count > 0)
+{
+    <div class="container py-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2 class="h4 mb-0"><i class="bi bi-lightning-charge-fill text-danger me-1"></i>@Loc["LimitedTimeDiscount"]</h2>
+        </div>
+        <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3">
+            @foreach (var product in Model.SaleItems)
+            {
+                <partial name="_ProductCard" model="@product" />
+            }
+        </div>
+    </div>
+}
+
 <div class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h2 class="h4 mb-0">@Loc["NewArrivals"]</h2>
