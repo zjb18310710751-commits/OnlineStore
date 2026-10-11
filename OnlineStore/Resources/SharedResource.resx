@@ -242,4 +242,9 @@
   <data name="Refund" xml:space="preserve"><value>退款</value></data>
   <data name="ConfirmCancelOrder" xml:space="preserve"><value>确定取消该订单吗？</value></data>
   <data name="ConfirmRefundOrder" xml:space="preserve"><value>确定退款该订单吗？</value></data>
+  <data name="ForgotPassword" xml:space="preserve"><value>忘记密码</value></data>
+  <data name="ResetPassword" xml:space="preserve"><value>重置密码</value></data>
+  <data name="NewPassword" xml:space="preserve"><value>新密码</value></data>
+  <data name="EmailNotRegistered" xml:space="preserve"><value>该邮箱未注册</value></data>
+  <data name="PasswordResetSuccess" xml:space="preserve"><value>密码已重置，请用新密码登录</value></data>
 </root>

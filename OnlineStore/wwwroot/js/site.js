@@ -51,3 +51,76 @@ function switchImage(btn, url) {
     btn.classList.add('active');
 }
 
+// 发送验证码按钮：通用组件（注册/找回密码共用），通过 data-* 属性配置
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('[data-send-code-url]').forEach(initSendCodeButton);
+});
+
+function initSendCodeButton(btn) {
+    var emailInput = document.querySelector(btn.getAttribute('data-send-code-email'));
+    var statusEl = document.querySelector(btn.getAttribute('data-send-code-status'));
+    if (!emailInput) return;
+
+    var url = btn.getAttribute('data-send-code-url');
+    var purpose = btn.getAttribute('data-send-code-purpose') || 'register';
+    var successMsg = btn.getAttribute('data-send-code-success') || '';
+    var failedMsg = btn.getAttribute('data-send-code-failed') || '';
+    var invalidMsg = btn.getAttribute('data-send-code-invalid') || '';
+    var label = btn.getAttribute('data-send-code-label') || btn.textContent;
+    var cooldown = 60;
+
+    function setStatus(msg) {
+        if (statusEl) statusEl.textContent = msg;
+    }
+
+    btn.addEventListener('click', function () {
+        var email = emailInput.value.trim();
+        if (!email) {
+            setStatus(invalidMsg);
+            return;
+        }
+
+        var token = document.querySelector('input[name="__RequestVerificationToken"]');
+        btn.disabled = true;
+
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'RequestVerificationToken': token ? token.value : ''
+            },
+            body: JSON.stringify({ email: email, purpose: purpose })
+        })
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+            if (data.ok) {
+                setStatus(successMsg);
+                startCountdown();
+            } else {
+                setStatus(data.error || failedMsg);
+                btn.disabled = false;
+            }
+        })
+        .catch(function () {
+            setStatus(failedMsg);
+            btn.disabled = false;
+        });
+    });
+
+    function startCountdown() {
+        var left = cooldown;
+        btn.disabled = true;
+        btn.textContent = left + 's';
+        var timer = setInterval(function () {
+            left--;
+            if (left <= 0) {
+                clearInterval(timer);
+                btn.disabled = false;
+                btn.textContent = label;
+            } else {
+                btn.textContent = left + 's';
+            }
+        }, 1000);
+    }
+}
+

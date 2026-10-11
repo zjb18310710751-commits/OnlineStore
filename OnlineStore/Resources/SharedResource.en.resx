@@ -242,4 +242,9 @@
   <data name="Refund" xml:space="preserve"><value>Refund</value></data>
   <data name="ConfirmCancelOrder" xml:space="preserve"><value>Cancel this order?</value></data>
   <data name="ConfirmRefundOrder" xml:space="preserve"><value>Refund this order?</value></data>
+  <data name="ForgotPassword" xml:space="preserve"><value>Forgot Password</value></data>
+  <data name="ResetPassword" xml:space="preserve"><value>Reset Password</value></data>
+  <data name="NewPassword" xml:space="preserve"><value>New Password</value></data>
+  <data name="EmailNotRegistered" xml:space="preserve"><value>This email is not registered</value></data>
+  <data name="PasswordResetSuccess" xml:space="preserve"><value>Password reset. Please sign in with your new password.</value></data>
 </root>

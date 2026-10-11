@@ -1,11 +1,12 @@
-using System.Net;
-using System.Net.Mail;
+using MailKit.Net.Smtp;
+using MailKit.Security;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using MimeKit;
 
 namespace OnlineStore.Services;
 
-/// <summary>基于 SMTP 的邮件发送实现，配置从 Email 段读取。</summary>
+/// <summary>基于 SMTP 的邮件发送实现（MailKit），配置从 Email 段读取。</summary>
 public class SmtpEmailService : IEmailService
 {
     private readonly IConfiguration _configuration;
@@ -34,34 +35,40 @@ public class SmtpEmailService : IEmailService
         var username = section["Username"];
         var password = section["Password"];
 
-        using var message = new MailMessage
-        {
-            From = new MailAddress(senderEmail, senderName),
-            Subject = subject,
-            Body = htmlBody,
-            IsBodyHtml = true
-        };
-        message.To.Add(to);
+        var message = new MimeMessage();
+        message.From.Add(new MailboxAddress(senderName, senderEmail));
+        message.To.Add(MailboxAddress.Parse(to));
+        message.Subject = subject;
+        message.Body = new BodyBuilder { HtmlBody = htmlBody }.ToMessageBody();
 
-        using var smtp = new SmtpClient(host, port)
-        {
-            EnableSsl = enableSsl,
-            DeliveryMethod = SmtpDeliveryMethod.Network
-        };
-
-        if (!string.IsNullOrWhiteSpace(username))
-        {
-            smtp.Credentials = new NetworkCredential(username, password);
-        }
-
+        using var client = new SmtpClient();
         try
         {
-            await smtp.SendMailAsync(message, cancellationToken);
+            // 465 端口是隐式 SSL（SMTPS）；其余端口按配置走 STARTTLS
+            var secureOptions = port == 465
+                ? SecureSocketOptions.SslOnConnect
+                : (enableSsl ? SecureSocketOptions.StartTls : SecureSocketOptions.None);
+
+            await client.ConnectAsync(host, port, secureOptions, cancellationToken);
+
+            if (!string.IsNullOrWhiteSpace(username))
+            {
+                await client.AuthenticateAsync(username, password ?? string.Empty, cancellationToken);
+            }
+
+            await client.SendAsync(message, cancellationToken);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "发送验证码邮件失败：{To}", to);
             throw new InvalidOperationException("验证码发送失败，请稍后再试。", ex);
+        }
+        finally
+        {
+            if (client.IsConnected)
+            {
+                await client.DisconnectAsync(true, cancellationToken);
+            }
         }
     }
 }

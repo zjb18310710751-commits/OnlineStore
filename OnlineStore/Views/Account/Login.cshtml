@@ -26,6 +26,9 @@
                             <label asp-for="RememberMe" class="form-check-label">@Loc["RememberMe"]</label>
                         </div>
                         <button type="submit" class="btn btn-primary w-100">@Loc["Login"]</button>
+                        <div class="text-end mt-2">
+                            <a asp-controller="Account" asp-action="ForgotPassword" class="small text-muted">@Loc["ForgotPassword"]</a>
+                        </div>
                     </form>
                 </div>
             </div>

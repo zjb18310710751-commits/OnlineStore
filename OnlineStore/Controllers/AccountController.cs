@@ -118,16 +118,29 @@ public class AccountController : Controller
             return Json(new { ok = false, error = _loc["InvalidEmail"].Value });
         }
 
-        if (await _userManager.FindByEmailAsync(model.Email) is not null)
+        var user = await _userManager.FindByEmailAsync(model.Email);
+        if (model.Purpose == "reset")
         {
-            return Json(new { ok = false, error = _loc["EmailAlreadyRegistered"].Value });
+            // 找回密码：邮箱必须已注册
+            if (user is null)
+            {
+                return Json(new { ok = false, error = _loc["EmailNotRegistered"].Value });
+            }
+        }
+        else
+        {
+            // 注册：邮箱必须未注册
+            if (user is not null)
+            {
+                return Json(new { ok = false, error = _loc["EmailAlreadyRegistered"].Value });
+            }
         }
 
         try
         {
             var code = await _verificationCodeService.GenerateAsync(model.Email);
             var subject = _loc["VerificationEmailSubject"].Value;
-            var body = string.Format(_loc["VerificationEmailBody"].Value, code);
+            var body = EmailTemplateBuilder.BuildVerificationCode(code);
             await _emailService.SendAsync(model.Email, subject, body);
             return Json(new { ok = true });
         }
@@ -186,6 +199,54 @@ public class AccountController : Controller
         await _signInManager.SignInAsync(user, isPersistent: false);
         TempData["Success"] = "注册成功，欢迎使用！";
         return RedirectToAction("Index", "Home");
+    }
+
+    [HttpGet]
+    public IActionResult ForgotPassword()
+    {
+        if (User.Identity?.IsAuthenticated == true)
+        {
+            return RedirectToAction("Index", "Home");
+        }
+
+        return View();
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel model)
+    {
+        if (!ModelState.IsValid)
+        {
+            return View(model);
+        }
+
+        var user = await _userManager.FindByEmailAsync(model.Email);
+        if (user is null)
+        {
+            ModelState.AddModelError(nameof(model.Email), _loc["EmailNotRegistered"].Value);
+            return View(model);
+        }
+
+        if (!await _verificationCodeService.VerifyAsync(model.Email, model.VerificationCode))
+        {
+            ModelState.AddModelError(nameof(model.VerificationCode), _loc["InvalidVerificationCode"].Value);
+            return View(model);
+        }
+
+        var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+        var result = await _userManager.ResetPasswordAsync(user, token, model.NewPassword);
+        if (!result.Succeeded)
+        {
+            foreach (var error in result.Errors)
+            {
+                ModelState.AddModelError(string.Empty, error.Description);
+            }
+            return View(model);
+        }
+
+        TempData["Success"] = _loc["PasswordResetSuccess"].Value;
+        return RedirectToAction(nameof(Login));
     }
 
     [HttpGet]
