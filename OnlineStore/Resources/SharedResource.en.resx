@@ -179,6 +179,9 @@
   <data name="DetailIntroHint" xml:space="preserve"><value>Type text directly; paste images directly (Ctrl+V).</value></data>
   <data name="DetailIntroPlaceholder" xml:space="preserve"><value>Type details; paste images directly…</value></data>
   <data name="ReviewImage" xml:space="preserve"><value>Upload image (optional)</value></data>
+  <data name="PasteImageHint" xml:space="preserve"><value>Click here and press Ctrl+V to paste</value></data>
+  <data name="SkuImageHint" xml:space="preserve"><value>Paste an image to upload, or clear it.</value></data>
+  <data name="ClearImage" xml:space="preserve"><value>Clear</value></data>
   <data name="NoOrders" xml:space="preserve"><value>No orders yet.</value></data>
   <data name="UserName" xml:space="preserve"><value>User</value></data>
   <data name="NoReviews" xml:space="preserve"><value>No reviews yet.</value></data>

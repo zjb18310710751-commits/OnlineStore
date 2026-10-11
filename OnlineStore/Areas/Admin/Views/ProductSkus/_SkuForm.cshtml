@@ -26,8 +26,24 @@
         <span asp-validation-for="Stock" class="text-danger small"></span>
     </div>
     <div class="col-md-8 mb-3">
-        <label asp-for="ImageUrl" class="form-label">@Loc["ImageUrl"]</label>
-        <input asp-for="ImageUrl" class="form-control" placeholder="可选" />
+        <label class="form-label">@Loc["ImageUrl"]</label>
+        <div id="skuImageBox" class="sku-image-box" tabindex="0"
+             data-upload-url="@Url.Action("Upload", "Images", new { area = "Admin" })"
+             data-placeholder="@Loc["PasteImageHint"]">
+            @if (!string.IsNullOrEmpty(Model.ImageUrl))
+            {
+                <img src="@Model.ImageUrl" alt="@Loc["Image"]" />
+            }
+            else
+            {
+                <span class="text-muted">@Loc["PasteImageHint"]</span>
+            }
+        </div>
+        <input type="hidden" asp-for="ImageUrl" id="skuImageUrl" />
+        <div class="d-flex gap-2 align-items-center mt-1">
+            <button type="button" class="btn btn-sm btn-outline-danger" id="skuImageClear">@Loc["ClearImage"]</button>
+            <div class="form-text mb-0">@Loc["SkuImageHint"]</div>
+        </div>
         <span asp-validation-for="ImageUrl" class="text-danger small"></span>
     </div>
 </div>
@@ -35,3 +51,49 @@
     <input asp-for="IsActive" class="form-check-input" />
     <label asp-for="IsActive" class="form-check-label">@Loc["IsActive"]</label>
 </div>
+<script>
+    (function () {
+        var box = document.getElementById('skuImageBox');
+        var hidden = document.getElementById('skuImageUrl');
+        var clearBtn = document.getElementById('skuImageClear');
+        if (!box || !hidden) return;
+
+        function setPreview(url) {
+            if (url) {
+                box.innerHTML = '<img src="' + url + '" alt="规格图" />';
+            } else {
+                box.innerHTML = '<span class="text-muted">' + box.getAttribute('data-placeholder') + '</span>';
+            }
+            hidden.value = url || '';
+        }
+
+        box.addEventListener('click', function () { box.focus(); });
+        box.addEventListener('paste', function (e) {
+            var items = (e.clipboardData || window.clipboardData).items;
+            if (!items) return;
+            for (var i = 0; i < items.length; i++) {
+                if (items[i].type.indexOf('image') === 0) {
+                    e.preventDefault();
+                    upload(items[i].getAsFile());
+                    return;
+                }
+            }
+        });
+
+        if (clearBtn) clearBtn.addEventListener('click', function () { setPreview(''); });
+
+        function upload(file) {
+            if (!file) return;
+            var fd = new FormData();
+            fd.append('file', file);
+            var token = document.querySelector('input[name="__RequestVerificationToken"]');
+            fetch(box.getAttribute('data-upload-url'), {
+                method: 'POST', body: fd,
+                headers: { 'RequestVerificationToken': token ? token.value : '' }
+            })
+            .then(function (r) { return r.json(); })
+            .then(function (data) { if (data.url) setPreview(data.url); })
+            .catch(function () {});
+        }
+    })();
+</script>

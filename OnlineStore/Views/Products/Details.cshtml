@@ -86,7 +86,7 @@
                             </div>
                             @if (images.Count > 1)
                             {
-                                <div class="d-flex gap-2 flex-wrap">
+                                <div class="d-flex gap-2 flex-wrap" id="galleryStrip">
                                     @for (var i = 0; i < images.Count; i++)
                                     {
                                         <button type="button" class="gallery-thumb @(i == 0 ? "active" : "")" onclick="switchImage(this, '@images[i]')">
@@ -286,6 +286,8 @@
                 const mainImg = document.getElementById('mainImage');
                 const skuInput = document.getElementById('skuIdInput');
                 const qtyInput = document.getElementById('qty');
+                const galleryStrip = document.getElementById('galleryStrip');
+                const originalGallery = galleryStrip ? galleryStrip.innerHTML : '';
 
                 function findSku() {
                     return skus.find(s => s.Color === selectedColor && s.Spec === selectedSpec) || null;
@@ -297,7 +299,14 @@
                         stockEl.textContent = stockTemplate.replace('{0}', sku.Stock);
                         skuInput.value = sku.Id;
                         qtyInput.max = sku.Stock;
-                        if (sku.ImageUrl) setMainImage(sku.ImageUrl);
+                        if (sku.ImageUrl) {
+                            setMainImage(sku.ImageUrl);
+                            if (galleryStrip) {
+                                galleryStrip.innerHTML = '<button type="button" class="gallery-thumb active"><img src="' + sku.ImageUrl + '" alt="" /></button>';
+                            }
+                        } else if (galleryStrip) {
+                            galleryStrip.innerHTML = originalGallery;
+                        }
                     }
                 }
                 document.querySelectorAll('.sku-chip').forEach(chip => {

@@ -25,3 +25,6 @@ OnlineStore/wwwroot/uploads/
 # 用户机密
 appsettings.*.local.json
 secrets.json
+
+# Word 临时锁定文件
+~$*
