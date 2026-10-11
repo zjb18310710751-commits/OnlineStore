@@ -247,4 +247,5 @@
   <data name="NewPassword" xml:space="preserve"><value>New Password</value></data>
   <data name="EmailNotRegistered" xml:space="preserve"><value>This email is not registered</value></data>
   <data name="PasswordResetSuccess" xml:space="preserve"><value>Password reset. Please sign in with your new password.</value></data>
+  <data name="DemoCode" xml:space="preserve"><value>Code: {0}</value></data>
 </root>

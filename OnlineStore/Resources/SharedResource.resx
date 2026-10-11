@@ -247,4 +247,5 @@
   <data name="NewPassword" xml:space="preserve"><value>新密码</value></data>
   <data name="EmailNotRegistered" xml:space="preserve"><value>该邮箱未注册</value></data>
   <data name="PasswordResetSuccess" xml:space="preserve"><value>密码已重置，请用新密码登录</value></data>
+  <data name="DemoCode" xml:space="preserve"><value>验证码：{0}</value></data>
 </root>

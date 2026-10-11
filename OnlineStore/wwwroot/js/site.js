@@ -67,6 +67,7 @@ function initSendCodeButton(btn) {
     var failedMsg = btn.getAttribute('data-send-code-failed') || '';
     var invalidMsg = btn.getAttribute('data-send-code-invalid') || '';
     var label = btn.getAttribute('data-send-code-label') || btn.textContent;
+    var demoMsg = btn.getAttribute('data-send-code-demo') || '';
     var cooldown = 60;
 
     function setStatus(msg) {
@@ -94,7 +95,11 @@ function initSendCodeButton(btn) {
         .then(function (r) { return r.json(); })
         .then(function (data) {
             if (data.ok) {
-                setStatus(successMsg);
+                if (data.code) {
+                    setStatus(demoMsg.replace('{0}', data.code));
+                } else {
+                    setStatus(successMsg);
+                }
                 startCountdown();
             } else {
                 setStatus(data.error || failedMsg);

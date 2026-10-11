@@ -139,10 +139,20 @@ public class AccountController : Controller
         try
         {
             var code = await _verificationCodeService.GenerateAsync(model.Email);
-            var subject = _loc["VerificationEmailSubject"].Value;
-            var body = EmailTemplateBuilder.BuildVerificationCode(code);
-            await _emailService.SendAsync(model.Email, subject, body);
-            return Json(new { ok = true });
+
+            // 演示模式：验证码始终随响应返回给页面显示；邮件作为尽力而为的补充（能发就发，失败不影响注册）
+            try
+            {
+                var subject = _loc["VerificationEmailSubject"].Value;
+                var body = EmailTemplateBuilder.BuildVerificationCode(code);
+                await _emailService.SendAsync(model.Email, subject, body);
+            }
+            catch
+            {
+                // 忽略邮件发送失败：演示模式下验证码已在页面展示
+            }
+
+            return Json(new { ok = true, code });
         }
         catch (InvalidOperationException ex)
         {
