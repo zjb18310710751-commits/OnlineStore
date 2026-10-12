@@ -157,8 +157,8 @@
                                 <input type="hidden" name="productId" value="@Model.Id" />
                                 <input type="hidden" name="skuId" id="skuIdInput" value="" />
                                 <input type="hidden" name="returnUrl" value="@($"{Context.Request.Path}{Context.Request.QueryString}")" />
-                                <button type="submit" class="btn btn-danger btn-lg flex-grow-1"><i class="bi bi-cart-plus me-1"></i>@Loc["AddToCart"]</button>
-                                <button type="submit" class="btn btn-warning btn-lg" formaction="@Url.Action("Add", "Cart", new { buyNow = true })">@Loc["BuyNow"]</button>
+                                <button type="submit" class="btn btn-amazon btn-lg flex-grow-1"><i class="bi bi-cart-plus me-1"></i>@Loc["AddToCart"]</button>
+                                <button type="submit" class="btn btn-buy-now btn-lg" formaction="@Url.Action("Add", "Cart", new { buyNow = true })">@Loc["BuyNow"]</button>
                             </form>
                             <form asp-controller="Favorites" asp-action="Toggle" method="post" class="mt-2">
                                 <input type="hidden" name="productId" value="@Model.Id" />

@@ -1,72 +1,131 @@
 :root {
-    --brand: #111111;
-    --brand-dark: #000000;
-    --brand-light: #ececec;
-    --bs-primary: #111111;
-    --bs-primary-rgb: 17, 17, 17;
-    --bs-link-color: #111111;
-    --bs-link-color-rgb: 17, 17, 17;
-    --bs-link-hover-color: #444444;
+    --amazon-dark: #131921;
+    --amazon-dark2: #232f3e;
+    --amazon-orange: #ff9900;
+    --amazon-yellow: #ffd814;
+    --amazon-buy: #ffa41c;
+    --amazon-price: #b12704;
+    --amazon-link: #007185;
+    --brand: #ff9900;
+    --brand-dark: #e68a00;
+    --brand-light: #fff4e0;
+    --bs-primary: #ff9900;
+    --bs-primary-rgb: 255, 153, 0;
+    --bs-link-color: #007185;
+    --bs-link-color-rgb: 0, 113, 133;
+    --bs-link-hover-color: #c7511f;
 }
 
 body {
     font-family: -apple-system, "Segoe UI", "Microsoft YaHei", Roboto, sans-serif;
-    background-color: #f6f4f1;
-    color: #212529;
+    background-color: #eaeded;
+    color: #0f1111;
 }
 
-/* 统一主色调为黑色，去除 Bootstrap 默认蓝 */
+/* 主按钮 = 亚马逊橙 */
 .btn-primary {
-    --bs-btn-bg: var(--brand);
-    --bs-btn-border-color: var(--brand);
-    --bs-btn-hover-bg: var(--brand-dark);
-    --bs-btn-hover-border-color: var(--brand-dark);
-    --bs-btn-active-bg: var(--brand-dark);
-    --bs-btn-active-border-color: var(--brand-dark);
-    --bs-btn-disabled-bg: var(--brand);
-    --bs-btn-disabled-border-color: var(--brand);
+    --bs-btn-bg: #ff9900;
+    --bs-btn-border-color: #ff9900;
+    --bs-btn-hover-bg: #e68a00;
+    --bs-btn-hover-border-color: #e68a00;
+    --bs-btn-active-bg: #cc7a00;
+    --bs-btn-active-border-color: #cc7a00;
+    --bs-btn-disabled-bg: #ff9900;
+    --bs-btn-disabled-border-color: #ff9900;
 }
 
 .btn-outline-primary {
-    --bs-btn-color: var(--brand);
-    --bs-btn-border-color: var(--brand);
-    --bs-btn-hover-bg: var(--brand);
-    --bs-btn-hover-border-color: var(--brand);
-    --bs-btn-hover-color: #fff;
-    --bs-btn-active-bg: var(--brand);
-    --bs-btn-active-border-color: var(--brand);
-    --bs-btn-active-color: #fff;
+    --bs-btn-color: #0f1111;
+    --bs-btn-border-color: #d5d9d9;
+    --bs-btn-hover-bg: #f0f2f2;
+    --bs-btn-hover-border-color: #d5d9d9;
+    --bs-btn-hover-color: #0f1111;
+    --bs-btn-active-bg: #e3e6e6;
+    --bs-btn-active-border-color: #d5d9d9;
+    --bs-btn-active-color: #0f1111;
+}
+
+/* 亚马逊「加入购物车」黄按钮 */
+.btn-amazon {
+    --bs-btn-bg: #ffd814;
+    --bs-btn-border-color: #fcd200;
+    --bs-btn-color: #0f1111;
+    --bs-btn-hover-bg: #f7ca00;
+    --bs-btn-hover-border-color: #f2c200;
+    --bs-btn-hover-color: #0f1111;
+    --bs-btn-active-bg: #f0c800;
+    --bs-btn-active-border-color: #e6c000;
+    --bs-btn-active-color: #0f1111;
+    border-radius: 50rem;
+}
+
+/* 亚马逊「立即购买」橙按钮 */
+.btn-buy-now {
+    --bs-btn-bg: #ffa41c;
+    --bs-btn-border-color: #ff8f00;
+    --bs-btn-color: #0f1111;
+    --bs-btn-hover-bg: #fa8900;
+    --bs-btn-hover-border-color: #fa8900;
+    --bs-btn-hover-color: #0f1111;
+    --bs-btn-active-bg: #f08800;
+    --bs-btn-active-border-color: #e67c00;
+    --bs-btn-active-color: #0f1111;
+    border-radius: 50rem;
 }
 
 .bg-brand {
-    background-color: var(--brand) !important;
+    background-color: var(--amazon-dark) !important;
 }
 
 .text-brand {
-    color: var(--brand) !important;
+    color: var(--amazon-orange) !important;
 }
 
-/* 首页 Hero */
+/* 深色导航条内的下拉菜单文字可读 */
+.navbar-dark .nav-link {
+    color: #fff;
+}
+
+.navbar-dark .nav-link:hover {
+    color: #fff;
+    text-decoration: underline;
+}
+
+/* 亚马逊式搜索按钮 */
+.search-btn-amazon {
+    background-color: #febd69;
+    border-color: #febd69;
+    color: #0f1111;
+}
+
+.search-btn-amazon:hover {
+    background-color: #f3a847;
+    border-color: #f3a847;
+    color: #0f1111;
+}
+
+/* 首页 Hero：亚马逊深色渐变横幅 */
 .hero {
-    background: linear-gradient(135deg, #111111 0%, #4a4a4a 100%);
+    background: linear-gradient(135deg, #232f3e 0%, #37475a 100%);
 }
 
 /* 商品卡片 */
 .product-card {
     border: 0;
-    border-radius: 0.75rem;
+    border-radius: .5rem;
     overflow: hidden;
     transition: transform .15s ease, box-shadow .15s ease;
+    background: #fff;
 }
 
 .product-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .12) !important;
+    transform: translateY(-3px);
+    box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15) !important;
 }
 
 .product-thumb {
     height: 180px;
-    background: #eef1f5;
+    background: #f0f2f2;
     color: #9aa4b2;
     text-decoration: none;
 }
@@ -82,12 +141,12 @@ body {
 }
 
 .product-link {
-    color: #212529;
+    color: #0f1111;
     text-decoration: none;
 }
 
 .product-link:hover {
-    color: var(--brand);
+    color: var(--amazon-link);
 }
 
 .category-badge {
@@ -97,8 +156,13 @@ body {
 }
 
 .price {
-    color: var(--brand);
+    color: var(--amazon-price);
     font-weight: 700;
+}
+
+/* 划线原价（促销） */
+.text-decoration-line-through {
+    color: #565959;
 }
 
 /* 商品详情 */
@@ -106,7 +170,7 @@ body {
     min-height: 320px;
     background: #fff;
     border: 1px solid #eef1f5;
-    border-radius: .75rem;
+    border-radius: .5rem;
     overflow: hidden;
 }
 
@@ -125,7 +189,7 @@ body {
 .cart-thumb {
     width: 64px;
     height: 64px;
-    background: #eef1f5;
+    background: #f0f2f2;
     border-radius: .5rem;
     overflow: hidden;
     color: #9aa4b2;
@@ -141,15 +205,15 @@ body {
 /* 商品详情页 */
 .sku-label {
     font-weight: 600;
-    color: #6b7280;
+    color: #0f1111;
     font-size: .85rem;
     margin-bottom: .4rem;
 }
 
 .sku-chip {
-    border: 1px solid #d1d5db;
+    border: 1px solid #d5d9d9;
     background: #fff;
-    border-radius: .375rem;
+    border-radius: .5rem;
     padding: .35rem .75rem;
     font-size: .85rem;
     cursor: pointer;
@@ -157,14 +221,14 @@ body {
 }
 
 .sku-chip:hover {
-    border-color: var(--brand);
-    color: var(--brand);
+    border-color: var(--amazon-orange);
+    color: var(--amazon-orange);
 }
 
 .sku-chip.active {
-    border-color: var(--brand);
+    border-color: var(--amazon-orange);
     background: var(--brand-light);
-    color: var(--brand);
+    color: var(--amazon-dark);
     font-weight: 600;
 }
 
@@ -172,7 +236,7 @@ body {
     width: 48px;
     height: 48px;
     border-radius: .5rem;
-    background: var(--brand);
+    background: var(--amazon-dark);
     color: #fff;
     display: flex;
     align-items: center;
@@ -193,7 +257,7 @@ body {
 
 .spec-row dt {
     width: 40%;
-    color: #6b7280;
+    color: #565959;
     font-weight: normal;
     margin: 0;
 }
@@ -204,8 +268,8 @@ body {
 }
 
 .shipping-box {
-    background: #f7f8fa;
-    border-radius: .375rem;
+    background: #f0f2f2;
+    border-radius: .5rem;
     padding: .5rem .75rem;
 }
 
@@ -294,7 +358,7 @@ body {
 }
 
 .gallery-thumb.active {
-    border-color: var(--brand);
+    border-color: var(--amazon-orange);
 }
 
 /* 后台布局 */
@@ -340,7 +404,7 @@ body {
 }
 
 .admin-nav-link.active {
-    background: var(--brand);
+    background: var(--amazon-orange);
     color: #fff;
 }
 
