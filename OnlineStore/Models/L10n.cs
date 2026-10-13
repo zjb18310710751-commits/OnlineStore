@@ -26,4 +26,8 @@ public static class L10n
 
     public static string Description(Shop? s) =>
         s is null ? string.Empty : (IsEnglish && !string.IsNullOrWhiteSpace(s.DescriptionEn) ? s.DescriptionEn : s.Description ?? string.Empty);
+
+    /// <summary>通用取值：英文界面下优先返回 en，否则返回 zh。</summary>
+    public static string Text(string zh, string? en) =>
+        IsEnglish && !string.IsNullOrWhiteSpace(en) ? en : zh;
 }

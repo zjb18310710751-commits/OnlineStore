@@ -16,10 +16,18 @@ public class ProductSpec
     [Display(Name = "参数名")]
     public string Name { get; set; } = string.Empty;
 
+    [StringLength(100)]
+    [Display(Name = "参数名（英文）")]
+    public string? NameEn { get; set; }
+
     [Required(ErrorMessage = "请填写参数值")]
     [StringLength(200)]
     [Display(Name = "参数值")]
     public string Value { get; set; } = string.Empty;
+
+    [StringLength(200)]
+    [Display(Name = "参数值（英文）")]
+    public string? ValueEn { get; set; }
 
     [Display(Name = "排序")]
     public int DisplayOrder { get; set; }

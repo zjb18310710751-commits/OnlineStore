@@ -99,8 +99,11 @@ public class OrdersController : Controller
             {
                 ProductId = i.ProductId,
                 ProductName = i.Name,
+                ProductNameEn = i.NameEn,
                 Color = i.Color,
+                ColorEn = i.ColorEn,
                 Spec = i.Spec,
+                SpecEn = i.SpecEn,
                 Price = i.Price,
                 Quantity = i.Quantity
             }).ToList()

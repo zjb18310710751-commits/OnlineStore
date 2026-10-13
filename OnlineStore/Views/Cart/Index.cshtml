@@ -44,10 +44,10 @@
                                         </a>
                                     </div>
                                     <div class="col">
-                                        <a asp-controller="Products" asp-action="Details" asp-route-id="@item.ProductId" class="fw-semibold text-decoration-none text-dark">@item.Name</a>
+                                        <a asp-controller="Products" asp-action="Details" asp-route-id="@item.ProductId" class="fw-semibold text-decoration-none text-dark">@L10n.Text(item.Name, item.NameEn)</a>
                                         @if (!string.IsNullOrEmpty(item.Color) || !string.IsNullOrEmpty(item.Spec))
                                         {
-                                            <div class="text-muted small">@item.Color @item.Spec</div>
+                                            <div class="text-muted small">@L10n.Text(item.Color ?? "", item.ColorEn) @L10n.Text(item.Spec ?? "", item.SpecEn)</div>
                                         }
                                         <div class="text-muted small">@Loc["UnitPrice"]：¥@item.Price.ToString("F2")</div>
                                         <div class="text-muted small">@Loc["StockLimit", item.Stock]</div>

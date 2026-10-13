@@ -26,10 +26,10 @@
                             {
                                 <tr>
                                     <td>
-                                        @i.ProductName
+                                        @L10n.Text(i.ProductName, i.ProductNameEn)
                                         @if (!string.IsNullOrEmpty(i.Color) || !string.IsNullOrEmpty(i.Spec))
                                         {
-                                            <small class="text-muted">@i.Color @i.Spec</small>
+                                            <small class="text-muted">@L10n.Text(i.Color ?? "", i.ColorEn) @L10n.Text(i.Spec ?? "", i.SpecEn)</small>
                                         }
                                     </td>
                                     <td>× @i.Quantity</td>

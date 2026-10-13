@@ -41,10 +41,10 @@
                             {
                                 <li class="d-flex justify-content-between py-1">
                                     <span>
-                                        @i.ProductName
+                                        @L10n.Text(i.ProductName, i.ProductNameEn)
                                         @if (!string.IsNullOrEmpty(i.Color) || !string.IsNullOrEmpty(i.Spec))
                                         {
-                                            <small class="text-muted">@i.Color @i.Spec</small>
+                                            <small class="text-muted">@L10n.Text(i.Color ?? "", i.ColorEn) @L10n.Text(i.Spec ?? "", i.SpecEn)</small>
                                         }
                                         <small class="text-muted">× @i.Quantity</small>
                                     </span>

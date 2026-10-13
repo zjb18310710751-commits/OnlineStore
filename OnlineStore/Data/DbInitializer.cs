@@ -378,6 +378,9 @@ public static class DbInitializer
             }
         }
 
+        // 为种子数据补充英文（快递/参数/规格颜色/评价）
+        ApplyEnglishTranslations(products);
+
         context.Shops.AddRange(shops);
         context.Categories.AddRange(categories);
         context.Products.AddRange(products);
@@ -495,4 +498,147 @@ public static class DbInitializer
 
     private static Review Review(string userName, int rating, string comment, int daysAgo = 0, string? imageUrl = null)
         => new() { UserName = userName, Rating = rating, Comment = comment, ImageUrl = imageUrl, CreatedAt = DateTime.UtcNow.AddDays(-daysAgo) };
+
+    /// <summary>按中文值查字典，为种子数据的快递/参数/规格/评价填充英文字段。</summary>
+    private static void ApplyEnglishTranslations(List<Product> products)
+    {
+        var specName = new Dictionary<string, string>
+        {
+            ["蓝牙版本"] = "Bluetooth Version", ["续航"] = "Battery Life", ["降噪"] = "Noise Cancelling",
+            ["单耳重量"] = "Weight per Bud", ["配列"] = "Layout", ["轴体"] = "Switch Type", ["背光"] = "Backlight",
+            ["键帽"] = "Keycaps", ["尺寸"] = "Size", ["分辨率"] = "Resolution", ["刷新率"] = "Refresh Rate",
+            ["面板"] = "Panel", ["材质"] = "Material", ["克重"] = "Weight", ["版型"] = "Fit", ["领型"] = "Collar",
+            ["厚度"] = "Thickness", ["作者"] = "Author", ["出版社"] = "Publisher", ["版本"] = "Edition",
+            ["页数"] = "Pages", ["装帧"] = "Binding", ["容量"] = "Capacity", ["可微波"] = "Microwave Safe",
+            ["填充"] = "Filling", ["枕套"] = "Cover", ["附赠"] = "Included", ["人数"] = "Capacity",
+            ["重量"] = "Weight", ["搭建"] = "Setup", ["防水"] = "Waterproof", ["品牌"] = "Brand",
+            ["质保"] = "Warranty", ["接口"] = "Interface", ["兼容"] = "Compatibility", ["面料"] = "Fabric",
+            ["洗涤"] = "Care", ["季节"] = "Season", ["弹性"] = "Stretch", ["语言"] = "Language",
+            ["版次"] = "Edition", ["纸张"] = "Paper", ["风格"] = "Style", ["清洁"] = "Care",
+            ["产地"] = "Origin", ["场景"] = "Use Case", ["防滑"] = "Non-slip", ["承重"] = "Load Capacity"
+        };
+
+        var specValue = new Dictionary<string, string>
+        {
+            ["主动降噪"] = "Active Noise Cancelling", ["30 小时"] = "30 Hours", ["热插拔"] = "Hot-swappable",
+            ["PBT 材质"] = "PBT Material", ["100% 精梳棉"] = "100% Combed Cotton", ["直筒"] = "Straight",
+            ["圆领"] = "Crew Neck", ["棉 + 涤纶"] = "Cotton + Polyester", ["加绒加厚"] = "Fleece-lined",
+            ["宽松"] = "Loose", ["陶瓷"] = "Ceramic", ["可拆洗"] = "Removable & Washable",
+            ["记忆棉"] = "Memory Foam", ["精装"] = "Hardcover", ["第 3 版"] = "3rd Edition",
+            ["机械工业出版社"] = "China Machine Press", ["南海出版公司"] = "Nan Hai Publishing",
+            ["210T 涤纶"] = "210T Polyester", ["速开"] = "Quick Setup", ["是"] = "Yes",
+            ["知名品牌"] = "Well-known Brand", ["一年"] = "1 Year", ["长续航"] = "Long Battery Life",
+            ["全兼容"] = "Universal Compatibility", ["铝合金"] = "Aluminum Alloy", ["纯棉"] = "Cotton",
+            ["标准"] = "Standard", ["可机洗"] = "Machine Washable", ["四季"] = "All Seasons",
+            ["微弹"] = "Slight Stretch", ["平装"] = "Paperback", ["中文"] = "Chinese",
+            ["正规出版"] = "Official Publication", ["第 1 版"] = "1st Edition", ["胶版纸"] = "Offset Paper",
+            ["300 页左右"] = "~300 Pages", ["优质耐用"] = "Durable", ["简约"] = "Minimalist",
+            ["易清洁"] = "Easy to Clean", ["适中"] = "Medium", ["中国"] = "China", ["耐磨耐用"] = "Wear-resistant",
+            ["轻便"] = "Lightweight", ["户外"] = "Outdoor", ["防泼水"] = "Water-repellent",
+            ["防滑设计"] = "Non-slip Design", ["承重强"] = "High Load Capacity",
+            ["加西亚·马尔克斯"] = "Gabriel García Márquez"
+        };
+
+        var color = new Dictionary<string, string>
+        {
+            ["黑色"] = "Black", ["白色"] = "White", ["灰色"] = "Gray", ["藏青"] = "Navy",
+            ["卡其"] = "Khaki", ["军绿"] = "Army Green", ["橙色"] = "Orange", ["蓝色"] = "Blue",
+            ["银色"] = "Silver", ["深空灰"] = "Space Gray", ["米白"] = "Cream", ["雾灰"] = "Mist Gray",
+            ["深灰"] = "Dark Gray", ["曜石黑"] = "Obsidian Black", ["云雾白"] = "Cloud White",
+            ["深海蓝"] = "Deep Sea Blue", ["静谧紫"] = "Serene Purple", ["抹茶绿"] = "Matcha Green",
+            ["透明"] = "Transparent", ["墨绿"] = "Dark Green", ["天蓝"] = "Sky Blue"
+        };
+
+        var specOption = new Dictionary<string, string>
+        {
+            ["标准版"] = "Standard", ["高配"] = "Pro", ["标配"] = "Standard", ["均码"] = "One Size",
+            ["加厚 10mm"] = "Thickened 10mm", ["3-4 人"] = "3-4 People", ["5-6 人"] = "5-6 People",
+            ["加大"] = "Large", ["标准款"] = "Standard", ["茶轴"] = "Brown Switch", ["红轴"] = "Red Switch"
+        };
+
+        var shipping = new Dictionary<string, string>
+        {
+            ["广东深圳"] = "Guangdong Shenzhen", ["浙江杭州"] = "Zhejiang Hangzhou", ["江苏苏州"] = "Jiangsu Suzhou",
+            ["上海"] = "Shanghai", ["北京"] = "Beijing", ["江苏南通"] = "Jiangsu Nantong",
+            ["江西景德镇"] = "Jiangxi Jingdezhen", ["广东惠州"] = "Guangdong Huizhou",
+            ["广东东莞"] = "Guangdong Dongguan", ["浙江宁波"] = "Zhejiang Ningbo",
+            ["包邮"] = "Free Shipping", ["运费 ¥6"] = "Shipping ¥6",
+            ["24小时内发货"] = "Ships in 24 Hours", ["48小时内发货"] = "Ships in 48 Hours",
+            ["72小时内发货"] = "Ships in 72 Hours"
+        };
+
+        var userName = new Dictionary<string, string>
+        {
+            ["老王"] = "Old Wang", ["小美"] = "Xiao Mei", ["阿杰"] = "A Jie", ["静静"] = "Jing Jing",
+            ["大熊"] = "Big Bear", ["路过的风"] = "Passing Wind", ["阿蓝"] = "A Lan", ["小鹿"] = "Little Deer",
+            ["爱吃鱼"] = "Fish Lover", ["老张头"] = "Old Zhang", ["通勤小李"] = "Commuter Xiao Li",
+            ["阿健"] = "A Jian", ["码字老张"] = "Typing Old Zhang", ["设计小刘"] = "Designer Xiao Liu",
+            ["老周"] = "Old Zhou", ["老白"] = "Old Bai", ["小江"] = "Xiao Jiang",
+            ["晨跑的小陈"] = "Morning Runner Xiao Chen", ["计算机研一"] = "CS Grad Student",
+            ["啃书人"] = "Book Worm", ["书虫阿兰"] = "Bookworm A Lan", ["阿暖"] = "A Nuan",
+            ["落枕星人"] = "Stiff Neck", ["在家练瑜伽"] = "Home Yogi", ["跑者小林"] = "Runner Xiao Lin",
+            ["露营新手"] = "Camping Newbie", ["户外老张"] = "Outdoor Old Zhang", ["一家三口"] = "Family of Three"
+        };
+
+        var comment = new Dictionary<string, string>
+        {
+            ["质量不错，做工精细，值得回购。"] = "Good quality, well made, worth repurchasing.",
+            ["性价比很高，用了几天很满意。"] = "Great value, very satisfied after a few days.",
+            ["物流快，包装严实，没有破损。"] = "Fast shipping, well packed, no damage.",
+            ["和描述一致，用起来很顺手。"] = "Matches the description, works great.",
+            ["已经第二次买了，家里人都说好。"] = "Second purchase, the whole family loves it.",
+            ["客服态度很好，有问题及时解决。"] = "Great customer service, issues resolved quickly.",
+            ["价格实惠，日常用足够了。"] = "Affordable, good enough for daily use.",
+            ["做工可以，就是发货稍慢，总体满意。"] = "Decent build, slightly slow shipping, overall satisfied.",
+            ["买来送人的，对方很喜欢。"] = "Bought as a gift, the recipient loved it.",
+            ["东西是好东西，就是包装简单了点。"] = "Good product, just simple packaging.",
+            ["降噪确实不错，地铁上戴着安静多了，续航也够用。"] = "Great noise cancelling — much quieter on the subway, battery lasts.",
+            ["音质一般，但胜在便宜，日常听听够用。"] = "Average sound, but cheap and fine for daily use.",
+            ["红轴打字很舒服，键帽手感也不错。"] = "Red switches feel great for typing, keycaps are nice too.",
+            ["色彩很好，做设计够用，性价比高。"] = "Great colors, good enough for design, great value.",
+            ["边框稍微有点宽，其他都满意。"] = "Slightly thick bezel, otherwise satisfied.",
+            ["面料舒服，洗了几次也没变形。"] = "Comfortable fabric, no deformation after several washes.",
+            ["尺码偏小，建议买大一码。"] = "Runs small, size up.",
+            ["加绒很暖和，冬天出门跑步正好。"] = "Warm fleece, perfect for winter runs.",
+            ["经典中的经典，学计算机底层必读。"] = "A classic, must-read for CS fundamentals.",
+            ["内容很深，需要慢慢啃，收获很大。"] = "Deep content, worth the slow read.",
+            ["翻译很流畅，一口气读完，意犹未尽。"] = "Smooth translation, read in one sitting.",
+            ["手感温润，颜色很治愈，喝水都勤快了。"] = "Warm feel, soothing color.",
+            ["睡了一周，脖子舒服多了。"] = "Neck feels much better after a week.",
+            ["回弹有点慢，习惯就好。"] = "Slow rebound, gets used to it.",
+            ["防滑不错，做动作很稳，没异味。"] = "Good grip, stable, no smell.",
+            ["一按弹盖很方便，装包里不漏水。"] = "One-press lid is convenient, no leaks.",
+            ["周末露营用了一次，搭起来很快，空间也够大。"] = "Used once for weekend camping, quick setup, spacious.",
+            ["防水不错，就是收起来要费点劲。"] = "Good waterproofing, a bit hard to pack.",
+            ["客服很耐心，教我怎么搭，孩子很喜欢。"] = "Patient support, kids loved it."
+        };
+
+        string? Tr(Dictionary<string, string> map, string? key) =>
+            key is not null && map.TryGetValue(key, out var v) ? v : null;
+
+        foreach (var p in products)
+        {
+            p.ShippingFromEn = Tr(shipping, p.ShippingFrom);
+            p.ShippingFeeEn = Tr(shipping, p.ShippingFee);
+            p.DeliveryTimeEn = Tr(shipping, p.DeliveryTime);
+
+            foreach (var spec in p.Specs)
+            {
+                spec.NameEn = Tr(specName, spec.Name);
+                spec.ValueEn = Tr(specValue, spec.Value);
+            }
+
+            foreach (var sku in p.Skus)
+            {
+                sku.ColorEn = Tr(color, sku.Color);
+                sku.SpecEn = Tr(specOption, sku.Spec);
+            }
+
+            foreach (var r in p.Reviews)
+            {
+                r.UserNameEn = Tr(userName, r.UserName);
+                r.CommentEn = Tr(comment, r.Comment);
+            }
+        }
+    }
 }

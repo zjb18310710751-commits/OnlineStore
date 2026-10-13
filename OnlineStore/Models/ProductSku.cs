@@ -16,10 +16,18 @@ public class ProductSku
     [Display(Name = "颜色")]
     public string Color { get; set; } = string.Empty;
 
+    [StringLength(50)]
+    [Display(Name = "颜色（英文）")]
+    public string? ColorEn { get; set; }
+
     [Required(ErrorMessage = "请填写规格")]
     [StringLength(50)]
     [Display(Name = "规格")]
     public string Spec { get; set; } = string.Empty;
+
+    [StringLength(50)]
+    [Display(Name = "规格（英文）")]
+    public string? SpecEn { get; set; }
 
     [Range(0, 9999999, ErrorMessage = "价格不能为负")]
     [Display(Name = "价格")]

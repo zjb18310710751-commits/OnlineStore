@@ -13,9 +13,15 @@ public class CartItem
 
     public string Name { get; set; } = string.Empty;
 
+    public string? NameEn { get; set; }
+
     public string? Color { get; set; }
 
+    public string? ColorEn { get; set; }
+
     public string? Spec { get; set; }
+
+    public string? SpecEn { get; set; }
 
     public decimal Price { get; set; }
 

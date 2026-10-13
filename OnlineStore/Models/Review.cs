@@ -19,6 +19,9 @@ public class Review
     [Display(Name = "昵称")]
     public string UserName { get; set; } = string.Empty;
 
+    [StringLength(50)]
+    public string? UserNameEn { get; set; }
+
     [Range(1, 5, ErrorMessage = "评分需在 1~5 星之间")]
     [Display(Name = "评分")]
     public int Rating { get; set; } = 5;
@@ -26,6 +29,9 @@ public class Review
     [StringLength(1000)]
     [Display(Name = "评价内容")]
     public string? Comment { get; set; }
+
+    [StringLength(1000)]
+    public string? CommentEn { get; set; }
 
     [StringLength(500)]
     [Display(Name = "图片")]

@@ -67,13 +67,25 @@ public class Product
     [Display(Name = "发货地")]
     public string? ShippingFrom { get; set; }
 
+    [StringLength(100)]
+    [Display(Name = "发货地（英文）")]
+    public string? ShippingFromEn { get; set; }
+
     [StringLength(50)]
     [Display(Name = "邮费")]
     public string? ShippingFee { get; set; }
 
+    [StringLength(50)]
+    [Display(Name = "邮费（英文）")]
+    public string? ShippingFeeEn { get; set; }
+
     [StringLength(100)]
     [Display(Name = "发货时效")]
     public string? DeliveryTime { get; set; }
+
+    [StringLength(100)]
+    [Display(Name = "发货时效（英文）")]
+    public string? DeliveryTimeEn { get; set; }
 
     [StringLength(10000)]
     [Display(Name = "图文介绍")]

@@ -4,6 +4,8 @@
     var skus = Model.Skus.Where(s => s.IsActive).ToList();
     var colors = skus.Select(s => s.Color).Where(c => !string.IsNullOrWhiteSpace(c)).Distinct().ToList();
     var specs = skus.Select(s => s.Spec).Where(s => !string.IsNullOrWhiteSpace(s)).Distinct().ToList();
+    var colorEn = skus.Where(s => s.ColorEn != null).GroupBy(s => s.Color).ToDictionary(g => g.Key, g => g.First().ColorEn);
+    var specEn = skus.Where(s => s.SpecEn != null).GroupBy(s => s.Spec).ToDictionary(g => g.Key, g => g.First().SpecEn);
     var reviews = Model.Reviews.OrderByDescending(r => r.CreatedAt).ToList();
     var avgRating = reviews.Count > 0 ? Math.Round(reviews.Average(r => r.Rating), 1) : 0;
     var hasSku = skus.Count > 0;
@@ -61,7 +63,7 @@
                         <dl class="mb-0">
                             @foreach (var s in Model.Specs.OrderBy(x => x.DisplayOrder))
                             {
-                                <div class="spec-row"><dt>@s.Name</dt><dd>@s.Value</dd></div>
+                                <div class="spec-row"><dt>@L10n.Text(s.Name, s.NameEn)</dt><dd>@L10n.Text(s.Value, s.ValueEn)</dd></div>
                             }
                         </dl>
                     }
@@ -119,7 +121,7 @@
                             </div>
 
                             <div class="shipping-box small text-muted mb-3">
-                                <i class="bi bi-truck me-1"></i>@Loc["Delivery"]：@(Model.ShippingFrom ?? "—") · @(Model.ShippingFee ?? "—") · @(Model.DeliveryTime ?? "—")
+                                <i class="bi bi-truck me-1"></i>@Loc["Delivery"]：@L10n.Text(Model.ShippingFrom ?? "—", Model.ShippingFromEn) · @L10n.Text(Model.ShippingFee ?? "—", Model.ShippingFeeEn) · @L10n.Text(Model.DeliveryTime ?? "—", Model.DeliveryTimeEn)
                             </div>
 
                             @if (hasSku)
@@ -129,7 +131,7 @@
                                     <div class="d-flex flex-wrap gap-2">
                                         @foreach (var c in colors)
                                         {
-                                            <button type="button" class="sku-chip" data-dim="color" data-value="@c">@c</button>
+                                            <button type="button" class="sku-chip" data-dim="color" data-value="@c">@L10n.Text(c, colorEn.GetValueOrDefault(c))</button>
                                         }
                                     </div>
                                 </div>
@@ -138,7 +140,7 @@
                                     <div class="d-flex flex-wrap gap-2">
                                         @foreach (var s in specs)
                                         {
-                                            <button type="button" class="sku-chip" data-dim="spec" data-value="@s">@s</button>
+                                            <button type="button" class="sku-chip" data-dim="spec" data-value="@s">@L10n.Text(s, specEn.GetValueOrDefault(s))</button>
                                         }
                                     </div>
                                 </div>
@@ -215,17 +217,17 @@
                             {
                                 <li class="review-item py-3 @(r != reviews.First() ? "border-top" : "")">
                                     <div class="d-flex justify-content-between align-items-center">
-                                        <span class="fw-semibold">@r.UserName</span>
+                                        <span class="fw-semibold">@L10n.Text(r.UserName, r.UserNameEn)</span>
                                         <span class="text-muted small">@r.CreatedAt.ToLocalTime().ToString("yyyy-MM-dd")</span>
                                     </div>
                                     <div class="text-warning small">@(new string('★', r.Rating))</div>
                                     @if (!string.IsNullOrEmpty(r.Comment))
                                     {
-                                        <p class="mb-0 text-secondary">@r.Comment</p>
+                                        <p class="mb-0 text-secondary">@L10n.Text(r.Comment ?? "", r.CommentEn)</p>
                                     }
                                     @if (!string.IsNullOrEmpty(r.ImageUrl))
                                     {
-                                        <img src="@r.ImageUrl" class="review-img mt-2" alt="@r.UserName" loading="lazy" />
+                                        <img src="@r.ImageUrl" class="review-img mt-2" alt="@L10n.Text(r.UserName, r.UserNameEn)" loading="lazy" />
                                     }
                                 </li>
                             }
