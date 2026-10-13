@@ -27,7 +27,9 @@ public class ProductService : IProductService
         {
             var term = query.SearchTerm.Trim();
             q = q.Where(p => p.Name.Contains(term)
+                          || (p.NameEn != null && p.NameEn.Contains(term))
                           || (p.Description != null && p.Description.Contains(term))
+                          || (p.DescriptionEn != null && p.DescriptionEn.Contains(term))
                           || (p.Sku != null && p.Sku.Contains(term)));
         }
 
@@ -114,7 +116,7 @@ public class ProductService : IProductService
         if (!string.IsNullOrWhiteSpace(search))
         {
             var term = search.Trim();
-            q = q.Where(p => p.Name.Contains(term) || (p.Sku != null && p.Sku.Contains(term)));
+            q = q.Where(p => p.Name.Contains(term) || (p.NameEn != null && p.NameEn.Contains(term)) || (p.Sku != null && p.Sku.Contains(term)));
         }
 
         if (categoryId.HasValue)
