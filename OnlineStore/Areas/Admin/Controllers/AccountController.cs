@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using OnlineStore.Models;
+using OnlineStore.Services;
 using OnlineStore.ViewModels;
 
 namespace OnlineStore.Areas.Admin.Controllers;
@@ -13,13 +14,16 @@ public class AccountController : Controller
 
     private readonly SignInManager<ApplicationUser> _signInManager;
     private readonly UserManager<ApplicationUser> _userManager;
+    private readonly IRememberedLoginService _rememberedLogin;
 
     public AccountController(
         SignInManager<ApplicationUser> signInManager,
-        UserManager<ApplicationUser> userManager)
+        UserManager<ApplicationUser> userManager,
+        IRememberedLoginService rememberedLogin)
     {
         _signInManager = signInManager;
         _userManager = userManager;
+        _rememberedLogin = rememberedLogin;
     }
 
     [HttpGet]
@@ -33,7 +37,7 @@ public class AccountController : Controller
         }
 
         ViewData["ReturnUrl"] = returnUrl;
-        return View();
+        return View(BuildLoginViewModel());
     }
 
     [HttpPost]
@@ -67,6 +71,15 @@ public class AccountController : Controller
 
         if (result.Succeeded)
         {
+            if (model.RememberCredentials)
+            {
+                _rememberedLogin.Save(model.Email, model.Password);
+            }
+            else
+            {
+                _rememberedLogin.Clear();
+            }
+
             return RedirectToLocal(returnUrl) ?? RedirectToAction("Index", "Dashboard");
         }
 
@@ -86,6 +99,22 @@ public class AccountController : Controller
     {
         await _signInManager.SignOutAsync();
         return RedirectToAction(nameof(Login));
+    }
+
+    private LoginViewModel BuildLoginViewModel()
+    {
+        var remembered = _rememberedLogin.Load();
+        if (remembered is null)
+        {
+            return new LoginViewModel();
+        }
+
+        return new LoginViewModel
+        {
+            Email = remembered.Email,
+            Password = remembered.Password,
+            RememberCredentials = true
+        };
     }
 
     private IActionResult? RedirectToLocal(string? returnUrl)

@@ -1,6 +1,7 @@
 @model RegisterViewModel
 @{
     ViewData["Title"] = Loc["RegisterTitle"].Value;
+    var isPhone = string.Equals(Model.RegisterBy, "phone", StringComparison.OrdinalIgnoreCase);
 }
 <div class="container py-5">
     <div class="row justify-content-center">
@@ -8,26 +9,65 @@
             <div class="card shadow-sm">
                 <div class="card-body p-4">
                     <h1 class="h4 mb-3 text-center">@Loc["RegisterTitle"]</h1>
+
+                    <ul class="nav nav-pills nav-fill mb-3" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link @(isPhone ? "" : "active")" id="email-register-tab" data-bs-toggle="pill" data-bs-target="#email-register" type="button" role="tab" aria-selected="@(!isPhone)">@Loc["EmailRegister"]</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link @(isPhone ? "active" : "")" id="phone-register-tab" data-bs-toggle="pill" data-bs-target="#phone-register" type="button" role="tab" aria-selected="@(isPhone)">@Loc["PhoneRegister"]</button>
+                        </li>
+                    </ul>
+
                     <form method="post" asp-controller="Account" asp-action="Register">
+                        <input type="hidden" asp-for="RegisterBy" />
                         <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
-                        <div class="mb-3">
-                            <label asp-for="Email" class="form-label">@Loc["Email"]</label>
-                            <div class="input-group">
-                                <input asp-for="Email" class="form-control" autocomplete="username" />
-                                <button type="button" class="btn btn-outline-primary"
-                                        data-send-code-url="@Url.Action("SendCode", "Account")"
-                                        data-send-code-purpose="register"
-                                        data-send-code-email="#Email"
-                                        data-send-code-status="#sendCodeStatus"
-                                        data-send-code-success="@Loc["SendCodeSuccess"].Value"
-                                        data-send-code-failed="@Loc["SendCodeFailed"].Value"
-                                        data-send-code-invalid="@Loc["InvalidEmail"].Value"
-                                        data-send-code-label="@Loc["SendVerificationCode"].Value"
-                                        data-send-code-demo="@Loc["DemoCode"].Value">@Loc["SendVerificationCode"]</button>
+
+                        <div class="tab-content">
+                            <div class="tab-pane fade @(isPhone ? "" : "show active")" id="email-register" role="tabpanel" aria-labelledby="email-register-tab">
+                                <div class="mb-3">
+                                    <label asp-for="Email" class="form-label">@Loc["Email"]</label>
+                                    <div class="input-group">
+                                        <input asp-for="Email" class="form-control" autocomplete="username" />
+                                        <button type="button" class="btn btn-outline-primary"
+                                                data-send-code-url="@Url.Action("SendCode", "Account")"
+                                                data-send-code-purpose="register"
+                                                data-send-code-channel="email"
+                                                data-send-code-target="#Email"
+                                                data-send-code-status="#emailSendCodeStatus"
+                                                data-send-code-success="@Loc["SendCodeSuccess"].Value"
+                                                data-send-code-failed="@Loc["SendCodeFailed"].Value"
+                                                data-send-code-invalid="@Loc["InvalidEmail"].Value"
+                                                data-send-code-label="@Loc["SendVerificationCode"].Value"
+                                                data-send-code-demo="@Loc["DemoCode"].Value">@Loc["SendVerificationCode"]</button>
+                                    </div>
+                                    <div id="emailSendCodeStatus" class="form-text"></div>
+                                    <span asp-validation-for="Email" class="text-danger small"></span>
+                                </div>
                             </div>
-                            <div id="sendCodeStatus" class="form-text"></div>
-                            <span asp-validation-for="Email" class="text-danger small"></span>
+                            <div class="tab-pane fade @(isPhone ? "show active" : "")" id="phone-register" role="tabpanel" aria-labelledby="phone-register-tab">
+                                <div class="mb-3">
+                                    <label asp-for="PhoneNumber" class="form-label">@Loc["PhoneNumber"]</label>
+                                    <div class="input-group">
+                                        <input asp-for="PhoneNumber" class="form-control" autocomplete="tel" />
+                                        <button type="button" class="btn btn-outline-primary"
+                                                data-send-code-url="@Url.Action("SendCode", "Account")"
+                                                data-send-code-purpose="register"
+                                                data-send-code-channel="sms"
+                                                data-send-code-target="#PhoneNumber"
+                                                data-send-code-status="#phoneSendCodeStatus"
+                                                data-send-code-success="@Loc["SendCodeSuccess"].Value"
+                                                data-send-code-failed="@Loc["SendCodeFailed"].Value"
+                                                data-send-code-invalid="@Loc["InvalidPhone"].Value"
+                                                data-send-code-label="@Loc["SendVerificationCode"].Value"
+                                                data-send-code-demo="@Loc["DemoCode"].Value">@Loc["SendVerificationCode"]</button>
+                                    </div>
+                                    <div id="phoneSendCodeStatus" class="form-text"></div>
+                                    <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
+                                </div>
+                            </div>
                         </div>
+
                         <div class="mb-3">
                             <label asp-for="VerificationCode" class="form-label">@Loc["VerificationCode"]</label>
                             <input asp-for="VerificationCode" class="form-control" autocomplete="one-time-code" />
@@ -49,11 +89,6 @@
                             <label asp-for="Address" class="form-label">@Loc["Address"]</label>
                             <input asp-for="Address" class="form-control" autocomplete="street-address" />
                             <span asp-validation-for="Address" class="text-danger small"></span>
-                        </div>
-                        <div class="mb-3">
-                            <label asp-for="PhoneNumber" class="form-label">@Loc["PhoneNumber"]</label>
-                            <input asp-for="PhoneNumber" class="form-control" autocomplete="tel" />
-                            <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
                         </div>
                         <div class="mb-3">
                             <label asp-for="Password" class="form-label">@Loc["Password"]</label>
@@ -79,4 +114,17 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script>
+        // 切换邮箱/手机号 Tab 时，同步隐藏字段 RegisterBy 的值，供后端判断账号标识
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('#email-register-tab, #phone-register-tab').forEach(function (btn) {
+                btn.addEventListener('shown.bs.tab', function () {
+                    var registerBy = document.getElementById('RegisterBy');
+                    if (registerBy) {
+                        registerBy.value = btn.id === 'email-register-tab' ? 'email' : 'phone';
+                    }
+                });
+            });
+        });
+    </script>
 }

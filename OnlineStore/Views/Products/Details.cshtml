@@ -249,7 +249,7 @@
                                 </select>
                             </div>
                             <div class="mb-2">
-                                <textarea name="comment" class="form-control" rows="3" placeholder="说说你的使用感受…"></textarea>
+                                <textarea name="comment" class="form-control" rows="3" placeholder="@Loc["ReviewPlaceholder"]"></textarea>
                             </div>
                             <div class="mb-2">
                                 <label class="form-label small fw-semibold">@Loc["ReviewImage"]</label>
@@ -269,9 +269,9 @@
     <div class="card shadow-sm mt-4">
         <div class="card-header bg-white fw-semibold">@Loc["DetailIntro"]</div>
         <div class="card-body">
-            @if (!string.IsNullOrEmpty(Model.DetailHtml))
+            @if (!string.IsNullOrEmpty(L10n.DetailHtml(Model)))
             {
-                @Html.Raw(Model.DetailHtml)
+                @Html.Raw(L10n.DetailHtml(Model))
             }
             else
             {

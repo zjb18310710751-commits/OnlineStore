@@ -18,9 +18,10 @@ public class VerificationCodeService : IVerificationCodeService
         _context = context;
     }
 
-    public async Task<string> GenerateAsync(string email)
+    public async Task<string> GenerateAsync(string target)
     {
-        var normalized = email.Trim().ToLowerInvariant();
+        // 目标地址：邮箱（转小写）或手机号（去首尾空格）；统一复用 EmailVerificationCodes 表存储，避免 EnsureCreated 下改表结构
+        var normalized = target.Trim().ToLowerInvariant();
 
         var latest = await _context.EmailVerificationCodes
             .Where(c => c.Email == normalized)
@@ -32,7 +33,7 @@ public class VerificationCodeService : IVerificationCodeService
             throw new InvalidOperationException("验证码发送过于频繁，请稍后再试。");
         }
 
-        // 删除该邮箱的旧验证码（load+RemoveRange，兼容 InMemory 测试）
+        // 删除该目标地址的旧验证码（load+RemoveRange，兼容 InMemory 测试）
         var olds = await _context.EmailVerificationCodes.Where(c => c.Email == normalized).ToListAsync();
         if (olds.Count > 0)
         {
@@ -51,9 +52,9 @@ public class VerificationCodeService : IVerificationCodeService
         return code;
     }
 
-    public async Task<bool> VerifyAsync(string email, string code)
+    public async Task<bool> VerifyAsync(string target, string code)
     {
-        var normalized = email.Trim().ToLowerInvariant();
+        var normalized = target.Trim().ToLowerInvariant();
         var record = await _context.EmailVerificationCodes
             .Where(c => c.Email == normalized)
             .OrderByDescending(c => c.CreatedAt)

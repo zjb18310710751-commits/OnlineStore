@@ -28,6 +28,27 @@ public class VerificationCodeServiceTests
     }
 
     [Fact]
+    public async Task GenerateAsync_Phone_ReturnsSixDigitCode()
+    {
+        using var context = CreateContext();
+        var service = new VerificationCodeService(context);
+
+        var code = await service.GenerateAsync("13800138000");
+
+        Assert.Matches(@"^\d{6}$", code);
+    }
+
+    [Fact]
+    public async Task VerifyAsync_Phone_CorrectCode_Succeeds()
+    {
+        using var context = CreateContext();
+        var service = new VerificationCodeService(context);
+        var code = await service.GenerateAsync("13800138000");
+
+        Assert.True(await service.VerifyAsync("13800138000", code));
+    }
+
+    [Fact]
     public async Task VerifyAsync_CorrectCode_Succeeds()
     {
         using var context = CreateContext();

@@ -12,8 +12,8 @@
   <data name="NoCategories" xml:space="preserve"><value>暂无分类</value></data>
   <data name="FooterCopyright" xml:space="preserve"><value>在线商店 · ASP.NET Core MVC</value></data>
   <data name="FooterQualities" xml:space="preserve"><value>正品保障 · 极速发货 · 售后无忧</value></data>
-  <data name="HeroTitle" xml:space="preserve"><value>好物不贵，生活不将就</value></data>
-  <data name="HeroSubtitle" xml:space="preserve"><value>数码 · 服饰 · 图书 · 家居 · 户外，慢慢逛</value></data>
+  <data name="HeroTitle" xml:space="preserve"><value>好物不多，件件用心挑</value></data>
+  <data name="HeroSubtitle" xml:space="preserve"><value>数码 · 服饰 · 图书 · 家居 · 户外，值得慢慢逛</value></data>
   <data name="StartShopping" xml:space="preserve"><value>开始逛</value></data>
   <data name="NewArrivals" xml:space="preserve"><value>最新上架</value></data>
   <data name="ViewAll" xml:space="preserve"><value>查看全部</value></data>
@@ -60,6 +60,12 @@
   <data name="Email" xml:space="preserve"><value>邮箱</value></data>
   <data name="Password" xml:space="preserve"><value>密码</value></data>
   <data name="RememberMe" xml:space="preserve"><value>记住我</value></data>
+  <data name="RememberCredentials" xml:space="preserve"><value>记住账号密码</value></data>
+  <data name="EmailRegister" xml:space="preserve"><value>邮箱注册</value></data>
+  <data name="PhoneRegister" xml:space="preserve"><value>手机号注册</value></data>
+  <data name="EmailOrPhone" xml:space="preserve"><value>邮箱 / 手机号</value></data>
+  <data name="PhoneAlreadyRegistered" xml:space="preserve"><value>该手机号已被注册</value></data>
+  <data name="InvalidPhone" xml:space="preserve"><value>请输入有效的手机号</value></data>
   <data name="LoginHint" xml:space="preserve"><value>默认账号见 README.md（首次登录后请修改密码）</value></data>
   <data name="Register" xml:space="preserve"><value>注册</value></data>
   <data name="RegisterTitle" xml:space="preserve"><value>创建账户</value></data>
@@ -191,6 +197,7 @@
   <data name="SubmitReview" xml:space="preserve"><value>提交评价</value></data>
   <data name="ReviewComment" xml:space="preserve"><value>评价内容</value></data>
   <data name="YourRating" xml:space="preserve"><value>您的评分</value></data>
+  <data name="ReviewPlaceholder" xml:space="preserve"><value>说说你的使用感受…</value></data>
   <data name="BackToProduct" xml:space="preserve"><value>返回商品</value></data>
   <data name="StockLeft" xml:space="preserve"><value>库存 {0} 件</value></data>
   <data name="Delivery" xml:space="preserve"><value>发货</value></data>

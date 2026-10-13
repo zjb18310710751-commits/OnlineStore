@@ -57,12 +57,15 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 function initSendCodeButton(btn) {
-    var emailInput = document.querySelector(btn.getAttribute('data-send-code-email'));
+    // 目标输入框：优先 data-send-code-target，兼容旧 data-send-code-email
+    var targetSelector = btn.getAttribute('data-send-code-target') || btn.getAttribute('data-send-code-email');
+    var targetInput = document.querySelector(targetSelector);
     var statusEl = document.querySelector(btn.getAttribute('data-send-code-status'));
-    if (!emailInput) return;
+    if (!targetInput) return;
 
     var url = btn.getAttribute('data-send-code-url');
     var purpose = btn.getAttribute('data-send-code-purpose') || 'register';
+    var channel = btn.getAttribute('data-send-code-channel') || 'email';
     var successMsg = btn.getAttribute('data-send-code-success') || '';
     var failedMsg = btn.getAttribute('data-send-code-failed') || '';
     var invalidMsg = btn.getAttribute('data-send-code-invalid') || '';
@@ -75,8 +78,8 @@ function initSendCodeButton(btn) {
     }
 
     btn.addEventListener('click', function () {
-        var email = emailInput.value.trim();
-        if (!email) {
+        var target = targetInput.value.trim();
+        if (!target) {
             setStatus(invalidMsg);
             return;
         }
@@ -90,7 +93,7 @@ function initSendCodeButton(btn) {
                 'Content-Type': 'application/json',
                 'RequestVerificationToken': token ? token.value : ''
             },
-            body: JSON.stringify({ email: email, purpose: purpose })
+            body: JSON.stringify({ target: target, channel: channel, purpose: purpose })
         })
         .then(function (r) { return r.json(); })
         .then(function (data) {

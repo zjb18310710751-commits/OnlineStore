@@ -369,6 +369,7 @@ public static class DbInitializer
             };
             p.Images = images;
             p.DetailHtml = BuildDetailHtml(p.Name, p.Description ?? "", images[0].ImageUrl, images[1].ImageUrl);
+            p.DetailHtmlEn = BuildDetailHtmlEn(p.NameEn ?? p.Name, p.DescriptionEn ?? p.Description ?? "", images[0].ImageUrl, images[1].ImageUrl);
 
             // 每个 SKU 配一张不同图，选择颜色/规格时主图随之切换
             var skuIndex = 0;
@@ -408,6 +409,12 @@ public static class DbInitializer
         $"<p>{description}</p>" +
         $"<p><img src=\"{img1}\" class=\"img-fluid rounded\" alt=\"{name}\" /></p>" +
         "<p>精选材质，做工扎实，细节到位。支持七天无理由退换，买得放心。</p>" +
+        $"<p><img src=\"{img2}\" class=\"img-fluid rounded\" alt=\"{name}\" /></p>";
+
+    private static string BuildDetailHtmlEn(string name, string description, string img1, string img2) =>
+        $"<p>{description}</p>" +
+        $"<p><img src=\"{img1}\" class=\"img-fluid rounded\" alt=\"{name}\" /></p>" +
+        "<p>Carefully selected materials and solid craftsmanship. 7-day no-reason returns for peace of mind.</p>" +
         $"<p><img src=\"{img2}\" class=\"img-fluid rounded\" alt=\"{name}\" /></p>";
 
     private static List<ProductSpec> BuildExtraSpecs(string categoryName)

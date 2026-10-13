@@ -12,7 +12,7 @@
   <data name="NoCategories" xml:space="preserve"><value>No categories</value></data>
   <data name="FooterCopyright" xml:space="preserve"><value>Online Store · ASP.NET Core MVC</value></data>
   <data name="FooterQualities" xml:space="preserve"><value>Genuine · Fast shipping · Easy returns</value></data>
-  <data name="HeroTitle" xml:space="preserve"><value>Good things, fair prices</value></data>
+  <data name="HeroTitle" xml:space="preserve"><value>Fewer things, better things</value></data>
   <data name="HeroSubtitle" xml:space="preserve"><value>Gadgets · Fashion · Books · Home · Outdoors</value></data>
   <data name="StartShopping" xml:space="preserve"><value>Start Shopping</value></data>
   <data name="NewArrivals" xml:space="preserve"><value>New Arrivals</value></data>
@@ -60,6 +60,12 @@
   <data name="Email" xml:space="preserve"><value>Email</value></data>
   <data name="Password" xml:space="preserve"><value>Password</value></data>
   <data name="RememberMe" xml:space="preserve"><value>Remember me</value></data>
+  <data name="RememberCredentials" xml:space="preserve"><value>Remember email &amp; password</value></data>
+  <data name="EmailRegister" xml:space="preserve"><value>Register with email</value></data>
+  <data name="PhoneRegister" xml:space="preserve"><value>Register with phone</value></data>
+  <data name="EmailOrPhone" xml:space="preserve"><value>Email or phone</value></data>
+  <data name="PhoneAlreadyRegistered" xml:space="preserve"><value>This phone number is already registered</value></data>
+  <data name="InvalidPhone" xml:space="preserve"><value>Enter a valid phone number</value></data>
   <data name="LoginHint" xml:space="preserve"><value>Default account: see README.md (change password after first login)</value></data>
   <data name="Register" xml:space="preserve"><value>Register</value></data>
   <data name="RegisterTitle" xml:space="preserve"><value>Create Account</value></data>
@@ -191,6 +197,7 @@
   <data name="SubmitReview" xml:space="preserve"><value>Submit</value></data>
   <data name="ReviewComment" xml:space="preserve"><value>Comment</value></data>
   <data name="YourRating" xml:space="preserve"><value>Your rating</value></data>
+  <data name="ReviewPlaceholder" xml:space="preserve"><value>Share your experience…</value></data>
   <data name="BackToProduct" xml:space="preserve"><value>Back to product</value></data>
   <data name="StockLeft" xml:space="preserve"><value>{0} in stock</value></data>
   <data name="Delivery" xml:space="preserve"><value>Delivery</value></data>
