@@ -37,6 +37,10 @@ public class OrderService : IOrderService
     {
         order.CreatedAt = DateTime.UtcNow;
         _context.Orders.Add(order);
+
+        // 下单扣减库存（与取消/退款时的恢复逻辑对称）
+        await DecrementStockAsync(order);
+
         await _context.SaveChangesAsync();
         return order;
     }
@@ -96,6 +100,26 @@ public class OrderService : IOrderService
     }
 
     public Task<int> CountAsync() => _context.Orders.CountAsync();
+
+    /// <summary>下单时扣减商品库存（商品级，不精确到 SKU）。</summary>
+    private async Task DecrementStockAsync(Order order)
+    {
+        var productIds = order.Items.Select(i => i.ProductId).Distinct().ToList();
+        if (productIds.Count == 0)
+        {
+            return;
+        }
+
+        var products = await _context.Products.Where(p => productIds.Contains(p.Id)).ToListAsync();
+        foreach (var item in order.Items)
+        {
+            var product = products.FirstOrDefault(p => p.Id == item.ProductId);
+            if (product is not null)
+            {
+                product.Stock = Math.Max(0, product.Stock - item.Quantity);
+            }
+        }
+    }
 
     /// <summary>取消/退款时把商品库存加回（商品级，不精确到 SKU）。</summary>
     private async Task RestoreStockAsync(Order order)

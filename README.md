@@ -30,8 +30,13 @@
 | 购物车 | 加入（支持所选颜色/规格）、查看、更新数量、移除、清空（基于 Session） |
 | 账号注册与登录 | 前台用户注册（姓名/邮箱/地址/电话，均必填，注册后自动登录）、用户登录；后台管理员专属登录（仅管理员角色可登录，前后台入口分离）；登出（ASP.NET Core Identity，密码策略+失败锁定） |
 | 数据库连接与数据操作 | EF Core + SQLite，首次运行自动创建数据库文件并写入种子数据 |
-| 商店主题界面 | 响应式 Bootstrap 主题、导航分类菜单、商品卡片、首页 Hero |
-| 单元测试 | xUnit 测试项目：商品筛选/分页/排序、购物车增删改清空、图片上传校验 |
+| 商店主题界面 | 亚马逊风格响应式主题、导航分类菜单、商品卡片、首页 Hero、详情页购买框 |
+| 邮箱验证码注册 | 注册与忘记密码均通过 6 位邮箱验证码（演示模式：验证码直接显示在页面；预留 Brevo 真实发信，配域名即可升级） |
+| 促销价（划线价） | 商品可设「原价」，前端显示划线原价 + 折扣标签，首页「限时折扣」专区 |
+| 优惠券 | 后台管理优惠券（百分比/固定金额、有效期、使用上限），下单输入优惠码抵扣订单金额 |
+| 取消订单与退款 | 用户取消自己的订单；后台订单管理（发货/完成/取消/退款）；取消/退款自动恢复库存 |
+| 完整中英双语 | 界面文案 + 商品/分类/店铺/评价/参数/SKU 颜色规格/快递等数据库内容全部随语言切换 |
+| 单元测试 | xUnit 测试项目：商品筛选/分页/排序、购物车增删改清空、图片上传校验、优惠券计算/校验、邮箱验证码、订单状态流转与库存扣减/恢复（共 47 个用例） |
 
 ## 目录结构
 
@@ -59,7 +64,7 @@ OnlineStore.Tests/  xUnit 单元测试项目（引用 OnlineStore，使用 EF Co
 - 默认语言：中文（zh-CN）；支持语言列表在 `Program.cs` 的 `supportedCultures` 中配置。
 - 新增语言：复制一份 `SharedResource.<culture>.resx` 翻译后，把 culture 加入 `Program.cs` 的 `supportedCultures` 即可。
 
-> 说明：当前仅本地化了界面文本；数据库中的商品/分类名称及表单校验提示仍为中文，可后续扩展。
+> 说明：界面文案与数据库内容（商品/分类/店铺名称与描述、评价、参数、SKU 颜色规格、快递信息）均已支持中英双语，切换语言时整页内容随之切换；英文内容已预置于种子数据中。
 
 ## 环境要求与前置步骤
 
@@ -120,7 +125,7 @@ dotnet test
 | --- | --- | --- |
 | **可用性 Availability** | `Program.cs` 的 `/health` 健康检查（`AddHealthChecks().AddDbContextCheck`）；`DbInitializer` 用 try/catch 包裹，数据库异常仅记日志不阻塞启动；`UseExceptionHandler` + `UseStatusCodePagesWithReExecute` 友好错误页；全链路 `async/await` 避免阻塞线程 | 应用可被探活、故障可观测、异常有兜底页，单个依赖故障不致整体不可用 |
 | **可修改性 Modifiability** | `Services/*` 接口抽象（`IProductService`、`ICategoryService`、`ICartService`、`ICartStore`、`IImageStorageService`）经 DI 注入；`Program.cs` 的 `AddScoped` 注册；`SessionCartStore` 可替换为数据库/Redis、`ImageStorageService` 可替换为 OSS/S3 而不改业务；`Areas/Admin` 区域隔离；`ViewModels` 与 `Models` 分离 | 面向接口编程 + 依赖注入，新增/替换实现、扩展功能时不改动调用方 |
-| **可测试性 Testability** | `OnlineStore.Tests/` 测试项目：`ProductServiceTests`（分页/分类/关键词/价格筛选/排序）、`CartServiceTests`（加入/累加/库存上限/更新/移除/清空），用 EF Core InMemory 与 `FakeCartStore` 假存储替代真实依赖 | 业务逻辑不依赖 HTTP/数据库细节，可独立实例化并快速验证；`dotnet test` 一键运行 |
+| **可测试性 Testability** | `OnlineStore.Tests/` 测试项目：`ProductServiceTests`（分页/分类/关键词/价格筛选/排序/促销商品）、`CartServiceTests`（加入/累加/库存上限/更新/移除/清空）、`ImageStorageServiceTests`（上传校验）、`CouponCalculatorTests`/`CouponServiceTests`（优惠券计算与校验）、`VerificationCodeServiceTests`（验证码生成/校验/过期/冷却）、`OrderServiceTests`（取消/退款/发货/完成与库存扣减/恢复），用 EF Core InMemory 与 `FakeCartStore` 假存储替代真实依赖 | 业务逻辑不依赖 HTTP/数据库细节，可独立实例化并快速验证；`dotnet test` 一键运行 47 个用例 |
 | **易用性 Usability** | Bootstrap 5.3 响应式主题（`Views/Shared/_Layout.cshtml`、`wwwroot/css/site.css`）；商品卡片 `_ProductCard.cshtml`、详情页数量步进器 `js/site.js` 的 `stepQty`；中英多语言（`Resources/*.resx`）；购物车徽标 `ViewComponents/CartSummaryViewComponent` | 界面一致美观、导航清晰、交互直观，减少用户操作成本 |
 | **安全性 Security** | Identity 密码哈希 + Cookie 认证（`Program.cs` 密码策略/锁定）；`[Authorize(Roles="Admin")]` 角色授权；前后台登录入口分离 + 后台登录校验管理员角色；Razor 默认 HTML 编码 + EF Core 参数化查询防 XSS/SQL 注入；表单 `[ValidateAntiForgeryToken]` 防 CSRF；`RedirectToLocal` 校验 `Url.IsLocalUrl` 防开放重定向；`ImageStorageService` 校验图片扩展名/大小/Content-Type 并 GUID 命名防路径注入；登录失败统一提示不泄露账号是否存在 | 纵深防御：认证、授权、入口隔离、输入编码、防伪令牌、上传校验、开放重定向防护层层把关 |
 
@@ -133,11 +138,10 @@ dotnet test
 
 当前未包含（可按需加入，服务层与模型已预留扩展点）：
 
-- 订单 / 支付 / 结算（购物车数据已可经 `ICartService` 复用）
-- 个人中心（订单历史、资料修改）
-- 商品多图、规格（SKU 属性）
+- 支付（下单已实现，支付环节为模拟，未接入真实支付网关）
 - 分类层级（父子分类）
 - 购物车从 Session 持久化到数据库/Redis（实现 `ICartStore` 接口即可）
+- 真实邮件发送需配置发件域名（当前为演示模式，代码已预留 Brevo API）
 
 ## 从 EnsureCreated 切换到 EF Migrations（正式环境建议）
 

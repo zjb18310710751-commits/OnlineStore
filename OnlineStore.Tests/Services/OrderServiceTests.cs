@@ -108,4 +108,33 @@ public class OrderServiceTests
 
         Assert.Equal(2, result.Count);
     }
+
+    [Fact]
+    public async Task CreateAsync_DecrementsStock()
+    {
+        var options = new DbContextOptionsBuilder<ApplicationDbContext>()
+            .UseInMemoryDatabase(Guid.NewGuid().ToString())
+            .Options;
+        using var context = new ApplicationDbContext(options);
+        context.Products.Add(new Product { Id = 1, Name = "无线耳机", Price = 299m, Stock = 10, IsActive = true, ShopId = 1 });
+        await context.SaveChangesAsync();
+
+        var service = new OrderService(context);
+        var order = new Order
+        {
+            OrderNo = "OS001",
+            UserId = "u1",
+            Total = 598m,
+            Status = OrderStatus.PendingShipment,
+            Items = new List<OrderItem>
+            {
+                new OrderItem { ProductId = 1, ProductName = "无线耳机", Price = 299m, Quantity = 2 }
+            }
+        };
+
+        await service.CreateAsync(order);
+
+        var product = await context.Products.FindAsync(1);
+        Assert.Equal(8, product!.Stock); // 10 - 2
+    }
 }
