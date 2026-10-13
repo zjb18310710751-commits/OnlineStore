@@ -60,20 +60,20 @@ public static class DbInitializer
         }
 
         // 店铺
-        var outdoor = new Shop { Name = "山野户外旗舰店", Rating = 4.9m, SalesCount = 12800, Description = "专注户外装备 12 年，只卖靠谱的。" };
-        var digital = new Shop { Name = "极客数码自营店", Rating = 4.8m, SalesCount = 8600, Description = "正品数码，官方直营。" };
-        var bookstore = new Shop { Name = "悦读图书专营店", Rating = 4.9m, SalesCount = 32000, Description = "好书，认真选每一本。" };
-        var homeStore = new Shop { Name = "温暖家居生活馆", Rating = 4.7m, SalesCount = 5600, Description = "把日子过得舒服一点。" };
-        var clothing = new Shop { Name = "简素服饰官方店", Rating = 4.8m, SalesCount = 21000, Description = "基础款，耐穿好搭。" };
+        var outdoor = new Shop { Name = "山野户外旗舰店", NameEn = "Mountain Outdoors Flagship Store", Rating = 4.9m, SalesCount = 12800, Description = "专注户外装备 12 年，只卖靠谱的。", DescriptionEn = "12 years of outdoor gear expertise — only dependable gear." };
+        var digital = new Shop { Name = "极客数码自营店", NameEn = "Geek Digital Store", Rating = 4.8m, SalesCount = 8600, Description = "正品数码，官方直营。", DescriptionEn = "Genuine digital products, direct from official channels." };
+        var bookstore = new Shop { Name = "悦读图书专营店", NameEn = "Joyful Reading Bookstore", Rating = 4.9m, SalesCount = 32000, Description = "好书，认真选每一本。", DescriptionEn = "Good books, carefully selected." };
+        var homeStore = new Shop { Name = "温暖家居生活馆", NameEn = "Warm Home Living", Rating = 4.7m, SalesCount = 5600, Description = "把日子过得舒服一点。", DescriptionEn = "Make everyday life a little more comfortable." };
+        var clothing = new Shop { Name = "简素服饰官方店", NameEn = "Simple Fashion Official Store", Rating = 4.8m, SalesCount = 21000, Description = "基础款，耐穿好搭。", DescriptionEn = "Basics that last and match everything." };
 
         var shops = new List<Shop> { outdoor, digital, bookstore, homeStore, clothing };
 
         // 分类
-        var electronics = new Category { Name = "电子产品", Slug = "电子产品", Description = "手机、电脑、数码配件", DisplayOrder = 1 };
-        var fashion = new Category { Name = "服装服饰", Slug = "服装服饰", Description = "男女装、鞋帽配饰", DisplayOrder = 2 };
-        var books = new Category { Name = "图书", Slug = "图书", Description = "文学、科技、教育", DisplayOrder = 3 };
-        var home = new Category { Name = "家居生活", Slug = "家居生活", Description = "家纺、厨具、日用", DisplayOrder = 4 };
-        var sports = new Category { Name = "运动户外", Slug = "运动户外", Description = "健身、户外装备", DisplayOrder = 5 };
+        var electronics = new Category { Name = "电子产品", NameEn = "Electronics", Slug = "电子产品", Description = "手机、电脑、数码配件", DisplayOrder = 1 };
+        var fashion = new Category { Name = "服装服饰", NameEn = "Fashion", Slug = "服装服饰", Description = "男女装、鞋帽配饰", DisplayOrder = 2 };
+        var books = new Category { Name = "图书", NameEn = "Books", Slug = "图书", Description = "文学、科技、教育", DisplayOrder = 3 };
+        var home = new Category { Name = "家居生活", NameEn = "Home & Living", Slug = "家居生活", Description = "家纺、厨具、日用", DisplayOrder = 4 };
+        var sports = new Category { Name = "运动户外", NameEn = "Sports & Outdoors", Slug = "运动户外", Description = "健身、户外装备", DisplayOrder = 5 };
 
         var categories = new List<Category> { electronics, fashion, books, home, sports };
 
@@ -81,8 +81,8 @@ public static class DbInitializer
         {
             new()
             {
-                Name = "无线蓝牙耳机", Slug = "无线蓝牙耳机",
-                Description = "主动降噪，30 小时续航，支持快充，通勤运动都好用。",
+                Name = "无线蓝牙耳机", NameEn = "Wireless Bluetooth Earbuds", Slug = "无线蓝牙耳机",
+                Description = "主动降噪，30 小时续航，支持快充，通勤运动都好用。", DescriptionEn = "Active noise cancelling, 30h battery, fast charging — great for commute and workouts.",
                 Price = 299.00m, OriginalPrice = 399.00m, Stock = 130, Sku = "ELEC-001", Shop = digital,
                 Categories = new List<Category> { electronics },
                 ShippingFrom = "广东深圳", ShippingFee = "包邮", DeliveryTime = "48小时内发货",
@@ -101,8 +101,8 @@ public static class DbInitializer
             },
             new()
             {
-                Name = "机械键盘 87 键", Slug = "机械键盘-87-键",
-                Description = "热插拔轴体，RGB 背光，PBT 键帽，办公游戏两相宜。",
+                Name = "机械键盘 87 键", NameEn = "Mechanical Keyboard 87-Key", Slug = "机械键盘-87-键",
+                Description = "热插拔轴体，RGB 背光，PBT 键帽，办公游戏两相宜。", DescriptionEn = "Hot-swappable switches, RGB backlight, PBT keycaps — great for work and gaming.",
                 Price = 459.00m, OriginalPrice = 549.00m, Stock = 90, Sku = "ELEC-002", Shop = digital,
                 Categories = new List<Category> { electronics },
                 ShippingFrom = "江苏苏州", ShippingFee = "包邮", DeliveryTime = "24小时内发货",
@@ -118,8 +118,8 @@ public static class DbInitializer
             },
             new()
             {
-                Name = "27 英寸 2K 显示器", Slug = "27-英寸-2k-显示器",
-                Description = "IPS 面板，144Hz 刷新率，广色域，办公游戏都合适。",
+                Name = "27 英寸 2K 显示器", NameEn = "27\" 2K Monitor", Slug = "27-英寸-2k-显示器",
+                Description = "IPS 面板，144Hz 刷新率，广色域，办公游戏都合适。", DescriptionEn = "IPS panel, 144Hz refresh, wide color gamut — great for work and gaming.",
                 Price = 1299.00m, OriginalPrice = 1599.00m, Stock = 35, Sku = "ELEC-003", Shop = digital,
                 Categories = new List<Category> { electronics },
                 ShippingFrom = "广东惠州", ShippingFee = "包邮", DeliveryTime = "48小时内发货",
@@ -132,8 +132,8 @@ public static class DbInitializer
             },
             new()
             {
-                Name = "纯棉基础款 T 恤", Slug = "纯棉基础款-t-恤",
-                Description = "100% 精梳棉，多色可选，透气舒适，一年四季都能穿。",
+                Name = "纯棉基础款 T 恤", NameEn = "Cotton Basic T-Shirt", Slug = "纯棉基础款-t-恤",
+                Description = "100% 精梳棉，多色可选，透气舒适，一年四季都能穿。", DescriptionEn = "100% combed cotton, breathable and comfortable — all-season wear.",
                 Price = 79.00m, OriginalPrice = 99.00m, Stock = 300, Sku = "CLOTH-001", Shop = clothing,
                 Categories = new List<Category> { fashion },
                 ShippingFrom = "浙江杭州", ShippingFee = "包邮", DeliveryTime = "24小时内发货",
@@ -155,8 +155,8 @@ public static class DbInitializer
             },
             new()
             {
-                Name = "休闲运动卫衣", Slug = "休闲运动卫衣",
-                Description = "宽松版型，加绒加厚，秋冬百搭，运动休闲都合适。",
+                Name = "休闲运动卫衣", NameEn = "Casual Sports Hoodie", Slug = "休闲运动卫衣",
+                Description = "宽松版型，加绒加厚，秋冬百搭，运动休闲都合适。", DescriptionEn = "Loose fit, fleece-lined and thick — perfect for fall and winter.",
                 Price = 199.00m, OriginalPrice = 259.00m, Stock = 150, Sku = "CLOTH-002", Shop = clothing,
                 Categories = new List<Category> { fashion, sports },
                 ShippingFrom = "浙江杭州", ShippingFee = "包邮", DeliveryTime = "24小时内发货",
@@ -170,8 +170,8 @@ public static class DbInitializer
             },
             new()
             {
-                Name = "《深入理解计算机系统》", Slug = "深入理解计算机系统",
-                Description = "计算机科学经典教材（原书第 3 版），程序员进阶必读。",
+                Name = "《深入理解计算机系统》", NameEn = "Computer Systems: A Programmer's Perspective", Slug = "深入理解计算机系统",
+                Description = "计算机科学经典教材（原书第 3 版），程序员进阶必读。", DescriptionEn = "The classic CS textbook (3rd edition) — a must-read for every programmer.",
                 Price = 139.00m, Stock = 80, Sku = "BOOK-001", Shop = bookstore,
                 Categories = new List<Category> { books },
                 ShippingFrom = "北京", ShippingFee = "运费 ¥6", DeliveryTime = "72小时内发货",
@@ -184,8 +184,8 @@ public static class DbInitializer
             },
             new()
             {
-                Name = "《百年孤独》", Slug = "百年孤独",
-                Description = "加西亚·马尔克斯代表作，魔幻现实主义经典。",
+                Name = "《百年孤独》", NameEn = "One Hundred Years of Solitude", Slug = "百年孤独",
+                Description = "加西亚·马尔克斯代表作，魔幻现实主义经典。", DescriptionEn = "Gabriel García Márquez's masterpiece of magical realism.",
                 Price = 55.00m, Stock = 200, Sku = "BOOK-002", Shop = bookstore,
                 Categories = new List<Category> { books },
                 ShippingFrom = "北京", ShippingFee = "运费 ¥6", DeliveryTime = "72小时内发货",
@@ -194,8 +194,8 @@ public static class DbInitializer
             },
             new()
             {
-                Name = "北欧风陶瓷马克杯", Slug = "北欧风陶瓷马克杯",
-                Description = "简约设计，450ml 大容量，可微波加热，日常喝水很合适。",
+                Name = "北欧风陶瓷马克杯", NameEn = "Nordic Ceramic Mug", Slug = "北欧风陶瓷马克杯",
+                Description = "简约设计，450ml 大容量，可微波加热，日常喝水很合适。", DescriptionEn = "Minimalist design, 450ml capacity, microwave safe.",
                 Price = 39.90m, OriginalPrice = 49.90m, Stock = 500, Sku = "HOME-001", Shop = homeStore,
                 Categories = new List<Category> { home },
                 ShippingFrom = "江西景德镇", ShippingFee = "包邮", DeliveryTime = "48小时内发货",
@@ -209,8 +209,8 @@ public static class DbInitializer
             },
             new()
             {
-                Name = "记忆棉护颈枕", Slug = "记忆棉护颈枕",
-                Description = "慢回弹，符合人体工学，改善睡眠，枕套可拆洗。",
+                Name = "记忆棉护颈枕", NameEn = "Memory Foam Neck Pillow", Slug = "记忆棉护颈枕",
+                Description = "慢回弹，符合人体工学，改善睡眠，枕套可拆洗。", DescriptionEn = "Slow rebound, ergonomic, improves sleep; removable washable cover.",
                 Price = 129.00m, OriginalPrice = 159.00m, Stock = 90, Sku = "HOME-002", Shop = homeStore,
                 Categories = new List<Category> { home },
                 ShippingFrom = "江苏南通", ShippingFee = "包邮", DeliveryTime = "48小时内发货",
@@ -223,8 +223,8 @@ public static class DbInitializer
             },
             new()
             {
-                Name = "瑜伽垫 加厚防滑", Slug = "瑜伽垫-加厚防滑",
-                Description = "10mm 加厚，TPE 环保材质，附赠绑带，居家健身好帮手。",
+                Name = "瑜伽垫 加厚防滑", NameEn = "Yoga Mat Extra Thick Non-Slip", Slug = "瑜伽垫-加厚防滑",
+                Description = "10mm 加厚，TPE 环保材质，附赠绑带，居家健身好帮手。", DescriptionEn = "10mm thick, TPE eco-friendly material, with carrying strap.",
                 Price = 89.00m, Stock = 110, Sku = "SPORT-001", Shop = outdoor,
                 Categories = new List<Category> { sports, home },
                 ShippingFrom = "广东东莞", ShippingFee = "包邮", DeliveryTime = "48小时内发货",
@@ -239,8 +239,8 @@ public static class DbInitializer
             },
             new()
             {
-                Name = "便携运动水壶", Slug = "便携运动水壶",
-                Description = "食品级材质，一按弹盖，750ml，健身出行都方便。",
+                Name = "便携运动水壶", NameEn = "Portable Sports Water Bottle", Slug = "便携运动水壶",
+                Description = "食品级材质，一按弹盖，750ml，健身出行都方便。", DescriptionEn = "Food-grade material, one-press flip lid, 750ml.",
                 Price = 49.00m, Stock = 260, Sku = "SPORT-002", Shop = outdoor,
                 Categories = new List<Category> { sports, home },
                 ShippingFrom = "广东东莞", ShippingFee = "包邮", DeliveryTime = "48小时内发货",
@@ -254,8 +254,8 @@ public static class DbInitializer
             },
             new()
             {
-                Name = "户外露营帐篷", Slug = "户外露营帐篷",
-                Description = "双层防雨，速开设计，3-6 人空间，周末露营首选。",
+                Name = "户外露营帐篷", NameEn = "Outdoor Camping Tent", Slug = "户外露营帐篷",
+                Description = "双层防雨，速开设计，3-6 人空间，周末露营首选。", DescriptionEn = "Double-layer waterproof, quick setup, fits 3-6 people.",
                 Price = 389.00m, OriginalPrice = 499.00m, Stock = 59, Sku = "SPORT-003", Shop = outdoor,
                 Categories = new List<Category> { sports },
                 ShippingFrom = "浙江宁波", ShippingFee = "包邮", DeliveryTime = "48小时内发货",
@@ -279,57 +279,57 @@ public static class DbInitializer
         };
 
         // 追加 88 件商品：覆盖各类目、价格从低到高，模拟真实商城
-        var extraItems = new (string Name, Category Category, Shop Shop, decimal Price)[]
+        var extraItems = new (string Name, string NameEn, Category Category, Shop Shop, decimal Price)[]
         {
-            ("手机支架", electronics, digital, 19.90m), ("三合一数据线", electronics, digital, 29.00m),
-            ("蓝牙自拍杆", electronics, digital, 39.00m), ("无线充电器", electronics, digital, 89.00m),
-            ("移动电源 20000mAh", electronics, digital, 129.00m), ("键鼠套装", electronics, digital, 129.00m),
-            ("显示器支架", electronics, digital, 149.00m), ("蓝牙音箱", electronics, digital, 159.00m),
-            ("电竞鼠标", electronics, digital, 199.00m), ("路由器", electronics, digital, 199.00m),
-            ("游戏手柄", electronics, digital, 269.00m), ("智能音箱", electronics, digital, 299.00m),
-            ("机械硬盘 2TB", electronics, digital, 499.00m), ("智能手表", electronics, digital, 599.00m),
-            ("固态硬盘 1TB", electronics, digital, 699.00m), ("电纸书阅读器", electronics, digital, 899.00m),
-            ("投影仪", electronics, digital, 1899.00m), ("平板电脑", electronics, digital, 2499.00m),
-            ("无人机", electronics, digital, 2999.00m), ("微单相机", electronics, digital, 3999.00m),
-            ("棉袜五双装", fashion, clothing, 29.00m), ("棒球帽", fashion, clothing, 39.00m),
-            ("围巾", fashion, clothing, 49.00m), ("短裤", fashion, clothing, 59.00m),
-            ("皮带", fashion, clothing, 69.00m), ("睡衣", fashion, clothing, 89.00m),
-            ("帆布鞋", fashion, clothing, 99.00m), ("泳衣", fashion, clothing, 99.00m),
-            ("衬衫", fashion, clothing, 129.00m), ("双肩包", fashion, clothing, 129.00m),
-            ("牛仔裤", fashion, clothing, 159.00m), ("毛衣", fashion, clothing, 179.00m),
-            ("连衣裙", fashion, clothing, 199.00m), ("运动鞋", fashion, clothing, 299.00m),
-            ("皮鞋", fashion, clothing, 299.00m), ("风衣", fashion, clothing, 399.00m),
-            ("冲锋衣", fashion, clothing, 499.00m), ("羽绒服", fashion, clothing, 599.00m),
-            ("《小王子》", books, bookstore, 19.00m), ("英语词汇书", books, bookstore, 35.00m),
-            ("《活着》", books, bookstore, 39.00m), ("《白夜行》", books, bookstore, 39.50m),
-            ("《时间简史》", books, bookstore, 45.00m), ("《红楼梦》", books, bookstore, 49.00m),
-            ("《平凡的世界》", books, bookstore, 59.00m), ("《人类简史》", books, bookstore, 68.00m),
-            ("《经济学原理》", books, bookstore, 98.00m), ("《算法导论》", books, bookstore, 128.00m),
-            ("儿童绘本套装", books, bookstore, 129.00m), ("《三体》全集", books, bookstore, 168.00m),
-            ("花瓶", home, homeStore, 29.00m), ("香薰蜡烛", home, homeStore, 39.00m),
-            ("抱枕", home, homeStore, 39.00m), ("毛巾三件套", home, homeStore, 49.00m),
-            ("收纳箱三件套", home, homeStore, 59.00m), ("挂钟", home, homeStore, 69.00m),
-            ("保温杯", home, homeStore, 89.00m), ("电热水壶", home, homeStore, 99.00m),
-            ("落地灯", home, homeStore, 159.00m), ("刀具套装", home, homeStore, 159.00m),
-            ("不锈钢锅", home, homeStore, 199.00m), ("窗帘", home, homeStore, 199.00m),
-            ("床品四件套", home, homeStore, 299.00m), ("电饭煲", home, homeStore, 299.00m),
-            ("地毯", home, homeStore, 399.00m), ("咖啡机", home, homeStore, 599.00m),
-            ("空气净化器", home, homeStore, 899.00m), ("吸尘器", home, homeStore, 1299.00m),
-            ("扫地机器人", home, homeStore, 1499.00m), ("智能马桶盖", home, homeStore, 1999.00m),
-            ("跳绳", sports, outdoor, 19.00m), ("冰袖", sports, outdoor, 19.00m),
-            ("泳镜", sports, outdoor, 29.00m), ("护膝", sports, outdoor, 39.00m),
-            ("帐篷灯", sports, outdoor, 39.00m), ("野餐垫", sports, outdoor, 49.00m),
-            ("瑜伽球", sports, outdoor, 59.00m), ("登山杖", sports, outdoor, 59.00m),
-            ("折叠椅", sports, outdoor, 79.00m), ("篮球", sports, outdoor, 89.00m),
-            ("足球", sports, outdoor, 99.00m), ("羽毛球拍", sports, outdoor, 99.00m),
-            ("骑行头盔", sports, outdoor, 129.00m), ("哑铃", sports, outdoor, 129.00m),
-            ("望远镜", sports, outdoor, 259.00m), ("筋膜枪", sports, outdoor, 399.00m),
-            ("山地自行车", sports, outdoor, 1299.00m), ("跑步机", sports, outdoor, 1999.00m)
+            ("手机支架", "Phone Holder", electronics, digital, 19.90m), ("三合一数据线", "3-in-1 Data Cable", electronics, digital, 29.00m),
+            ("蓝牙自拍杆", "Bluetooth Selfie Stick", electronics, digital, 39.00m), ("无线充电器", "Wireless Charger", electronics, digital, 89.00m),
+            ("移动电源 20000mAh", "Power Bank 20000mAh", electronics, digital, 129.00m), ("键鼠套装", "Keyboard & Mouse Combo", electronics, digital, 129.00m),
+            ("显示器支架", "Monitor Stand", electronics, digital, 149.00m), ("蓝牙音箱", "Bluetooth Speaker", electronics, digital, 159.00m),
+            ("电竞鼠标", "Gaming Mouse", electronics, digital, 199.00m), ("路由器", "Router", electronics, digital, 199.00m),
+            ("游戏手柄", "Game Controller", electronics, digital, 269.00m), ("智能音箱", "Smart Speaker", electronics, digital, 299.00m),
+            ("机械硬盘 2TB", "HDD 2TB", electronics, digital, 499.00m), ("智能手表", "Smartwatch", electronics, digital, 599.00m),
+            ("固态硬盘 1TB", "SSD 1TB", electronics, digital, 699.00m), ("电纸书阅读器", "E-Reader", electronics, digital, 899.00m),
+            ("投影仪", "Projector", electronics, digital, 1899.00m), ("平板电脑", "Tablet", electronics, digital, 2499.00m),
+            ("无人机", "Drone", electronics, digital, 2999.00m), ("微单相机", "Mirrorless Camera", electronics, digital, 3999.00m),
+            ("棉袜五双装", "Cotton Socks (5-Pack)", fashion, clothing, 29.00m), ("棒球帽", "Baseball Cap", fashion, clothing, 39.00m),
+            ("围巾", "Scarf", fashion, clothing, 49.00m), ("短裤", "Shorts", fashion, clothing, 59.00m),
+            ("皮带", "Belt", fashion, clothing, 69.00m), ("睡衣", "Pajamas", fashion, clothing, 89.00m),
+            ("帆布鞋", "Canvas Shoes", fashion, clothing, 99.00m), ("泳衣", "Swimsuit", fashion, clothing, 99.00m),
+            ("衬衫", "Shirt", fashion, clothing, 129.00m), ("双肩包", "Backpack", fashion, clothing, 129.00m),
+            ("牛仔裤", "Jeans", fashion, clothing, 159.00m), ("毛衣", "Sweater", fashion, clothing, 179.00m),
+            ("连衣裙", "Dress", fashion, clothing, 199.00m), ("运动鞋", "Sneakers", fashion, clothing, 299.00m),
+            ("皮鞋", "Leather Shoes", fashion, clothing, 299.00m), ("风衣", "Trench Coat", fashion, clothing, 399.00m),
+            ("冲锋衣", "Outdoor Jacket", fashion, clothing, 499.00m), ("羽绒服", "Down Jacket", fashion, clothing, 599.00m),
+            ("《小王子》", "\"The Little Prince\"", books, bookstore, 19.00m), ("英语词汇书", "English Vocabulary Book", books, bookstore, 35.00m),
+            ("《活着》", "\"To Live\"", books, bookstore, 39.00m), ("《白夜行》", "\"Journey Under the Midnight Sun\"", books, bookstore, 39.50m),
+            ("《时间简史》", "\"A Brief History of Time\"", books, bookstore, 45.00m), ("《红楼梦》", "\"Dream of the Red Chamber\"", books, bookstore, 49.00m),
+            ("《平凡的世界》", "\"Ordinary World\"", books, bookstore, 59.00m), ("《人类简史》", "\"Sapiens\"", books, bookstore, 68.00m),
+            ("《经济学原理》", "\"Principles of Economics\"", books, bookstore, 98.00m), ("《算法导论》", "\"Introduction to Algorithms\"", books, bookstore, 128.00m),
+            ("儿童绘本套装", "Children's Picture Book Set", books, bookstore, 129.00m), ("《三体》全集", "\"The Three-Body Problem\" Trilogy", books, bookstore, 168.00m),
+            ("花瓶", "Vase", home, homeStore, 29.00m), ("香薰蜡烛", "Scented Candle", home, homeStore, 39.00m),
+            ("抱枕", "Throw Pillow", home, homeStore, 39.00m), ("毛巾三件套", "Towel Set (3-Pack)", home, homeStore, 49.00m),
+            ("收纳箱三件套", "Storage Box Set (3-Pack)", home, homeStore, 59.00m), ("挂钟", "Wall Clock", home, homeStore, 69.00m),
+            ("保温杯", "Thermos", home, homeStore, 89.00m), ("电热水壶", "Electric Kettle", home, homeStore, 99.00m),
+            ("落地灯", "Floor Lamp", home, homeStore, 159.00m), ("刀具套装", "Knife Set", home, homeStore, 159.00m),
+            ("不锈钢锅", "Stainless Steel Pot", home, homeStore, 199.00m), ("窗帘", "Curtains", home, homeStore, 199.00m),
+            ("床品四件套", "Bedding Set (4-Pack)", home, homeStore, 299.00m), ("电饭煲", "Rice Cooker", home, homeStore, 299.00m),
+            ("地毯", "Rug", home, homeStore, 399.00m), ("咖啡机", "Coffee Maker", home, homeStore, 599.00m),
+            ("空气净化器", "Air Purifier", home, homeStore, 899.00m), ("吸尘器", "Vacuum Cleaner", home, homeStore, 1299.00m),
+            ("扫地机器人", "Robot Vacuum", home, homeStore, 1499.00m), ("智能马桶盖", "Smart Toilet Seat", home, homeStore, 1999.00m),
+            ("跳绳", "Jump Rope", sports, outdoor, 19.00m), ("冰袖", "Cooling Arm Sleeves", sports, outdoor, 19.00m),
+            ("泳镜", "Swim Goggles", sports, outdoor, 29.00m), ("护膝", "Knee Brace", sports, outdoor, 39.00m),
+            ("帐篷灯", "Tent Lamp", sports, outdoor, 39.00m), ("野餐垫", "Picnic Mat", sports, outdoor, 49.00m),
+            ("瑜伽球", "Yoga Ball", sports, outdoor, 59.00m), ("登山杖", "Trekking Poles", sports, outdoor, 59.00m),
+            ("折叠椅", "Folding Chair", sports, outdoor, 79.00m), ("篮球", "Basketball", sports, outdoor, 89.00m),
+            ("足球", "Soccer Ball", sports, outdoor, 99.00m), ("羽毛球拍", "Badminton Racket", sports, outdoor, 99.00m),
+            ("骑行头盔", "Bike Helmet", sports, outdoor, 129.00m), ("哑铃", "Dumbbell", sports, outdoor, 129.00m),
+            ("望远镜", "Binoculars", sports, outdoor, 259.00m), ("筋膜枪", "Massage Gun", sports, outdoor, 399.00m),
+            ("山地自行车", "Mountain Bike", sports, outdoor, 1299.00m), ("跑步机", "Treadmill", sports, outdoor, 1999.00m)
         };
 
         for (var i = 0; i < extraItems.Length; i++)
         {
-            var (name, category, shop, price) = extraItems[i];
+            var (name, nameEn, category, shop, price) = extraItems[i];
             var stock = Random.Shared.Next(30, 500);
             var sku = $"EXT-{i + 1:000}";
             var originalPrice = Random.Shared.NextDouble() < 0.25
@@ -338,8 +338,10 @@ public static class DbInitializer
             products.Add(new Product
             {
                 Name = name,
+                NameEn = nameEn,
                 Slug = name,
                 Description = BuildDescription(name),
+                DescriptionEn = BuildDescriptionEn(nameEn),
                 Price = price,
                 OriginalPrice = originalPrice,
                 Stock = stock,
@@ -391,6 +393,13 @@ public static class DbInitializer
             $"{name}，人气之选，买了不后悔。",
             $"{name}，实用耐用，日常必备。",
             $"{name}，口碑很好，回购率高。");
+
+    private static string BuildDescriptionEn(string name) =>
+        PickOne(
+            $"{name}, a quality pick you can count on.",
+            $"{name}, a popular choice you won't regret.",
+            $"{name}, practical and durable for everyday use.",
+            $"{name}, well-reviewed and loved by repeat buyers.");
 
     private static string BuildDetailHtml(string name, string description, string img1, string img2) =>
         $"<p>{description}</p>" +

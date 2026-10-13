@@ -13,6 +13,10 @@ public class Category
     public string Name { get; set; } = string.Empty;
 
     [StringLength(100)]
+    [Display(Name = "分类名称（英文）")]
+    public string? NameEn { get; set; }
+
+    [StringLength(100)]
     public string Slug { get; set; } = string.Empty;
 
     [StringLength(500)]

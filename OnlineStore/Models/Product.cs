@@ -13,11 +13,19 @@ public class Product
     public string Name { get; set; } = string.Empty;
 
     [StringLength(150)]
+    [Display(Name = "商品名称（英文）")]
+    public string? NameEn { get; set; }
+
+    [StringLength(150)]
     public string Slug { get; set; } = string.Empty;
 
     [StringLength(2000)]
     [Display(Name = "商品描述")]
     public string? Description { get; set; }
+
+    [StringLength(2000)]
+    [Display(Name = "商品描述（英文）")]
+    public string? DescriptionEn { get; set; }
 
     [Display(Name = "价格")]
     public decimal Price { get; set; }

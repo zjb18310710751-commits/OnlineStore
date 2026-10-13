@@ -1,6 +1,6 @@
 @model ShopViewModel
 @{
-    ViewData["Title"] = Model.Shop.Name;
+    ViewData["Title"] = L10n.Name(Model.Shop);
 }
 <div class="container py-4">
     <div class="card shadow-sm mb-4">
@@ -8,7 +8,7 @@
             <div class="d-flex align-items-center gap-3">
                 <div class="shop-avatar" style="width:64px;height:64px;font-size:1.8rem;"><i class="bi bi-shop"></i></div>
                 <div>
-                    <h1 class="h5 mb-1">@Model.Shop.Name</h1>
+                    <h1 class="h5 mb-1">@L10n.Name(Model.Shop)</h1>
                     <div class="text-warning">
                         @(new string('★', (int)Math.Round(Model.Shop.Rating)))
                         <span class="text-dark ms-1">@Model.Shop.Rating.ToString("0.0")</span>
@@ -18,7 +18,7 @@
             </div>
             @if (!string.IsNullOrEmpty(Model.Shop.Description))
             {
-                <div class="border-top mt-3 pt-2 text-muted small">@Model.Shop.Description</div>
+                <div class="border-top mt-3 pt-2 text-muted small">@L10n.Description(Model.Shop)</div>
             }
         </div>
     </div>

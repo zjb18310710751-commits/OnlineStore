@@ -34,7 +34,7 @@
                             <ul class="dropdown-menu">
                                 @foreach (var c in categories)
                                 {
-                                    <li><a class="dropdown-item" asp-controller="Products" asp-action="Index" asp-route-categoryId="@c.Id">@c.Name</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Products" asp-action="Index" asp-route-categoryId="@c.Id">@L10n.Name(c)</a></li>
                                 }
                                 @if (categories.Count == 0)
                                 {
