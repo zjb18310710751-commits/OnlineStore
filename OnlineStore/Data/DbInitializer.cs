@@ -5,8 +5,7 @@ using OnlineStore.Models;
 namespace OnlineStore.Data;
 
 /// <summary>
-/// 首次运行初始化：按当前模型建库建表（EnsureCreated）并写入种子数据。
-/// 生产环境建议改用 EF Core Migrations（见 README）。
+/// 首次运行初始化：应用 EF Core Migrations 建库建表，并写入种子数据。
 /// </summary>
 public static class DbInitializer
 {
@@ -21,7 +20,7 @@ public static class DbInitializer
         var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
         var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
-        await context.Database.EnsureCreatedAsync();
+        await context.Database.MigrateAsync();
 
         await SeedAsync(context, userManager, roleManager);
     }

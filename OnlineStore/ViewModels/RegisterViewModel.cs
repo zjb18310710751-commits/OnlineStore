@@ -9,10 +9,10 @@ public class RegisterViewModel
     public string RegisterBy { get; set; } = "email";
 
     [Display(Name = "邮箱")]
-    public string Email { get; set; } = string.Empty;
+    public string? Email { get; set; }
 
     [Display(Name = "手机号")]
-    public string PhoneNumber { get; set; } = string.Empty;
+    public string? PhoneNumber { get; set; }
 
     [Required(ErrorMessage = "请输入验证码")]
     [StringLength(6, MinimumLength = 6, ErrorMessage = "验证码为 6 位数字")]
@@ -36,7 +36,8 @@ public class RegisterViewModel
     public string Address { get; set; } = string.Empty;
 
     [Required(ErrorMessage = "请输入密码")]
-    [StringLength(100, MinimumLength = 6, ErrorMessage = "密码至少 6 位")]
+    [StringLength(100, ErrorMessage = "密码最长 100 位")]
+    [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^a-zA-Z0-9]).{6,}$", ErrorMessage = "密码至少 6 位，须包含大写字母、小写字母、数字和特殊字符")]
     [DataType(DataType.Password)]
     [Display(Name = "密码")]
     public string Password { get; set; } = string.Empty;

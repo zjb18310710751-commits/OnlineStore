@@ -17,7 +17,8 @@ public class ForgotPasswordViewModel
     public string VerificationCode { get; set; } = string.Empty;
 
     [Required(ErrorMessage = "请输入新密码")]
-    [StringLength(100, MinimumLength = 6, ErrorMessage = "密码至少 6 位")]
+    [StringLength(100, ErrorMessage = "密码最长 100 位")]
+    [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^a-zA-Z0-9]).{6,}$", ErrorMessage = "密码至少 6 位，须包含大写字母、小写字母、数字和特殊字符")]
     [DataType(DataType.Password)]
     [Display(Name = "新密码")]
     public string NewPassword { get; set; } = string.Empty;

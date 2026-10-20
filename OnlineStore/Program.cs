@@ -10,9 +10,9 @@ var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
     ?? throw new InvalidOperationException("未配置连接字符串 ConnectionStrings:DefaultConnection。");
 
-// 数据访问：EF Core + SQLite（文件型数据库，无需外部服务，dotnet run 即可运行）
+// 数据访问：EF Core + SQL Server（SQL Server Express，经 SSMS 管理）
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlite(connectionString));
+    options.UseSqlServer(connectionString));
 
 // 身份认证与角色授权（安全性）
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
@@ -132,7 +132,7 @@ try
 catch (Exception ex)
 {
     var logger = app.Services.GetRequiredService<ILoggerFactory>().CreateLogger("DbInitializer");
-    logger.LogError(ex, "数据库初始化失败：请检查 SQLite 数据库文件路径与写入权限是否正确。");
+    logger.LogError(ex, "数据库初始化失败：请检查 SQL Server (SQLEXPRESS) 服务是否已启动，以及连接串/凭据是否正确。");
 }
 
 app.Run();

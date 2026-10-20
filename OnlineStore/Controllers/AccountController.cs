@@ -128,7 +128,7 @@ public class AccountController : Controller
             return RedirectToAction("Index", "Home");
         }
 
-        return View();
+        return View(new RegisterViewModel());
     }
 
     [HttpPost]
@@ -231,7 +231,7 @@ public class AccountController : Controller
             return View(model);
         }
 
-        var identifier = isPhone ? model.PhoneNumber.Trim() : model.Email.Trim().ToLowerInvariant();
+        var identifier = isPhone ? model.PhoneNumber!.Trim() : model.Email!.Trim().ToLowerInvariant();
 
         // 目标地址唯一性校验（统一提示，避免泄露账号是否已存在）
         var existing = isPhone

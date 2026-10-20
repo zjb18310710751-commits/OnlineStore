@@ -1,11 +1,11 @@
 # 在线商店系统
 
-基于 **ASP.NET Core 8 MVC** 的在线商店演示项目，采用分层架构与 SQLite 数据库。系统围绕五项质量属性设计：**可用性（Availability）、可修改性（Modifiability）、可测试性（Testability）、易用性（Usability）、安全性（Security）**。
+基于 **ASP.NET Core 8 MVC** 的在线商店演示项目，采用分层架构与 SQL Server 数据库。系统围绕五项质量属性设计：**可用性（Availability）、可修改性（Modifiability）、可测试性（Testability）、易用性（Usability）、安全性（Security）**。
 
 ## 技术栈
 
 - ASP.NET Core 8 MVC（Razor 视图）
-- Entity Framework Core 8 + **Microsoft.EntityFrameworkCore.Sqlite**（文件型数据库，零配置）
+- Entity Framework Core 8 + **Microsoft.EntityFrameworkCore.SqlServer**（SQL Server Express，SSMS 管理）
 - ASP.NET Core Identity（Cookie 认证 + 角色授权）
 - Bootstrap 5.3 + Bootstrap Icons（前端主题）
 - ASP.NET Core Health Checks（健康检查）
@@ -30,7 +30,7 @@
 | 购物车 | 加入（支持所选颜色/规格）、查看、更新数量、移除、清空（基于 Session） |
 | 账号注册与登录 | 前台支持「邮箱注册 / 手机号注册」双入口（各自验证码校验，注册后自动登录）、登录支持邮箱或手机号；后台管理员专属登录（仅管理员角色可登录，前后台入口分离）；登出（ASP.NET Core Identity，密码策略+失败锁定） |
 | 记住账号密码 | 登录页「记住账号密码」勾选后，账号（邮箱或手机号）与密码经 Data Protection 加密写入 HttpOnly 持久化 Cookie，下次打开登录页自动回填（前后台登录均支持）；取消勾选即清除 |
-| 数据库连接与数据操作 | EF Core + SQLite，首次运行自动创建数据库文件并写入种子数据 |
+| 数据库连接与数据操作 | EF Core + SQL Server，首次运行经 EF Migrations 自动建库建表并写入种子数据 |
 | 商店主题界面 | 亚马逊风格响应式主题、导航分类菜单、商品卡片、首页 Hero、详情页购买框 |
 | 验证码注册/找回 | 邮箱注册、手机号注册与忘记密码均通过 6 位验证码（演示模式：验证码直接显示在页面；邮箱渠道预留 Brevo 真实发信、短信渠道预留接口） |
 | 促销价（划线价） | 商品可设「原价」，前端显示划线原价 + 折扣标签，首页「限时折扣」专区 |
@@ -72,17 +72,17 @@ OnlineStore.Tests/  xUnit 单元测试项目（引用 OnlineStore，使用 EF Co
 1. **安装 .NET 8 SDK**（本机当前仅有运行时，缺编译用的 SDK）：
    - 命令行：`winget install Microsoft.DotNet.SDK.8`
    - 或打开 Visual Studio Installer，为 VS 2022 勾选「ASP.NET 和 Web 开发」工作负载。
-2. **无需额外数据库**：已改用 SQLite 文件型数据库，`dotnet run` 即可自动创建 `onlinestore.db`。
+2. **需安装 SQL Server Express**：本机需有 SQL Server 实例（默认 `SQLEXPRESS`），首次运行会自动建库建表。
 
-## 配置数据库连接（SQLite）
+## 配置数据库连接（SQL Server）
 
-无需外部服务。默认连接串已在 `OnlineStore/appsettings.json` 中配置为文件型 SQLite：
+默认连接串已在 `OnlineStore/appsettings.json` 中配置为 SQL Server Express（Windows 集成认证）：
 
 ```json
-"DefaultConnection": "Data Source=onlinestore.db"
+"DefaultConnection": "Server=localhost\\SQLEXPRESS;Database=OnlineStore;Trusted_Connection=True;TrustServerCertificate=True;"
 ```
 
-首次运行时会在项目目录自动生成 `onlinestore.db` 数据库文件（含 5 个分类、100 个示例商品、5 家店铺与管理员账号）。如需改名/换路径，改 `Data Source=` 的值即可。
+首次运行会经 EF Migrations 自动创建 `OnlineStore` 数据库与全部表，并写入种子数据（5 个分类、100 个示例商品、5 家店铺与管理员账号）。用 SSMS 连接 `localhost\SQLEXPRESS` 即可查看/管理数据库；也可先在 SSMS 中建好空库 `OnlineStore`，应用首次启动时会自动建表并写入种子数据。
 
 ## 运行
 
@@ -118,7 +118,7 @@ dotnet test
 - 邮箱：`admin@store.com`
 - 密码：`Admin@123456`
 
-> ⚠️ 首次登录后请尽快修改密码（生产环境务必修改）。密码策略默认要求：至少 6 位，含大小写字母、数字与特殊字符。
+> ⚠️ 首次登录后请尽快修改密码（生产环境务必修改）。密码策略要求：至少 6 位，含大小写字母、数字与特殊字符（注册/找回密码时前端即时校验，与 Identity 服务端规则一致）。
 
 ## 质量属性如何落地（属性 → 关键代码片段）
 
@@ -144,11 +144,10 @@ dotnet test
 - 购物车从 Session 持久化到数据库/Redis（实现 `ICartStore` 接口即可）
 - 真实邮件发送需配置发件域名（当前为演示模式，代码已预留 Brevo API）
 
-## 从 EnsureCreated 切换到 EF Migrations（正式环境建议）
+## 数据库迁移（EF Core Migrations）
 
-当前为便于零工具启动，首次建表使用 `DbInitializer` 中的 `EnsureCreated()`。正式环境建议改用迁移：
+项目已采用 EF Core Migrations（`Data/DbInitializer.cs` 中调用 `Database.MigrateAsync()`），首个迁移为 `Migrations/*_InitialCreate`。模型变更时：
 
-1. 安装工具：`dotnet tool install --global dotnet-ef`
-2. 生成首个迁移：`dotnet ef migrations add InitialCreate`
-3. 将 `DbInitializer.InitializeAsync` 中的 `EnsureCreatedAsync()` 替换为 `MigrateAsync()`。
-4. 后续模型变更通过 `dotnet ef migrations add Xxx` + 部署时 `MigrateAsync()` 演进结构。
+1. 安装工具（如未安装）：`dotnet tool install --global dotnet-ef`
+2. 新增迁移：在 `OnlineStore/` 目录下执行 `dotnet ef migrations add Xxx`
+3. 应用迁移：`dotnet ef database update`（或直接 `dotnet run`，启动时会自动 `MigrateAsync()`）
