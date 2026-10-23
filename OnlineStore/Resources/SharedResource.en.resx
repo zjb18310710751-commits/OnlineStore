@@ -52,6 +52,7 @@
   <data name="AddToCart" xml:space="preserve"><value>Add to cart</value></data>
   <data name="ShoppingCart" xml:space="preserve"><value>Shopping Cart</value></data>
   <data name="EmptyCart" xml:space="preserve"><value>Your cart is empty. Start shopping now.</value></data>
+  <data name="CartQuantityRequired" xml:space="preserve"><value>Please enter a quantity</value></data>
   <data name="ContinueShopping" xml:space="preserve"><value>Continue shopping</value></data>
   <data name="UnitPrice" xml:space="preserve"><value>Unit price</value></data>
   <data name="Quantity" xml:space="preserve"><value>Quantity</value></data>
@@ -178,6 +179,12 @@
   <data name="Checkout" xml:space="preserve"><value>Checkout</value></data>
   <data name="Receiver" xml:space="preserve"><value>Receiver</value></data>
   <data name="SubmitOrder" xml:space="preserve"><value>Place order</value></data>
+  <data name="CheckoutReceiverRequired" xml:space="preserve"><value>Please enter the receiver's name</value></data>
+  <data name="CheckoutReceiverTooLong" xml:space="preserve"><value>Receiver name cannot exceed 50 characters</value></data>
+  <data name="CheckoutPhoneRequired" xml:space="preserve"><value>Please enter a phone number</value></data>
+  <data name="CheckoutPhoneTooLong" xml:space="preserve"><value>Phone number cannot exceed 20 characters</value></data>
+  <data name="CheckoutAddressRequired" xml:space="preserve"><value>Please enter a delivery address</value></data>
+  <data name="CheckoutAddressTooLong" xml:space="preserve"><value>Delivery address cannot exceed 500 characters</value></data>
   <data name="OrderPlaced" xml:space="preserve"><value>Order placed</value></data>
   <data name="OrderNo" xml:space="preserve"><value>Order no.</value></data>
   <data name="OrderStatus" xml:space="preserve"><value>Status</value></data>

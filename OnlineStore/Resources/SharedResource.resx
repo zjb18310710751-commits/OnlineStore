@@ -52,6 +52,7 @@
   <data name="AddToCart" xml:space="preserve"><value>加入购物车</value></data>
   <data name="ShoppingCart" xml:space="preserve"><value>购物车</value></data>
   <data name="EmptyCart" xml:space="preserve"><value>购物车是空的，快去挑选心仪的商品吧。</value></data>
+  <data name="CartQuantityRequired" xml:space="preserve"><value>请输入商品数量</value></data>
   <data name="ContinueShopping" xml:space="preserve"><value>继续购物</value></data>
   <data name="UnitPrice" xml:space="preserve"><value>单价</value></data>
   <data name="Quantity" xml:space="preserve"><value>数量</value></data>
@@ -178,6 +179,12 @@
   <data name="Checkout" xml:space="preserve"><value>去结算</value></data>
   <data name="Receiver" xml:space="preserve"><value>收货人</value></data>
   <data name="SubmitOrder" xml:space="preserve"><value>提交订单</value></data>
+  <data name="CheckoutReceiverRequired" xml:space="preserve"><value>请输入收货人姓名</value></data>
+  <data name="CheckoutReceiverTooLong" xml:space="preserve"><value>收货人姓名不能超过 50 个字符</value></data>
+  <data name="CheckoutPhoneRequired" xml:space="preserve"><value>请输入联系电话</value></data>
+  <data name="CheckoutPhoneTooLong" xml:space="preserve"><value>联系电话不能超过 20 个字符</value></data>
+  <data name="CheckoutAddressRequired" xml:space="preserve"><value>请输入收货地址</value></data>
+  <data name="CheckoutAddressTooLong" xml:space="preserve"><value>收货地址不能超过 500 个字符</value></data>
   <data name="OrderPlaced" xml:space="preserve"><value>下单成功</value></data>
   <data name="OrderNo" xml:space="preserve"><value>订单号</value></data>
   <data name="OrderStatus" xml:space="preserve"><value>订单状态</value></data>

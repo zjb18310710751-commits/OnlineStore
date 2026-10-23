@@ -29,6 +29,7 @@
                     <ul class="list-group list-group-flush">
                         @foreach (var item in Model.Items)
                         {
+                            var quantityErrorId = $"cartQuantityError_{item.ProductId}_{item.SkuId ?? 0}";
                             <li class="list-group-item cart-product-row">
                                 <div class="cart-product-grid">
                                     <div class="cart-product-main">
@@ -59,18 +60,23 @@
 
                                     <div class="cart-quantity">
                                         <span class="cart-mobile-label">@Loc["Quantity"]</span>
-                                        <form asp-controller="Cart" asp-action="Update" method="post" class="cart-quantity-form">
-                                            <input type="hidden" name="productId" value="@item.ProductId" />
-                                            <input type="hidden" name="skuId" value="@item.SkuId" />
-                                            <input type="number" name="quantity" class="form-control form-control-sm cart-quantity-input text-center"
-                                                   value="@item.Quantity" min="1" max="@item.Stock" step="1" inputmode="numeric"
-                                                   required aria-label="@Loc["Quantity"].Value" />
-                                            <button type="submit" class="btn btn-sm btn-outline-secondary">@Loc["Update"]</button>
-                                            <button type="submit" class="btn btn-sm btn-link text-danger cart-remove-button"
-                                                    formaction="@Url.Action("Remove", "Cart")" formnovalidate>
-                                                @Loc["Remove"]
-                                            </button>
-                                        </form>
+                                        <div class="cart-quantity-controls">
+                                            <form asp-controller="Cart" asp-action="Update" method="post" class="cart-quantity-form" novalidate>
+                                                <input type="hidden" name="productId" value="@item.ProductId" />
+                                                <input type="hidden" name="skuId" value="@item.SkuId" />
+                                                <input type="number" name="quantity" class="form-control form-control-sm cart-quantity-input text-center"
+                                                       value="@item.Quantity" min="1" max="@item.Stock" step="1" inputmode="numeric"
+                                                       required aria-describedby="@quantityErrorId" aria-label="@Loc["Quantity"].Value" />
+                                                <button type="submit" class="btn btn-sm btn-outline-secondary">@Loc["Update"]</button>
+                                                <button type="submit" class="btn btn-sm btn-link text-danger cart-remove-button"
+                                                        formaction="@Url.Action("Remove", "Cart")">
+                                                    @Loc["Remove"]
+                                                </button>
+                                            </form>
+                                            <div id="@quantityErrorId" class="text-danger small cart-quantity-error d-none" role="alert">
+                                                @Loc["CartQuantityRequired"]
+                                            </div>
+                                        </div>
                                     </div>
 
                                     <div class="cart-line-total text-end">
@@ -114,3 +120,34 @@
         </div>
     }
 </div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('.cart-quantity-form').forEach(function (form) {
+                var input = form.querySelector('input[name="quantity"]');
+                var error = document.getElementById(input.getAttribute('aria-describedby'));
+
+                input.addEventListener('input', function () {
+                    input.classList.remove('is-invalid');
+                    if (error) error.classList.add('d-none');
+                });
+
+                form.addEventListener('submit', function (event) {
+                    if (event.submitter && event.submitter.hasAttribute('formaction')) {
+                        return;
+                    }
+
+                    var rawValue = input.value.trim();
+                    var quantity = Number(rawValue);
+                    if (!rawValue || !Number.isInteger(quantity) || quantity < 1) {
+                        event.preventDefault();
+                        input.classList.add('is-invalid');
+                        if (error) error.classList.remove('d-none');
+                        input.focus();
+                    }
+                });
+            });
+        });
+    </script>
+}

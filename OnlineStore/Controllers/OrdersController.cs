@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Localization;
 using Microsoft.AspNetCore.Mvc;
 using OnlineStore.Models;
 using OnlineStore.Services;
@@ -15,17 +16,20 @@ public class OrdersController : Controller
     private readonly ICartService _cartService;
     private readonly ICouponService _couponService;
     private readonly UserManager<ApplicationUser> _userManager;
+    private readonly IStringLocalizer<SharedResource> _loc;
 
     public OrdersController(
         IOrderService orderService,
         ICartService cartService,
         ICouponService couponService,
-        UserManager<ApplicationUser> userManager)
+        UserManager<ApplicationUser> userManager,
+        IStringLocalizer<SharedResource> localizer)
     {
         _orderService = orderService;
         _cartService = cartService;
         _couponService = couponService;
         _userManager = userManager;
+        _loc = localizer;
     }
 
     [HttpGet]
@@ -62,6 +66,7 @@ public class OrdersController : Controller
         vm.Items = cart.Items;
         vm.Total = cart.Total;
 
+        ValidateCheckoutDetails(vm);
         if (!ModelState.IsValid)
         {
             return View(vm);
@@ -88,7 +93,7 @@ public class OrdersController : Controller
         {
             OrderNo = GenerateOrderNo(),
             UserId = user?.Id,
-            UserName = vm.UserName,
+            UserName = vm.UserName!,
             Phone = vm.Phone,
             Address = vm.Address,
             Total = cart.Total - discount,
@@ -163,4 +168,34 @@ public class OrdersController : Controller
 
     private static string GenerateOrderNo() =>
         $"OS{DateTime.UtcNow:yyyyMMddHHmmss}{Random.Shared.Next(100, 999)}";
+
+    private void ValidateCheckoutDetails(CheckoutViewModel vm)
+    {
+        if (string.IsNullOrWhiteSpace(vm.UserName))
+        {
+            ModelState.AddModelError(nameof(vm.UserName), _loc["CheckoutReceiverRequired"]);
+        }
+        else if (vm.UserName.Length > 50)
+        {
+            ModelState.AddModelError(nameof(vm.UserName), _loc["CheckoutReceiverTooLong"]);
+        }
+
+        if (string.IsNullOrWhiteSpace(vm.Phone))
+        {
+            ModelState.AddModelError(nameof(vm.Phone), _loc["CheckoutPhoneRequired"]);
+        }
+        else if (vm.Phone.Length > 20)
+        {
+            ModelState.AddModelError(nameof(vm.Phone), _loc["CheckoutPhoneTooLong"]);
+        }
+
+        if (string.IsNullOrWhiteSpace(vm.Address))
+        {
+            ModelState.AddModelError(nameof(vm.Address), _loc["CheckoutAddressRequired"]);
+        }
+        else if (vm.Address.Length > 500)
+        {
+            ModelState.AddModelError(nameof(vm.Address), _loc["CheckoutAddressTooLong"]);
+        }
+    }
 }

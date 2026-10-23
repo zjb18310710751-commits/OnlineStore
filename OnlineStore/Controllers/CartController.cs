@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Localization;
 using Microsoft.AspNetCore.Mvc;
 using OnlineStore.Services;
 
@@ -7,10 +8,12 @@ namespace OnlineStore.Controllers;
 public class CartController : Controller
 {
     private readonly ICartService _cartService;
+    private readonly IStringLocalizer<SharedResource> _loc;
 
-    public CartController(ICartService cartService)
+    public CartController(ICartService cartService, IStringLocalizer<SharedResource> localizer)
     {
         _cartService = cartService;
+        _loc = localizer;
     }
 
     public async Task<IActionResult> Index()
@@ -40,7 +43,7 @@ public class CartController : Controller
     {
         if (!quantity.HasValue || quantity.Value < 1)
         {
-            TempData["Error"] = "请输入商品数量，数量必须大于 0。";
+            TempData["Error"] = _loc["CartQuantityRequired"].Value;
             return RedirectToAction(nameof(Index));
         }
 

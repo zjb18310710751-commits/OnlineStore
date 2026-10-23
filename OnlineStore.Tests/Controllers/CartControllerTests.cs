@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using Microsoft.Extensions.Localization;
 using OnlineStore.Controllers;
 using OnlineStore.Models;
 using OnlineStore.Services;
@@ -22,7 +23,7 @@ public class CartControllerTests
 
         Assert.IsType<RedirectToActionResult>(result);
         Assert.Null(cartService.UpdatedQuantity);
-        Assert.Equal("请输入商品数量，数量必须大于 0。", controller.TempData["Error"]);
+        Assert.Equal("请输入商品数量", controller.TempData["Error"]);
     }
 
     [Fact]
@@ -38,7 +39,7 @@ public class CartControllerTests
     }
 
     private static CartController CreateController(ICartService cartService) =>
-        new(cartService)
+        new(cartService, new TestStringLocalizer())
         {
             TempData = new TempDataDictionary(new DefaultHttpContext(), new NullTempDataProvider())
         };
@@ -70,5 +71,23 @@ public class CartControllerTests
         public void SaveTempData(HttpContext context, IDictionary<string, object> values)
         {
         }
+    }
+
+    private sealed class TestStringLocalizer : IStringLocalizer<SharedResource>
+    {
+        private static readonly IReadOnlyDictionary<string, string> Values =
+            new Dictionary<string, string>
+            {
+                ["CartQuantityRequired"] = "请输入商品数量"
+            };
+
+        public LocalizedString this[string name] =>
+            new(name, Values.GetValueOrDefault(name, name));
+
+        public LocalizedString this[string name, params object[] arguments] =>
+            new(name, string.Format(Values.GetValueOrDefault(name, name), arguments));
+
+        public IEnumerable<LocalizedString> GetAllStrings(bool includeParentCultures) =>
+            Values.Select(item => new LocalizedString(item.Key, item.Value));
     }
 }

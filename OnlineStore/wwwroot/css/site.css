@@ -389,6 +389,17 @@ body {
     gap: .45rem;
 }
 
+.cart-quantity-controls {
+    display: flex;
+    flex-direction: column;
+    gap: .3rem;
+    min-width: 0;
+}
+
+.cart-quantity-error {
+    margin-top: -.1rem;
+}
+
 .cart-quantity-input {
     width: 62px;
     flex: 0 0 auto;
