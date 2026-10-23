@@ -198,7 +198,7 @@ public class ProductService : IProductService
 
         // 已跟踪的实体先加载现有分类，再 Clear+Add，EF 才能正确计算多对多联结表差异
         var nav = _context.Entry(product).Collection(p => p.Categories);
-        if (!nav.IsLoaded && nav.CurrentValue is null)
+        if (!nav.IsLoaded)
         {
             await nav.LoadAsync();
         }

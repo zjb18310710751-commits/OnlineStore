@@ -12,10 +12,10 @@ namespace OnlineStore.Tests.Services;
 /// </summary>
 public class ProductServiceTests
 {
-    private static ApplicationDbContext CreateContext()
+    private static ApplicationDbContext CreateContext(string? databaseName = null)
     {
         var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-            .UseInMemoryDatabase(Guid.NewGuid().ToString())
+            .UseInMemoryDatabase(databaseName ?? Guid.NewGuid().ToString())
             .Options;
         return new ApplicationDbContext(options);
     }
@@ -183,5 +183,57 @@ public class ProductServiceTests
         Assert.Single(result);
         Assert.Equal(1, result[0].Id);
         Assert.True(result[0].IsOnSale);
+    }
+
+    [Fact]
+    public async Task SetCategoriesAsync_PreservesExistingCategory_WhenProductIsEdited()
+    {
+        var databaseName = Guid.NewGuid().ToString();
+        using (var seedContext = CreateContext(databaseName))
+        {
+            await SeedAsync(seedContext);
+        }
+
+        using var context = CreateContext(databaseName);
+        var service = new ProductService(context);
+        var product = await service.GetByIdAsync(1);
+        Assert.NotNull(product);
+
+        await service.SetCategoriesAsync(product!, new[] { 1 });
+        await service.UpdateAsync(product!);
+
+        context.ChangeTracker.Clear();
+        var savedProduct = await context.Products
+            .Include(p => p.Categories)
+            .SingleAsync(p => p.Id == 1);
+
+        Assert.Single(savedProduct.Categories);
+        Assert.Equal(1, savedProduct.Categories.Single().Id);
+    }
+
+    [Fact]
+    public async Task SetCategoriesAsync_ReplacesExistingCategories_WhenProductIsEdited()
+    {
+        var databaseName = Guid.NewGuid().ToString();
+        using (var seedContext = CreateContext(databaseName))
+        {
+            await SeedAsync(seedContext);
+        }
+
+        using var context = CreateContext(databaseName);
+        var service = new ProductService(context);
+        var product = await service.GetByIdAsync(1);
+        Assert.NotNull(product);
+
+        await service.SetCategoriesAsync(product!, new[] { 2 });
+        await service.UpdateAsync(product!);
+
+        context.ChangeTracker.Clear();
+        var savedProduct = await context.Products
+            .Include(p => p.Categories)
+            .SingleAsync(p => p.Id == 1);
+
+        Assert.Single(savedProduct.Categories);
+        Assert.Equal(2, savedProduct.Categories.Single().Id);
     }
 }
