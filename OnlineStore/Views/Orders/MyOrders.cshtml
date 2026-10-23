@@ -34,7 +34,7 @@
                                 <span class="text-muted small me-2">@Loc["OrderNo"]：@o.OrderNo</span>
                                 <span class="text-muted small">@o.CreatedAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</span>
                             </div>
-                            <span class="badge @StatusBadge(o.Status)">@o.Status</span>
+                            <span class="badge @StatusBadge(o.Status)">@L10n.Status(o.Status)</span>
                         </div>
                         <ul class="list-unstyled mb-2">
                             @foreach (var i in o.Items)

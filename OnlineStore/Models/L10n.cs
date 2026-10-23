@@ -35,4 +35,18 @@ public static class L10n
     /// <summary>通用取值：英文界面下优先返回 en，否则返回 zh。</summary>
     public static string Text(string zh, string? en) =>
         IsEnglish && !string.IsNullOrWhiteSpace(en) ? en : zh;
+
+    /// <summary>订单状态（数据库存储中文常量）的界面语言取值。</summary>
+    public static string Status(string zh) =>
+        IsEnglish
+            ? zh switch
+            {
+                OrderStatus.PendingShipment => "Pending shipment",
+                OrderStatus.Shipped => "Shipped",
+                OrderStatus.Completed => "Completed",
+                OrderStatus.Cancelled => "Cancelled",
+                OrderStatus.Refunded => "Refunded",
+                _ => zh
+            }
+            : zh;
 }

@@ -15,7 +15,7 @@
                     <dl class="row mb-3">
                         <dt class="col-sm-3 text-muted">@Loc["Receiver"]</dt><dd class="col-sm-9">@Model.UserName · @Model.Phone</dd>
                         <dt class="col-sm-3 text-muted">@Loc["Address"]</dt><dd class="col-sm-9">@Model.Address</dd>
-                        <dt class="col-sm-3 text-muted">@Loc["OrderStatus"]</dt><dd class="col-sm-9"><span class="badge bg-warning-subtle text-warning">@Model.Status</span></dd>
+                        <dt class="col-sm-3 text-muted">@Loc["OrderStatus"]</dt><dd class="col-sm-9"><span class="badge bg-warning-subtle text-warning">@L10n.Status(Model.Status)</span></dd>
                     </dl>
                     <table class="table table-sm align-middle">
                         <thead class="table-light">

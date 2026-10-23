@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 using OnlineStore.Models;
 using OnlineStore.Services;
 
@@ -12,11 +13,16 @@ public class FavoritesController : Controller
 {
     private readonly IFavoriteService _favoriteService;
     private readonly UserManager<ApplicationUser> _userManager;
+    private readonly IStringLocalizer<SharedResource> _loc;
 
-    public FavoritesController(IFavoriteService favoriteService, UserManager<ApplicationUser> userManager)
+    public FavoritesController(
+        IFavoriteService favoriteService,
+        UserManager<ApplicationUser> userManager,
+        IStringLocalizer<SharedResource> localizer)
     {
         _favoriteService = favoriteService;
         _userManager = userManager;
+        _loc = localizer;
     }
 
     [HttpPost]
@@ -30,7 +36,7 @@ public class FavoritesController : Controller
         }
 
         var nowFavorite = await _favoriteService.ToggleAsync(user.Id, productId);
-        TempData["Success"] = nowFavorite ? "已加入收藏。" : "已取消收藏。";
+        TempData["Success"] = nowFavorite ? _loc["FavoriteAdded"].Value : _loc["FavoriteRemoved"].Value;
         return RedirectToLocal(returnUrl) ?? RedirectToAction("Details", "Products", new { id = productId });
     }
 

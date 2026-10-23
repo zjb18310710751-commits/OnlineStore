@@ -80,7 +80,7 @@ public class AccountController : Controller
         if (user is null)
         {
             // 统一错误信息，避免泄露账号是否存在（安全性）
-            ModelState.AddModelError(string.Empty, "账号或密码错误。");
+            ModelState.AddModelError(string.Empty, _loc["LoginFailed"].Value);
             return View(model);
         }
 
@@ -105,11 +105,11 @@ public class AccountController : Controller
 
         if (result.IsLockedOut)
         {
-            ModelState.AddModelError(string.Empty, "登录失败次数过多，账号已锁定，请稍后再试。");
+            ModelState.AddModelError(string.Empty, _loc["AccountLocked"].Value);
             return View(model);
         }
 
-        ModelState.AddModelError(string.Empty, "账号或密码错误。");
+        ModelState.AddModelError(string.Empty, _loc["LoginFailed"].Value);
         return View(model);
     }
 
@@ -211,22 +211,22 @@ public class AccountController : Controller
         {
             if (string.IsNullOrWhiteSpace(model.PhoneNumber))
             {
-                ModelState.AddModelError(nameof(model.PhoneNumber), "请输入手机号");
+                ModelState.AddModelError(nameof(model.PhoneNumber), _loc["PhoneRequired"].Value);
             }
             else if (!Regex.IsMatch(model.PhoneNumber, PhonePattern))
             {
-                ModelState.AddModelError(nameof(model.PhoneNumber), "手机号格式不正确");
+                ModelState.AddModelError(nameof(model.PhoneNumber), _loc["PhoneFormatInvalid"].Value);
             }
         }
         else
         {
             if (string.IsNullOrWhiteSpace(model.Email))
             {
-                ModelState.AddModelError(nameof(model.Email), "请输入邮箱");
+                ModelState.AddModelError(nameof(model.Email), _loc["EmailRequired"].Value);
             }
             else if (!new EmailAddressAttribute().IsValid(model.Email))
             {
-                ModelState.AddModelError(nameof(model.Email), "邮箱格式不正确");
+                ModelState.AddModelError(nameof(model.Email), _loc["InvalidEmail"].Value);
             }
         }
 
@@ -279,7 +279,7 @@ public class AccountController : Controller
 
         // 注册成功后自动登录并跳转首页
         await _signInManager.SignInAsync(user, isPersistent: false);
-        TempData["Success"] = "注册成功，欢迎使用！";
+        TempData["Success"] = _loc["RegisterSuccess"].Value;
         return RedirectToAction("Index", "Home");
     }
 

@@ -11,7 +11,7 @@ public class ProductSpec
 
     public Product? Product { get; set; }
 
-    [Required(ErrorMessage = "请填写参数名")]
+    [Required(ErrorMessage = "ParamNameRequired")]
     [StringLength(100)]
     [Display(Name = "参数名")]
     public string Name { get; set; } = string.Empty;
@@ -20,7 +20,7 @@ public class ProductSpec
     [Display(Name = "参数名（英文）")]
     public string? NameEn { get; set; }
 
-    [Required(ErrorMessage = "请填写参数值")]
+    [Required(ErrorMessage = "ParamValueRequired")]
     [StringLength(200)]
     [Display(Name = "参数值")]
     public string Value { get; set; } = string.Empty;

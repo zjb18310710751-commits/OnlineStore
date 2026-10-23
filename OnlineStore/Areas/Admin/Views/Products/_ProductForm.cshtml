@@ -28,7 +28,7 @@
     </div>
     <div class="col-md-4 mb-3">
         <label asp-for="OriginalPrice" class="form-label">@Loc["OriginalPrice"]</label>
-        <input asp-for="OriginalPrice" class="form-control" placeholder="选填，用于划线原价" />
+        <input asp-for="OriginalPrice" class="form-control" placeholder="@Loc["OriginalPricePlaceholder"]" />
         <span asp-validation-for="OriginalPrice" class="text-danger small"></span>
     </div>
     <div class="col-md-4 mb-3">
@@ -112,17 +112,17 @@
 <div class="row g-3">
     <div class="col-md-4 mb-3">
         <label asp-for="ShippingFrom" class="form-label">@Loc["ShippingFrom"]</label>
-        <input asp-for="ShippingFrom" class="form-control" placeholder="如：广东深圳" />
+        <input asp-for="ShippingFrom" class="form-control" placeholder="@Loc["ShippingFromPlaceholder"]" />
         <span asp-validation-for="ShippingFrom" class="text-danger small"></span>
     </div>
     <div class="col-md-4 mb-3">
         <label asp-for="ShippingFee" class="form-label">@Loc["ShippingFee"]</label>
-        <input asp-for="ShippingFee" class="form-control" placeholder="如：包邮 / 运费 ¥8" />
+        <input asp-for="ShippingFee" class="form-control" placeholder="@Loc["ShippingFeePlaceholder"]" />
         <span asp-validation-for="ShippingFee" class="text-danger small"></span>
     </div>
     <div class="col-md-4 mb-3">
         <label asp-for="DeliveryTime" class="form-label">@Loc["DeliveryTime"]</label>
-        <input asp-for="DeliveryTime" class="form-control" placeholder="如：48小时内发货" />
+        <input asp-for="DeliveryTime" class="form-control" placeholder="@Loc["DeliveryTimePlaceholder"]" />
         <span asp-validation-for="DeliveryTime" class="text-danger small"></span>
     </div>
 </div>

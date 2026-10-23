@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 using OnlineStore.Models;
 using OnlineStore.Services;
 
@@ -11,11 +12,16 @@ public class ProductSpecsController : Controller
 {
     private readonly IProductSpecService _specService;
     private readonly IProductService _productService;
+    private readonly IStringLocalizer<SharedResource> _loc;
 
-    public ProductSpecsController(IProductSpecService specService, IProductService productService)
+    public ProductSpecsController(
+        IProductSpecService specService,
+        IProductService productService,
+        IStringLocalizer<SharedResource> localizer)
     {
         _specService = specService;
         _productService = productService;
+        _loc = localizer;
     }
 
     public async Task<IActionResult> Index(int productId)
@@ -55,7 +61,7 @@ public class ProductSpecsController : Controller
         }
 
         await _specService.CreateAsync(spec);
-        TempData["Success"] = "参数已添加。";
+        TempData["Success"] = _loc["SpecAdded"].Value;
         return RedirectToAction(nameof(Index), new { productId = spec.ProductId });
     }
 
@@ -88,7 +94,7 @@ public class ProductSpecsController : Controller
         }
 
         await _specService.UpdateAsync(spec);
-        TempData["Success"] = "参数已更新。";
+        TempData["Success"] = _loc["SpecUpdated"].Value;
         return RedirectToAction(nameof(Index), new { productId = spec.ProductId });
     }
 
@@ -101,7 +107,7 @@ public class ProductSpecsController : Controller
         if (spec is not null)
         {
             await _specService.DeleteAsync(id);
-            TempData["Success"] = "参数已删除。";
+            TempData["Success"] = _loc["SpecDeleted"].Value;
         }
 
         return RedirectToAction(nameof(Index), new { productId });

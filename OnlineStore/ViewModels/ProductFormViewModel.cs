@@ -9,7 +9,7 @@ public class ProductFormViewModel
 {
     public int Id { get; set; }
 
-    [Required(ErrorMessage = "请输入商品名称")]
+    [Required(ErrorMessage = "ProductNameRequired")]
     [StringLength(150)]
     [Display(Name = "商品名称")]
     public string Name { get; set; } = string.Empty;
@@ -18,17 +18,17 @@ public class ProductFormViewModel
     [Display(Name = "商品描述")]
     public string? Description { get; set; }
 
-    [Required(ErrorMessage = "请输入价格")]
-    [Range(0, 9999999, ErrorMessage = "价格不能为负")]
+    [Required(ErrorMessage = "PriceRequired")]
+    [Range(0, 9999999, ErrorMessage = "PriceInvalid")]
     [Display(Name = "价格")]
     public decimal Price { get; set; }
 
-    [Range(0, 9999999, ErrorMessage = "原价不能为负")]
+    [Range(0, 9999999, ErrorMessage = "OriginalPriceInvalid")]
     [Display(Name = "原价")]
     public decimal? OriginalPrice { get; set; }
 
-    [Required(ErrorMessage = "请输入库存")]
-    [Range(0, int.MaxValue, ErrorMessage = "库存不能为负")]
+    [Required(ErrorMessage = "StockRequired")]
+    [Range(0, int.MaxValue, ErrorMessage = "StockInvalid")]
     [Display(Name = "库存")]
     public int Stock { get; set; }
 
@@ -46,11 +46,11 @@ public class ProductFormViewModel
     [Display(Name = "上架")]
     public bool IsActive { get; set; } = true;
 
-    [Required(ErrorMessage = "请选择店铺")]
+    [Required(ErrorMessage = "ShopRequired")]
     [Display(Name = "店铺")]
     public int ShopId { get; set; }
 
-    [MinLength(1, ErrorMessage = "请至少选择一个分类")]
+    [MinLength(1, ErrorMessage = "CategoryRequired")]
     [Display(Name = "分类")]
     public List<int> CategoryIds { get; set; } = new();
 

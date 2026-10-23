@@ -324,4 +324,100 @@
   <data name="EmailNotRegistered" xml:space="preserve"><value>This email is not registered</value></data>
   <data name="PasswordResetSuccess" xml:space="preserve"><value>Password reset. Please sign in with your new password.</value></data>
   <data name="DemoCode" xml:space="preserve"><value>Code: {0}</value></data>
+  <data name="AccountRequired" xml:space="preserve"><value>Please enter your email or phone number</value></data>
+  <data name="PasswordRequired" xml:space="preserve"><value>Please enter your password</value></data>
+  <data name="AddressRequired" xml:space="preserve"><value>Please enter your address</value></data>
+  <data name="PasswordTooLong" xml:space="preserve"><value>Password cannot exceed 100 characters</value></data>
+  <data name="ProductNameRequired" xml:space="preserve"><value>Please enter a product name</value></data>
+  <data name="PriceRequired" xml:space="preserve"><value>Please enter a price</value></data>
+  <data name="PriceInvalid" xml:space="preserve"><value>Price cannot be negative</value></data>
+  <data name="OriginalPriceInvalid" xml:space="preserve"><value>Original price cannot be negative</value></data>
+  <data name="StockRequired" xml:space="preserve"><value>Please enter the stock quantity</value></data>
+  <data name="StockInvalid" xml:space="preserve"><value>Stock cannot be negative</value></data>
+  <data name="ShopRequired" xml:space="preserve"><value>Please select a shop</value></data>
+  <data name="CategoryRequired" xml:space="preserve"><value>Please select at least one category</value></data>
+  <data name="CategoryNameRequired" xml:space="preserve"><value>Please enter a category name</value></data>
+  <data name="ShopNameRequired" xml:space="preserve"><value>Please enter a shop name</value></data>
+  <data name="ShopRatingInvalid" xml:space="preserve"><value>Rating must be between 0 and 5</value></data>
+  <data name="UserNameRequired" xml:space="preserve"><value>Please enter a nickname</value></data>
+  <data name="RatingInvalid" xml:space="preserve"><value>Rating must be between 1 and 5 stars</value></data>
+  <data name="ParamNameRequired" xml:space="preserve"><value>Please enter a parameter name</value></data>
+  <data name="ParamValueRequired" xml:space="preserve"><value>Please enter a parameter value</value></data>
+  <data name="ColorRequired" xml:space="preserve"><value>Please enter a color</value></data>
+  <data name="SpecRequired" xml:space="preserve"><value>Please enter a spec</value></data>
+  <data name="CouponCodeRequired" xml:space="preserve"><value>Please enter a coupon code</value></data>
+  <data name="CouponValueInvalid" xml:space="preserve"><value>Coupon value must be greater than 0</value></data>
+  <data name="MinOrderAmountInvalid" xml:space="preserve"><value>Minimum order amount cannot be negative</value></data>
+  <data name="UsageLimitInvalid" xml:space="preserve"><value>Usage limit must be at least 1</value></data>
+  <data name="CartAdded" xml:space="preserve"><value>Added to cart.</value></data>
+  <data name="FavoriteAdded" xml:space="preserve"><value>Added to favorites.</value></data>
+  <data name="FavoriteRemoved" xml:space="preserve"><value>Removed from favorites.</value></data>
+  <data name="ReviewSubmitted" xml:space="preserve"><value>Review submitted. Thanks for sharing!</value></data>
+  <data name="LoginFailed" xml:space="preserve"><value>Invalid username or password.</value></data>
+  <data name="AccountLocked" xml:space="preserve"><value>Too many failed login attempts. Your account is locked. Try again later.</value></data>
+  <data name="PhoneRequired" xml:space="preserve"><value>Please enter a phone number</value></data>
+  <data name="PhoneFormatInvalid" xml:space="preserve"><value>Invalid phone number format</value></data>
+  <data name="RegisterSuccess" xml:space="preserve"><value>Registration successful. Welcome!</value></data>
+  <data name="EmailOrPasswordIncorrect" xml:space="preserve"><value>Incorrect email or password.</value></data>
+  <data name="NotAdmin" xml:space="preserve"><value>This account does not have admin privileges.</value></data>
+  <data name="OrderCancelled" xml:space="preserve"><value>Order cancelled.</value></data>
+  <data name="OrderCancelFailed" xml:space="preserve"><value>Cancellation failed: the order cannot be cancelled in its current state.</value></data>
+  <data name="ShopCreated" xml:space="preserve"><value>Shop created.</value></data>
+  <data name="ShopUpdated" xml:space="preserve"><value>Shop updated.</value></data>
+  <data name="ShopDeleted" xml:space="preserve"><value>Shop deleted.</value></data>
+  <data name="ShopDeleteFailed" xml:space="preserve"><value>Cannot delete: the shop still has products.</value></data>
+  <data name="ProductCreated" xml:space="preserve"><value>Product created.</value></data>
+  <data name="ProductUpdated" xml:space="preserve"><value>Product updated.</value></data>
+  <data name="ProductDeleted" xml:space="preserve"><value>Product deleted.</value></data>
+  <data name="SkuAdded" xml:space="preserve"><value>Variant added.</value></data>
+  <data name="SkuUpdated" xml:space="preserve"><value>Variant updated.</value></data>
+  <data name="SkuDeleted" xml:space="preserve"><value>Variant deleted.</value></data>
+  <data name="SpecAdded" xml:space="preserve"><value>Specification added.</value></data>
+  <data name="SpecUpdated" xml:space="preserve"><value>Specification updated.</value></data>
+  <data name="SpecDeleted" xml:space="preserve"><value>Specification deleted.</value></data>
+  <data name="ReviewDeleted" xml:space="preserve"><value>Review deleted.</value></data>
+  <data name="CouponCreated" xml:space="preserve"><value>Coupon created.</value></data>
+  <data name="CouponUpdated" xml:space="preserve"><value>Coupon updated.</value></data>
+  <data name="CouponDeleted" xml:space="preserve"><value>Coupon deleted.</value></data>
+  <data name="CouponDeleteFailed" xml:space="preserve"><value>Cannot delete: coupon not found.</value></data>
+  <data name="CouponCodeExists" xml:space="preserve"><value>Coupon code already exists.</value></data>
+  <data name="CategoryCreated" xml:space="preserve"><value>Category created.</value></data>
+  <data name="CategoryUpdated" xml:space="preserve"><value>Category updated.</value></data>
+  <data name="CategoryDeleted" xml:space="preserve"><value>Category deleted.</value></data>
+  <data name="CategoryDeleteFailed" xml:space="preserve"><value>Cannot delete: the category still has products.</value></data>
+  <data name="OrderShipped" xml:space="preserve"><value>Order shipped.</value></data>
+  <data name="OrderShipFailed" xml:space="preserve"><value>Operation failed: the order cannot be shipped in its current state.</value></data>
+  <data name="OrderCompleted" xml:space="preserve"><value>Order completed.</value></data>
+  <data name="OrderCompleteFailed" xml:space="preserve"><value>Operation failed: the order cannot be completed in its current state.</value></data>
+  <data name="OrderCancelledRestored" xml:space="preserve"><value>Order cancelled and stock restored.</value></data>
+  <data name="OrderCancelFailedAdmin" xml:space="preserve"><value>Operation failed: the order cannot be cancelled in its current state.</value></data>
+  <data name="OrderRefunded" xml:space="preserve"><value>Order refunded and stock restored.</value></data>
+  <data name="OrderRefundFailed" xml:space="preserve"><value>Operation failed: the order cannot be refunded in its current state.</value></data>
+  <data name="CouponNotFound" xml:space="preserve"><value>Coupon code does not exist.</value></data>
+  <data name="CouponDisabled" xml:space="preserve"><value>Coupon code is disabled.</value></data>
+  <data name="CouponNotStarted" xml:space="preserve"><value>Coupon code is not active yet.</value></data>
+  <data name="CouponExpired" xml:space="preserve"><value>Coupon code has expired.</value></data>
+  <data name="CouponUsageLimit" xml:space="preserve"><value>Coupon code has reached its usage limit.</value></data>
+  <data name="CouponMinOrder" xml:space="preserve"><value>Order total must be at least ¥{0} to use this coupon.</value></data>
+  <data name="CouponUnavailable" xml:space="preserve"><value>Coupon code is not available.</value></data>
+  <data name="VerificationCodeTooFrequent" xml:space="preserve"><value>Verification code sent too frequently. Try again later.</value></data>
+  <data name="UnsupportedImageFormat" xml:space="preserve"><value>Unsupported image format: {0}. Only jpg / png / webp / gif are supported.</value></data>
+  <data name="ImageEmpty" xml:space="preserve"><value>The image file is empty.</value></data>
+  <data name="ImageTooLarge" xml:space="preserve"><value>The image cannot exceed 5 MB.</value></data>
+  <data name="ImageInvalid" xml:space="preserve"><value>Please upload an image file.</value></data>
+  <data name="NoFileReceived" xml:space="preserve"><value>No file received</value></data>
+  <data name="HotKwHeadphones" xml:space="preserve"><value>Headphones</value></data>
+  <data name="HotKwKeyboard" xml:space="preserve"><value>Keyboard</value></data>
+  <data name="HotKwTent" xml:space="preserve"><value>Tent</value></data>
+  <data name="HotKwTshirt" xml:space="preserve"><value>T-shirt</value></data>
+  <data name="HotKwBooks" xml:space="preserve"><value>Books</value></data>
+  <data name="OriginalPricePlaceholder" xml:space="preserve"><value>Optional, shown as the strikethrough original price</value></data>
+  <data name="ShippingFromPlaceholder" xml:space="preserve"><value>e.g. Shenzhen, Guangdong</value></data>
+  <data name="ShippingFeePlaceholder" xml:space="preserve"><value>e.g. Free shipping / ¥8</value></data>
+  <data name="DeliveryTimePlaceholder" xml:space="preserve"><value>e.g. Ships within 48 hours</value></data>
+  <data name="CouponCodePlaceholder" xml:space="preserve"><value>e.g. SAVE20</value></data>
+  <data name="SkuColorPlaceholder" xml:space="preserve"><value>e.g. Army green</value></data>
+  <data name="SkuSpecPlaceholder" xml:space="preserve"><value>e.g. 3-4 persons</value></data>
+  <data name="SpecNamePlaceholder" xml:space="preserve"><value>e.g. Material</value></data>
+  <data name="SpecValuePlaceholder" xml:space="preserve"><value>e.g. 210T polyester</value></data>
 </root>

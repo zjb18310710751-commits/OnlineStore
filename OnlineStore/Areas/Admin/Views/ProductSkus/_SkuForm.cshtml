@@ -5,12 +5,12 @@
 <div class="row g-3">
     <div class="col-md-4 mb-3">
         <label asp-for="Color" class="form-label">@Loc["Color"]</label>
-        <input asp-for="Color" class="form-control" placeholder="如：军绿" />
+        <input asp-for="Color" class="form-control" placeholder="@Loc["SkuColorPlaceholder"]" />
         <span asp-validation-for="Color" class="text-danger small"></span>
     </div>
     <div class="col-md-4 mb-3">
         <label asp-for="Spec" class="form-label">@Loc["Spec"]</label>
-        <input asp-for="Spec" class="form-control" placeholder="如：3-4 人" />
+        <input asp-for="Spec" class="form-control" placeholder="@Loc["SkuSpecPlaceholder"]" />
         <span asp-validation-for="Spec" class="text-danger small"></span>
     </div>
     <div class="col-md-4 mb-3">

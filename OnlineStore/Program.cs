@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Localization;//本地化多语言
 using Microsoft.AspNetCore.Identity;//身份认证
 using Microsoft.EntityFrameworkCore;
+using OnlineStore;
 using OnlineStore.Data;
 using OnlineStore.Models;
 using OnlineStore.Services;
@@ -74,7 +75,10 @@ builder.Services.AddLocalization(options => options.ResourcesPath = "Resources")
 
 builder.Services.AddHttpClient();
 
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews()
+    // 数据注解（校验错误消息）也跟随界面语言切换
+    .AddDataAnnotationsLocalization(options =>
+        options.DataAnnotationLocalizerProvider = (type, factory) => factory.Create(typeof(SharedResource)));
 
 var app = builder.Build();
 

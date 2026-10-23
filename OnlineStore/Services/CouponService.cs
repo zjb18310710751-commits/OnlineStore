@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Localization;
 using OnlineStore.Data;
 using OnlineStore.Models;
 
@@ -7,10 +8,12 @@ namespace OnlineStore.Services;
 public class CouponService : ICouponService
 {
     private readonly ApplicationDbContext _context;
+    private readonly IStringLocalizer<SharedResource> _loc;
 
-    public CouponService(ApplicationDbContext context)
+    public CouponService(ApplicationDbContext context, IStringLocalizer<SharedResource>? localizer = null)
     {
         _context = context;
+        _loc = localizer ?? FallbackStringLocalizer<SharedResource>.Instance;
     }
 
     public async Task<IReadOnlyList<Coupon>> GetAllAsync() =>
@@ -57,34 +60,34 @@ public class CouponService : ICouponService
 
         if (coupon is null)
         {
-            return new CouponApplyResult(false, "优惠码不存在。", 0, null);
+            return new CouponApplyResult(false, _loc["CouponNotFound"].Value, 0, null);
         }
         if (!coupon.IsActive)
         {
-            return new CouponApplyResult(false, "优惠码已停用。", 0, null);
+            return new CouponApplyResult(false, _loc["CouponDisabled"].Value, 0, null);
         }
 
         var now = DateTime.UtcNow;
         if (now < coupon.StartDate)
         {
-            return new CouponApplyResult(false, "优惠码尚未生效。", 0, null);
+            return new CouponApplyResult(false, _loc["CouponNotStarted"].Value, 0, null);
         }
         if (now > coupon.EndDate)
         {
-            return new CouponApplyResult(false, "优惠码已过期。", 0, null);
+            return new CouponApplyResult(false, _loc["CouponExpired"].Value, 0, null);
         }
         if (coupon.UsageLimit.HasValue && coupon.UsedCount >= coupon.UsageLimit.Value)
         {
-            return new CouponApplyResult(false, "优惠码已达使用上限。", 0, null);
+            return new CouponApplyResult(false, _loc["CouponUsageLimit"].Value, 0, null);
         }
         if (coupon.MinOrderAmount.HasValue && orderTotal < coupon.MinOrderAmount.Value)
         {
-            return new CouponApplyResult(false, $"订单金额需满 ¥{coupon.MinOrderAmount.Value:F2} 才能使用该优惠码。", 0, null);
+            return new CouponApplyResult(false, _loc["CouponMinOrder", coupon.MinOrderAmount.Value.ToString("F2")].Value, 0, null);
         }
 
         return CouponCalculator.TryCompute(coupon, orderTotal, out var discount)
             ? new CouponApplyResult(true, null, discount, coupon)
-            : new CouponApplyResult(false, "优惠码不可用。", 0, null);
+            : new CouponApplyResult(false, _loc["CouponUnavailable"].Value, 0, null);
     }
 
     public async Task IncrementUsageAsync(int id)

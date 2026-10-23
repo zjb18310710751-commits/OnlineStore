@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 using OnlineStore.Services;
 
 namespace OnlineStore.Areas.Admin.Controllers;
@@ -9,10 +10,12 @@ namespace OnlineStore.Areas.Admin.Controllers;
 public class ReviewsController : Controller
 {
     private readonly IReviewService _reviewService;
+    private readonly IStringLocalizer<SharedResource> _loc;
 
-    public ReviewsController(IReviewService reviewService)
+    public ReviewsController(IReviewService reviewService, IStringLocalizer<SharedResource> localizer)
     {
         _reviewService = reviewService;
+        _loc = localizer;
     }
 
     public async Task<IActionResult> Index()
@@ -26,7 +29,7 @@ public class ReviewsController : Controller
     public async Task<IActionResult> Delete(int id)
     {
         await _reviewService.DeleteAsync(id);
-        TempData["Success"] = "评价已删除。";
+        TempData["Success"] = _loc["ReviewDeleted"].Value;
         return RedirectToAction(nameof(Index));
     }
 }

@@ -36,7 +36,7 @@
                             }
                             <span class="text-danger fw-semibold ms-1">¥@o.Total.ToString("F2")</span>
                         </td>
-                        <td><span class="badge @StatusBadge(o.Status)">@o.Status</span></td>
+                        <td><span class="badge @StatusBadge(o.Status)">@L10n.Status(o.Status)</span></td>
                         <td class="text-muted small">@o.CreatedAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</td>
                         <td class="text-end text-nowrap">
                             @if (o.Status == OrderStatus.PendingShipment)

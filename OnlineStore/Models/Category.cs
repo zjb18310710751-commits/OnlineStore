@@ -7,7 +7,7 @@ public class Category
 {
     public int Id { get; set; }
 
-    [Required(ErrorMessage = "请输入分类名称")]
+    [Required(ErrorMessage = "CategoryNameRequired")]
     [StringLength(100)]
     [Display(Name = "分类名称")]
     public string Name { get; set; } = string.Empty;

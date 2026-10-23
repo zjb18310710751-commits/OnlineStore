@@ -14,7 +14,7 @@ public class Review
     /// <summary>提交评价的用户 Id；种子数据为空。</summary>
     public string? UserId { get; set; }
 
-    [Required(ErrorMessage = "请填写昵称")]
+    [Required(ErrorMessage = "UserNameRequired")]
     [StringLength(50)]
     [Display(Name = "昵称")]
     public string UserName { get; set; } = string.Empty;
@@ -22,7 +22,7 @@ public class Review
     [StringLength(50)]
     public string? UserNameEn { get; set; }
 
-    [Range(1, 5, ErrorMessage = "评分需在 1~5 星之间")]
+    [Range(1, 5, ErrorMessage = "RatingInvalid")]
     [Display(Name = "评分")]
     public int Rating { get; set; } = 5;
 

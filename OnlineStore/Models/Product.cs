@@ -7,7 +7,7 @@ public class Product
 {
     public int Id { get; set; }
 
-    [Required(ErrorMessage = "请输入商品名称")]
+    [Required(ErrorMessage = "ProductNameRequired")]
     [StringLength(150)]
     [Display(Name = "商品名称")]
     public string Name { get; set; } = string.Empty;

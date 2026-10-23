@@ -17,7 +17,7 @@ public class Coupon
 {
     public int Id { get; set; }
 
-    [Required(ErrorMessage = "请输入优惠码")]
+    [Required(ErrorMessage = "CouponCodeRequired")]
     [StringLength(50)]
     [Display(Name = "优惠码")]
     public string Code { get; set; } = string.Empty;
@@ -25,11 +25,11 @@ public class Coupon
     [Display(Name = "优惠类型")]
     public CouponDiscountType DiscountType { get; set; } = CouponDiscountType.Percent;
 
-    [Range(0.01, 1000000, ErrorMessage = "优惠值必须大于 0")]
+    [Range(0.01, 1000000, ErrorMessage = "CouponValueInvalid")]
     [Display(Name = "优惠值")]
     public decimal DiscountValue { get; set; }
 
-    [Range(0, 1000000, ErrorMessage = "最低订单金额不能为负")]
+    [Range(0, 1000000, ErrorMessage = "MinOrderAmountInvalid")]
     [Display(Name = "最低订单金额")]
     public decimal? MinOrderAmount { get; set; }
 
@@ -42,7 +42,7 @@ public class Coupon
     [Display(Name = "启用")]
     public bool IsActive { get; set; } = true;
 
-    [Range(1, int.MaxValue, ErrorMessage = "使用上限至少为 1")]
+    [Range(1, int.MaxValue, ErrorMessage = "UsageLimitInvalid")]
     [Display(Name = "使用上限")]
     public int? UsageLimit { get; set; }
 

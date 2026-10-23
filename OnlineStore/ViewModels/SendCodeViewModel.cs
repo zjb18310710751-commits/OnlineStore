@@ -5,7 +5,7 @@ namespace OnlineStore.ViewModels;
 /// <summary>发送验证码请求模型：目标地址（邮箱或手机号）+ 渠道 + 用途。</summary>
 public class SendCodeViewModel
 {
-    [Required(ErrorMessage = "请输入邮箱或手机号")]
+    [Required(ErrorMessage = "AccountRequired")]
     public string Target { get; set; } = string.Empty;
 
     /// <summary>渠道：email（邮箱）或 sms（手机号，演示模式）。</summary>

@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 using OnlineStore.Services;
 
 namespace OnlineStore.Areas.Admin.Controllers;
@@ -10,10 +11,12 @@ namespace OnlineStore.Areas.Admin.Controllers;
 public class ImagesController : Controller
 {
     private readonly IImageStorageService _imageStorage;
+    private readonly IStringLocalizer<SharedResource> _loc;
 
-    public ImagesController(IImageStorageService imageStorage)
+    public ImagesController(IImageStorageService imageStorage, IStringLocalizer<SharedResource> localizer)
     {
         _imageStorage = imageStorage;
+        _loc = localizer;
     }
 
     [HttpPost]
@@ -22,7 +25,7 @@ public class ImagesController : Controller
     {
         if (file is null || file.Length == 0)
         {
-            return BadRequest(new { error = "未收到文件" });
+            return BadRequest(new { error = _loc["NoFileReceived"].Value });
         }
 
         try
