@@ -125,6 +125,35 @@ public class OrdersController : Controller
     }
 
     [HttpGet]
+    public async Task<IActionResult> PreviewCoupon(string? couponCode)
+    {
+        var cart = await _cartService.GetCartAsync();
+        if (cart.Items.Count == 0)
+        {
+            return Json(new { ok = false, error = _loc["EmptyCart"].Value });
+        }
+
+        if (string.IsNullOrWhiteSpace(couponCode))
+        {
+            return Json(new { ok = true, discount = 0m, total = cart.Total, payable = cart.Total });
+        }
+
+        var result = await _couponService.ValidateAsync(couponCode, cart.Total);
+        if (!result.Success)
+        {
+            return Json(new { ok = false, error = result.Error });
+        }
+
+        return Json(new
+        {
+            ok = true,
+            discount = result.DiscountAmount,
+            total = cart.Total,
+            payable = cart.Total - result.DiscountAmount
+        });
+    }
+
+    [HttpGet]
     public async Task<IActionResult> Confirmation(int id)
     {
         var user = await _userManager.GetUserAsync(User);
@@ -197,6 +226,21 @@ public class OrdersController : Controller
         else if (fullAddress.Length > 500)
         {
             ModelState.AddModelError(nameof(vm.Address), _loc["CheckoutAddressTooLong"]);
+        }
+
+        if (string.IsNullOrWhiteSpace(vm.City))
+        {
+            ModelState.AddModelError(nameof(vm.City), _loc["CheckoutCityRequired"]);
+        }
+
+        if (string.IsNullOrWhiteSpace(vm.PostalCode))
+        {
+            ModelState.AddModelError(nameof(vm.PostalCode), _loc["CheckoutPostalCodeRequired"]);
+        }
+
+        if (string.IsNullOrWhiteSpace(vm.Country))
+        {
+            ModelState.AddModelError(nameof(vm.Country), _loc["CheckoutCountryRequired"]);
         }
     }
 

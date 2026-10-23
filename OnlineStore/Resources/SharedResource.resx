@@ -203,6 +203,11 @@
   <data name="CheckoutPhoneTooLong" xml:space="preserve"><value>联系电话不能超过 20 个字符</value></data>
   <data name="CheckoutAddressRequired" xml:space="preserve"><value>请输入收货地址</value></data>
   <data name="CheckoutAddressTooLong" xml:space="preserve"><value>收货地址不能超过 500 个字符</value></data>
+  <data name="CheckoutCityRequired" xml:space="preserve"><value>请输入城市</value></data>
+  <data name="CheckoutPostalCodeRequired" xml:space="preserve"><value>请输入邮编</value></data>
+  <data name="CheckoutCountryRequired" xml:space="preserve"><value>请输入国家</value></data>
+  <data name="ApplyCoupon" xml:space="preserve"><value>应用</value></data>
+  <data name="CouponPreviewFailed" xml:space="preserve"><value>优惠码试算失败，请稍后再试。</value></data>
   <data name="OrderPlaced" xml:space="preserve"><value>下单成功</value></data>
   <data name="OrderNo" xml:space="preserve"><value>订单号</value></data>
   <data name="OrderStatus" xml:space="preserve"><value>订单状态</value></data>

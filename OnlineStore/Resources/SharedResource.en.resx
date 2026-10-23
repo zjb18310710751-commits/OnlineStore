@@ -203,6 +203,11 @@
   <data name="CheckoutPhoneTooLong" xml:space="preserve"><value>Phone number cannot exceed 20 characters</value></data>
   <data name="CheckoutAddressRequired" xml:space="preserve"><value>Please enter a delivery address</value></data>
   <data name="CheckoutAddressTooLong" xml:space="preserve"><value>Delivery address cannot exceed 500 characters</value></data>
+  <data name="CheckoutCityRequired" xml:space="preserve"><value>Please enter a city</value></data>
+  <data name="CheckoutPostalCodeRequired" xml:space="preserve"><value>Please enter a postal code</value></data>
+  <data name="CheckoutCountryRequired" xml:space="preserve"><value>Please enter a country</value></data>
+  <data name="ApplyCoupon" xml:space="preserve"><value>Apply</value></data>
+  <data name="CouponPreviewFailed" xml:space="preserve"><value>Could not preview the coupon. Try again later.</value></data>
   <data name="OrderPlaced" xml:space="preserve"><value>Order placed</value></data>
   <data name="OrderNo" xml:space="preserve"><value>Order no.</value></data>
   <data name="OrderStatus" xml:space="preserve"><value>Status</value></data>
