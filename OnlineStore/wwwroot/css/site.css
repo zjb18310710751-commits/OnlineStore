@@ -386,6 +386,80 @@ body {
     }
 }
 
+/* 个人中心 */
+.profile-sidebar {
+    position: sticky;
+    top: 88px;
+}
+
+.profile-sidebar-card {
+    border: 1px solid #e4e7ea;
+    border-radius: .75rem;
+}
+
+.profile-avatar {
+    width: 88px;
+    height: 88px;
+    border: 4px solid var(--brand-light);
+    border-radius: 50%;
+    background: var(--amazon-dark);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.4rem;
+}
+
+.profile-nav {
+    border-radius: .75rem;
+    overflow: hidden;
+}
+
+.profile-nav .list-group-item {
+    border-color: #e4e7ea;
+    color: #0f1111;
+    font-weight: 600;
+}
+
+.profile-nav .list-group-item:hover {
+    background: #f7f8f8;
+    color: #0f1111;
+}
+
+.profile-nav .list-group-item.active {
+    border-color: var(--amazon-orange);
+    background: var(--brand-light) !important;
+    color: #0f1111 !important;
+    box-shadow: inset 4px 0 0 var(--amazon-orange);
+}
+
+.profile-section-card {
+    border: 1px solid #e4e7ea;
+    border-radius: .75rem;
+}
+
+.profile-section-card .card-header {
+    padding: 1.2rem 1.35rem;
+    border-bottom-color: #eef1f5;
+}
+
+.profile-section-card .card-body {
+    padding: 1.35rem;
+}
+
+.profile-readonly-input:disabled {
+    border-color: #e0e3e5;
+    background: #f0f2f2;
+    color: #565959;
+    opacity: 1;
+}
+
+@media (max-width: 991.98px) {
+    .profile-sidebar {
+        position: static;
+    }
+}
+
 .price {
     color: var(--amazon-price);
     font-weight: 700;

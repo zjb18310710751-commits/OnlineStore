@@ -201,12 +201,10 @@ public class OrdersController : Controller
     }
 
     private static string BuildFullAddress(CheckoutViewModel vm) =>
-        string.Join(", ", new[]
-        {
+        AddressFormatter.Combine(
             vm.Address,
             vm.AddressLine2,
             vm.City,
             vm.PostalCode,
-            vm.Country
-        }.Where(part => !string.IsNullOrWhiteSpace(part)).Select(part => part!.Trim()));
+            vm.Country);
 }

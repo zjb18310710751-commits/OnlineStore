@@ -1,30 +1,23 @@
-using System.ComponentModel.DataAnnotations;
-
 namespace OnlineStore.ViewModels;
 
-/// <summary>个人中心：查看/修改用户资料（邮箱只读）。</summary>
-public class ProfileViewModel
+/// <summary>个人中心侧栏所需的只读账号信息。</summary>
+public class ProfileSidebarViewModel
 {
-    [Required(ErrorMessage = "请输入名")]
-    [StringLength(100)]
-    [Display(Name = "名")]
-    public string FirstName { get; set; } = string.Empty;
+    public string? UserName { get; set; }
 
-    [Required(ErrorMessage = "请输入姓")]
-    [StringLength(100)]
-    [Display(Name = "姓")]
-    public string LastName { get; set; } = string.Empty;
+    public string? Email { get; set; }
 
-    [Display(Name = "邮箱")]
-    public string Email { get; set; } = string.Empty;
+    public string? DisplayName { get; set; }
 
-    [Required(ErrorMessage = "请输入电话号码")]
-    [RegularExpression(@"^[0-9+\-\s()]{6,20}$", ErrorMessage = "电话号码格式不正确")]
-    [Display(Name = "电话号码")]
-    public string PhoneNumber { get; set; } = string.Empty;
+    public string? ActiveSection { get; set; }
+}
 
-    [Required(ErrorMessage = "请输入地址")]
-    [StringLength(500)]
-    [Display(Name = "地址")]
-    public string Address { get; set; } = string.Empty;
+/// <summary>基本个人信息：用户名和邮箱只读，姓名与电话可修改。</summary>
+public class ProfileViewModel : ProfileSidebarViewModel
+{
+    public string? FirstName { get; set; }
+
+    public string? LastName { get; set; }
+
+    public string? PhoneNumber { get; set; }
 }

@@ -207,6 +207,38 @@
   <data name="OrderStatus" xml:space="preserve"><value>订单状态</value></data>
   <data name="MyOrders" xml:space="preserve"><value>我的订单</value></data>
   <data name="Profile" xml:space="preserve"><value>个人中心</value></data>
+  <data name="BasicPersonalInformation" xml:space="preserve"><value>基本个人信息</value></data>
+  <data name="BasicPersonalInformationHint" xml:space="preserve"><value>管理姓名、联系电话和账户资料。</value></data>
+  <data name="ProfileDetails" xml:space="preserve"><value>个人资料</value></data>
+  <data name="UsernameLabel" xml:space="preserve"><value>用户名</value></data>
+  <data name="EmailAddress" xml:space="preserve"><value>邮箱地址</value></data>
+  <data name="UsernameImmutableHint" xml:space="preserve"><value>系统账户标识，不可修改。</value></data>
+  <data name="EmailImmutableHint" xml:space="preserve"><value>如需修改邮箱，请前往“修改密码”。</value></data>
+  <data name="ChangePassword" xml:space="preserve"><value>修改密码</value></data>
+  <data name="ChangePasswordHint" xml:space="preserve"><value>通过邮箱验证码确认身份后修改密码。</value></data>
+  <data name="RegisteredEmailAddress" xml:space="preserve"><value>注册邮箱地址</value></data>
+  <data name="RegisteredEmailHint" xml:space="preserve"><value>可填写当前邮箱，也可填写新的邮箱地址。</value></data>
+  <data name="VerificationCodeHint" xml:space="preserve"><value>请输入发送到邮箱的 6 位验证码。</value></data>
+  <data name="ChangeAddress" xml:space="preserve"><value>修改地址</value></data>
+  <data name="AddressDetails" xml:space="preserve"><value>收货地址</value></data>
+  <data name="AddressDetailsHint" xml:space="preserve"><value>维护用于订单配送的地址信息。</value></data>
+  <data name="UpdatePassword" xml:space="preserve"><value>更新密码</value></data>
+  <data name="UpdateAddress" xml:space="preserve"><value>保存地址</value></data>
+  <data name="ProfileUpdated" xml:space="preserve"><value>个人信息已保存。</value></data>
+  <data name="PasswordUpdated" xml:space="preserve"><value>密码和注册邮箱已更新。</value></data>
+  <data name="AddressUpdated" xml:space="preserve"><value>收货地址已保存。</value></data>
+  <data name="FirstNameRequired" xml:space="preserve"><value>请输入名</value></data>
+  <data name="FirstNameTooLong" xml:space="preserve"><value>名不能超过 100 个字符</value></data>
+  <data name="LastNameRequired" xml:space="preserve"><value>请输入姓</value></data>
+  <data name="LastNameTooLong" xml:space="preserve"><value>姓不能超过 100 个字符</value></data>
+  <data name="PhoneNumberRequired" xml:space="preserve"><value>请输入联系电话</value></data>
+  <data name="EmailRequired" xml:space="preserve"><value>请输入邮箱</value></data>
+  <data name="NewPasswordRequired" xml:space="preserve"><value>请输入新密码</value></data>
+  <data name="PasswordPolicyError" xml:space="preserve"><value>密码至少 6 位，须包含大写字母、小写字母、数字和特殊字符</value></data>
+  <data name="ConfirmPasswordRequired" xml:space="preserve"><value>请再次输入新密码</value></data>
+  <data name="PasswordsDoNotMatch" xml:space="preserve"><value>两次输入的密码不一致</value></data>
+  <data name="VerificationCodeRequired" xml:space="preserve"><value>请输入验证码</value></data>
+  <data name="VerificationCodeFormat" xml:space="preserve"><value>验证码为 6 位数字</value></data>
   <data name="HotKeywords" xml:space="preserve"><value>热门搜索</value></data>
   <data name="GuessYouLike" xml:space="preserve"><value>猜你喜欢</value></data>
   <data name="Favorite" xml:space="preserve"><value>收藏</value></data>

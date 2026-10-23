@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using OnlineStore.Models;
 using OnlineStore.Services;
+using OnlineStore.Validation;
 using OnlineStore.ViewModels;
 
 namespace OnlineStore.Controllers;
@@ -337,14 +338,14 @@ public class AccountController : Controller
             return RedirectToAction(nameof(Login));
         }
 
-        return View(new ProfileViewModel
+        var vm = new ProfileViewModel
         {
             FirstName = user.FirstName,
             LastName = user.LastName,
-            Email = user.Email ?? string.Empty,
-            PhoneNumber = user.PhoneNumber ?? string.Empty,
-            Address = user.Address ?? string.Empty
-        });
+            PhoneNumber = user.PhoneNumber
+        };
+        PopulateProfileSidebar(vm, user, "basic");
+        return View(vm);
     }
 
     [HttpPost]
@@ -358,20 +359,330 @@ public class AccountController : Controller
             return RedirectToAction(nameof(Login));
         }
 
+        ValidateBasicProfile(vm);
         if (!ModelState.IsValid)
         {
-            vm.Email = user.Email ?? string.Empty;
+            PopulateProfileSidebar(vm, user, "basic");
             return View(vm);
         }
 
-        user.FirstName = vm.FirstName;
-        user.LastName = vm.LastName;
-        user.PhoneNumber = vm.PhoneNumber;
-        user.Address = vm.Address;
-        await _userManager.UpdateAsync(user);
+        user.FirstName = vm.FirstName!.Trim();
+        user.LastName = vm.LastName!.Trim();
+        user.PhoneNumber = vm.PhoneNumber!.Trim();
+        var result = await _userManager.UpdateAsync(user);
+        if (!result.Succeeded)
+        {
+            AddIdentityErrors(result);
+            PopulateProfileSidebar(vm, user, "basic");
+            return View(vm);
+        }
 
-        TempData["Success"] = "资料已保存。";
+        TempData["Success"] = _loc["ProfileUpdated"].Value;
         return RedirectToAction(nameof(Profile));
+    }
+
+    [HttpGet]
+    [Authorize]
+    public async Task<IActionResult> ChangePassword()
+    {
+        var user = await _userManager.GetUserAsync(User);
+        if (user is null)
+        {
+            return RedirectToAction(nameof(Login));
+        }
+
+        var vm = new ChangePasswordViewModel
+        {
+            RegisteredEmail = GetEditableEmail(user)
+        };
+        PopulateProfileSidebar(vm, user, "password");
+        return View(vm);
+    }
+
+    [HttpPost]
+    [Authorize]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ChangePassword(ChangePasswordViewModel vm)
+    {
+        var user = await _userManager.GetUserAsync(User);
+        if (user is null)
+        {
+            return RedirectToAction(nameof(Login));
+        }
+
+        var normalizedEmail = vm.RegisteredEmail?.Trim().ToLowerInvariant();
+        await ValidateChangePasswordAsync(vm, user, normalizedEmail);
+        if (!ModelState.IsValid)
+        {
+            PopulateProfileSidebar(vm, user, "password");
+            return View(vm);
+        }
+
+        if (!await _verificationCodeService.VerifyAsync(normalizedEmail!, vm.VerificationCode!))
+        {
+            ModelState.AddModelError(nameof(vm.VerificationCode), _loc["InvalidVerificationCode"]);
+            PopulateProfileSidebar(vm, user, "password");
+            return View(vm);
+        }
+
+        var resetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
+        var resetResult = await _userManager.ResetPasswordAsync(user, resetToken, vm.NewPassword!);
+        if (!resetResult.Succeeded)
+        {
+            AddIdentityErrors(resetResult);
+            PopulateProfileSidebar(vm, user, "password");
+            return View(vm);
+        }
+
+        if (!string.Equals(user.Email, normalizedEmail, StringComparison.OrdinalIgnoreCase))
+        {
+            var emailResult = await _userManager.SetEmailAsync(user, normalizedEmail);
+            if (!emailResult.Succeeded)
+            {
+                AddIdentityErrors(emailResult);
+                PopulateProfileSidebar(vm, user, "password");
+                return View(vm);
+            }
+
+            user.EmailConfirmed = true;
+            var updateResult = await _userManager.UpdateAsync(user);
+            if (!updateResult.Succeeded)
+            {
+                AddIdentityErrors(updateResult);
+                PopulateProfileSidebar(vm, user, "password");
+                return View(vm);
+            }
+        }
+
+        TempData["Success"] = _loc["PasswordUpdated"].Value;
+        return RedirectToAction(nameof(Profile));
+    }
+
+    [HttpPost]
+    [Authorize]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> SendProfileEmailCode([FromBody] SendCodeViewModel model)
+    {
+        var user = await _userManager.GetUserAsync(User);
+        if (user is null)
+        {
+            return Unauthorized();
+        }
+
+        var target = model?.Target?.Trim().ToLowerInvariant() ?? string.Empty;
+        if (string.IsNullOrWhiteSpace(target) || !new EmailAddressAttribute().IsValid(target))
+        {
+            return Json(new { ok = false, error = _loc["InvalidEmail"].Value });
+        }
+
+        var owner = await _userManager.FindByEmailAsync(target);
+        if (owner is not null && owner.Id != user.Id)
+        {
+            return Json(new { ok = false, error = _loc["EmailAlreadyRegistered"].Value });
+        }
+
+        try
+        {
+            var code = await _verificationCodeService.GenerateAsync(target);
+            try
+            {
+                await _emailService.SendAsync(
+                    target,
+                    _loc["VerificationEmailSubject"].Value,
+                    EmailTemplateBuilder.BuildVerificationCode(code));
+            }
+            catch
+            {
+                // 演示模式：验证码直接返回页面显示。
+            }
+
+            return Json(new { ok = true, code });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Json(new { ok = false, error = ex.Message });
+        }
+    }
+
+    [HttpGet]
+    [Authorize]
+    public async Task<IActionResult> ChangeAddress()
+    {
+        var user = await _userManager.GetUserAsync(User);
+        if (user is null)
+        {
+            return RedirectToAction(nameof(Login));
+        }
+
+        var vm = new AddressViewModel();
+        PopulateAddressFields(vm, user.Address);
+        PopulateProfileSidebar(vm, user, "address");
+        return View(vm);
+    }
+
+    [HttpPost]
+    [Authorize]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ChangeAddress(AddressViewModel vm)
+    {
+        var user = await _userManager.GetUserAsync(User);
+        if (user is null)
+        {
+            return RedirectToAction(nameof(Login));
+        }
+
+        var fullAddress = AddressFormatter.Combine(
+            vm.Address,
+            vm.AddressLine2,
+            vm.City,
+            vm.PostalCode,
+            vm.Country);
+
+        if (string.IsNullOrWhiteSpace(vm.Address))
+        {
+            ModelState.AddModelError(nameof(vm.Address), _loc["CheckoutAddressRequired"]);
+        }
+        else if (fullAddress.Length > 500)
+        {
+            ModelState.AddModelError(nameof(vm.Address), _loc["CheckoutAddressTooLong"]);
+        }
+
+        if (!ModelState.IsValid)
+        {
+            PopulateProfileSidebar(vm, user, "address");
+            return View(vm);
+        }
+
+        user.Address = fullAddress;
+        var result = await _userManager.UpdateAsync(user);
+        if (!result.Succeeded)
+        {
+            AddIdentityErrors(result);
+            PopulateProfileSidebar(vm, user, "address");
+            return View(vm);
+        }
+
+        TempData["Success"] = _loc["AddressUpdated"].Value;
+        return RedirectToAction(nameof(Profile));
+    }
+
+    private void ValidateBasicProfile(ProfileViewModel vm)
+    {
+        if (string.IsNullOrWhiteSpace(vm.FirstName))
+        {
+            ModelState.AddModelError(nameof(vm.FirstName), _loc["FirstNameRequired"]);
+        }
+        else if (vm.FirstName.Length > 100)
+        {
+            ModelState.AddModelError(nameof(vm.FirstName), _loc["FirstNameTooLong"]);
+        }
+
+        if (string.IsNullOrWhiteSpace(vm.LastName))
+        {
+            ModelState.AddModelError(nameof(vm.LastName), _loc["LastNameRequired"]);
+        }
+        else if (vm.LastName.Length > 100)
+        {
+            ModelState.AddModelError(nameof(vm.LastName), _loc["LastNameTooLong"]);
+        }
+
+        if (string.IsNullOrWhiteSpace(vm.PhoneNumber))
+        {
+            ModelState.AddModelError(nameof(vm.PhoneNumber), _loc["PhoneNumberRequired"]);
+        }
+        else if (!Regex.IsMatch(vm.PhoneNumber, PhonePattern))
+        {
+            ModelState.AddModelError(nameof(vm.PhoneNumber), _loc["InvalidPhone"]);
+        }
+    }
+
+    private async Task ValidateChangePasswordAsync(
+        ChangePasswordViewModel vm,
+        ApplicationUser user,
+        string? normalizedEmail)
+    {
+        if (string.IsNullOrWhiteSpace(normalizedEmail))
+        {
+            ModelState.AddModelError(nameof(vm.RegisteredEmail), _loc["EmailRequired"]);
+        }
+        else if (!new EmailAddressAttribute().IsValid(normalizedEmail))
+        {
+            ModelState.AddModelError(nameof(vm.RegisteredEmail), _loc["InvalidEmail"]);
+        }
+        else
+        {
+            var owner = await _userManager.FindByEmailAsync(normalizedEmail);
+            if (owner is not null && owner.Id != user.Id)
+            {
+                ModelState.AddModelError(nameof(vm.RegisteredEmail), _loc["EmailAlreadyRegistered"]);
+            }
+        }
+
+        if (string.IsNullOrWhiteSpace(vm.NewPassword))
+        {
+            ModelState.AddModelError(nameof(vm.NewPassword), _loc["NewPasswordRequired"]);
+        }
+        else if (!Regex.IsMatch(vm.NewPassword, PasswordPolicy.Pattern))
+        {
+            ModelState.AddModelError(nameof(vm.NewPassword), _loc["PasswordPolicyError"]);
+        }
+
+        if (string.IsNullOrWhiteSpace(vm.ConfirmPassword))
+        {
+            ModelState.AddModelError(nameof(vm.ConfirmPassword), _loc["ConfirmPasswordRequired"]);
+        }
+        else if (!string.Equals(vm.NewPassword, vm.ConfirmPassword, StringComparison.Ordinal))
+        {
+            ModelState.AddModelError(nameof(vm.ConfirmPassword), _loc["PasswordsDoNotMatch"]);
+        }
+
+        if (string.IsNullOrWhiteSpace(vm.VerificationCode))
+        {
+            ModelState.AddModelError(nameof(vm.VerificationCode), _loc["VerificationCodeRequired"]);
+        }
+        else if (!Regex.IsMatch(vm.VerificationCode, @"^\d{6}$"))
+        {
+            ModelState.AddModelError(nameof(vm.VerificationCode), _loc["VerificationCodeFormat"]);
+        }
+    }
+
+    private void PopulateProfileSidebar(
+        ProfileSidebarViewModel vm,
+        ApplicationUser user,
+        string activeSection)
+    {
+        vm.UserName = user.UserName;
+        vm.Email = user.Email;
+        vm.DisplayName = string.IsNullOrWhiteSpace($"{user.LastName}{user.FirstName}")
+            ? user.UserName
+            : $"{user.LastName}{user.FirstName}";
+        vm.ActiveSection = activeSection;
+    }
+
+    private void AddIdentityErrors(IdentityResult result)
+    {
+        foreach (var error in result.Errors)
+        {
+            ModelState.AddModelError(string.Empty, error.Description);
+        }
+    }
+
+    private static string? GetEditableEmail(ApplicationUser user) =>
+        user.Email ?? (user.UserName?.Contains('@') == true ? user.UserName : null);
+
+    private static void PopulateAddressFields(AddressViewModel vm, string? storedAddress)
+    {
+        if (string.IsNullOrWhiteSpace(storedAddress))
+        {
+            return;
+        }
+
+        var parts = storedAddress.Split(", ", 5, StringSplitOptions.None);
+        vm.Address = parts.ElementAtOrDefault(0);
+        vm.AddressLine2 = parts.ElementAtOrDefault(1);
+        vm.City = parts.ElementAtOrDefault(2);
+        vm.PostalCode = parts.ElementAtOrDefault(3);
+        vm.Country = parts.ElementAtOrDefault(4);
     }
 
     private static string? NullIfBlank(string? value) =>
