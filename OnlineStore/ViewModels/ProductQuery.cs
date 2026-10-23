@@ -9,6 +9,9 @@ public class ProductQuery
 
     public int? CategoryId { get; set; }
 
+    /// <summary>品牌筛选；当前数据模型中品牌由商品所属店铺表示。</summary>
+    public int? ShopId { get; set; }
+
     public string? SearchTerm { get; set; }
 
     /// <summary>newest | price_asc | price_desc | name</summary>
@@ -17,4 +20,19 @@ public class ProductQuery
     public decimal? MinPrice { get; set; }
 
     public decimal? MaxPrice { get; set; }
+
+    /// <summary>商品评价的平均最低评分（1~5）。</summary>
+    public double? MinRating { get; set; }
+
+    public bool InStockOnly { get; set; }
+
+    public bool HasActiveFilters =>
+        CategoryId.HasValue
+        || ShopId.HasValue
+        || MinPrice.HasValue
+        || MaxPrice.HasValue
+        || MinRating.HasValue
+        || InStockOnly
+        || !string.IsNullOrWhiteSpace(SearchTerm)
+        || (!string.IsNullOrWhiteSpace(SortBy) && SortBy != "newest");
 }

@@ -25,10 +25,26 @@ public class ProductServiceTests
         var c1 = new Category { Id = 1, Name = "电子产品", DisplayOrder = 1 };
         var c2 = new Category { Id = 2, Name = "图书", DisplayOrder = 2 };
         context.Categories.AddRange(c1, c2);
+        var shop = new Shop { Id = 1, Name = "极客数码" };
+        context.Shops.Add(shop);
 
         context.Products.AddRange(
-            new Product { Id = 1, Name = "无线耳机", Price = 299m, Stock = 10, IsActive = true, ShopId = 1, Categories = new List<Category> { c1 } },
-            new Product { Id = 2, Name = "机械键盘", Price = 459m, Stock = 5, IsActive = true, ShopId = 1, Categories = new List<Category> { c1 } },
+            new Product
+            {
+                Id = 1, Name = "无线耳机", Price = 299m, Stock = 10, IsActive = true, ShopId = 1,
+                Categories = new List<Category> { c1 },
+                Reviews = new List<Review>
+                {
+                    new() { Rating = 5, UserName = "测试用户一" },
+                    new() { Rating = 4, UserName = "测试用户二" }
+                }
+            },
+            new Product
+            {
+                Id = 2, Name = "机械键盘", Price = 459m, Stock = 5, IsActive = true, ShopId = 1,
+                Categories = new List<Category> { c1 },
+                Reviews = new List<Review> { new() { Rating = 3, UserName = "测试用户三" } }
+            },
             new Product { Id = 3, Name = "百年孤独", Price = 55m, Stock = 0, IsActive = true, ShopId = 1, Categories = new List<Category> { c2 } },
             new Product { Id = 4, Name = "已下架商品", Price = 999m, Stock = 5, IsActive = false, ShopId = 1, Categories = new List<Category> { c1 } });
 
@@ -85,6 +101,45 @@ public class ProductServiceTests
 
         Assert.Single(result.Items);
         Assert.Equal(1, result.Items[0].Id);
+    }
+
+    [Fact]
+    public async Task GetPagedAsync_FiltersByBrand()
+    {
+        using var context = CreateContext();
+        await SeedAsync(context);
+        var service = new ProductService(context);
+
+        var result = await service.GetPagedAsync(new ProductQuery { ShopId = 1 });
+
+        Assert.Equal(3, result.TotalItems);
+        Assert.Contains(result.Brands, brand => brand.Id == 1);
+    }
+
+    [Fact]
+    public async Task GetPagedAsync_FiltersByAverageRating()
+    {
+        using var context = CreateContext();
+        await SeedAsync(context);
+        var service = new ProductService(context);
+
+        var result = await service.GetPagedAsync(new ProductQuery { MinRating = 4.5 });
+
+        Assert.Single(result.Items);
+        Assert.Equal(1, result.Items[0].Id);
+    }
+
+    [Fact]
+    public async Task GetPagedAsync_FiltersInStockProducts()
+    {
+        using var context = CreateContext();
+        await SeedAsync(context);
+        var service = new ProductService(context);
+
+        var result = await service.GetPagedAsync(new ProductQuery { InStockOnly = true });
+
+        Assert.Equal(2, result.TotalItems);
+        Assert.All(result.Items, product => Assert.True(product.Stock > 0));
     }
 
     [Fact]
