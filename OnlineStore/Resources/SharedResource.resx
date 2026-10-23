@@ -22,6 +22,14 @@
   <data name="MinPrice" xml:space="preserve"><value>最低价</value></data>
   <data name="MaxPrice" xml:space="preserve"><value>最高价</value></data>
   <data name="Filter" xml:space="preserve"><value>筛选</value></data>
+  <data name="BrandFilter" xml:space="preserve"><value>品牌</value></data>
+  <data name="AllBrands" xml:space="preserve"><value>全部品牌</value></data>
+  <data name="MinRating" xml:space="preserve"><value>最低评分</value></data>
+  <data name="NoRatingLimit" xml:space="preserve"><value>不限</value></data>
+  <data name="RatingStars" xml:space="preserve"><value>{0} 星及以上</value></data>
+  <data name="OnlyInStock" xml:space="preserve"><value>仅看有货</value></data>
+  <data name="ApplyFilters" xml:space="preserve"><value>应用筛选</value></data>
+  <data name="ClearFilters" xml:space="preserve"><value>清除筛选</value></data>
   <data name="All" xml:space="preserve"><value>全部</value></data>
   <data name="ItemsCount" xml:space="preserve"><value>共 {0} 件商品</value></data>
   <data name="SortBy" xml:space="preserve"><value>排序</value></data>

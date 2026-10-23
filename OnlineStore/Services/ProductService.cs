@@ -23,6 +23,11 @@ public class ProductService : IProductService
             q = q.Where(p => p.Categories.Any(c => c.Id == query.CategoryId.Value));
         }
 
+        if (query.ShopId.HasValue)
+        {
+            q = q.Where(p => p.ShopId == query.ShopId.Value);
+        }
+
         if (!string.IsNullOrWhiteSpace(query.SearchTerm))
         {
             var term = query.SearchTerm.Trim();
@@ -41,6 +46,18 @@ public class ProductService : IProductService
         if (query.MaxPrice.HasValue)
         {
             q = q.Where(p => p.Price <= query.MaxPrice.Value);
+        }
+
+        if (query.MinRating.HasValue)
+        {
+            var minRating = query.MinRating.Value;
+            q = q.Where(p => p.Reviews.Any()
+                          && p.Reviews.Average(r => (double)r.Rating) >= minRating);
+        }
+
+        if (query.InStockOnly)
+        {
+            q = q.Where(p => p.Stock > 0);
         }
 
         q = query.SortBy switch
@@ -81,10 +98,17 @@ public class ProductService : IProductService
             .ThenBy(c => c.Name)
             .ToListAsync();
 
+        var brands = await _context.Shops
+            .AsNoTracking()
+            .Where(s => s.Products.Any(p => p.IsActive))
+            .OrderBy(s => s.Name)
+            .ToListAsync();
+
         return new ProductListViewModel
         {
             Items = items,
             Categories = categories,
+            Brands = brands,
             Query = query,
             Page = page,
             PageSize = pageSize,
@@ -174,7 +198,7 @@ public class ProductService : IProductService
 
         // 已跟踪的实体先加载现有分类，再 Clear+Add，EF 才能正确计算多对多联结表差异
         var nav = _context.Entry(product).Collection(p => p.Categories);
-        if (!nav.IsLoaded && nav.CurrentValue is null)
+        if (!nav.IsLoaded)
         {
             await nav.LoadAsync();
         }

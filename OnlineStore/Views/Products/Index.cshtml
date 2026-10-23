@@ -12,6 +12,11 @@
                     <a class="list-group-item list-group-item-action @(q.CategoryId is null ? "active" : "")"
                        asp-controller="Products" asp-action="Index"
                        asp-route-searchTerm="@q.SearchTerm"
+                       asp-route-shopId="@q.ShopId"
+                       asp-route-minPrice="@q.MinPrice"
+                       asp-route-maxPrice="@q.MaxPrice"
+                       asp-route-minRating="@q.MinRating"
+                       asp-route-inStockOnly="@(q.InStockOnly ? "true" : null)"
                        asp-route-sortBy="@q.SortBy">@Loc["All"]</a>
                     @foreach (var c in Model.Categories)
                     {
@@ -19,28 +24,85 @@
                            asp-controller="Products" asp-action="Index"
                            asp-route-categoryId="@c.Id"
                            asp-route-searchTerm="@q.SearchTerm"
+                           asp-route-shopId="@q.ShopId"
+                           asp-route-minPrice="@q.MinPrice"
+                           asp-route-maxPrice="@q.MaxPrice"
+                           asp-route-minRating="@q.MinRating"
+                           asp-route-inStockOnly="@(q.InStockOnly ? "true" : null)"
                            asp-route-sortBy="@q.SortBy">@L10n.Name(c)</a>
                     }
                 </div>
             </div>
 
-            <div class="card shadow-sm">
-                <div class="card-header fw-semibold">@Loc["PriceRange"]</div>
+            <div class="card catalog-filter-card">
                 <div class="card-body">
                     <form method="get" asp-controller="Products" asp-action="Index">
                         <input type="hidden" name="categoryId" value="@q.CategoryId" />
                         <input type="hidden" name="searchTerm" value="@q.SearchTerm" />
-                        <input type="hidden" name="sortBy" value="@q.SortBy" />
-                        <div class="row g-2 align-items-center">
-                            <div class="col-5">
-                                <input type="number" name="minPrice" class="form-control form-control-sm" placeholder="@Loc["MinPrice"]" value="@q.MinPrice" />
-                            </div>
-                            <div class="col-2 text-center text-muted">—</div>
-                            <div class="col-5">
-                                <input type="number" name="maxPrice" class="form-control form-control-sm" placeholder="@Loc["MaxPrice"]" value="@q.MaxPrice" />
+
+                        <div class="catalog-filter-heading">
+                            <h2 class="catalog-filter-title">@Loc["Filter"]</h2>
+                            @if (q.HasActiveFilters)
+                            {
+                                <a asp-controller="Products" asp-action="Index" class="catalog-filter-clear">@Loc["ClearFilters"]</a>
+                            }
+                        </div>
+
+                        <div class="catalog-filter-group">
+                            <label class="catalog-filter-label" for="filterShop">@Loc["BrandFilter"]</label>
+                            <select id="filterShop" name="shopId" class="form-select catalog-filter-control">
+                                <option value="" selected="@(!q.ShopId.HasValue)">@Loc["AllBrands"]</option>
+                                @foreach (var brand in Model.Brands)
+                                {
+                                    <option value="@brand.Id" selected="@(q.ShopId == brand.Id)">@L10n.Name(brand)</option>
+                                }
+                            </select>
+                        </div>
+
+                        <div class="catalog-filter-group">
+                            <span class="catalog-filter-label">@Loc["PriceRange"]</span>
+                            <div class="catalog-price-row">
+                                <label class="visually-hidden" for="filterMinPrice">@Loc["MinPrice"]</label>
+                                <input id="filterMinPrice" type="number" name="minPrice" inputmode="decimal"
+                                       class="form-control catalog-filter-control" min="0" step="0.01"
+                                       placeholder="@Loc["MinPrice"]" value="@q.MinPrice" />
+                                <span class="catalog-price-separator" aria-hidden="true">—</span>
+                                <label class="visually-hidden" for="filterMaxPrice">@Loc["MaxPrice"]</label>
+                                <input id="filterMaxPrice" type="number" name="maxPrice" inputmode="decimal"
+                                       class="form-control catalog-filter-control" min="0" step="0.01"
+                                       placeholder="@Loc["MaxPrice"]" value="@q.MaxPrice" />
                             </div>
                         </div>
-                        <button class="btn btn-primary btn-sm w-100 mt-2" type="submit">@Loc["Filter"]</button>
+
+                        <div class="catalog-filter-group">
+                            <label class="catalog-filter-label" for="filterRating">@Loc["MinRating"]</label>
+                            <select id="filterRating" name="minRating" class="form-select catalog-filter-control">
+                                <option value="" selected="@(!q.MinRating.HasValue)">@Loc["NoRatingLimit"]</option>
+                                <option value="3" selected="@(q.MinRating == 3)">@Loc["RatingStars", 3]</option>
+                                <option value="4" selected="@(q.MinRating == 4)">@Loc["RatingStars", 4]</option>
+                                <option value="4.5" selected="@(q.MinRating == 4.5)">@Loc["RatingStars", "4.5"]</option>
+                            </select>
+                        </div>
+
+                        <div class="catalog-filter-group">
+                            <div class="form-check catalog-stock-check">
+                                <input id="filterInStock" name="inStockOnly" value="true" type="checkbox"
+                                       class="form-check-input" checked="@q.InStockOnly" />
+                                <label class="form-check-label" for="filterInStock">@Loc["OnlyInStock"]</label>
+                            </div>
+                        </div>
+
+                        <div class="catalog-filter-group">
+                            <label class="catalog-filter-label" for="filterSortBy">@Loc["SortBy"]</label>
+                            <select id="filterSortBy" name="sortBy" class="form-select catalog-filter-control">
+                                <option value="newest" selected="@(q.SortBy == "newest" || string.IsNullOrWhiteSpace(q.SortBy))">@Loc["SortNewest"]</option>
+                                <option value="price_asc" selected="@(q.SortBy == "price_asc")">@Loc["SortPriceAsc"]</option>
+                                <option value="price_desc" selected="@(q.SortBy == "price_desc")">@Loc["SortPriceDesc"]</option>
+                                <option value="name" selected="@(q.SortBy == "name")">@Loc["SortName"]</option>
+                            </select>
+                        </div>
+
+                        <button class="btn catalog-filter-apply w-100" type="submit">@Loc["ApplyFilters"]</button>
                     </form>
                 </div>
             </div>
@@ -49,22 +111,9 @@
         <div class="col-lg-9">
             <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
                 <h1 class="h4 mb-0">@Loc["ItemsCount", Model.TotalItems]</h1>
-                <form method="get" asp-controller="Products" asp-action="Index" class="d-flex align-items-center gap-2">
-                    <input type="hidden" name="categoryId" value="@q.CategoryId" />
-                    <input type="hidden" name="searchTerm" value="@q.SearchTerm" />
-                    <input type="hidden" name="minPrice" value="@q.MinPrice" />
-                    <input type="hidden" name="maxPrice" value="@q.MaxPrice" />
-                    <label class="text-muted small text-nowrap" for="sortBy">@Loc["SortBy"]</label>
-                    <select id="sortBy" name="sortBy" class="form-select form-select-sm" onchange="this.form.submit()">
-                        <option value="newest" selected="@(q.SortBy == "newest" || q.SortBy is null)">@Loc["SortNewest"]</option>
-                        <option value="price_asc" selected="@(q.SortBy == "price_asc")">@Loc["SortPriceAsc"]</option>
-                        <option value="price_desc" selected="@(q.SortBy == "price_desc")">@Loc["SortPriceDesc"]</option>
-                        <option value="name" selected="@(q.SortBy == "name")">@Loc["SortName"]</option>
-                    </select>
-                </form>
             </div>
 
-            @if (string.IsNullOrWhiteSpace(q.SearchTerm) && q.CategoryId is null && q.MinPrice is null && q.MaxPrice is null)
+            @if (!q.HasActiveFilters)
             {
                 <div class="mb-3">
                     <span class="text-muted small me-2"><i class="bi bi-fire"></i>@Loc["HotKeywords"]</span>
@@ -106,7 +155,9 @@
                         <li class="page-item @(Model.HasPrevious ? "" : "disabled")">
                             <a class="page-link" asp-controller="Products" asp-action="Index"
                                asp-route-categoryId="@q.CategoryId" asp-route-searchTerm="@q.SearchTerm"
+                               asp-route-shopId="@q.ShopId"
                                asp-route-minPrice="@q.MinPrice" asp-route-maxPrice="@q.MaxPrice"
+                               asp-route-minRating="@q.MinRating" asp-route-inStockOnly="@(q.InStockOnly ? "true" : null)"
                                asp-route-sortBy="@q.SortBy" asp-route-page="@(Model.Page - 1)">@Loc["Previous"]</a>
                         </li>
                         @for (var i = 1; i <= Model.TotalPages; i++)
@@ -114,14 +165,18 @@
                             <li class="page-item @(i == Model.Page ? "active" : "")">
                                 <a class="page-link" asp-controller="Products" asp-action="Index"
                                    asp-route-categoryId="@q.CategoryId" asp-route-searchTerm="@q.SearchTerm"
+                                   asp-route-shopId="@q.ShopId"
                                    asp-route-minPrice="@q.MinPrice" asp-route-maxPrice="@q.MaxPrice"
+                                   asp-route-minRating="@q.MinRating" asp-route-inStockOnly="@(q.InStockOnly ? "true" : null)"
                                    asp-route-sortBy="@q.SortBy" asp-route-page="@i">@i</a>
                             </li>
                         }
                         <li class="page-item @(Model.HasNext ? "" : "disabled")">
                             <a class="page-link" asp-controller="Products" asp-action="Index"
                                asp-route-categoryId="@q.CategoryId" asp-route-searchTerm="@q.SearchTerm"
+                               asp-route-shopId="@q.ShopId"
                                asp-route-minPrice="@q.MinPrice" asp-route-maxPrice="@q.MaxPrice"
+                               asp-route-minRating="@q.MinRating" asp-route-inStockOnly="@(q.InStockOnly ? "true" : null)"
                                asp-route-sortBy="@q.SortBy" asp-route-page="@(Model.Page + 1)">@Loc["Next"]</a>
                         </li>
                     </ul>

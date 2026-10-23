@@ -9,6 +9,9 @@ public class ProductListViewModel
 
     public IReadOnlyList<Category> Categories { get; set; } = new List<Category>();
 
+    /// <summary>当前可筛选的品牌（由店铺数据提供）。</summary>
+    public IReadOnlyList<Shop> Brands { get; set; } = new List<Shop>();
+
     public ProductQuery Query { get; set; } = new();
 
     public int Page { get; set; }

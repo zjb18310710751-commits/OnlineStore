@@ -22,6 +22,14 @@
   <data name="MinPrice" xml:space="preserve"><value>Min price</value></data>
   <data name="MaxPrice" xml:space="preserve"><value>Max price</value></data>
   <data name="Filter" xml:space="preserve"><value>Filter</value></data>
+  <data name="BrandFilter" xml:space="preserve"><value>Brand</value></data>
+  <data name="AllBrands" xml:space="preserve"><value>All brands</value></data>
+  <data name="MinRating" xml:space="preserve"><value>Minimum rating</value></data>
+  <data name="NoRatingLimit" xml:space="preserve"><value>Any</value></data>
+  <data name="RatingStars" xml:space="preserve"><value>{0} stars &amp; up</value></data>
+  <data name="OnlyInStock" xml:space="preserve"><value>In stock only</value></data>
+  <data name="ApplyFilters" xml:space="preserve"><value>Apply filters</value></data>
+  <data name="ClearFilters" xml:space="preserve"><value>Clear filters</value></data>
   <data name="All" xml:space="preserve"><value>All</value></data>
   <data name="ItemsCount" xml:space="preserve"><value>{0} products</value></data>
   <data name="SortBy" xml:space="preserve"><value>Sort</value></data>
