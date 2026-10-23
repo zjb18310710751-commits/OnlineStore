@@ -36,9 +36,15 @@ public class CartController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Update(int productId, int? skuId, int quantity)
+    public async Task<IActionResult> Update(int productId, int? skuId, int? quantity)
     {
-        await _cartService.UpdateAsync(productId, skuId, quantity);
+        if (!quantity.HasValue || quantity.Value < 1)
+        {
+            TempData["Error"] = "请输入商品数量，数量必须大于 0。";
+            return RedirectToAction(nameof(Index));
+        }
+
+        await _cartService.UpdateAsync(productId, skuId, quantity.Value);
         return RedirectToAction(nameof(Index));
     }
 

@@ -63,10 +63,11 @@
                                             <input type="hidden" name="productId" value="@item.ProductId" />
                                             <input type="hidden" name="skuId" value="@item.SkuId" />
                                             <input type="number" name="quantity" class="form-control form-control-sm cart-quantity-input text-center"
-                                                   value="@item.Quantity" min="1" max="@item.Stock" inputmode="numeric" aria-label="@Loc["Quantity"].Value" />
+                                                   value="@item.Quantity" min="1" max="@item.Stock" step="1" inputmode="numeric"
+                                                   required aria-label="@Loc["Quantity"].Value" />
                                             <button type="submit" class="btn btn-sm btn-outline-secondary">@Loc["Update"]</button>
                                             <button type="submit" class="btn btn-sm btn-link text-danger cart-remove-button"
-                                                    formaction="@Url.Action("Remove", "Cart")">
+                                                    formaction="@Url.Action("Remove", "Cart")" formnovalidate>
                                                 @Loc["Remove"]
                                             </button>
                                         </form>
