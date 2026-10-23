@@ -178,6 +178,23 @@
   <data name="LoginToReview" xml:space="preserve"><value>to write a review</value></data>
   <data name="Checkout" xml:space="preserve"><value>Checkout</value></data>
   <data name="Receiver" xml:space="preserve"><value>Receiver</value></data>
+  <data name="DeliveryInformation" xml:space="preserve"><value>Delivery information</value></data>
+  <data name="AddressLine1" xml:space="preserve"><value>Address line 1</value></data>
+  <data name="AddressLine2Optional" xml:space="preserve"><value>Address line 2 (optional)</value></data>
+  <data name="City" xml:space="preserve"><value>City</value></data>
+  <data name="PostalCode" xml:space="preserve"><value>Postal code</value></data>
+  <data name="Country" xml:space="preserve"><value>Country</value></data>
+  <data name="YourOrder" xml:space="preserve"><value>Your order</value></data>
+  <data name="Payment" xml:space="preserve"><value>Payment</value></data>
+  <data name="CashOnDelivery" xml:space="preserve"><value>Cash on delivery</value></data>
+  <data name="CashOnDeliveryHint" xml:space="preserve"><value>Pay when your order arrives.</value></data>
+  <data name="CardPaymentDemo" xml:space="preserve"><value>Card payment (demo)</value></data>
+  <data name="CardPaymentHint" xml:space="preserve"><value>Simulated card payment for demonstration.</value></data>
+  <data name="BankTransferDemo" xml:space="preserve"><value>Bank transfer (demo)</value></data>
+  <data name="BankTransferHint" xml:space="preserve"><value>Simulated bank transfer for demonstration.</value></data>
+  <data name="OrderNotesOptional" xml:space="preserve"><value>Order notes (optional)</value></data>
+  <data name="OrderNotesPlaceholder" xml:space="preserve"><value>Enter order notes…</value></data>
+  <data name="BackToCart" xml:space="preserve"><value>Back to cart</value></data>
   <data name="SubmitOrder" xml:space="preserve"><value>Place order</value></data>
   <data name="CheckoutReceiverRequired" xml:space="preserve"><value>Please enter the receiver's name</value></data>
   <data name="CheckoutReceiverTooLong" xml:space="preserve"><value>Receiver name cannot exceed 50 characters</value></data>

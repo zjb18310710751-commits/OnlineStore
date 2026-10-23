@@ -178,6 +178,23 @@
   <data name="LoginToReview" xml:space="preserve"><value>后可发表评价</value></data>
   <data name="Checkout" xml:space="preserve"><value>去结算</value></data>
   <data name="Receiver" xml:space="preserve"><value>收货人</value></data>
+  <data name="DeliveryInformation" xml:space="preserve"><value>配送信息</value></data>
+  <data name="AddressLine1" xml:space="preserve"><value>地址第一行</value></data>
+  <data name="AddressLine2Optional" xml:space="preserve"><value>地址第二行（可选）</value></data>
+  <data name="City" xml:space="preserve"><value>城市</value></data>
+  <data name="PostalCode" xml:space="preserve"><value>邮编</value></data>
+  <data name="Country" xml:space="preserve"><value>国家</value></data>
+  <data name="YourOrder" xml:space="preserve"><value>你的订单</value></data>
+  <data name="Payment" xml:space="preserve"><value>支付</value></data>
+  <data name="CashOnDelivery" xml:space="preserve"><value>货到付款</value></data>
+  <data name="CashOnDeliveryHint" xml:space="preserve"><value>收到商品时再付款。</value></data>
+  <data name="CardPaymentDemo" xml:space="preserve"><value>银行卡支付（演示）</value></data>
+  <data name="CardPaymentHint" xml:space="preserve"><value>演示用的模拟银行卡支付。</value></data>
+  <data name="BankTransferDemo" xml:space="preserve"><value>银行转账（演示）</value></data>
+  <data name="BankTransferHint" xml:space="preserve"><value>演示用的模拟银行转账。</value></data>
+  <data name="OrderNotesOptional" xml:space="preserve"><value>订单备注（可选）</value></data>
+  <data name="OrderNotesPlaceholder" xml:space="preserve"><value>输入订单备注…</value></data>
+  <data name="BackToCart" xml:space="preserve"><value>返回购物车</value></data>
   <data name="SubmitOrder" xml:space="preserve"><value>提交订单</value></data>
   <data name="CheckoutReceiverRequired" xml:space="preserve"><value>请输入收货人姓名</value></data>
   <data name="CheckoutReceiverTooLong" xml:space="preserve"><value>收货人姓名不能超过 50 个字符</value></data>

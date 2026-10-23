@@ -3,74 +3,143 @@
     ViewData["Title"] = Loc["Checkout"].Value;
 }
 <div class="container py-4">
-    <h1 class="h4 mb-4">@Loc["Checkout"]</h1>
-    <div class="row g-4">
-        <div class="col-lg-7">
-            <div class="card shadow-sm">
-                <div class="card-header bg-white fw-semibold">@Loc["Receiver"]</div>
-                <div class="card-body">
-                    <form id="checkoutForm" asp-controller="Orders" asp-action="Checkout" method="post">
-                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
-                        <div class="mb-3">
-                            <label asp-for="UserName" class="form-label">@Loc["Receiver"]</label>
-                            <input asp-for="UserName" class="form-control" autocomplete="name" />
-                            <span asp-validation-for="UserName" class="text-danger small"></span>
-                        </div>
-                        <div class="mb-3">
-                            <label asp-for="Phone" class="form-label">@Loc["PhoneNumber"]</label>
-                            <input asp-for="Phone" class="form-control" autocomplete="tel" />
-                            <span asp-validation-for="Phone" class="text-danger small"></span>
-                        </div>
-                        <div class="mb-3">
-                            <label asp-for="Address" class="form-label">@Loc["Address"]</label>
-                            <textarea asp-for="Address" class="form-control" rows="3" autocomplete="street-address"></textarea>
-                            <span asp-validation-for="Address" class="text-danger small"></span>
-                        </div>
-                        <button type="submit" class="btn btn-amazon btn-lg"><i class="bi bi-bag-check me-1"></i>@Loc["SubmitOrder"]</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-5">
-            <div class="card shadow-sm">
-                <div class="card-header bg-white fw-semibold">@Loc["OrderSummary"]</div>
-                <div class="card-body">
-                    <ul class="list-unstyled mb-3">
-                        @foreach (var item in Model.Items)
-                        {
-                            <li class="d-flex justify-content-between py-2 border-bottom">
-                                <div>
-                                    <div>@item.Name</div>
-                                    @if (!string.IsNullOrEmpty(item.Color) || !string.IsNullOrEmpty(item.Spec))
-                                    {
-                                        <small class="text-muted">@item.Color @item.Spec</small>
-                                    }
-                                    <small class="text-muted d-block">× @item.Quantity</small>
-                                </div>
-                                <div>¥@item.LineTotal.ToString("F2")</div>
-                            </li>
-                        }
-                    </ul>
-                    <div class="border-top pt-3">
-                        <label class="form-label small fw-semibold">@Loc["CouponCode"]</label>
-                        <div class="input-group mb-2">
-                            <input asp-for="CouponCode" class="form-control" form="checkoutForm" placeholder="@Loc["EnterCoupon"]" />
-                        </div>
-                        <span asp-validation-for="CouponCode" class="text-danger small"></span>
-                        @if (Model.DiscountAmount > 0)
-                        {
-                            <div class="d-flex justify-content-between text-success">
-                                <span>@Loc["Discount"]</span>
-                                <span>-¥@Model.DiscountAmount.ToString("F2")</span>
+    <h1 class="h3 mb-4">@Loc["Checkout"]</h1>
+
+    <form id="checkoutForm" asp-controller="Orders" asp-action="Checkout" method="post">
+        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-white fw-semibold">@Loc["DeliveryInformation"]</div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label asp-for="UserName" class="form-label">@Loc["Receiver"]</label>
+                                <input asp-for="UserName" class="form-control" autocomplete="name" />
+                                <span asp-validation-for="UserName" class="text-danger small"></span>
                             </div>
-                        }
-                        <div class="d-flex justify-content-between">
-                            <span class="fw-semibold">@Loc["Total"]</span>
-                            <span class="text-danger fw-bold fs-5">¥@Model.PayableTotal.ToString("F2")</span>
+                            <div class="col-md-6">
+                                <label asp-for="Phone" class="form-label">@Loc["PhoneNumber"]</label>
+                                <input asp-for="Phone" class="form-control" autocomplete="tel" />
+                                <span asp-validation-for="Phone" class="text-danger small"></span>
+                            </div>
+                            <div class="col-12">
+                                <label asp-for="Address" class="form-label">@Loc["AddressLine1"]</label>
+                                <input asp-for="Address" class="form-control" autocomplete="address-line1" />
+                                <span asp-validation-for="Address" class="text-danger small"></span>
+                            </div>
+                            <div class="col-12">
+                                <label asp-for="AddressLine2" class="form-label">@Loc["AddressLine2Optional"]</label>
+                                <input asp-for="AddressLine2" class="form-control" autocomplete="address-line2" />
+                            </div>
+                            <div class="col-md-4">
+                                <label asp-for="City" class="form-label">@Loc["City"]</label>
+                                <input asp-for="City" class="form-control" autocomplete="address-level2" />
+                            </div>
+                            <div class="col-md-4">
+                                <label asp-for="PostalCode" class="form-label">@Loc["PostalCode"]</label>
+                                <input asp-for="PostalCode" class="form-control" autocomplete="postal-code" />
+                            </div>
+                            <div class="col-md-4">
+                                <label asp-for="Country" class="form-label">@Loc["Country"]</label>
+                                <input asp-for="Country" class="form-control" autocomplete="country-name" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm">
+                    <div class="card-header bg-white fw-semibold">@Loc["Payment"]</div>
+                    <div class="card-body">
+                        <label class="checkout-payment-option">
+                            <input asp-for="PaymentMethod" id="paymentCash" type="radio" value="cash_on_delivery" class="form-check-input" />
+                            <span>
+                                <span class="checkout-payment-title"><i class="bi bi-cash-coin me-2"></i>@Loc["CashOnDelivery"]</span>
+                                <span class="checkout-payment-hint">@Loc["CashOnDeliveryHint"]</span>
+                            </span>
+                        </label>
+                        <label class="checkout-payment-option">
+                            <input asp-for="PaymentMethod" id="paymentCard" type="radio" value="card_demo" class="form-check-input" />
+                            <span>
+                                <span class="checkout-payment-title"><i class="bi bi-credit-card me-2"></i>@Loc["CardPaymentDemo"]</span>
+                                <span class="checkout-payment-hint">@Loc["CardPaymentHint"]</span>
+                            </span>
+                        </label>
+                        <label class="checkout-payment-option">
+                            <input asp-for="PaymentMethod" id="paymentTransfer" type="radio" value="bank_transfer_demo" class="form-check-input" />
+                            <span>
+                                <span class="checkout-payment-title"><i class="bi bi-bank me-2"></i>@Loc["BankTransferDemo"]</span>
+                                <span class="checkout-payment-hint">@Loc["BankTransferHint"]</span>
+                            </span>
+                        </label>
+
+                        <div class="mt-4">
+                            <label asp-for="OrderNotes" class="form-label">@Loc["OrderNotesOptional"]</label>
+                            <textarea asp-for="OrderNotes" class="form-control" rows="3" maxlength="500" placeholder="@Loc["OrderNotesPlaceholder"]"></textarea>
                         </div>
                     </div>
                 </div>
             </div>
+
+            <div class="col-lg-4">
+                <div class="card checkout-summary-card shadow-sm">
+                    <div class="card-header bg-white fw-semibold">@Loc["YourOrder"]</div>
+                    <div class="card-body">
+                        <ul class="list-unstyled mb-3">
+                            @foreach (var item in Model.Items)
+                            {
+                                <li class="checkout-order-item">
+                                    <div>
+                                        <div>@L10n.Text(item.Name, item.NameEn)</div>
+                                        @if (!string.IsNullOrEmpty(item.Color) || !string.IsNullOrEmpty(item.Spec))
+                                        {
+                                            <small class="text-muted d-block">
+                                                @L10n.Text(item.Color ?? "", item.ColorEn) @L10n.Text(item.Spec ?? "", item.SpecEn)
+                                            </small>
+                                        }
+                                        <small class="text-muted">× @item.Quantity</small>
+                                    </div>
+                                    <span class="text-nowrap">¥@item.LineTotal.ToString("F2")</span>
+                                </li>
+                            }
+                        </ul>
+
+                        <div class="border-top pt-3">
+                            <label asp-for="CouponCode" class="form-label small fw-semibold">@Loc["CouponCode"]</label>
+                            <input asp-for="CouponCode" class="form-control mb-2" placeholder="@Loc["EnterCoupon"]" />
+                            <span asp-validation-for="CouponCode" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mt-3">
+                            <div class="checkout-total-row">
+                                <span>@Loc["Subtotal"]</span>
+                                <span>¥@Model.Total.ToString("F2")</span>
+                            </div>
+                            @if (Model.DiscountAmount > 0)
+                            {
+                                <div class="checkout-total-row text-success">
+                                    <span>@Loc["Discount"]</span>
+                                    <span>-¥@Model.DiscountAmount.ToString("F2")</span>
+                                </div>
+                            }
+                            <div class="checkout-total-row">
+                                <span>@Loc["ShippingFee"]</span>
+                                <span>@Loc["FreeShipping"]</span>
+                            </div>
+                            <div class="checkout-total-row checkout-grand-total">
+                                <span>@Loc["Total"]</span>
+                                <span class="text-danger">¥@Model.PayableTotal.ToString("F2")</span>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-amazon btn-lg w-100 mt-4">
+                            <i class="bi bi-bag-check me-1"></i>@Loc["SubmitOrder"]
+                        </button>
+                        <a asp-controller="Cart" asp-action="Index" class="btn btn-link w-100 mt-1">@Loc["BackToCart"]</a>
+                    </div>
+                </div>
+            </div>
         </div>
-    </div>
+    </form>
 </div>

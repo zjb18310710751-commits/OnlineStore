@@ -93,9 +93,9 @@ public class OrdersController : Controller
         {
             OrderNo = GenerateOrderNo(),
             UserId = user?.Id,
-            UserName = vm.UserName!,
-            Phone = vm.Phone,
-            Address = vm.Address,
+            UserName = vm.UserName!.Trim(),
+            Phone = vm.Phone?.Trim(),
+            Address = BuildFullAddress(vm),
             Total = cart.Total - discount,
             CouponCode = applied?.Code,
             DiscountAmount = discount,
@@ -189,13 +189,24 @@ public class OrdersController : Controller
             ModelState.AddModelError(nameof(vm.Phone), _loc["CheckoutPhoneTooLong"]);
         }
 
+        var fullAddress = BuildFullAddress(vm);
         if (string.IsNullOrWhiteSpace(vm.Address))
         {
             ModelState.AddModelError(nameof(vm.Address), _loc["CheckoutAddressRequired"]);
         }
-        else if (vm.Address.Length > 500)
+        else if (fullAddress.Length > 500)
         {
             ModelState.AddModelError(nameof(vm.Address), _loc["CheckoutAddressTooLong"]);
         }
     }
+
+    private static string BuildFullAddress(CheckoutViewModel vm) =>
+        string.Join(", ", new[]
+        {
+            vm.Address,
+            vm.AddressLine2,
+            vm.City,
+            vm.PostalCode,
+            vm.Country
+        }.Where(part => !string.IsNullOrWhiteSpace(part)).Select(part => part!.Trim()));
 }

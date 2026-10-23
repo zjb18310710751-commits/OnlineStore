@@ -295,6 +295,97 @@ body {
     color: #181818 !important;
 }
 
+/* 结算页 */
+.checkout-summary-card {
+    position: sticky;
+    top: 88px;
+}
+
+.checkout-order-item {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: .65rem 0;
+    border-bottom: 1px solid #eef1f5;
+}
+
+.checkout-order-item:first-child {
+    padding-top: 0;
+}
+
+.checkout-order-item:last-child {
+    border-bottom: 0;
+}
+
+.checkout-total-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: .35rem 0;
+    color: #565959;
+}
+
+.checkout-grand-total {
+    margin-top: .65rem;
+    padding-top: .9rem;
+    border-top: 1px solid #dee2e6;
+    color: #0f1111;
+    font-size: 1.05rem;
+    font-weight: 700;
+}
+
+.checkout-payment-option {
+    display: flex;
+    align-items: flex-start;
+    gap: .8rem;
+    padding: .9rem 1rem;
+    border: 1px solid #d5d9d9;
+    border-radius: .5rem;
+    background: #fff;
+    cursor: pointer;
+    transition: border-color .15s ease, background-color .15s ease;
+}
+
+.checkout-payment-option + .checkout-payment-option {
+    margin-top: .75rem;
+}
+
+.checkout-payment-option:hover,
+.checkout-payment-option:has(input:checked) {
+    border-color: var(--amazon-orange);
+    background: var(--brand-light);
+}
+
+.checkout-payment-option .form-check-input {
+    flex: 0 0 auto;
+    margin-top: .25rem;
+}
+
+.checkout-payment-option .form-check-input:checked {
+    background-color: var(--amazon-orange);
+    border-color: var(--amazon-orange);
+}
+
+.checkout-payment-title {
+    display: block;
+    color: #0f1111;
+    font-weight: 600;
+}
+
+.checkout-payment-hint {
+    display: block;
+    margin-top: .15rem;
+    color: #6b7280;
+    font-size: .85rem;
+}
+
+@media (max-width: 991.98px) {
+    .checkout-summary-card {
+        position: static;
+    }
+}
+
 .price {
     color: var(--amazon-price);
     font-weight: 700;
