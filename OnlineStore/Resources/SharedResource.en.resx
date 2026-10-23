@@ -42,6 +42,7 @@
   <data name="Next" xml:space="preserve"><value>Next</value></data>
   <data name="InStock" xml:space="preserve"><value>In stock</value></data>
   <data name="OutOfStock" xml:space="preserve"><value>Out of stock</value></data>
+  <data name="FreeShipping" xml:space="preserve"><value>Free</value></data>
   <data name="Products" xml:space="preserve"><value>Products</value></data>
   <data name="Category" xml:space="preserve"><value>Category</value></data>
   <data name="Sku" xml:space="preserve"><value>SKU</value></data>

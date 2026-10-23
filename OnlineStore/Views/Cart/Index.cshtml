@@ -3,14 +3,8 @@
     ViewData["Title"] = Loc["ShoppingCart"].Value;
 }
 <div class="container py-4">
-    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+    <div class="mb-4">
         <h1 class="h3 mb-0"><i class="bi bi-cart3 me-2"></i>@Loc["ShoppingCart"]</h1>
-        @if (Model.Items.Count > 0)
-        {
-            <form asp-controller="Cart" asp-action="Clear" method="post" onsubmit="return confirm('@Loc["ConfirmClearCart"].Value');">
-                <button type="submit" class="btn btn-outline-danger btn-sm"><i class="bi bi-trash me-1"></i>@Loc["ClearCart"]</button>
-            </form>
-        }
     </div>
 
     @if (Model.Items.Count == 0)
@@ -25,13 +19,19 @@
     {
         <div class="row g-4">
             <div class="col-lg-8">
-                <div class="card shadow-sm">
+                <div class="card cart-products-card shadow-sm">
+                    <div class="cart-product-grid cart-product-header" aria-hidden="true">
+                        <div>@Loc["Products"]</div>
+                        <div>@Loc["Price"]</div>
+                        <div>@Loc["Quantity"]</div>
+                        <div class="text-end">@Loc["Subtotal"]</div>
+                    </div>
                     <ul class="list-group list-group-flush">
                         @foreach (var item in Model.Items)
                         {
-                            <li class="list-group-item py-3">
-                                <div class="row align-items-center g-3">
-                                    <div class="col-auto">
+                            <li class="list-group-item cart-product-row">
+                                <div class="cart-product-grid">
+                                    <div class="cart-product-main">
                                         <a asp-controller="Products" asp-action="Details" asp-route-id="@item.ProductId" class="d-block cart-thumb d-flex align-items-center justify-content-center">
                                             @if (!string.IsNullOrEmpty(item.ImageUrl))
                                             {
@@ -42,55 +42,70 @@
                                                 <i class="bi bi-image"></i>
                                             }
                                         </a>
+                                        <div class="cart-product-info">
+                                            <a asp-controller="Products" asp-action="Details" asp-route-id="@item.ProductId" class="fw-semibold text-decoration-none text-dark">@L10n.Text(item.Name, item.NameEn)</a>
+                                            @if (!string.IsNullOrEmpty(item.Color) || !string.IsNullOrEmpty(item.Spec))
+                                            {
+                                                <div class="text-muted small mt-1">@Loc["Spec"]：@L10n.Text(item.Color ?? "", item.ColorEn) @L10n.Text(item.Spec ?? "", item.SpecEn)</div>
+                                            }
+                                            <div class="text-muted small">@Loc["StockLimit", item.Stock]</div>
+                                        </div>
                                     </div>
-                                    <div class="col">
-                                        <a asp-controller="Products" asp-action="Details" asp-route-id="@item.ProductId" class="fw-semibold text-decoration-none text-dark">@L10n.Text(item.Name, item.NameEn)</a>
-                                        @if (!string.IsNullOrEmpty(item.Color) || !string.IsNullOrEmpty(item.Spec))
-                                        {
-                                            <div class="text-muted small">@L10n.Text(item.Color ?? "", item.ColorEn) @L10n.Text(item.Spec ?? "", item.SpecEn)</div>
-                                        }
-                                        <div class="text-muted small">@Loc["UnitPrice"]：¥@item.Price.ToString("F2")</div>
-                                        <div class="text-muted small">@Loc["StockLimit", item.Stock]</div>
+
+                                    <div class="cart-price">
+                                        <span class="cart-mobile-label">@Loc["Price"]</span>
+                                        <span>¥@item.Price.ToString("F2")</span>
                                     </div>
-                                    <div class="col-12 col-md-4">
-                                        <form asp-controller="Cart" asp-action="Update" method="post" class="d-flex align-items-center gap-2">
+
+                                    <div class="cart-quantity">
+                                        <span class="cart-mobile-label">@Loc["Quantity"]</span>
+                                        <form asp-controller="Cart" asp-action="Update" method="post" class="cart-quantity-form">
                                             <input type="hidden" name="productId" value="@item.ProductId" />
                                             <input type="hidden" name="skuId" value="@item.SkuId" />
-                                            <div class="input-group input-group-sm" style="max-width: 130px;">
-                                                <input type="number" name="quantity" class="form-control text-center" value="@item.Quantity" min="1" max="@item.Stock" />
-                                            </div>
-                                            <button type="submit" class="btn btn-sm btn-outline-secondary" title="@Loc["Update"].Value"><i class="bi bi-arrow-clockwise"></i></button>
-                                            <button type="submit" class="btn btn-sm btn-outline-danger" title="@Loc["Remove"].Value"
+                                            <input type="number" name="quantity" class="form-control form-control-sm cart-quantity-input text-center"
+                                                   value="@item.Quantity" min="1" max="@item.Stock" inputmode="numeric" aria-label="@Loc["Quantity"].Value" />
+                                            <button type="submit" class="btn btn-sm btn-outline-secondary">@Loc["Update"]</button>
+                                            <button type="submit" class="btn btn-sm btn-link text-danger cart-remove-button"
                                                     formaction="@Url.Action("Remove", "Cart")">
-                                                <i class="bi bi-trash"></i>
+                                                @Loc["Remove"]
                                             </button>
                                         </form>
-                                        <div class="price mt-1 text-end">¥@item.LineTotal.ToString("F2")</div>
+                                    </div>
+
+                                    <div class="cart-line-total text-end">
+                                        <span class="cart-mobile-label">@Loc["Subtotal"]</span>
+                                        <span class="price">¥@item.LineTotal.ToString("F2")</span>
                                     </div>
                                 </div>
                             </li>
                         }
                     </ul>
                 </div>
+                <form asp-controller="Cart" asp-action="Clear" method="post" class="mt-2"
+                      onsubmit="return confirm('@Loc["ConfirmClearCart"].Value');">
+                    <button type="submit" class="btn btn-link text-muted p-0 text-decoration-none">
+                        @Loc["ClearCart"]
+                    </button>
+                </form>
             </div>
 
             <div class="col-lg-4">
-                <div class="card shadow-sm">
+                <div class="card cart-summary-card shadow-sm">
                     <div class="card-header fw-semibold">@Loc["OrderSummary"]</div>
                     <div class="card-body">
-                        <div class="d-flex justify-content-between mb-2">
-                            <span class="text-muted">@Loc["CartItemCount"]</span>
-                            <span>@Model.TotalItems</span>
-                        </div>
-                        <div class="d-flex justify-content-between mb-3">
-                            <span class="text-muted">@Loc["Subtotal"]</span>
+                        <div class="cart-summary-line">
+                            <span>@Loc["Subtotal"]</span>
                             <span>¥@Model.Total.ToString("F2")</span>
                         </div>
-                        <div class="d-flex justify-content-between border-top pt-3 mb-3">
-                            <span class="fw-semibold">@Loc["Total"]</span>
+                        <div class="cart-summary-line">
+                            <span>@Loc["ShippingFee"]</span>
+                            <span>@Loc["FreeShipping"]</span>
+                        </div>
+                        <div class="cart-summary-line cart-summary-total">
+                            <span>@Loc["Total"]</span>
                             <span class="price fs-5">¥@Model.Total.ToString("F2")</span>
                         </div>
-                        <a asp-controller="Orders" asp-action="Checkout" class="btn btn-amazon btn-lg w-100"><i class="bi bi-bag-check me-1"></i>@Loc["Checkout"]</a>
+                        <a asp-controller="Orders" asp-action="Checkout" class="btn btn-amazon btn-lg w-100 mt-4"><i class="bi bi-bag-check me-1"></i>@Loc["Checkout"]</a>
                         <a asp-controller="Products" asp-action="Index" class="btn btn-outline-secondary w-100 mt-2">@Loc["ContinueShopping"]</a>
                     </div>
                 </div>

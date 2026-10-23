@@ -342,6 +342,126 @@ body {
     object-fit: cover;
 }
 
+/* 购物车：商品表格与订单摘要 */
+.cart-products-card {
+    overflow: hidden;
+}
+
+.cart-product-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 2.5fr) minmax(84px, .8fr) minmax(210px, 1.6fr) minmax(90px, .9fr);
+    align-items: center;
+    gap: 1rem;
+}
+
+.cart-product-header {
+    padding: .8rem 1rem;
+    border-bottom: 1px solid #c7c7c7;
+    background: #f8f9fa;
+    color: #2d2d2d;
+    font-weight: 600;
+}
+
+.cart-product-row {
+    padding: 1rem;
+}
+
+.cart-product-main {
+    display: flex;
+    align-items: center;
+    gap: .85rem;
+    min-width: 0;
+}
+
+.cart-product-info {
+    min-width: 0;
+}
+
+.cart-price,
+.cart-line-total {
+    color: #2d2d2d;
+    white-space: nowrap;
+}
+
+.cart-quantity-form {
+    display: flex;
+    align-items: center;
+    gap: .45rem;
+}
+
+.cart-quantity-input {
+    width: 62px;
+    flex: 0 0 auto;
+}
+
+.cart-remove-button {
+    padding: .2rem .3rem;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.cart-remove-button:hover {
+    text-decoration: underline;
+}
+
+.cart-mobile-label {
+    display: none;
+}
+
+.cart-summary-line {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: .45rem 0;
+    color: #565959;
+}
+
+.cart-summary-total {
+    margin-top: .55rem;
+    padding-top: 1rem;
+    border-top: 1px solid #dee2e6;
+    color: #0f1111;
+    font-size: 1.05rem;
+    font-weight: 700;
+}
+
+@media (max-width: 991.98px) {
+    .cart-product-header {
+        display: none;
+    }
+
+    .cart-product-grid {
+        grid-template-columns: 1fr;
+        gap: .75rem;
+    }
+
+    .cart-price,
+    .cart-quantity,
+    .cart-line-total {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        padding-left: .1rem;
+    }
+
+    .cart-quantity-form {
+        justify-content: flex-end;
+    }
+
+    .cart-line-total {
+        text-align: left !important;
+    }
+
+    .cart-mobile-label {
+        display: inline;
+        color: #6b7280;
+        font-size: .85rem;
+        white-space: nowrap;
+    }
+}
+
 /* 商品详情页 */
 .sku-label {
     font-weight: 600;
