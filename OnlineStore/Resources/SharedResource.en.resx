@@ -50,6 +50,7 @@
   <data name="InStockCount" xml:space="preserve"><value>In stock ({0})</value></data>
   <data name="Cart" xml:space="preserve"><value>Cart</value></data>
   <data name="AddToCart" xml:space="preserve"><value>Add to cart</value></data>
+  <data name="AddedToCart" xml:space="preserve"><value>Added to cart.</value></data>
   <data name="ShoppingCart" xml:space="preserve"><value>Shopping Cart</value></data>
   <data name="EmptyCart" xml:space="preserve"><value>Your cart is empty. Start shopping now.</value></data>
   <data name="CartQuantityRequired" xml:space="preserve"><value>Please enter a quantity</value></data>

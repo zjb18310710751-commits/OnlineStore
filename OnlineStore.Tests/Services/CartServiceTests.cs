@@ -55,6 +55,7 @@ public class CartServiceTests
         Assert.Equal(2, cart.Items[0].Quantity);
         Assert.Equal(598m, cart.Total);
         Assert.Equal(2, cart.TotalItems);
+        Assert.Equal(1, cart.ItemCount);
     }
 
     [Fact]

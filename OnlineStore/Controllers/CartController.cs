@@ -33,7 +33,7 @@ public class CartController : Controller
             return RedirectToAction("Checkout", "Orders");
         }
 
-        TempData["Success"] = "已加入购物车。";
+        TempData["Success"] = _loc["AddedToCart"].Value;
         return RedirectToLocal(returnUrl) ?? RedirectToAction("Index", "Products");
     }
 

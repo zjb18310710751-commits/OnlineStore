@@ -50,6 +50,7 @@
   <data name="InStockCount" xml:space="preserve"><value>有货（{0} 件）</value></data>
   <data name="Cart" xml:space="preserve"><value>购物车</value></data>
   <data name="AddToCart" xml:space="preserve"><value>加入购物车</value></data>
+  <data name="AddedToCart" xml:space="preserve"><value>已加入购物车。</value></data>
   <data name="ShoppingCart" xml:space="preserve"><value>购物车</value></data>
   <data name="EmptyCart" xml:space="preserve"><value>购物车是空的，快去挑选心仪的商品吧。</value></data>
   <data name="CartQuantityRequired" xml:space="preserve"><value>请输入商品数量</value></data>

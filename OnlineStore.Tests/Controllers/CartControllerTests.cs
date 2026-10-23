@@ -38,6 +38,24 @@ public class CartControllerTests
         Assert.Equal(3, cartService.UpdatedQuantity);
     }
 
+    [Fact]
+    public async Task Add_UsesLocalizedSuccessMessage()
+    {
+        var controller = new CartController(
+            new RecordingCartService(),
+            new TestStringLocalizer(new Dictionary<string, string>
+            {
+                ["AddedToCart"] = "Added to cart."
+            }))
+        {
+            TempData = new TempDataDictionary(new DefaultHttpContext(), new NullTempDataProvider())
+        };
+
+        await controller.Add(1, 2);
+
+        Assert.Equal("Added to cart.", controller.TempData["Success"]);
+    }
+
     private static CartController CreateController(ICartService cartService) =>
         new(cartService, new TestStringLocalizer())
         {
@@ -75,19 +93,24 @@ public class CartControllerTests
 
     private sealed class TestStringLocalizer : IStringLocalizer<SharedResource>
     {
-        private static readonly IReadOnlyDictionary<string, string> Values =
-            new Dictionary<string, string>
+        private readonly IReadOnlyDictionary<string, string> _values;
+
+        public TestStringLocalizer(IReadOnlyDictionary<string, string>? values = null)
+        {
+            _values = values ?? new Dictionary<string, string>
             {
-                ["CartQuantityRequired"] = "请输入商品数量"
+                ["CartQuantityRequired"] = "请输入商品数量",
+                ["AddedToCart"] = "已加入购物车。"
             };
+        }
 
         public LocalizedString this[string name] =>
-            new(name, Values.GetValueOrDefault(name, name));
+            new(name, _values.GetValueOrDefault(name, name));
 
         public LocalizedString this[string name, params object[] arguments] =>
-            new(name, string.Format(Values.GetValueOrDefault(name, name), arguments));
+            new(name, string.Format(_values.GetValueOrDefault(name, name), arguments));
 
         public IEnumerable<LocalizedString> GetAllStrings(bool includeParentCultures) =>
-            Values.Select(item => new LocalizedString(item.Key, item.Value));
+            _values.Select(item => new LocalizedString(item.Key, item.Value));
     }
 }
