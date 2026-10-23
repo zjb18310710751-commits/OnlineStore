@@ -1,0 +1,52 @@
+@model AddressViewModel
+@{
+    ViewData["Title"] = Loc["ChangeAddress"].Value;
+}
+<div class="container py-4">
+    <div class="row g-4">
+        <div class="col-lg-3">
+            <partial name="_ProfileSidebar" model="Model" />
+        </div>
+        <div class="col-lg-9">
+            <section class="card shadow-sm profile-section-card">
+                <div class="card-header bg-white">
+                    <h1 class="h4 mb-1">@Loc["AddressDetails"]</h1>
+                    <div class="text-muted small">@Loc["AddressDetailsHint"]</div>
+                </div>
+                <div class="card-body">
+                    <form method="post" asp-controller="Account" asp-action="ChangeAddress">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label asp-for="Address" class="form-label">@Loc["AddressLine1"]</label>
+                                <input asp-for="Address" class="form-control" autocomplete="address-line1" />
+                                <span asp-validation-for="Address" class="text-danger small"></span>
+                            </div>
+                            <div class="col-12">
+                                <label asp-for="AddressLine2" class="form-label">@Loc["AddressLine2Optional"]</label>
+                                <input asp-for="AddressLine2" class="form-control" autocomplete="address-line2" />
+                            </div>
+                            <div class="col-md-4">
+                                <label asp-for="City" class="form-label">@Loc["City"]</label>
+                                <input asp-for="City" class="form-control" autocomplete="address-level2" />
+                            </div>
+                            <div class="col-md-4">
+                                <label asp-for="PostalCode" class="form-label">@Loc["PostalCode"]</label>
+                                <input asp-for="PostalCode" class="form-control" autocomplete="postal-code" />
+                            </div>
+                            <div class="col-md-4">
+                                <label asp-for="Country" class="form-label">@Loc["Country"]</label>
+                                <input asp-for="Country" class="form-control" autocomplete="country-name" />
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end mt-4">
+                            <button type="submit" class="btn btn-primary">@Loc["UpdateAddress"]</button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>

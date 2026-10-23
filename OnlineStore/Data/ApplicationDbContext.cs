@@ -28,6 +28,12 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
         base.OnModelCreating(builder);
 
+        builder.Entity<ApplicationUser>(entity =>
+        {
+            entity.Property(u => u.Address).HasMaxLength(500);
+            entity.Property(u => u.AvatarUrl).HasMaxLength(500);
+        });
+
         builder.Entity<Category>(entity =>
         {
             entity.HasIndex(c => c.Name);

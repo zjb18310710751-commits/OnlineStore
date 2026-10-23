@@ -18,18 +18,30 @@ public class CheckoutViewModel
     /// <summary>实付金额 = 商品总额 - 优惠。</summary>
     public decimal PayableTotal => Total - DiscountAmount;
 
-    [Required(ErrorMessage = "请输入收货人姓名")]
-    [StringLength(50)]
     [Display(Name = "收货人")]
-    public string UserName { get; set; } = string.Empty;
+    public string? UserName { get; set; }
 
-    [Required(ErrorMessage = "请输入联系电话")]
-    [StringLength(20)]
     [Display(Name = "联系电话")]
-    public string Phone { get; set; } = string.Empty;
+    public string? Phone { get; set; }
 
-    [Required(ErrorMessage = "请输入收货地址")]
-    [StringLength(500)]
     [Display(Name = "收货地址")]
-    public string Address { get; set; } = string.Empty;
+    public string? Address { get; set; }
+
+    [Display(Name = "地址第二行（可选）")]
+    public string? AddressLine2 { get; set; }
+
+    [Display(Name = "城市")]
+    public string? City { get; set; }
+
+    [Display(Name = "邮编")]
+    public string? PostalCode { get; set; }
+
+    [Display(Name = "国家")]
+    public string? Country { get; set; }
+
+    [Display(Name = "支付方式")]
+    public string PaymentMethod { get; set; } = "cash_on_delivery";
+
+    [Display(Name = "订单备注（可选）")]
+    public string? OrderNotes { get; set; }
 }

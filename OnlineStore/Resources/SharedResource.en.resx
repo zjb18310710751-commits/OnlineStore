@@ -42,6 +42,7 @@
   <data name="Next" xml:space="preserve"><value>Next</value></data>
   <data name="InStock" xml:space="preserve"><value>In stock</value></data>
   <data name="OutOfStock" xml:space="preserve"><value>Out of stock</value></data>
+  <data name="FreeShipping" xml:space="preserve"><value>Free</value></data>
   <data name="Products" xml:space="preserve"><value>Products</value></data>
   <data name="Category" xml:space="preserve"><value>Category</value></data>
   <data name="Sku" xml:space="preserve"><value>SKU</value></data>
@@ -51,6 +52,7 @@
   <data name="AddToCart" xml:space="preserve"><value>Add to cart</value></data>
   <data name="ShoppingCart" xml:space="preserve"><value>Shopping Cart</value></data>
   <data name="EmptyCart" xml:space="preserve"><value>Your cart is empty. Start shopping now.</value></data>
+  <data name="CartQuantityRequired" xml:space="preserve"><value>Please enter a quantity</value></data>
   <data name="ContinueShopping" xml:space="preserve"><value>Continue shopping</value></data>
   <data name="UnitPrice" xml:space="preserve"><value>Unit price</value></data>
   <data name="Quantity" xml:space="preserve"><value>Quantity</value></data>
@@ -176,12 +178,71 @@
   <data name="LoginToReview" xml:space="preserve"><value>to write a review</value></data>
   <data name="Checkout" xml:space="preserve"><value>Checkout</value></data>
   <data name="Receiver" xml:space="preserve"><value>Receiver</value></data>
+  <data name="DeliveryInformation" xml:space="preserve"><value>Delivery information</value></data>
+  <data name="AddressLine1" xml:space="preserve"><value>Address line 1</value></data>
+  <data name="AddressLine2Optional" xml:space="preserve"><value>Address line 2 (optional)</value></data>
+  <data name="City" xml:space="preserve"><value>City</value></data>
+  <data name="PostalCode" xml:space="preserve"><value>Postal code</value></data>
+  <data name="Country" xml:space="preserve"><value>Country</value></data>
+  <data name="YourOrder" xml:space="preserve"><value>Your order</value></data>
+  <data name="Payment" xml:space="preserve"><value>Payment</value></data>
+  <data name="CashOnDelivery" xml:space="preserve"><value>Cash on delivery</value></data>
+  <data name="CashOnDeliveryHint" xml:space="preserve"><value>Pay when your order arrives.</value></data>
+  <data name="CardPaymentDemo" xml:space="preserve"><value>Card payment (demo)</value></data>
+  <data name="CardPaymentHint" xml:space="preserve"><value>Simulated card payment for demonstration.</value></data>
+  <data name="BankTransferDemo" xml:space="preserve"><value>Bank transfer (demo)</value></data>
+  <data name="BankTransferHint" xml:space="preserve"><value>Simulated bank transfer for demonstration.</value></data>
+  <data name="OrderNotesOptional" xml:space="preserve"><value>Order notes (optional)</value></data>
+  <data name="OrderNotesPlaceholder" xml:space="preserve"><value>Enter order notes…</value></data>
+  <data name="BackToCart" xml:space="preserve"><value>Back to cart</value></data>
   <data name="SubmitOrder" xml:space="preserve"><value>Place order</value></data>
+  <data name="CheckoutReceiverRequired" xml:space="preserve"><value>Please enter the receiver's name</value></data>
+  <data name="CheckoutReceiverTooLong" xml:space="preserve"><value>Receiver name cannot exceed 50 characters</value></data>
+  <data name="CheckoutPhoneRequired" xml:space="preserve"><value>Please enter a phone number</value></data>
+  <data name="CheckoutPhoneTooLong" xml:space="preserve"><value>Phone number cannot exceed 20 characters</value></data>
+  <data name="CheckoutAddressRequired" xml:space="preserve"><value>Please enter a delivery address</value></data>
+  <data name="CheckoutAddressTooLong" xml:space="preserve"><value>Delivery address cannot exceed 500 characters</value></data>
   <data name="OrderPlaced" xml:space="preserve"><value>Order placed</value></data>
   <data name="OrderNo" xml:space="preserve"><value>Order no.</value></data>
   <data name="OrderStatus" xml:space="preserve"><value>Status</value></data>
   <data name="MyOrders" xml:space="preserve"><value>My orders</value></data>
   <data name="Profile" xml:space="preserve"><value>Profile</value></data>
+  <data name="BasicPersonalInformation" xml:space="preserve"><value>Basic personal information</value></data>
+  <data name="BasicPersonalInformationHint" xml:space="preserve"><value>Manage your name, contact number and account details.</value></data>
+  <data name="ProfileDetails" xml:space="preserve"><value>Profile details</value></data>
+  <data name="UsernameLabel" xml:space="preserve"><value>Username</value></data>
+  <data name="EmailAddress" xml:space="preserve"><value>Email address</value></data>
+  <data name="UsernameImmutableHint" xml:space="preserve"><value>System account handle. This cannot be changed.</value></data>
+  <data name="EmailImmutableHint" xml:space="preserve"><value>To change your email, use “Change password”.</value></data>
+  <data name="ChangePassword" xml:space="preserve"><value>Change password</value></data>
+  <data name="ChangePasswordHint" xml:space="preserve"><value>Verify your email code before updating your password.</value></data>
+  <data name="RegisteredEmailAddress" xml:space="preserve"><value>Registered email address</value></data>
+  <data name="RegisteredEmailHint" xml:space="preserve"><value>Keep your current email or enter a new email address.</value></data>
+  <data name="VerificationCodeHint" xml:space="preserve"><value>Enter the 6-digit code sent to your email.</value></data>
+  <data name="ChangeAddress" xml:space="preserve"><value>Change address</value></data>
+  <data name="AddressDetails" xml:space="preserve"><value>Delivery address</value></data>
+  <data name="AddressDetailsHint" xml:space="preserve"><value>Maintain the address used for order delivery.</value></data>
+  <data name="UpdatePassword" xml:space="preserve"><value>Update password</value></data>
+  <data name="UpdateAddress" xml:space="preserve"><value>Save address</value></data>
+  <data name="ProfileUpdated" xml:space="preserve"><value>Personal information saved.</value></data>
+  <data name="PasswordUpdated" xml:space="preserve"><value>Password and registered email updated.</value></data>
+  <data name="AddressUpdated" xml:space="preserve"><value>Delivery address saved.</value></data>
+  <data name="UploadAvatar" xml:space="preserve"><value>Upload avatar</value></data>
+  <data name="AvatarSpec" xml:space="preserve"><value>JPG, PNG, WebP or GIF, up to 5 MB.</value></data>
+  <data name="AvatarFileRequired" xml:space="preserve"><value>Please select an avatar image.</value></data>
+  <data name="AvatarUpdated" xml:space="preserve"><value>Avatar updated.</value></data>
+  <data name="FirstNameRequired" xml:space="preserve"><value>Please enter your first name</value></data>
+  <data name="FirstNameTooLong" xml:space="preserve"><value>First name cannot exceed 100 characters</value></data>
+  <data name="LastNameRequired" xml:space="preserve"><value>Please enter your last name</value></data>
+  <data name="LastNameTooLong" xml:space="preserve"><value>Last name cannot exceed 100 characters</value></data>
+  <data name="PhoneNumberRequired" xml:space="preserve"><value>Please enter a phone number</value></data>
+  <data name="EmailRequired" xml:space="preserve"><value>Please enter an email address</value></data>
+  <data name="NewPasswordRequired" xml:space="preserve"><value>Please enter a new password</value></data>
+  <data name="PasswordPolicyError" xml:space="preserve"><value>Password must be at least 6 characters and include uppercase, lowercase, a number and a symbol</value></data>
+  <data name="ConfirmPasswordRequired" xml:space="preserve"><value>Please confirm the new password</value></data>
+  <data name="PasswordsDoNotMatch" xml:space="preserve"><value>Passwords do not match</value></data>
+  <data name="VerificationCodeRequired" xml:space="preserve"><value>Please enter the verification code</value></data>
+  <data name="VerificationCodeFormat" xml:space="preserve"><value>The verification code must be 6 digits</value></data>
   <data name="HotKeywords" xml:space="preserve"><value>Hot searches</value></data>
   <data name="GuessYouLike" xml:space="preserve"><value>You may also like</value></data>
   <data name="Favorite" xml:space="preserve"><value>Favorite</value></data>

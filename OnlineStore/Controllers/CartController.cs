@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Localization;
 using Microsoft.AspNetCore.Mvc;
 using OnlineStore.Services;
 
@@ -7,10 +8,12 @@ namespace OnlineStore.Controllers;
 public class CartController : Controller
 {
     private readonly ICartService _cartService;
+    private readonly IStringLocalizer<SharedResource> _loc;
 
-    public CartController(ICartService cartService)
+    public CartController(ICartService cartService, IStringLocalizer<SharedResource> localizer)
     {
         _cartService = cartService;
+        _loc = localizer;
     }
 
     public async Task<IActionResult> Index()
@@ -36,9 +39,15 @@ public class CartController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Update(int productId, int? skuId, int quantity)
+    public async Task<IActionResult> Update(int productId, int? skuId, int? quantity)
     {
-        await _cartService.UpdateAsync(productId, skuId, quantity);
+        if (!quantity.HasValue || quantity.Value < 1)
+        {
+            TempData["Error"] = _loc["CartQuantityRequired"].Value;
+            return RedirectToAction(nameof(Index));
+        }
+
+        await _cartService.UpdateAsync(productId, skuId, quantity.Value);
         return RedirectToAction(nameof(Index));
     }
 
