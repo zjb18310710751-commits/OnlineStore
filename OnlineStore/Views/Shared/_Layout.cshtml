@@ -1,6 +1,8 @@
 @inject ICategoryService CategoryService
+@inject Microsoft.AspNetCore.Identity.UserManager<ApplicationUser> UserManager
 @{
     var categories = (await CategoryService.GetAllAsync()).ToList();
+    var currentUser = User.Identity?.IsAuthenticated == true ? await UserManager.GetUserAsync(User) : null;
     var isAdmin = User.IsInRole("Admin");
     var isZh = CultureInfo.CurrentUICulture.Name.StartsWith("zh", StringComparison.OrdinalIgnoreCase);
     var returnUrl = $"{Context.Request.Path}{Context.Request.QueryString}";
@@ -66,7 +68,15 @@
                         {
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="bi bi-person-circle me-1"></i>@Loc["Profile"]
+                                    @if (!string.IsNullOrEmpty(currentUser?.AvatarUrl))
+                                    {
+                                        <img src="@currentUser.AvatarUrl" class="nav-user-avatar me-1" alt="" />
+                                    }
+                                    else
+                                    {
+                                        <i class="bi bi-person-circle me-1"></i>
+                                    }
+                                    @Loc["Profile"]
                                 </a>
                                 <ul class="dropdown-menu dropdown-menu-end">
                                     <li><a class="dropdown-item" asp-controller="Account" asp-action="Profile"><i class="bi bi-person me-2"></i>@Loc["Profile"]</a></li>

@@ -18,6 +18,7 @@ public class AccountController : Controller
     private readonly IEmailService _emailService;
     private readonly IVerificationCodeService _verificationCodeService;
     private readonly IRememberedLoginService _rememberedLogin;
+    private readonly IImageStorageService _imageStorage;
     private readonly IStringLocalizer<SharedResource> _loc;
 
     private const string PhonePattern = @"^[0-9+\-\s()]{6,20}$";
@@ -28,6 +29,7 @@ public class AccountController : Controller
         IEmailService emailService,
         IVerificationCodeService verificationCodeService,
         IRememberedLoginService rememberedLogin,
+        IImageStorageService imageStorage,
         IStringLocalizer<SharedResource> localizer)
     {
         _signInManager = signInManager;
@@ -35,6 +37,7 @@ public class AccountController : Controller
         _emailService = emailService;
         _verificationCodeService = verificationCodeService;
         _rememberedLogin = rememberedLogin;
+        _imageStorage = imageStorage;
         _loc = localizer;
     }
 
@@ -566,6 +569,52 @@ public class AccountController : Controller
         return RedirectToAction(nameof(Profile));
     }
 
+    [HttpPost]
+    [Authorize]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> UpdateAvatar(IFormFile? avatarFile)
+    {
+        var user = await _userManager.GetUserAsync(User);
+        if (user is null)
+        {
+            return RedirectToAction(nameof(Login));
+        }
+
+        if (avatarFile is null || avatarFile.Length == 0)
+        {
+            TempData["Error"] = _loc["AvatarFileRequired"].Value;
+            return RedirectToAction(nameof(Profile));
+        }
+
+        string newAvatarUrl;
+        try
+        {
+            newAvatarUrl = await _imageStorage.SaveAsync(avatarFile);
+        }
+        catch (InvalidOperationException ex)
+        {
+            TempData["Error"] = ex.Message;
+            return RedirectToAction(nameof(Profile));
+        }
+
+        var previousAvatarUrl = user.AvatarUrl;
+        user.AvatarUrl = newAvatarUrl;
+        var result = await _userManager.UpdateAsync(user);
+        if (!result.Succeeded)
+        {
+            _imageStorage.Delete(newAvatarUrl);
+            AddIdentityErrors(result);
+            TempData["Error"] = string.Join(" ", ModelState.Values
+                .SelectMany(value => value.Errors)
+                .Select(error => error.ErrorMessage));
+            return RedirectToAction(nameof(Profile));
+        }
+
+        _imageStorage.Delete(previousAvatarUrl);
+        TempData["Success"] = _loc["AvatarUpdated"].Value;
+        return RedirectToAction(nameof(Profile));
+    }
+
     private void ValidateBasicProfile(ProfileViewModel vm)
     {
         if (string.IsNullOrWhiteSpace(vm.FirstName))
@@ -653,6 +702,7 @@ public class AccountController : Controller
     {
         vm.UserName = user.UserName;
         vm.Email = user.Email;
+        vm.AvatarUrl = user.AvatarUrl;
         vm.DisplayName = string.IsNullOrWhiteSpace($"{user.LastName}{user.FirstName}")
             ? user.UserName
             : $"{user.LastName}{user.FirstName}";

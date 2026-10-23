@@ -227,6 +227,10 @@
   <data name="ProfileUpdated" xml:space="preserve"><value>个人信息已保存。</value></data>
   <data name="PasswordUpdated" xml:space="preserve"><value>密码和注册邮箱已更新。</value></data>
   <data name="AddressUpdated" xml:space="preserve"><value>收货地址已保存。</value></data>
+  <data name="UploadAvatar" xml:space="preserve"><value>上传头像</value></data>
+  <data name="AvatarSpec" xml:space="preserve"><value>支持 JPG、PNG、WebP、GIF，最大 5MB。</value></data>
+  <data name="AvatarFileRequired" xml:space="preserve"><value>请选择一张头像图片。</value></data>
+  <data name="AvatarUpdated" xml:space="preserve"><value>头像已更新。</value></data>
   <data name="FirstNameRequired" xml:space="preserve"><value>请输入名</value></data>
   <data name="FirstNameTooLong" xml:space="preserve"><value>名不能超过 100 个字符</value></data>
   <data name="LastNameRequired" xml:space="preserve"><value>请输入姓</value></data>

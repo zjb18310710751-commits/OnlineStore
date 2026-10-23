@@ -23,4 +23,9 @@ public class ApplicationUser : IdentityUser
     [StringLength(500)]
     [Display(Name = "地址")]
     public string? Address { get; set; }
+
+    [PersonalData]
+    [StringLength(500)]
+    [Display(Name = "头像")]
+    public string? AvatarUrl { get; set; }
 }

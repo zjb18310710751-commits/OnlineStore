@@ -227,6 +227,10 @@
   <data name="ProfileUpdated" xml:space="preserve"><value>Personal information saved.</value></data>
   <data name="PasswordUpdated" xml:space="preserve"><value>Password and registered email updated.</value></data>
   <data name="AddressUpdated" xml:space="preserve"><value>Delivery address saved.</value></data>
+  <data name="UploadAvatar" xml:space="preserve"><value>Upload avatar</value></data>
+  <data name="AvatarSpec" xml:space="preserve"><value>JPG, PNG, WebP or GIF, up to 5 MB.</value></data>
+  <data name="AvatarFileRequired" xml:space="preserve"><value>Please select an avatar image.</value></data>
+  <data name="AvatarUpdated" xml:space="preserve"><value>Avatar updated.</value></data>
   <data name="FirstNameRequired" xml:space="preserve"><value>Please enter your first name</value></data>
   <data name="FirstNameTooLong" xml:space="preserve"><value>First name cannot exceed 100 characters</value></data>
   <data name="LastNameRequired" xml:space="preserve"><value>Please enter your last name</value></data>
