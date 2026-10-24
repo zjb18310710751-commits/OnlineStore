@@ -250,6 +250,10 @@ namespace OnlineStore.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
+                    b.Property<string>("DescriptionEn")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
                     b.Property<int>("DisplayOrder")
                         .HasColumnType("int");
 

@@ -41,8 +41,10 @@ public class CategoriesController : Controller
         var category = new Category
         {
             Name = vm.Name,
+            NameEn = vm.NameEn,
             Slug = SlugHelper.ToSlug(vm.Name),
             Description = vm.Description,
+            DescriptionEn = vm.DescriptionEn,
             DisplayOrder = vm.DisplayOrder
         };
 
@@ -64,7 +66,9 @@ public class CategoriesController : Controller
         {
             Id = category.Id,
             Name = category.Name,
+            NameEn = category.NameEn,
             Description = category.Description,
+            DescriptionEn = category.DescriptionEn,
             DisplayOrder = category.DisplayOrder
         });
     }
@@ -90,8 +94,10 @@ public class CategoriesController : Controller
         }
 
         category.Name = vm.Name;
+        category.NameEn = vm.NameEn;
         category.Slug = SlugHelper.ToSlug(vm.Name);
         category.Description = vm.Description;
+        category.DescriptionEn = vm.DescriptionEn;
         category.DisplayOrder = vm.DisplayOrder;
 
         await _categoryService.UpdateAsync(category);

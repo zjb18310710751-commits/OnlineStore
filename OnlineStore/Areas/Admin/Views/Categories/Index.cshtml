@@ -27,7 +27,7 @@
                 <tr>
                     <td>@c.DisplayOrder</td>
                     <td class="fw-semibold">@L10n.Name(c)</td>
-                    <td class="text-muted">@c.Description</td>
+                    <td class="text-muted">@L10n.Description(c)</td>
                     <td class="text-end text-nowrap">
                         <a asp-area="Admin" asp-controller="Categories" asp-action="Edit" asp-route-id="@c.Id" class="btn btn-sm btn-outline-primary" title="@Loc["Edit"]"><i class="bi bi-pencil"></i></a>
                         <form asp-area="Admin" asp-controller="Categories" asp-action="Delete" asp-route-id="@c.Id" method="post" class="d-inline" onsubmit="return confirm('@Loc["ConfirmDeleteCategory"]');">

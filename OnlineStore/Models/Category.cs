@@ -23,6 +23,10 @@ public class Category
     [Display(Name = "分类描述")]
     public string? Description { get; set; }
 
+    [StringLength(500)]
+    [Display(Name = "分类描述（英文）")]
+    public string? DescriptionEn { get; set; }
+
     [Display(Name = "排序")]
     public int DisplayOrder { get; set; }
 

@@ -140,6 +140,8 @@
   <data name="DisplayOrder" xml:space="preserve"><value>排序</value></data>
   <data name="CategoryName" xml:space="preserve"><value>分类名称</value></data>
   <data name="CategoryDescription" xml:space="preserve"><value>分类描述</value></data>
+  <data name="CategoryNameEn" xml:space="preserve"><value>分类名称（英文）</value></data>
+  <data name="CategoryDescriptionEn" xml:space="preserve"><value>分类描述（英文）</value></data>
   <data name="CreateCategory" xml:space="preserve"><value>新增分类</value></data>
   <data name="EditCategory" xml:space="preserve"><value>编辑分类</value></data>
   <data name="Shop" xml:space="preserve"><value>店铺</value></data>

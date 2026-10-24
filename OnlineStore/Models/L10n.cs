@@ -21,6 +21,9 @@ public static class L10n
     public static string Name(Category? c) =>
         c is null ? string.Empty : (IsEnglish && !string.IsNullOrWhiteSpace(c.NameEn) ? c.NameEn : c.Name);
 
+    public static string Description(Category? c) =>
+        c is null ? string.Empty : (IsEnglish && !string.IsNullOrWhiteSpace(c.DescriptionEn) ? c.DescriptionEn : c.Description ?? string.Empty);
+
     public static string Name(Shop? s) =>
         s is null ? string.Empty : (IsEnglish && !string.IsNullOrWhiteSpace(s.NameEn) ? s.NameEn : s.Name);
 

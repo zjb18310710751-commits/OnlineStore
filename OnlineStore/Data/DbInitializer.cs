@@ -68,11 +68,11 @@ public static class DbInitializer
         var shops = new List<Shop> { outdoor, digital, bookstore, homeStore, clothing };
 
         // 分类
-        var electronics = new Category { Name = "电子产品", NameEn = "Electronics", Slug = "电子产品", Description = "手机、电脑、数码配件", DisplayOrder = 1 };
-        var fashion = new Category { Name = "服装服饰", NameEn = "Fashion", Slug = "服装服饰", Description = "男女装、鞋帽配饰", DisplayOrder = 2 };
-        var books = new Category { Name = "图书", NameEn = "Books", Slug = "图书", Description = "文学、科技、教育", DisplayOrder = 3 };
-        var home = new Category { Name = "家居生活", NameEn = "Home & Living", Slug = "家居生活", Description = "家纺、厨具、日用", DisplayOrder = 4 };
-        var sports = new Category { Name = "运动户外", NameEn = "Sports & Outdoors", Slug = "运动户外", Description = "健身、户外装备", DisplayOrder = 5 };
+        var electronics = new Category { Name = "电子产品", NameEn = "Electronics", Slug = "电子产品", Description = "手机、电脑、数码配件", DescriptionEn = "Phones, computers and digital accessories", DisplayOrder = 1 };
+        var fashion = new Category { Name = "服装服饰", NameEn = "Fashion", Slug = "服装服饰", Description = "男女装、鞋帽配饰", DescriptionEn = "Men's and women's clothing, shoes and accessories", DisplayOrder = 2 };
+        var books = new Category { Name = "图书", NameEn = "Books", Slug = "图书", Description = "文学、科技、教育", DescriptionEn = "Literature, technology and education", DisplayOrder = 3 };
+        var home = new Category { Name = "家居生活", NameEn = "Home & Living", Slug = "家居生活", Description = "家纺、厨具、日用", DescriptionEn = "Textiles, kitchenware and daily necessities", DisplayOrder = 4 };
+        var sports = new Category { Name = "运动户外", NameEn = "Sports & Outdoors", Slug = "运动户外", Description = "健身、户外装备", DescriptionEn = "Fitness and outdoor gear", DisplayOrder = 5 };
 
         var categories = new List<Category> { electronics, fashion, books, home, sports };
 
