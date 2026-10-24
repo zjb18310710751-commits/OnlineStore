@@ -41,6 +41,7 @@ builder.Services.ConfigureApplicationCookie(options =>
 
 // 业务服务（通过接口注入，便于替换与测试 —— 可修改性）
 builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<IAdminDashboardService, AdminDashboardService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IShopService, ShopService>();
 builder.Services.AddScoped<IProductSkuService, ProductSkuService>();

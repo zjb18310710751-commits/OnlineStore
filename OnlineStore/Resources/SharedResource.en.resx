@@ -98,6 +98,18 @@
   <data name="RequestId" xml:space="preserve"><value>Request ID: </value></data>
   <data name="ManagementConsole" xml:space="preserve"><value>Admin Console</value></data>
   <data name="Dashboard" xml:space="preserve"><value>Dashboard</value></data>
+  <data name="DashboardRevenueSubtitle" xml:space="preserve"><value>Revenue, order status and pending tasks for the last 30 days.</value></data>
+  <data name="TodayRevenue" xml:space="preserve"><value>Today's revenue</value></data>
+  <data name="TodayOrders" xml:space="preserve"><value>Today's orders</value></data>
+  <data name="Today" xml:space="preserve"><value>Today</value></data>
+  <data name="AverageOrderValue" xml:space="preserve"><value>Average order value</value></data>
+  <data name="TodayRefund" xml:space="preserve"><value>Today's refunds</value></data>
+  <data name="ComparedToYesterday" xml:space="preserve"><value>vs yesterday</value></data>
+  <data name="RevenueTrend" xml:space="preserve"><value>Revenue trend (30 days)</value></data>
+  <data name="OrderStatusDistribution" xml:space="preserve"><value>Order status distribution</value></data>
+  <data name="CategoryRevenue" xml:space="preserve"><value>Revenue by category</value></data>
+  <data name="NeedsAttention" xml:space="preserve"><value>Needs attention</value></data>
+  <data name="PendingShipment" xml:space="preserve"><value>Pending shipment</value></data>
   <data name="ProductManagement" xml:space="preserve"><value>Products</value></data>
   <data name="CategoryManagement" xml:space="preserve"><value>Categories</value></data>
   <data name="BackToStore" xml:space="preserve"><value>Back to Store</value></data>

@@ -98,6 +98,18 @@
   <data name="RequestId" xml:space="preserve"><value>请求 ID：</value></data>
   <data name="ManagementConsole" xml:space="preserve"><value>管理后台</value></data>
   <data name="Dashboard" xml:space="preserve"><value>仪表盘</value></data>
+  <data name="DashboardRevenueSubtitle" xml:space="preserve"><value>近 30 天营收、订单状态与待办事项概览。</value></data>
+  <data name="TodayRevenue" xml:space="preserve"><value>今日营收</value></data>
+  <data name="TodayOrders" xml:space="preserve"><value>今日订单</value></data>
+  <data name="Today" xml:space="preserve"><value>今日</value></data>
+  <data name="AverageOrderValue" xml:space="preserve"><value>客单价</value></data>
+  <data name="TodayRefund" xml:space="preserve"><value>今日退款</value></data>
+  <data name="ComparedToYesterday" xml:space="preserve"><value>较昨日</value></data>
+  <data name="RevenueTrend" xml:space="preserve"><value>营收趋势（近30天）</value></data>
+  <data name="OrderStatusDistribution" xml:space="preserve"><value>订单状态分布</value></data>
+  <data name="CategoryRevenue" xml:space="preserve"><value>分类营收</value></data>
+  <data name="NeedsAttention" xml:space="preserve"><value>待处理事项</value></data>
+  <data name="PendingShipment" xml:space="preserve"><value>待发货</value></data>
   <data name="ProductManagement" xml:space="preserve"><value>商品管理</value></data>
   <data name="CategoryManagement" xml:space="preserve"><value>分类管理</value></data>
   <data name="BackToStore" xml:space="preserve"><value>返回前台</value></data>
