@@ -15,6 +15,7 @@ public class OrdersController : Controller
     private readonly IOrderService _orderService;
     private readonly ICartService _cartService;
     private readonly ICouponService _couponService;
+    private readonly IDeliveryAddressService _deliveryAddressService;
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly IStringLocalizer<SharedResource> _loc;
 
@@ -22,12 +23,14 @@ public class OrdersController : Controller
         IOrderService orderService,
         ICartService cartService,
         ICouponService couponService,
+        IDeliveryAddressService deliveryAddressService,
         UserManager<ApplicationUser> userManager,
         IStringLocalizer<SharedResource> localizer)
     {
         _orderService = orderService;
         _cartService = cartService;
         _couponService = couponService;
+        _deliveryAddressService = deliveryAddressService;
         _userManager = userManager;
         _loc = localizer;
     }
@@ -42,13 +45,27 @@ public class OrdersController : Controller
         }
 
         var user = await _userManager.GetUserAsync(User);
+        DeliveryAddress? defaultAddress = null;
+        if (user is not null)
+        {
+            await _deliveryAddressService.EnsureLegacyAddressAsync(user);
+            defaultAddress = await _deliveryAddressService.GetDefaultAsync(user.Id);
+        }
+
         var vm = new CheckoutViewModel
         {
             Items = cart.Items,
             Total = cart.Total,
-            UserName = $"{user?.LastName}{user?.FirstName}".Trim(),
-            Phone = user?.PhoneNumber ?? string.Empty,
-            Address = user?.Address ?? string.Empty
+            UserName = defaultAddress?.RecipientName ?? $"{user?.LastName}{user?.FirstName}".Trim(),
+            Phone = defaultAddress?.PhoneNumber ?? user?.PhoneNumber ?? string.Empty,
+            Address = defaultAddress is null
+                ? user?.Address ?? string.Empty
+                : AddressFormatter.Combine(
+                    defaultAddress.AddressLine1,
+                    defaultAddress.AddressLine2,
+                    defaultAddress.City,
+                    defaultAddress.PostalCode,
+                    defaultAddress.Country)
         };
         return View(vm);
     }

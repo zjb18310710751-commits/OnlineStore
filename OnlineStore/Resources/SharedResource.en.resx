@@ -235,14 +235,24 @@
   <data name="PrimaryAddress" xml:space="preserve"><value>Primary address</value></data>
   <data name="ActiveDelivery" xml:space="preserve"><value>Active delivery address</value></data>
   <data name="AddAddress" xml:space="preserve"><value>Add address</value></data>
+  <data name="RecipientName" xml:space="preserve"><value>Recipient name</value></data>
+  <data name="RecipientNameRequired" xml:space="preserve"><value>Please enter the recipient name</value></data>
   <data name="EditDeliveryAddress" xml:space="preserve"><value>Edit delivery address</value></data>
   <data name="EditAddressHint" xml:space="preserve"><value>The updated address will be used for future deliveries.</value></data>
+  <data name="SetAsDefaultAddress" xml:space="preserve"><value>Set as default delivery address</value></data>
   <data name="NoAddressTitle" xml:space="preserve"><value>No delivery address yet</value></data>
   <data name="NoAddressHint" xml:space="preserve"><value>Add an address to fill it in automatically at checkout and check out faster.</value></data>
   <data name="DeleteAddressTitle" xml:space="preserve"><value>Delete this delivery address?</value></data>
   <data name="DeleteAddressConfirm" xml:space="preserve"><value>It will no longer be available for delivery. You can add it again later.</value></data>
+  <data name="AddressAdded" xml:space="preserve"><value>New delivery address added.</value></data>
   <data name="AddressDeleted" xml:space="preserve"><value>Delivery address deleted.</value></data>
   <data name="AddressDeleteFailed" xml:space="preserve"><value>The delivery address could not be deleted. Please try again.</value></data>
+  <data name="AddressSaveFailed" xml:space="preserve"><value>The delivery address could not be saved. Refresh and try again.</value></data>
+  <data name="AddressDefaultUpdated" xml:space="preserve"><value>Default delivery address updated.</value></data>
+  <data name="AddressSetDefaultFailed" xml:space="preserve"><value>The default address could not be updated. Refresh and try again.</value></data>
+  <data name="CityRequired" xml:space="preserve"><value>Please enter a city</value></data>
+  <data name="PostalCodeRequired" xml:space="preserve"><value>Please enter a postal code</value></data>
+  <data name="CountryRequired" xml:space="preserve"><value>Please enter a country or region</value></data>
   <data name="UpdatePassword" xml:space="preserve"><value>Update password</value></data>
   <data name="UpdateAddress" xml:space="preserve"><value>Save address</value></data>
   <data name="ProfileUpdated" xml:space="preserve"><value>Personal information saved.</value></data>

@@ -1,9 +1,7 @@
 @model AddressViewModel
 @{
     ViewData["Title"] = Loc["ChangeAddress"].Value;
-    var hasAddress = !string.IsNullOrWhiteSpace(Model.Address);
-    var editorTitle = hasAddress ? Loc["EditDeliveryAddress"].Value : Loc["AddAddress"].Value;
-    var editorAction = hasAddress ? Loc["Edit"].Value : Loc["AddAddress"].Value;
+    var editorTitle = Model.Id.HasValue ? Loc["EditDeliveryAddress"].Value : Loc["AddAddress"].Value;
 }
 
 <div class="container py-4">
@@ -12,7 +10,8 @@
             <partial name="_ProfileSidebar" model="Model" />
         </div>
         <div class="col-lg-9">
-            <section class="address-book-shell" aria-labelledby="addressBookTitle">
+            <section class="address-book-shell" aria-labelledby="addressBookTitle"
+                     data-has-addresses="@(Model.Addresses.Count > 0 ? "true" : "false")">
                 <header class="address-book-header">
                     <div>
                         <div class="address-book-kicker">@Loc["AddressDetails"]</div>
@@ -20,80 +19,106 @@
                         <p class="address-book-subtitle mb-0">@Loc["AddressBookHint"]</p>
                     </div>
                     <button type="button" class="btn btn-primary address-book-primary-action"
-                            data-bs-toggle="modal" data-bs-target="#addressEditorModal">
-                        <i class="bi @(hasAddress ? "bi-pencil-square" : "bi-plus-lg") me-2"></i>@editorAction
+                            data-address-add>
+                        <i class="bi bi-plus-lg me-2"></i>@Loc["AddAddress"]
                     </button>
                 </header>
 
                 <div class="address-book-grid">
-                    @if (hasAddress)
+                    @if (Model.Addresses.Count > 0)
                     {
-                        <article class="delivery-address-card">
-                            <div class="delivery-address-card-top">
-                                <span class="delivery-address-primary">
-                                    <i class="bi bi-check2-circle me-1"></i>@Loc["PrimaryAddress"]
-                                </span>
-                            </div>
+                        @foreach (var address in Model.Addresses)
+                        {
+                            <article class="delivery-address-card @(address.IsDefault ? "is-primary" : "")">
+                                <div class="delivery-address-card-top">
+                                    @if (address.IsDefault)
+                                    {
+                                        <span class="delivery-address-primary">
+                                            <i class="bi bi-check2-circle me-1"></i>@Loc["PrimaryAddress"]
+                                        </span>
+                                    }
+                                </div>
 
-                            <div class="delivery-address-person">
-                                <h2>@Model.DisplayName</h2>
-                                @if (!string.IsNullOrWhiteSpace(Model.PhoneNumber))
-                                {
-                                    <div class="delivery-address-phone">
-                                        <i class="bi bi-telephone"></i>
-                                        <span>@Model.PhoneNumber</span>
+                                <div class="delivery-address-person">
+                                    <h2>@address.RecipientName</h2>
+                                    @if (!string.IsNullOrWhiteSpace(address.PhoneNumber))
+                                    {
+                                        <div class="delivery-address-phone">
+                                            <i class="bi bi-telephone"></i>
+                                            <span>@address.PhoneNumber</span>
+                                        </div>
+                                    }
+                                </div>
+
+                                <div class="delivery-address-divider"></div>
+
+                                <dl class="delivery-address-details">
+                                    <div>
+                                        <dt>@Loc["AddressLine1"]</dt>
+                                        <dd>
+                                            @address.AddressLine1
+                                            @if (!string.IsNullOrWhiteSpace(address.AddressLine2))
+                                            {
+                                                <span class="d-block">@address.AddressLine2</span>
+                                            }
+                                        </dd>
                                     </div>
-                                }
-                            </div>
-
-                            <div class="delivery-address-divider"></div>
-
-                            <dl class="delivery-address-details">
-                                <div>
-                                    <dt>@Loc["AddressLine1"]</dt>
-                                    <dd>
-                                        @Model.Address
-                                        @if (!string.IsNullOrWhiteSpace(Model.AddressLine2))
-                                        {
-                                            <span class="d-block">@Model.AddressLine2</span>
-                                        }
-                                    </dd>
-                                </div>
-                                <div>
-                                    <dt>@Loc["City"]</dt>
-                                    <dd>@(string.IsNullOrWhiteSpace(Model.City) ? "—" : Model.City)</dd>
-                                </div>
-                                <div>
-                                    <dt>@Loc["PostalCode"]</dt>
-                                    <dd><span class="delivery-address-code">@(string.IsNullOrWhiteSpace(Model.PostalCode) ? "—" : Model.PostalCode)</span></dd>
-                                </div>
-                                @if (!string.IsNullOrWhiteSpace(Model.Country))
-                                {
+                                    <div>
+                                        <dt>@Loc["City"]</dt>
+                                        <dd>@(string.IsNullOrWhiteSpace(address.City) ? "—" : address.City)</dd>
+                                    </div>
+                                    <div>
+                                        <dt>@Loc["PostalCode"]</dt>
+                                        <dd><span class="delivery-address-code">@(string.IsNullOrWhiteSpace(address.PostalCode) ? "—" : address.PostalCode)</span></dd>
+                                    </div>
                                     <div>
                                         <dt>@Loc["Country"]</dt>
-                                        <dd>@Model.Country</dd>
+                                        <dd>@(string.IsNullOrWhiteSpace(address.Country) ? "—" : address.Country)</dd>
                                     </div>
-                                }
-                            </dl>
+                                </dl>
 
-                            <div class="delivery-address-divider"></div>
+                                <div class="delivery-address-divider"></div>
 
-                            <footer class="delivery-address-card-footer">
-                                <span class="delivery-address-active">
-                                    <i class="bi bi-check-circle me-1"></i>@Loc["ActiveDelivery"]
-                                </span>
-                                <div class="delivery-address-actions">
-                                    <button type="button" class="btn address-action-btn"
-                                            data-bs-toggle="modal" data-bs-target="#addressEditorModal">
-                                        @Loc["Edit"]
-                                    </button>
-                                    <button type="button" class="btn address-action-btn address-action-danger"
-                                            data-bs-toggle="modal" data-bs-target="#addressDeleteModal">
-                                        @Loc["Delete"]
-                                    </button>
-                                </div>
-                            </footer>
-                        </article>
+                                <footer class="delivery-address-card-footer">
+                                    <div class="delivery-address-status">
+                                        @if (address.IsDefault)
+                                        {
+                                            <span class="delivery-address-active">
+                                                <i class="bi bi-check-circle me-1"></i>@Loc["ActiveDelivery"]
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <form method="post" asp-controller="Account" asp-action="SetDefaultAddress">
+                                                <input type="hidden" name="id" value="@address.Id" />
+                                                <button type="submit" class="btn address-default-btn">
+                                                    @Loc["SetAsDefaultAddress"]
+                                                </button>
+                                            </form>
+                                        }
+                                    </div>
+                                    <div class="delivery-address-actions">
+                                        <button type="button" class="btn address-action-btn"
+                                                data-address-edit
+                                                data-address-id="@address.Id"
+                                                data-address-recipient="@address.RecipientName"
+                                                data-address-phone="@address.PhoneNumber"
+                                                data-address-line1="@address.AddressLine1"
+                                                data-address-line2="@address.AddressLine2"
+                                                data-address-city="@address.City"
+                                                data-address-postal="@address.PostalCode"
+                                                data-address-country="@address.Country"
+                                                data-address-default="@(address.IsDefault ? "true" : "false")">
+                                            @Loc["Edit"]
+                                        </button>
+                                        <button type="button" class="btn address-action-btn address-action-danger"
+                                                data-address-delete data-address-id="@address.Id">
+                                            @Loc["Delete"]
+                                        </button>
+                                    </div>
+                                </footer>
+                            </article>
+                        }
                     }
                     else
                     {
@@ -103,8 +128,7 @@
                             </span>
                             <h2>@Loc["NoAddressTitle"]</h2>
                             <p>@Loc["NoAddressHint"]</p>
-                            <button type="button" class="btn btn-primary"
-                                    data-bs-toggle="modal" data-bs-target="#addressEditorModal">
+                            <button type="button" class="btn btn-primary" data-address-add>
                                 <i class="bi bi-plus-lg me-2"></i>@Loc["AddAddress"]
                             </button>
                         </div>
@@ -119,7 +143,8 @@
      aria-labelledby="addressEditorTitle" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
         <div class="modal-content">
-            <form method="post" asp-controller="Account" asp-action="ChangeAddress">
+            <form method="post" asp-controller="Account" asp-action="ChangeAddress" id="addressEditorForm">
+                <input asp-for="Id" type="hidden" />
                 <div class="modal-header">
                     <div>
                         <span class="address-modal-kicker">@Loc["AddressDetails"]</span>
@@ -132,6 +157,22 @@
                     <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
                     <div class="row g-3">
+                        <div class="col-md-6">
+                            <label asp-for="RecipientName" class="form-label">
+                                @Loc["RecipientName"] <span class="address-required">*</span>
+                            </label>
+                            <input asp-for="RecipientName" class="form-control address-form-control"
+                                   autocomplete="name" placeholder="@Loc["RecipientName"]" />
+                            <span asp-validation-for="RecipientName" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="PhoneNumber" class="form-label">
+                                @Loc["PhoneNumber"] <span class="address-required">*</span>
+                            </label>
+                            <input asp-for="PhoneNumber" class="form-control address-form-control"
+                                   autocomplete="tel" placeholder="@Loc["PhoneNumber"]" />
+                            <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
+                        </div>
                         <div class="col-12">
                             <label asp-for="Address" class="form-label">
                                 @Loc["AddressLine1"] <span class="address-required">*</span>
@@ -146,19 +187,34 @@
                                    autocomplete="address-line2" placeholder="@Loc["AddressLine2Optional"]" />
                         </div>
                         <div class="col-6 col-md-4">
-                            <label asp-for="City" class="form-label">@Loc["City"]</label>
+                            <label asp-for="City" class="form-label">
+                                @Loc["City"] <span class="address-required">*</span>
+                            </label>
                             <input asp-for="City" class="form-control address-form-control"
                                    autocomplete="address-level2" placeholder="@Loc["City"]" />
+                            <span asp-validation-for="City" class="text-danger small"></span>
                         </div>
                         <div class="col-6 col-md-4">
-                            <label asp-for="PostalCode" class="form-label">@Loc["PostalCode"]</label>
+                            <label asp-for="PostalCode" class="form-label">
+                                @Loc["PostalCode"] <span class="address-required">*</span>
+                            </label>
                             <input asp-for="PostalCode" class="form-control address-form-control"
                                    autocomplete="postal-code" placeholder="@Loc["PostalCode"]" />
+                            <span asp-validation-for="PostalCode" class="text-danger small"></span>
                         </div>
                         <div class="col-12 col-md-4">
-                            <label asp-for="Country" class="form-label">@Loc["Country"]</label>
+                            <label asp-for="Country" class="form-label">
+                                @Loc["Country"] <span class="address-required">*</span>
+                            </label>
                             <input asp-for="Country" class="form-control address-form-control"
                                    autocomplete="country-name" placeholder="@Loc["Country"]" />
+                            <span asp-validation-for="Country" class="text-danger small"></span>
+                        </div>
+                        <div class="col-12">
+                            <label class="address-default-check">
+                                <input asp-for="IsDefault" class="form-check-input" />
+                                <span>@Loc["SetAsDefaultAddress"]</span>
+                            </label>
                         </div>
                     </div>
                 </div>
@@ -173,13 +229,14 @@
     </div>
 </div>
 
-@if (hasAddress)
+@if (Model.Addresses.Count > 0)
 {
     <div class="modal fade address-modal address-delete-modal" id="addressDeleteModal" tabindex="-1"
          aria-labelledby="addressDeleteTitle" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <form method="post" asp-controller="Account" asp-action="DeleteAddress">
+                    <input type="hidden" name="id" id="addressDeleteId" />
                     <div class="modal-body">
                         <span class="address-delete-icon"><i class="bi bi-trash3"></i></span>
                         <h2 class="modal-title" id="addressDeleteTitle">@Loc["DeleteAddressTitle"]</h2>
@@ -198,12 +255,74 @@
 }
 
 @section Scripts {
-    @if (!ViewData.ModelState.IsValid)
-    {
-        <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                bootstrap.Modal.getOrCreateInstance(document.getElementById('addressEditorModal')).show();
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const editorModal = document.getElementById('addressEditorModal');
+            const editorForm = document.getElementById('addressEditorForm');
+            const editorTitle = document.getElementById('addressEditorTitle');
+            const hasAddresses = document.querySelector('.address-book-shell')?.dataset.hasAddresses === 'true';
+            const addTitle = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Loc["AddAddress"].Value));
+            const editTitle = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Loc["EditDeliveryAddress"].Value));
+
+            function setField(name, value) {
+                const field = editorForm?.elements.namedItem(name);
+                if (field) {
+                    field.value = value || '';
+                }
+            }
+
+            function openEditor() {
+                bootstrap.Modal.getOrCreateInstance(editorModal).show();
+            }
+
+            document.querySelectorAll('[data-address-add]').forEach(function (button) {
+                button.addEventListener('click', function () {
+                    editorForm?.reset();
+                    setField('Id', '');
+                    editorTitle.textContent = addTitle;
+                    const defaultField = editorForm?.querySelector('#IsDefault');
+                    if (defaultField) {
+                        defaultField.checked = !hasAddresses;
+                    }
+                    openEditor();
+                });
             });
-        </script>
-    }
+
+            document.querySelectorAll('[data-address-edit]').forEach(function (button) {
+                button.addEventListener('click', function () {
+                    editorForm?.reset();
+                    editorTitle.textContent = editTitle;
+                    setField('Id', button.dataset.addressId);
+                    setField('RecipientName', button.dataset.addressRecipient);
+                    setField('PhoneNumber', button.dataset.addressPhone);
+                    setField('Address', button.dataset.addressLine1);
+                    setField('AddressLine2', button.dataset.addressLine2);
+                    setField('City', button.dataset.addressCity);
+                    setField('PostalCode', button.dataset.addressPostal);
+                    setField('Country', button.dataset.addressCountry);
+                    const defaultField = editorForm?.querySelector('#IsDefault');
+                    if (defaultField) {
+                        defaultField.checked = button.dataset.addressDefault === 'true';
+                    }
+                    openEditor();
+                });
+            });
+
+            const deleteModal = document.getElementById('addressDeleteModal');
+            const deleteId = document.getElementById('addressDeleteId');
+            document.querySelectorAll('[data-address-delete]').forEach(function (button) {
+                button.addEventListener('click', function () {
+                    if (deleteId) {
+                        deleteId.value = button.dataset.addressId;
+                    }
+                    bootstrap.Modal.getOrCreateInstance(deleteModal).show();
+                });
+            });
+
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <text>openEditor();</text>
+            }
+        });
+    </script>
 }

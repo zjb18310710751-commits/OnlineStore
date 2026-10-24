@@ -544,6 +544,10 @@ body {
     transform: translateY(-2px);
 }
 
+.delivery-address-card.is-primary {
+    border-color: #b8c0c7;
+}
+
 .delivery-address-card-top {
     display: flex;
     justify-content: flex-end;
@@ -638,6 +642,31 @@ body {
     color: #067d62;
     font-size: .82rem;
     font-weight: 650;
+}
+
+.delivery-address-status {
+    min-width: 0;
+}
+
+.delivery-address-status form {
+    margin: 0;
+}
+
+.address-default-btn {
+    padding: .34rem .68rem;
+    border: 1px solid #cfd4d8;
+    border-radius: .35rem;
+    background: #fff;
+    color: #30363b;
+    font-size: .8rem;
+    font-weight: 650;
+}
+
+.address-default-btn:hover,
+.address-default-btn:focus-visible {
+    border-color: var(--amazon-orange);
+    background: var(--brand-light);
+    color: #111;
 }
 
 .delivery-address-actions {
@@ -785,6 +814,26 @@ body {
 
 .address-required {
     color: #b3261e;
+}
+
+.address-default-check {
+    display: inline-flex;
+    align-items: center;
+    gap: .6rem;
+    color: #30363b;
+    cursor: pointer;
+    font-size: .9rem;
+    font-weight: 600;
+}
+
+.address-default-check .form-check-input {
+    flex: 0 0 auto;
+    margin: 0;
+}
+
+.address-default-check .form-check-input:checked {
+    border-color: var(--amazon-orange);
+    background-color: var(--amazon-orange);
 }
 
 .address-modal .modal-footer {

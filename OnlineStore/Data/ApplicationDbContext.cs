@@ -23,6 +23,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<Favorite> Favorites => Set<Favorite>();
     public DbSet<Coupon> Coupons => Set<Coupon>();
     public DbSet<EmailVerificationCode> EmailVerificationCodes => Set<EmailVerificationCode>();
+    public DbSet<DeliveryAddress> DeliveryAddresses => Set<DeliveryAddress>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -32,6 +33,23 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
         {
             entity.Property(u => u.Address).HasMaxLength(500);
             entity.Property(u => u.AvatarUrl).HasMaxLength(500);
+        });
+
+        builder.Entity<DeliveryAddress>(entity =>
+        {
+            entity.HasIndex(a => a.UserId);
+            entity.HasIndex(a => new { a.UserId, a.IsDefault });
+            entity.Property(a => a.RecipientName).HasMaxLength(100).IsRequired();
+            entity.Property(a => a.PhoneNumber).HasMaxLength(20).IsRequired();
+            entity.Property(a => a.AddressLine1).HasMaxLength(200).IsRequired();
+            entity.Property(a => a.AddressLine2).HasMaxLength(200);
+            entity.Property(a => a.City).HasMaxLength(100).IsRequired();
+            entity.Property(a => a.PostalCode).HasMaxLength(100).IsRequired();
+            entity.Property(a => a.Country).HasMaxLength(100).IsRequired();
+            entity.HasOne(a => a.User)
+                  .WithMany(u => u.DeliveryAddresses)
+                  .HasForeignKey(a => a.UserId)
+                  .OnDelete(DeleteBehavior.Cascade);
         });
 
         builder.Entity<Category>(entity =>

@@ -19,6 +19,7 @@ public class AccountController : Controller
     private readonly IVerificationCodeService _verificationCodeService;
     private readonly IRememberedLoginService _rememberedLogin;
     private readonly IImageStorageService _imageStorage;
+    private readonly IDeliveryAddressService _deliveryAddressService;
     private readonly IStringLocalizer<SharedResource> _loc;
 
     private const string PhonePattern = @"^[0-9+\-\s()]{6,20}$";
@@ -30,6 +31,7 @@ public class AccountController : Controller
         IVerificationCodeService verificationCodeService,
         IRememberedLoginService rememberedLogin,
         IImageStorageService imageStorage,
+        IDeliveryAddressService deliveryAddressService,
         IStringLocalizer<SharedResource> localizer)
     {
         _signInManager = signInManager;
@@ -38,6 +40,7 @@ public class AccountController : Controller
         _verificationCodeService = verificationCodeService;
         _rememberedLogin = rememberedLogin;
         _imageStorage = imageStorage;
+        _deliveryAddressService = deliveryAddressService;
         _loc = localizer;
     }
 
@@ -517,10 +520,9 @@ public class AccountController : Controller
             return RedirectToAction(nameof(Login));
         }
 
+        await _deliveryAddressService.EnsureLegacyAddressAsync(user);
         var vm = new AddressViewModel();
-        PopulateAddressFields(vm, user.Address);
-        vm.PhoneNumber = user.PhoneNumber;
-        PopulateProfileSidebar(vm, user, "address");
+        await PopulateAddressBookAsync(vm, user);
         return View(vm);
     }
 
@@ -535,6 +537,40 @@ public class AccountController : Controller
             return RedirectToAction(nameof(Login));
         }
 
+        if (string.IsNullOrWhiteSpace(vm.RecipientName))
+        {
+            ModelState.AddModelError(nameof(vm.RecipientName), _loc["RecipientNameRequired"]);
+        }
+
+        if (string.IsNullOrWhiteSpace(vm.PhoneNumber))
+        {
+            ModelState.AddModelError(nameof(vm.PhoneNumber), _loc["PhoneNumberRequired"]);
+        }
+        else if (!Regex.IsMatch(vm.PhoneNumber.Trim(), PhonePattern))
+        {
+            ModelState.AddModelError(nameof(vm.PhoneNumber), _loc["InvalidPhone"]);
+        }
+
+        if (string.IsNullOrWhiteSpace(vm.Address))
+        {
+            ModelState.AddModelError(nameof(vm.Address), _loc["CheckoutAddressRequired"]);
+        }
+
+        if (string.IsNullOrWhiteSpace(vm.City))
+        {
+            ModelState.AddModelError(nameof(vm.City), _loc["CityRequired"]);
+        }
+
+        if (string.IsNullOrWhiteSpace(vm.PostalCode))
+        {
+            ModelState.AddModelError(nameof(vm.PostalCode), _loc["PostalCodeRequired"]);
+        }
+
+        if (string.IsNullOrWhiteSpace(vm.Country))
+        {
+            ModelState.AddModelError(nameof(vm.Country), _loc["CountryRequired"]);
+        }
+
         var fullAddress = AddressFormatter.Combine(
             vm.Address,
             vm.AddressLine2,
@@ -542,38 +578,44 @@ public class AccountController : Controller
             vm.PostalCode,
             vm.Country);
 
-        if (string.IsNullOrWhiteSpace(vm.Address))
-        {
-            ModelState.AddModelError(nameof(vm.Address), _loc["CheckoutAddressRequired"]);
-        }
-        else if (fullAddress.Length > 500)
+        if (fullAddress.Length > 500)
         {
             ModelState.AddModelError(nameof(vm.Address), _loc["CheckoutAddressTooLong"]);
         }
 
         if (!ModelState.IsValid)
         {
-            PopulateProfileSidebar(vm, user, "address");
+            await PopulateAddressBookAsync(vm, user);
             return View(vm);
         }
 
-        user.Address = fullAddress;
-        var result = await _userManager.UpdateAsync(user);
-        if (!result.Succeeded)
+        var saved = await _deliveryAddressService.SaveAsync(
+            user.Id,
+            vm.Id,
+            new DeliveryAddressInput(
+                vm.RecipientName,
+                vm.PhoneNumber,
+                vm.Address,
+                vm.AddressLine2,
+                vm.City,
+                vm.PostalCode,
+                vm.Country,
+                vm.IsDefault));
+        if (saved is null)
         {
-            AddIdentityErrors(result);
-            PopulateProfileSidebar(vm, user, "address");
+            ModelState.AddModelError(string.Empty, _loc["AddressSaveFailed"]);
+            await PopulateAddressBookAsync(vm, user);
             return View(vm);
         }
 
-        TempData["Success"] = _loc["AddressUpdated"].Value;
+        TempData["Success"] = (vm.Id.HasValue ? _loc["AddressUpdated"] : _loc["AddressAdded"]).Value;
         return RedirectToAction(nameof(ChangeAddress));
     }
 
     [HttpPost]
     [Authorize]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> DeleteAddress()
+    public async Task<IActionResult> DeleteAddress(int id)
     {
         var user = await _userManager.GetUserAsync(User);
         if (user is null)
@@ -581,15 +623,34 @@ public class AccountController : Controller
             return RedirectToAction(nameof(Login));
         }
 
-        user.Address = null;
-        var result = await _userManager.UpdateAsync(user);
-        if (!result.Succeeded)
+        if (!await _deliveryAddressService.DeleteAsync(user.Id, id))
         {
             TempData["Error"] = _loc["AddressDeleteFailed"].Value;
             return RedirectToAction(nameof(ChangeAddress));
         }
 
         TempData["Success"] = _loc["AddressDeleted"].Value;
+        return RedirectToAction(nameof(ChangeAddress));
+    }
+
+    [HttpPost]
+    [Authorize]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> SetDefaultAddress(int id)
+    {
+        var user = await _userManager.GetUserAsync(User);
+        if (user is null)
+        {
+            return RedirectToAction(nameof(Login));
+        }
+
+        if (!await _deliveryAddressService.SetDefaultAsync(user.Id, id))
+        {
+            TempData["Error"] = _loc["AddressSetDefaultFailed"].Value;
+            return RedirectToAction(nameof(ChangeAddress));
+        }
+
+        TempData["Success"] = _loc["AddressDefaultUpdated"].Value;
         return RedirectToAction(nameof(ChangeAddress));
     }
 
@@ -741,23 +802,26 @@ public class AccountController : Controller
         }
     }
 
+    private async Task PopulateAddressBookAsync(AddressViewModel vm, ApplicationUser user)
+    {
+        var addresses = await _deliveryAddressService.GetAsync(user.Id);
+        vm.Addresses = addresses.Select(address => new DeliveryAddressItemViewModel
+        {
+            Id = address.Id,
+            RecipientName = address.RecipientName,
+            PhoneNumber = address.PhoneNumber,
+            AddressLine1 = address.AddressLine1,
+            AddressLine2 = address.AddressLine2,
+            City = address.City,
+            PostalCode = address.PostalCode,
+            Country = address.Country,
+            IsDefault = address.IsDefault
+        }).ToList();
+        PopulateProfileSidebar(vm, user, "address");
+    }
+
     private static string? GetEditableEmail(ApplicationUser user) =>
         user.Email ?? (user.UserName?.Contains('@') == true ? user.UserName : null);
-
-    private static void PopulateAddressFields(AddressViewModel vm, string? storedAddress)
-    {
-        if (string.IsNullOrWhiteSpace(storedAddress))
-        {
-            return;
-        }
-
-        var parts = storedAddress.Split(", ", 5, StringSplitOptions.None);
-        vm.Address = parts.ElementAtOrDefault(0);
-        vm.AddressLine2 = parts.ElementAtOrDefault(1);
-        vm.City = parts.ElementAtOrDefault(2);
-        vm.PostalCode = parts.ElementAtOrDefault(3);
-        vm.Country = parts.ElementAtOrDefault(4);
-    }
 
     private static string? NullIfBlank(string? value) =>
         string.IsNullOrWhiteSpace(value) ? null : value.Trim();

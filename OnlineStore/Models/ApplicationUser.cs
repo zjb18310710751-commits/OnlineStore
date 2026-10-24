@@ -5,7 +5,7 @@ namespace OnlineStore.Models;
 
 /// <summary>
 /// 应用用户（基于 ASP.NET Core Identity）。
-/// 在 IdentityUser 基础上扩展姓名与地址；电话号码复用 IdentityUser 自带的 PhoneNumber。
+/// 在 IdentityUser 基础上扩展姓名与地址；Address 保留为默认收货地址的兼容字段。
 /// </summary>
 public class ApplicationUser : IdentityUser
 {
@@ -23,6 +23,8 @@ public class ApplicationUser : IdentityUser
     [StringLength(500)]
     [Display(Name = "地址")]
     public string? Address { get; set; }
+
+    public ICollection<DeliveryAddress> DeliveryAddresses { get; set; } = new List<DeliveryAddress>();
 
     [PersonalData]
     [StringLength(500)]
