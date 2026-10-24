@@ -52,8 +52,8 @@ public static class DbInitializer
             }
         }
 
-        // 3) 为既有分类回填英文名称/描述（幂等），保证老库切英文也有英文内容
-        await BackfillCategoryTranslationsAsync(context);
+        // 3) 为既有数据回填英文字段（幂等），保证老库切英文时各类内容都有英文
+        await BackfillContentTranslationsAsync(context);
 
         // 4) 分类与示例商品（幂等：仅在分类表为空时写入）
         if (await context.Categories.AnyAsync())
@@ -399,12 +399,21 @@ public static class DbInitializer
         ["运动户外"] = ("Sports & Outdoors", "Fitness and outdoor gear")
     };
 
-    private static async Task BackfillCategoryTranslationsAsync(ApplicationDbContext context)
+    private static readonly Dictionary<string, (string NameEn, string DescriptionEn)> ShopTranslations = new()
     {
+        ["山野户外旗舰店"] = ("Mountain Outdoors Flagship Store", "12 years of outdoor gear expertise — only dependable gear."),
+        ["极客数码自营店"] = ("Geek Digital Store", "Genuine digital products, direct from official channels."),
+        ["悦读图书专营店"] = ("Joyful Reading Bookstore", "Good books, carefully selected."),
+        ["温暖家居生活馆"] = ("Warm Home Living", "Make everyday life a little more comfortable."),
+        ["简素服饰官方店"] = ("Simple Fashion Official Store", "Basics that last and match everything.")
+    };
+
+    private static async Task BackfillContentTranslationsAsync(ApplicationDbContext context)
+    {
+        // 分类
         var categories = await context.Categories
             .Where(c => c.NameEn == null || c.DescriptionEn == null)
             .ToListAsync();
-
         foreach (var category in categories)
         {
             if (CategoryTranslations.TryGetValue(category.Name, out var translation))
@@ -414,10 +423,26 @@ public static class DbInitializer
             }
         }
 
-        if (categories.Count > 0)
+        // 店铺
+        var shops = await context.Shops.ToListAsync();
+        foreach (var shop in shops)
         {
-            await context.SaveChangesAsync();
+            if (ShopTranslations.TryGetValue(shop.Name, out var translation))
+            {
+                shop.NameEn ??= translation.NameEn;
+                shop.DescriptionEn ??= translation.DescriptionEn;
+            }
         }
+
+        // 商品（含快递信息、参数、规格颜色、评价）
+        var products = await context.Products
+            .Include(p => p.Specs)
+            .Include(p => p.Skus)
+            .Include(p => p.Reviews)
+            .ToListAsync();
+        ApplyEnglishTranslations(products);
+
+        await context.SaveChangesAsync();
     }
 
     private static string PickOne(params string[] options) =>
@@ -575,7 +600,10 @@ public static class DbInitializer
             ["易清洁"] = "Easy to Clean", ["适中"] = "Medium", ["中国"] = "China", ["耐磨耐用"] = "Wear-resistant",
             ["轻便"] = "Lightweight", ["户外"] = "Outdoor", ["防泼水"] = "Water-repellent",
             ["防滑设计"] = "Non-slip Design", ["承重强"] = "High Load Capacity",
-            ["加西亚·马尔克斯"] = "Gabriel García Márquez"
+            ["加西亚·马尔克斯"] = "Gabriel García Márquez",
+            ["TPE 环保"] = "TPE Eco-friendly", ["收纳绑带"] = "Carrying Strap",
+            ["食品级 Tritan"] = "Food-grade Tritan", ["广口易清洗"] = "Wide Mouth, Easy to Clean",
+            ["3-6 人"] = "3-6 People", ["27 英寸"] = "27-inch"
         };
 
         var color = new Dictionary<string, string>
@@ -657,26 +685,26 @@ public static class DbInitializer
 
         foreach (var p in products)
         {
-            p.ShippingFromEn = Tr(shipping, p.ShippingFrom);
-            p.ShippingFeeEn = Tr(shipping, p.ShippingFee);
-            p.DeliveryTimeEn = Tr(shipping, p.DeliveryTime);
+            p.ShippingFromEn ??= Tr(shipping, p.ShippingFrom);
+            p.ShippingFeeEn ??= Tr(shipping, p.ShippingFee);
+            p.DeliveryTimeEn ??= Tr(shipping, p.DeliveryTime);
 
             foreach (var spec in p.Specs)
             {
-                spec.NameEn = Tr(specName, spec.Name);
-                spec.ValueEn = Tr(specValue, spec.Value);
+                spec.NameEn ??= Tr(specName, spec.Name);
+                spec.ValueEn ??= Tr(specValue, spec.Value);
             }
 
             foreach (var sku in p.Skus)
             {
-                sku.ColorEn = Tr(color, sku.Color);
-                sku.SpecEn = Tr(specOption, sku.Spec);
+                sku.ColorEn ??= Tr(color, sku.Color);
+                sku.SpecEn ??= Tr(specOption, sku.Spec);
             }
 
             foreach (var r in p.Reviews)
             {
-                r.UserNameEn = Tr(userName, r.UserName);
-                r.CommentEn = Tr(comment, r.Comment);
+                r.UserNameEn ??= Tr(userName, r.UserName);
+                r.CommentEn ??= Tr(comment, r.Comment);
             }
         }
     }

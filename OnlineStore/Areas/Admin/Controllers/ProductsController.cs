@@ -70,8 +70,10 @@ public class ProductsController : Controller
         var product = new Product
         {
             Name = vm.Name,
+            NameEn = vm.NameEn,
             Slug = SlugHelper.ToSlug(vm.Name),
             Description = vm.Description,
+            DescriptionEn = vm.DescriptionEn,
             Price = vm.Price,
             OriginalPrice = vm.OriginalPrice,
             Stock = vm.Stock,
@@ -80,8 +82,11 @@ public class ProductsController : Controller
             IsActive = vm.IsActive,
             ShopId = vm.ShopId,
             ShippingFrom = vm.ShippingFrom,
+            ShippingFromEn = vm.ShippingFromEn,
             ShippingFee = vm.ShippingFee,
+            ShippingFeeEn = vm.ShippingFeeEn,
             DeliveryTime = vm.DeliveryTime,
+            DeliveryTimeEn = vm.DeliveryTimeEn,
             DetailHtml = vm.DetailHtml
         };
 
@@ -120,7 +125,9 @@ public class ProductsController : Controller
         {
             Id = product.Id,
             Name = product.Name,
+            NameEn = product.NameEn,
             Description = product.Description,
+            DescriptionEn = product.DescriptionEn,
             Price = product.Price,
             OriginalPrice = product.OriginalPrice,
             Stock = product.Stock,
@@ -130,8 +137,11 @@ public class ProductsController : Controller
             ShopId = product.ShopId,
             CategoryIds = categories.Select(c => c.Id).ToList(),
             ShippingFrom = product.ShippingFrom,
+            ShippingFromEn = product.ShippingFromEn,
             ShippingFee = product.ShippingFee,
+            ShippingFeeEn = product.ShippingFeeEn,
             DeliveryTime = product.DeliveryTime,
+            DeliveryTimeEn = product.DeliveryTimeEn,
             DetailHtml = product.DetailHtml
         };
 
@@ -161,8 +171,10 @@ public class ProductsController : Controller
         }
 
         product.Name = vm.Name;
+        product.NameEn = vm.NameEn;
         product.Slug = SlugHelper.ToSlug(vm.Name);
         product.Description = vm.Description;
+        product.DescriptionEn = vm.DescriptionEn;
         product.Price = vm.Price;
         product.OriginalPrice = vm.OriginalPrice;
         product.Stock = vm.Stock;
@@ -171,8 +183,11 @@ public class ProductsController : Controller
         product.IsActive = vm.IsActive;
         product.ShopId = vm.ShopId;
         product.ShippingFrom = vm.ShippingFrom;
+        product.ShippingFromEn = vm.ShippingFromEn;
         product.ShippingFee = vm.ShippingFee;
+        product.ShippingFeeEn = vm.ShippingFeeEn;
         product.DeliveryTime = vm.DeliveryTime;
+        product.DeliveryTimeEn = vm.DeliveryTimeEn;
         product.DetailHtml = vm.DetailHtml;
 
         // 若上传了新图片，保存成功后清理被替换的旧本地图片

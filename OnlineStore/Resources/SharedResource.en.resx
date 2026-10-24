@@ -457,4 +457,15 @@
   <data name="SkuSpecPlaceholder" xml:space="preserve"><value>e.g. 3-4 persons</value></data>
   <data name="SpecNamePlaceholder" xml:space="preserve"><value>e.g. Material</value></data>
   <data name="SpecValuePlaceholder" xml:space="preserve"><value>e.g. 210T polyester</value></data>
+  <data name="ShopNameEn" xml:space="preserve"><value>Shop name (English)</value></data>
+  <data name="ShopDescriptionEn" xml:space="preserve"><value>Shop description (English)</value></data>
+  <data name="ColorEn" xml:space="preserve"><value>Color (English)</value></data>
+  <data name="SpecEn" xml:space="preserve"><value>Spec (English)</value></data>
+  <data name="SpecNameEn" xml:space="preserve"><value>Parameter name (English)</value></data>
+  <data name="SpecValueEn" xml:space="preserve"><value>Parameter value (English)</value></data>
+  <data name="ProductNameEn" xml:space="preserve"><value>Product name (English)</value></data>
+  <data name="ProductDescriptionEn" xml:space="preserve"><value>Product description (English)</value></data>
+  <data name="ShippingFromEn" xml:space="preserve"><value>Ships from (English)</value></data>
+  <data name="ShippingFeeEn" xml:space="preserve"><value>Shipping fee (English)</value></data>
+  <data name="DeliveryTimeEn" xml:space="preserve"><value>Delivery time (English)</value></data>
 </root>

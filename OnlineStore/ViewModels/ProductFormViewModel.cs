@@ -14,9 +14,17 @@ public class ProductFormViewModel
     [Display(Name = "商品名称")]
     public string Name { get; set; } = string.Empty;
 
+    [StringLength(150)]
+    [Display(Name = "商品名称（英文）")]
+    public string? NameEn { get; set; }
+
     [StringLength(2000)]
     [Display(Name = "商品描述")]
     public string? Description { get; set; }
+
+    [StringLength(2000)]
+    [Display(Name = "商品描述（英文）")]
+    public string? DescriptionEn { get; set; }
 
     [Required(ErrorMessage = "PriceRequired")]
     [Range(0, 9999999, ErrorMessage = "PriceInvalid")]
@@ -58,13 +66,25 @@ public class ProductFormViewModel
     [Display(Name = "发货地")]
     public string? ShippingFrom { get; set; }
 
+    [StringLength(100)]
+    [Display(Name = "发货地（英文）")]
+    public string? ShippingFromEn { get; set; }
+
     [StringLength(50)]
     [Display(Name = "邮费")]
     public string? ShippingFee { get; set; }
 
+    [StringLength(50)]
+    [Display(Name = "邮费（英文）")]
+    public string? ShippingFeeEn { get; set; }
+
     [StringLength(100)]
     [Display(Name = "发货时效")]
     public string? DeliveryTime { get; set; }
+
+    [StringLength(100)]
+    [Display(Name = "发货时效（英文）")]
+    public string? DeliveryTimeEn { get; set; }
 
     [StringLength(10000)]
     [Display(Name = "图文介绍")]

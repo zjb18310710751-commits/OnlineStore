@@ -5,6 +5,11 @@
     <input asp-for="Name" class="form-control" />
     <span asp-validation-for="Name" class="text-danger small"></span>
 </div>
+<div class="mb-3">
+    <label asp-for="NameEn" class="form-label">@Loc["ProductNameEn"]</label>
+    <input asp-for="NameEn" class="form-control" />
+    <span asp-validation-for="NameEn" class="text-danger small"></span>
+</div>
 <div class="row g-3">
     <div class="col-md-6 mb-3">
         <label asp-for="ShopId" class="form-label">@Loc["Shop"]</label>
@@ -126,10 +131,32 @@
         <span asp-validation-for="DeliveryTime" class="text-danger small"></span>
     </div>
 </div>
+<div class="row g-3">
+    <div class="col-md-4 mb-3">
+        <label asp-for="ShippingFromEn" class="form-label">@Loc["ShippingFromEn"]</label>
+        <input asp-for="ShippingFromEn" class="form-control" />
+        <span asp-validation-for="ShippingFromEn" class="text-danger small"></span>
+    </div>
+    <div class="col-md-4 mb-3">
+        <label asp-for="ShippingFeeEn" class="form-label">@Loc["ShippingFeeEn"]</label>
+        <input asp-for="ShippingFeeEn" class="form-control" />
+        <span asp-validation-for="ShippingFeeEn" class="text-danger small"></span>
+    </div>
+    <div class="col-md-4 mb-3">
+        <label asp-for="DeliveryTimeEn" class="form-label">@Loc["DeliveryTimeEn"]</label>
+        <input asp-for="DeliveryTimeEn" class="form-control" />
+        <span asp-validation-for="DeliveryTimeEn" class="text-danger small"></span>
+    </div>
+</div>
 <div class="mb-3">
     <label asp-for="Description" class="form-label">@Loc["Description"]</label>
     <textarea asp-for="Description" class="form-control" rows="4"></textarea>
     <span asp-validation-for="Description" class="text-danger small"></span>
+</div>
+<div class="mb-3">
+    <label asp-for="DescriptionEn" class="form-label">@Loc["ProductDescriptionEn"]</label>
+    <textarea asp-for="DescriptionEn" class="form-control" rows="4"></textarea>
+    <span asp-validation-for="DescriptionEn" class="text-danger small"></span>
 </div>
 <div class="mb-3">
     <label asp-for="DetailHtml" class="form-label">@Loc["DetailIntro"]</label>

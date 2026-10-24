@@ -457,4 +457,15 @@
   <data name="SkuSpecPlaceholder" xml:space="preserve"><value>如：3-4 人</value></data>
   <data name="SpecNamePlaceholder" xml:space="preserve"><value>如：材质</value></data>
   <data name="SpecValuePlaceholder" xml:space="preserve"><value>如：210T 涤纶</value></data>
+  <data name="ShopNameEn" xml:space="preserve"><value>店铺名称（英文）</value></data>
+  <data name="ShopDescriptionEn" xml:space="preserve"><value>店铺简介（英文）</value></data>
+  <data name="ColorEn" xml:space="preserve"><value>颜色（英文）</value></data>
+  <data name="SpecEn" xml:space="preserve"><value>规格（英文）</value></data>
+  <data name="SpecNameEn" xml:space="preserve"><value>参数名（英文）</value></data>
+  <data name="SpecValueEn" xml:space="preserve"><value>参数值（英文）</value></data>
+  <data name="ProductNameEn" xml:space="preserve"><value>商品名称（英文）</value></data>
+  <data name="ProductDescriptionEn" xml:space="preserve"><value>商品描述（英文）</value></data>
+  <data name="ShippingFromEn" xml:space="preserve"><value>发货地（英文）</value></data>
+  <data name="ShippingFeeEn" xml:space="preserve"><value>邮费（英文）</value></data>
+  <data name="DeliveryTimeEn" xml:space="preserve"><value>发货时效（英文）</value></data>
 </root>
