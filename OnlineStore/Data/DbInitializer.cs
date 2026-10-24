@@ -52,7 +52,10 @@ public static class DbInitializer
             }
         }
 
-        // 3) 分类与示例商品（幂等：仅在分类表为空时写入）
+        // 3) 为既有分类回填英文名称/描述（幂等），保证老库切英文也有英文内容
+        await BackfillCategoryTranslationsAsync(context);
+
+        // 4) 分类与示例商品（幂等：仅在分类表为空时写入）
         if (await context.Categories.AnyAsync())
         {
             return;
@@ -385,6 +388,36 @@ public static class DbInitializer
         context.Categories.AddRange(categories);
         context.Products.AddRange(products);
         await context.SaveChangesAsync();
+    }
+
+    private static readonly Dictionary<string, (string NameEn, string DescriptionEn)> CategoryTranslations = new()
+    {
+        ["电子产品"] = ("Electronics", "Phones, computers and digital accessories"),
+        ["服装服饰"] = ("Fashion", "Men's and women's clothing, shoes and accessories"),
+        ["图书"] = ("Books", "Literature, technology and education"),
+        ["家居生活"] = ("Home & Living", "Textiles, kitchenware and daily necessities"),
+        ["运动户外"] = ("Sports & Outdoors", "Fitness and outdoor gear")
+    };
+
+    private static async Task BackfillCategoryTranslationsAsync(ApplicationDbContext context)
+    {
+        var categories = await context.Categories
+            .Where(c => c.NameEn == null || c.DescriptionEn == null)
+            .ToListAsync();
+
+        foreach (var category in categories)
+        {
+            if (CategoryTranslations.TryGetValue(category.Name, out var translation))
+            {
+                category.NameEn ??= translation.NameEn;
+                category.DescriptionEn ??= translation.DescriptionEn;
+            }
+        }
+
+        if (categories.Count > 0)
+        {
+            await context.SaveChangesAsync();
+        }
     }
 
     private static string PickOne(params string[] options) =>
