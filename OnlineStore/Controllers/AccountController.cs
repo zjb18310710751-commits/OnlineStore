@@ -519,6 +519,7 @@ public class AccountController : Controller
 
         var vm = new AddressViewModel();
         PopulateAddressFields(vm, user.Address);
+        vm.PhoneNumber = user.PhoneNumber;
         PopulateProfileSidebar(vm, user, "address");
         return View(vm);
     }
@@ -566,7 +567,30 @@ public class AccountController : Controller
         }
 
         TempData["Success"] = _loc["AddressUpdated"].Value;
-        return RedirectToAction(nameof(Profile));
+        return RedirectToAction(nameof(ChangeAddress));
+    }
+
+    [HttpPost]
+    [Authorize]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> DeleteAddress()
+    {
+        var user = await _userManager.GetUserAsync(User);
+        if (user is null)
+        {
+            return RedirectToAction(nameof(Login));
+        }
+
+        user.Address = null;
+        var result = await _userManager.UpdateAsync(user);
+        if (!result.Succeeded)
+        {
+            TempData["Error"] = _loc["AddressDeleteFailed"].Value;
+            return RedirectToAction(nameof(ChangeAddress));
+        }
+
+        TempData["Success"] = _loc["AddressDeleted"].Value;
+        return RedirectToAction(nameof(ChangeAddress));
     }
 
     [HttpPost]

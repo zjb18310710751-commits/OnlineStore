@@ -1,52 +1,209 @@
 @model AddressViewModel
 @{
     ViewData["Title"] = Loc["ChangeAddress"].Value;
+    var hasAddress = !string.IsNullOrWhiteSpace(Model.Address);
+    var editorTitle = hasAddress ? Loc["EditDeliveryAddress"].Value : Loc["AddAddress"].Value;
+    var editorAction = hasAddress ? Loc["Edit"].Value : Loc["AddAddress"].Value;
 }
+
 <div class="container py-4">
     <div class="row g-4">
         <div class="col-lg-3">
             <partial name="_ProfileSidebar" model="Model" />
         </div>
         <div class="col-lg-9">
-            <section class="card shadow-sm profile-section-card">
-                <div class="card-header bg-white">
-                    <h1 class="h4 mb-1">@Loc["AddressDetails"]</h1>
-                    <div class="text-muted small">@Loc["AddressDetailsHint"]</div>
-                </div>
-                <div class="card-body">
-                    <form method="post" asp-controller="Account" asp-action="ChangeAddress">
-                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+            <section class="address-book-shell" aria-labelledby="addressBookTitle">
+                <header class="address-book-header">
+                    <div>
+                        <div class="address-book-kicker">@Loc["AddressDetails"]</div>
+                        <h1 id="addressBookTitle" class="address-book-title">@Loc["AddressBookTitle"]</h1>
+                        <p class="address-book-subtitle mb-0">@Loc["AddressBookHint"]</p>
+                    </div>
+                    <button type="button" class="btn btn-primary address-book-primary-action"
+                            data-bs-toggle="modal" data-bs-target="#addressEditorModal">
+                        <i class="bi @(hasAddress ? "bi-pencil-square" : "bi-plus-lg") me-2"></i>@editorAction
+                    </button>
+                </header>
 
-                        <div class="row g-3">
-                            <div class="col-12">
-                                <label asp-for="Address" class="form-label">@Loc["AddressLine1"]</label>
-                                <input asp-for="Address" class="form-control" autocomplete="address-line1" />
-                                <span asp-validation-for="Address" class="text-danger small"></span>
+                <div class="address-book-grid">
+                    @if (hasAddress)
+                    {
+                        <article class="delivery-address-card">
+                            <div class="delivery-address-card-top">
+                                <span class="delivery-address-primary">
+                                    <i class="bi bi-check2-circle me-1"></i>@Loc["PrimaryAddress"]
+                                </span>
                             </div>
-                            <div class="col-12">
-                                <label asp-for="AddressLine2" class="form-label">@Loc["AddressLine2Optional"]</label>
-                                <input asp-for="AddressLine2" class="form-control" autocomplete="address-line2" />
-                            </div>
-                            <div class="col-md-4">
-                                <label asp-for="City" class="form-label">@Loc["City"]</label>
-                                <input asp-for="City" class="form-control" autocomplete="address-level2" />
-                            </div>
-                            <div class="col-md-4">
-                                <label asp-for="PostalCode" class="form-label">@Loc["PostalCode"]</label>
-                                <input asp-for="PostalCode" class="form-control" autocomplete="postal-code" />
-                            </div>
-                            <div class="col-md-4">
-                                <label asp-for="Country" class="form-label">@Loc["Country"]</label>
-                                <input asp-for="Country" class="form-control" autocomplete="country-name" />
-                            </div>
-                        </div>
 
-                        <div class="d-flex justify-content-end mt-4">
-                            <button type="submit" class="btn btn-primary">@Loc["UpdateAddress"]</button>
+                            <div class="delivery-address-person">
+                                <h2>@Model.DisplayName</h2>
+                                @if (!string.IsNullOrWhiteSpace(Model.PhoneNumber))
+                                {
+                                    <div class="delivery-address-phone">
+                                        <i class="bi bi-telephone"></i>
+                                        <span>@Model.PhoneNumber</span>
+                                    </div>
+                                }
+                            </div>
+
+                            <div class="delivery-address-divider"></div>
+
+                            <dl class="delivery-address-details">
+                                <div>
+                                    <dt>@Loc["AddressLine1"]</dt>
+                                    <dd>
+                                        @Model.Address
+                                        @if (!string.IsNullOrWhiteSpace(Model.AddressLine2))
+                                        {
+                                            <span class="d-block">@Model.AddressLine2</span>
+                                        }
+                                    </dd>
+                                </div>
+                                <div>
+                                    <dt>@Loc["City"]</dt>
+                                    <dd>@(string.IsNullOrWhiteSpace(Model.City) ? "—" : Model.City)</dd>
+                                </div>
+                                <div>
+                                    <dt>@Loc["PostalCode"]</dt>
+                                    <dd><span class="delivery-address-code">@(string.IsNullOrWhiteSpace(Model.PostalCode) ? "—" : Model.PostalCode)</span></dd>
+                                </div>
+                                @if (!string.IsNullOrWhiteSpace(Model.Country))
+                                {
+                                    <div>
+                                        <dt>@Loc["Country"]</dt>
+                                        <dd>@Model.Country</dd>
+                                    </div>
+                                }
+                            </dl>
+
+                            <div class="delivery-address-divider"></div>
+
+                            <footer class="delivery-address-card-footer">
+                                <span class="delivery-address-active">
+                                    <i class="bi bi-check-circle me-1"></i>@Loc["ActiveDelivery"]
+                                </span>
+                                <div class="delivery-address-actions">
+                                    <button type="button" class="btn address-action-btn"
+                                            data-bs-toggle="modal" data-bs-target="#addressEditorModal">
+                                        @Loc["Edit"]
+                                    </button>
+                                    <button type="button" class="btn address-action-btn address-action-danger"
+                                            data-bs-toggle="modal" data-bs-target="#addressDeleteModal">
+                                        @Loc["Delete"]
+                                    </button>
+                                </div>
+                            </footer>
+                        </article>
+                    }
+                    else
+                    {
+                        <div class="delivery-address-empty">
+                            <span class="delivery-address-empty-icon">
+                                <i class="bi bi-geo-alt"></i>
+                            </span>
+                            <h2>@Loc["NoAddressTitle"]</h2>
+                            <p>@Loc["NoAddressHint"]</p>
+                            <button type="button" class="btn btn-primary"
+                                    data-bs-toggle="modal" data-bs-target="#addressEditorModal">
+                                <i class="bi bi-plus-lg me-2"></i>@Loc["AddAddress"]
+                            </button>
                         </div>
-                    </form>
+                    }
                 </div>
             </section>
         </div>
     </div>
 </div>
+
+<div class="modal fade address-modal" id="addressEditorModal" tabindex="-1"
+     aria-labelledby="addressEditorTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+        <div class="modal-content">
+            <form method="post" asp-controller="Account" asp-action="ChangeAddress">
+                <div class="modal-header">
+                    <div>
+                        <span class="address-modal-kicker">@Loc["AddressDetails"]</span>
+                        <h2 class="modal-title" id="addressEditorTitle">@editorTitle</h2>
+                        <p class="address-modal-subtitle mb-0">@Loc["EditAddressHint"]</p>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="@Loc["Cancel"]"></button>
+                </div>
+                <div class="modal-body">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label asp-for="Address" class="form-label">
+                                @Loc["AddressLine1"] <span class="address-required">*</span>
+                            </label>
+                            <input asp-for="Address" class="form-control address-form-control"
+                                   autocomplete="address-line1" placeholder="@Loc["AddressLine1"]" />
+                            <span asp-validation-for="Address" class="text-danger small"></span>
+                        </div>
+                        <div class="col-12">
+                            <label asp-for="AddressLine2" class="form-label">@Loc["AddressLine2Optional"]</label>
+                            <input asp-for="AddressLine2" class="form-control address-form-control"
+                                   autocomplete="address-line2" placeholder="@Loc["AddressLine2Optional"]" />
+                        </div>
+                        <div class="col-6 col-md-4">
+                            <label asp-for="City" class="form-label">@Loc["City"]</label>
+                            <input asp-for="City" class="form-control address-form-control"
+                                   autocomplete="address-level2" placeholder="@Loc["City"]" />
+                        </div>
+                        <div class="col-6 col-md-4">
+                            <label asp-for="PostalCode" class="form-label">@Loc["PostalCode"]</label>
+                            <input asp-for="PostalCode" class="form-control address-form-control"
+                                   autocomplete="postal-code" placeholder="@Loc["PostalCode"]" />
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <label asp-for="Country" class="form-label">@Loc["Country"]</label>
+                            <input asp-for="Country" class="form-control address-form-control"
+                                   autocomplete="country-name" placeholder="@Loc["Country"]" />
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn address-modal-cancel" data-bs-dismiss="modal">@Loc["Cancel"]</button>
+                    <button type="submit" class="btn btn-primary address-modal-save">
+                        <i class="bi bi-check2 me-1"></i>@Loc["UpdateAddress"]
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@if (hasAddress)
+{
+    <div class="modal fade address-modal address-delete-modal" id="addressDeleteModal" tabindex="-1"
+         aria-labelledby="addressDeleteTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <form method="post" asp-controller="Account" asp-action="DeleteAddress">
+                    <div class="modal-body">
+                        <span class="address-delete-icon"><i class="bi bi-trash3"></i></span>
+                        <h2 class="modal-title" id="addressDeleteTitle">@Loc["DeleteAddressTitle"]</h2>
+                        <p class="address-delete-copy">@Loc["DeleteAddressConfirm"]</p>
+                    </div>
+                    <div class="modal-footer address-delete-footer">
+                        <button type="button" class="btn address-modal-cancel" data-bs-dismiss="modal">@Loc["Cancel"]</button>
+                        <button type="submit" class="btn address-delete-confirm">
+                            <i class="bi bi-trash3 me-1"></i>@Loc["Delete"]
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                bootstrap.Modal.getOrCreateInstance(document.getElementById('addressEditorModal')).show();
+            });
+        </script>
+    }
+}

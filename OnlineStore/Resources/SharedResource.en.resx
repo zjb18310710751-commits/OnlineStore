@@ -230,6 +230,19 @@
   <data name="ChangeAddress" xml:space="preserve"><value>Change address</value></data>
   <data name="AddressDetails" xml:space="preserve"><value>Delivery address</value></data>
   <data name="AddressDetailsHint" xml:space="preserve"><value>Maintain the address used for order delivery.</value></data>
+  <data name="AddressBookTitle" xml:space="preserve"><value>My delivery addresses</value></data>
+  <data name="AddressBookHint" xml:space="preserve"><value>Manage the address used for delivery. It will be filled in automatically at checkout.</value></data>
+  <data name="PrimaryAddress" xml:space="preserve"><value>Primary address</value></data>
+  <data name="ActiveDelivery" xml:space="preserve"><value>Active delivery address</value></data>
+  <data name="AddAddress" xml:space="preserve"><value>Add address</value></data>
+  <data name="EditDeliveryAddress" xml:space="preserve"><value>Edit delivery address</value></data>
+  <data name="EditAddressHint" xml:space="preserve"><value>The updated address will be used for future deliveries.</value></data>
+  <data name="NoAddressTitle" xml:space="preserve"><value>No delivery address yet</value></data>
+  <data name="NoAddressHint" xml:space="preserve"><value>Add an address to fill it in automatically at checkout and check out faster.</value></data>
+  <data name="DeleteAddressTitle" xml:space="preserve"><value>Delete this delivery address?</value></data>
+  <data name="DeleteAddressConfirm" xml:space="preserve"><value>It will no longer be available for delivery. You can add it again later.</value></data>
+  <data name="AddressDeleted" xml:space="preserve"><value>Delivery address deleted.</value></data>
+  <data name="AddressDeleteFailed" xml:space="preserve"><value>The delivery address could not be deleted. Please try again.</value></data>
   <data name="UpdatePassword" xml:space="preserve"><value>Update password</value></data>
   <data name="UpdateAddress" xml:space="preserve"><value>Save address</value></data>
   <data name="ProfileUpdated" xml:space="preserve"><value>Personal information saved.</value></data>

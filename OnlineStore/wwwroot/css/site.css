@@ -470,9 +470,457 @@ body {
     opacity: 1;
 }
 
+/* 个人中心：收货地址簿 */
+.address-book-shell {
+    padding: 1.55rem;
+    border: 1px solid #e4e7ea;
+    border-radius: .85rem;
+    background: #fff;
+    box-shadow: 0 .35rem 1.1rem rgba(15, 17, 17, .06);
+}
+
+.address-book-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1.5rem;
+}
+
+.address-book-kicker,
+.address-modal-kicker {
+    margin-bottom: .35rem;
+    color: #7b858e;
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+}
+
+.address-book-title {
+    margin: 0;
+    color: #0f1111;
+    font-size: clamp(1.65rem, 3vw, 2.35rem);
+    font-weight: 700;
+    letter-spacing: -.035em;
+    line-height: 1.12;
+}
+
+.address-book-subtitle {
+    max-width: 42rem;
+    margin-top: .45rem;
+    color: #667078;
+    font-size: .92rem;
+}
+
+.address-book-primary-action {
+    flex: 0 0 auto;
+    padding: .68rem 1.1rem;
+    border-radius: .5rem;
+    font-weight: 700;
+}
+
+.address-book-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 330px), 1fr));
+    gap: 1.1rem;
+    margin-top: 1.55rem;
+}
+
+.delivery-address-card {
+    display: flex;
+    min-height: 348px;
+    flex-direction: column;
+    padding: 1.35rem;
+    border: 1.5px solid #cbd1d6;
+    border-radius: .75rem;
+    background: #fff;
+    box-shadow: 0 .2rem .65rem rgba(15, 17, 17, .035);
+    transition: border-color .15s ease, box-shadow .15s ease, transform .15s ease;
+}
+
+.delivery-address-card:hover {
+    border-color: #b8c0c7;
+    box-shadow: 0 .45rem 1.15rem rgba(15, 17, 17, .075);
+    transform: translateY(-2px);
+}
+
+.delivery-address-card-top {
+    display: flex;
+    justify-content: flex-end;
+    min-height: 1.8rem;
+}
+
+.delivery-address-primary {
+    padding: .3rem .62rem;
+    border-radius: .28rem;
+    background: var(--amazon-dark);
+    color: #fff;
+    font-size: .7rem;
+    font-weight: 700;
+    letter-spacing: .03em;
+}
+
+.delivery-address-person h2 {
+    margin: 0;
+    overflow-wrap: anywhere;
+    color: #111;
+    font-size: 1.48rem;
+    font-weight: 650;
+    letter-spacing: -.025em;
+    line-height: 1.25;
+}
+
+.delivery-address-phone {
+    display: flex;
+    align-items: center;
+    gap: .45rem;
+    margin-top: .55rem;
+    color: #68727a;
+    font-size: .9rem;
+}
+
+.delivery-address-phone i {
+    color: #8a949c;
+}
+
+.delivery-address-divider {
+    margin: 1.05rem 0;
+    border-top: 1px solid #dfe3e6;
+}
+
+.delivery-address-details {
+    display: grid;
+    gap: .58rem;
+    margin: 0;
+}
+
+.delivery-address-details > div {
+    display: grid;
+    grid-template-columns: 7rem minmax(0, 1fr);
+    align-items: start;
+    gap: .55rem;
+}
+
+.delivery-address-details dt {
+    margin: 0;
+    color: #202326;
+    font-weight: 650;
+}
+
+.delivery-address-details dd {
+    margin: 0;
+    overflow-wrap: anywhere;
+    color: #30363b;
+    line-height: 1.5;
+}
+
+.delivery-address-code {
+    display: inline-block;
+    padding: .1rem .42rem;
+    border: 1px solid #cfd4d8;
+    border-radius: .2rem;
+    background: #f7f8f8;
+    color: #202326;
+    font-size: .86rem;
+    font-weight: 600;
+    letter-spacing: .02em;
+}
+
+.delivery-address-card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .85rem;
+    margin-top: auto;
+}
+
+.delivery-address-active {
+    color: #067d62;
+    font-size: .82rem;
+    font-weight: 650;
+}
+
+.delivery-address-actions {
+    display: flex;
+    gap: .45rem;
+    margin-left: auto;
+}
+
+.address-action-btn {
+    padding: .36rem .7rem;
+    border: 1px solid #cfd4d8;
+    border-radius: .35rem;
+    background: #fff;
+    color: #3d454b;
+    font-size: .82rem;
+    font-weight: 600;
+}
+
+.address-action-btn:hover,
+.address-action-btn:focus-visible {
+    border-color: #aeb6bd;
+    background: #f4f6f7;
+    color: #111;
+}
+
+.address-action-danger {
+    border-color: #e2b8b8;
+    color: #b3261e;
+}
+
+.address-action-danger:hover,
+.address-action-danger:focus-visible {
+    border-color: #cb7772;
+    background: #fff5f4;
+    color: #9c1c15;
+}
+
+.delivery-address-empty {
+    grid-column: 1 / -1;
+    padding: 3.5rem 1.25rem;
+    border: 1px dashed #c8cfd4;
+    border-radius: .8rem;
+    background: #fafbfb;
+    text-align: center;
+}
+
+.delivery-address-empty-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 3.25rem;
+    height: 3.25rem;
+    margin-bottom: .85rem;
+    border-radius: 50%;
+    background: var(--brand-light);
+    color: var(--brand-dark);
+    font-size: 1.45rem;
+}
+
+.delivery-address-empty h2 {
+    margin-bottom: .4rem;
+    color: #202326;
+    font-size: 1.2rem;
+    font-weight: 700;
+}
+
+.delivery-address-empty p {
+    max-width: 32rem;
+    margin: 0 auto 1.15rem;
+    color: #68727a;
+    font-size: .9rem;
+}
+
+.address-modal .modal-content {
+    display: flex;
+    max-height: calc(100vh - 2rem);
+    flex-direction: column;
+    overflow: hidden;
+    border: 0;
+    border-radius: 1rem;
+    box-shadow: 0 1.4rem 4rem rgba(15, 17, 17, .24);
+}
+
+.address-modal .modal-content > form {
+    display: flex;
+    min-height: 0;
+    flex: 1 1 auto;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.address-modal .modal-dialog-scrollable {
+    height: calc(100% - 2rem);
+}
+
+.address-modal .modal-header {
+    flex: 0 0 auto;
+    align-items: flex-start;
+    padding: 1.4rem 1.5rem 1.15rem;
+    border-bottom: 1px solid #edf0f2;
+}
+
+.address-modal .modal-title {
+    color: #15181a;
+    font-size: 1.45rem;
+    font-weight: 700;
+    letter-spacing: -.025em;
+}
+
+.address-modal-subtitle {
+    margin-top: .35rem;
+    color: #69737b;
+    font-size: .87rem;
+}
+
+.address-modal .btn-close {
+    margin-left: auto;
+}
+
+.address-modal .modal-body {
+    min-height: 0;
+    flex: 1 1 auto;
+    overflow-y: auto;
+    padding: 1.4rem 1.5rem 1.55rem;
+}
+
+.address-modal .form-label {
+    margin-bottom: .45rem;
+    color: #31373c;
+    font-size: .9rem;
+    font-weight: 600;
+}
+
+.address-form-control {
+    min-height: 46px;
+    border-color: #d8dde1;
+    border-radius: .5rem;
+    box-shadow: none;
+}
+
+.address-form-control:focus {
+    border-color: var(--amazon-orange);
+    box-shadow: 0 0 0 .18rem rgba(255, 153, 0, .16);
+}
+
+.address-required {
+    color: #b3261e;
+}
+
+.address-modal .modal-footer {
+    flex: 0 0 auto;
+    gap: .65rem;
+    padding: 1rem 1.5rem;
+    border-top: 1px solid #edf0f2;
+    background: #fff;
+}
+
+.address-modal-cancel {
+    padding: .56rem 1rem;
+    border: 1px solid #d4d9dd;
+    border-radius: .45rem;
+    background: #fff;
+    color: #30363b;
+    font-weight: 600;
+}
+
+.address-modal-cancel:hover,
+.address-modal-cancel:focus-visible {
+    border-color: #b9c0c6;
+    background: #f5f7f8;
+    color: #111;
+}
+
+.address-modal-save {
+    padding: .58rem 1.15rem;
+    border-radius: .45rem;
+    font-weight: 700;
+}
+
+.address-delete-modal .modal-dialog {
+    max-width: 430px;
+}
+
+.address-delete-modal .modal-body {
+    padding: 1.65rem 1.6rem 1rem;
+}
+
+.address-delete-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 3rem;
+    height: 3rem;
+    margin-bottom: .9rem;
+    border-radius: 50%;
+    background: #fff0ef;
+    color: #b3261e;
+    font-size: 1.25rem;
+}
+
+.address-delete-copy {
+    margin: .55rem 0 0;
+    color: #68727a;
+    line-height: 1.55;
+}
+
+.address-delete-footer {
+    border-top: 0 !important;
+    padding-top: .65rem !important;
+}
+
+.address-delete-confirm {
+    padding: .56rem 1rem;
+    border: 1px solid #b3261e;
+    border-radius: .45rem;
+    background: #b3261e;
+    color: #fff;
+    font-weight: 700;
+}
+
+.address-delete-confirm:hover,
+.address-delete-confirm:focus-visible {
+    border-color: #942019;
+    background: #942019;
+    color: #fff;
+}
+
 @media (max-width: 991.98px) {
     .profile-sidebar {
         position: static;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .address-book-shell {
+        padding: 1.1rem;
+    }
+
+    .address-book-header {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .address-book-primary-action {
+        width: 100%;
+    }
+
+    .delivery-address-card {
+        min-height: 0;
+        padding: 1.15rem;
+    }
+
+    .delivery-address-details > div {
+        grid-template-columns: 6rem minmax(0, 1fr);
+    }
+
+    .delivery-address-card-footer {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .delivery-address-actions {
+        width: 100%;
+        margin-left: 0;
+    }
+
+    .address-action-btn {
+        flex: 1;
+    }
+
+    .address-modal .modal-header,
+    .address-modal .modal-body {
+        padding-left: 1.15rem;
+        padding-right: 1.15rem;
+    }
+
+    .address-form-control {
+        min-height: 43px;
+    }
+
+    .address-modal .modal-footer {
+        padding-left: 1.15rem;
+        padding-right: 1.15rem;
     }
 }
 
