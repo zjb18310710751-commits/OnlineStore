@@ -512,7 +512,7 @@ public class AccountController : Controller
 
     [HttpGet]
     [Authorize]
-    public async Task<IActionResult> ChangeAddress()
+    public async Task<IActionResult> ChangeAddress([FromQuery] bool embedded = false)
     {
         var user = await _userManager.GetUserAsync(User);
         if (user is null)
@@ -523,19 +523,24 @@ public class AccountController : Controller
         await _deliveryAddressService.EnsureLegacyAddressAsync(user);
         var vm = new AddressViewModel();
         await PopulateAddressBookAsync(vm, user);
+        ViewData["Embedded"] = embedded;
         return View(vm);
     }
 
     [HttpPost]
     [Authorize]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> ChangeAddress(AddressViewModel vm)
+    public async Task<IActionResult> ChangeAddress(
+        AddressViewModel vm,
+        [FromForm] bool embedded = false)
     {
         var user = await _userManager.GetUserAsync(User);
         if (user is null)
         {
             return RedirectToAction(nameof(Login));
         }
+
+        ViewData["Embedded"] = embedded;
 
         if (string.IsNullOrWhiteSpace(vm.RecipientName))
         {
@@ -609,13 +614,15 @@ public class AccountController : Controller
         }
 
         TempData["Success"] = (vm.Id.HasValue ? _loc["AddressUpdated"] : _loc["AddressAdded"]).Value;
-        return RedirectToAction(nameof(ChangeAddress));
+        return RedirectToAction(nameof(ChangeAddress), new { embedded });
     }
 
     [HttpPost]
     [Authorize]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> DeleteAddress(int id)
+    public async Task<IActionResult> DeleteAddress(
+        int id,
+        [FromForm] bool embedded = false)
     {
         var user = await _userManager.GetUserAsync(User);
         if (user is null)
@@ -626,17 +633,19 @@ public class AccountController : Controller
         if (!await _deliveryAddressService.DeleteAsync(user.Id, id))
         {
             TempData["Error"] = _loc["AddressDeleteFailed"].Value;
-            return RedirectToAction(nameof(ChangeAddress));
+            return RedirectToAction(nameof(ChangeAddress), new { embedded });
         }
 
         TempData["Success"] = _loc["AddressDeleted"].Value;
-        return RedirectToAction(nameof(ChangeAddress));
+        return RedirectToAction(nameof(ChangeAddress), new { embedded });
     }
 
     [HttpPost]
     [Authorize]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> SetDefaultAddress(int id)
+    public async Task<IActionResult> SetDefaultAddress(
+        int id,
+        [FromForm] bool embedded = false)
     {
         var user = await _userManager.GetUserAsync(User);
         if (user is null)
@@ -647,11 +656,11 @@ public class AccountController : Controller
         if (!await _deliveryAddressService.SetDefaultAsync(user.Id, id))
         {
             TempData["Error"] = _loc["AddressSetDefaultFailed"].Value;
-            return RedirectToAction(nameof(ChangeAddress));
+            return RedirectToAction(nameof(ChangeAddress), new { embedded });
         }
 
         TempData["Success"] = _loc["AddressDefaultUpdated"].Value;
-        return RedirectToAction(nameof(ChangeAddress));
+        return RedirectToAction(nameof(ChangeAddress), new { embedded });
     }
 
     [HttpPost]

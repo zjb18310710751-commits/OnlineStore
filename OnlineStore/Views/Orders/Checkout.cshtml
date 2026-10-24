@@ -6,12 +6,19 @@
     <h1 class="h3 mb-4">@Loc["Checkout"]</h1>
 
     <form id="checkoutForm" asp-controller="Orders" asp-action="Checkout" method="post">
+        <input asp-for="AddressId" type="hidden" id="AddressId" />
         <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
         <div class="row g-4">
             <div class="col-lg-8">
                 <div class="card shadow-sm mb-4">
-                    <div class="card-header bg-white fw-semibold">@Loc["DeliveryInformation"]</div>
+                    <div class="card-header bg-white d-flex justify-content-between align-items-center gap-2 flex-wrap">
+                        <span class="fw-semibold">@Loc["DeliveryInformation"]</span>
+                        <button type="button" class="btn btn-sm btn-outline-primary"
+                                data-bs-toggle="modal" data-bs-target="#switchAddressModal">
+                            <i class="bi bi-arrow-repeat me-1"></i>@Loc["SwitchAddress"]
+                        </button>
+                    </div>
                     <div class="card-body">
                         <div class="row g-3">
                             <div class="col-md-6">
@@ -48,6 +55,18 @@
                                 <input asp-for="Country" class="form-control" autocomplete="country-name" />
                                 <span asp-validation-for="Country" class="text-danger small"></span>
                             </div>
+                            @if (!Model.HasSavedAddresses)
+                            {
+                                <div class="col-12">
+                                    <label class="checkout-save-address">
+                                        <input asp-for="SaveAsDefaultAddress" class="form-check-input" />
+                                        <span>
+                                            <span class="checkout-save-address-title">@Loc["SaveAddressAsDefault"]</span>
+                                            <span class="checkout-save-address-hint">@Loc["SaveAddressAsDefaultHint"]</span>
+                                        </span>
+                                    </label>
+                                </div>
+                            }
                         </div>
                     </div>
                 </div>
@@ -148,6 +167,28 @@
     </form>
 </div>
 
+<div class="modal fade checkout-address-modal" id="switchAddressModal" tabindex="-1"
+     aria-labelledby="switchAddressTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div>
+                    <h2 class="modal-title" id="switchAddressTitle">@Loc["SelectDeliveryAddress"]</h2>
+                    <p class="modal-subtitle text-muted small mb-0">@Loc["SelectDeliveryAddressHint"]</p>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="@Loc["Cancel"]"></button>
+            </div>
+            <div class="modal-body p-0">
+                <iframe id="addressBookFrame"
+                        src="@Url.Action("ChangeAddress", "Account", new { embedded = true })"
+                        title="@Loc["AddressBookTitle"]"
+                        class="checkout-address-frame"
+                        loading="lazy"></iframe>
+            </div>
+        </div>
+    </div>
+</div>
+
 @section Scripts {
     <script>
         document.addEventListener('DOMContentLoaded', function () {
@@ -188,6 +229,35 @@
                 .catch(function () {
                     statusEl.textContent = '@Loc["CouponPreviewFailed"]';
                 });
+            });
+
+            var switchAddressModal = document.getElementById('switchAddressModal');
+            window.addEventListener('message', function (event) {
+                if (event.origin !== window.location.origin ||
+                    !event.data ||
+                    event.data.type !== 'checkout-select-address') {
+                    return;
+                }
+
+                var address = event.data.address || {};
+                function setValue(name, value) {
+                    var input = document.getElementById(name);
+                    if (input) {
+                        input.value = value || '';
+                    }
+                }
+
+                setValue('AddressId', address.id);
+                setValue('UserName', address.recipientName);
+                setValue('Phone', address.phoneNumber);
+                setValue('Address', address.addressLine1);
+                setValue('AddressLine2', address.addressLine2);
+                setValue('City', address.city);
+                setValue('PostalCode', address.postalCode);
+                setValue('Country', address.country);
+
+                var modal = bootstrap.Modal.getOrCreateInstance(switchAddressModal);
+                modal.hide();
             });
         });
     </script>

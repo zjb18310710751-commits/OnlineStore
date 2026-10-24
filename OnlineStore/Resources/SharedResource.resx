@@ -235,6 +235,12 @@
   <data name="PrimaryAddress" xml:space="preserve"><value>主要地址</value></data>
   <data name="ActiveDelivery" xml:space="preserve"><value>当前配送地址</value></data>
   <data name="AddAddress" xml:space="preserve"><value>添加地址</value></data>
+  <data name="UseAddress" xml:space="preserve"><value>使用此地址</value></data>
+  <data name="SwitchAddress" xml:space="preserve"><value>切换地址</value></data>
+  <data name="SaveAddressAsDefault" xml:space="preserve"><value>保存为默认收货地址</value></data>
+  <data name="SaveAddressAsDefaultHint" xml:space="preserve"><value>下次结算时将自动使用这个地址。</value></data>
+  <data name="SelectDeliveryAddress" xml:space="preserve"><value>选择收货地址</value></data>
+  <data name="SelectDeliveryAddressHint" xml:space="preserve"><value>从地址簿中选择一个地址，或添加新的收货地址。</value></data>
   <data name="RecipientName" xml:space="preserve"><value>收件人姓名</value></data>
   <data name="RecipientNameRequired" xml:space="preserve"><value>请输入收件人姓名</value></data>
   <data name="EditDeliveryAddress" xml:space="preserve"><value>编辑收货地址</value></data>

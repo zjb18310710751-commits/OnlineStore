@@ -2,14 +2,18 @@
 @{
     ViewData["Title"] = Loc["ChangeAddress"].Value;
     var editorTitle = Model.Id.HasValue ? Loc["EditDeliveryAddress"].Value : Loc["AddAddress"].Value;
+    var embedded = ViewData["Embedded"] as bool? == true;
 }
 
-<div class="container py-4">
+<div class="@(embedded ? "p-2 p-md-3" : "container py-4")">
     <div class="row g-4">
-        <div class="col-lg-3">
-            <partial name="_ProfileSidebar" model="Model" />
-        </div>
-        <div class="col-lg-9">
+        @if (!embedded)
+        {
+            <div class="col-lg-3">
+                <partial name="_ProfileSidebar" model="Model" />
+            </div>
+        }
+        <div class="@(embedded ? "col-12" : "col-lg-9")">
             <section class="card shadow-sm profile-section-card" aria-labelledby="addressBookTitle"
                      data-has-addresses="@(Model.Addresses.Count > 0 ? "true" : "false")">
                 <div class="card-header bg-white">
@@ -92,6 +96,7 @@
                                         {
                                             <form method="post" asp-controller="Account" asp-action="SetDefaultAddress">
                                                 <input type="hidden" name="id" value="@address.Id" />
+                                                <input type="hidden" name="embedded" value="@(embedded ? "true" : "false")" />
                                                 <button type="submit" class="btn address-default-btn">
                                                     @Loc["SetAsDefaultAddress"]
                                                 </button>
@@ -99,6 +104,21 @@
                                         }
                                     </div>
                                     <div class="delivery-address-actions">
+                                        @if (embedded)
+                                        {
+                                            <button type="button" class="btn address-use-btn"
+                                                    data-use-address
+                                                    data-address-id="@address.Id"
+                                                    data-address-recipient="@address.RecipientName"
+                                                    data-address-phone="@address.PhoneNumber"
+                                                    data-address-line1="@address.AddressLine1"
+                                                    data-address-line2="@address.AddressLine2"
+                                                    data-address-city="@address.City"
+                                                    data-address-postal="@address.PostalCode"
+                                                    data-address-country="@address.Country">
+                                                @Loc["UseAddress"]
+                                            </button>
+                                        }
                                         <button type="button" class="btn address-action-btn"
                                                 data-address-edit
                                                 data-address-id="@address.Id"
@@ -147,6 +167,7 @@
         <div class="modal-content">
             <form method="post" asp-controller="Account" asp-action="ChangeAddress" id="addressEditorForm">
                 <input asp-for="Id" type="hidden" />
+                <input type="hidden" name="embedded" value="@(embedded ? "true" : "false")" />
                 <div class="modal-header">
                     <div>
                         <span class="address-modal-kicker">@Loc["AddressDetails"]</span>
@@ -239,6 +260,7 @@
             <div class="modal-content">
                 <form method="post" asp-controller="Account" asp-action="DeleteAddress">
                     <input type="hidden" name="id" id="addressDeleteId" />
+                    <input type="hidden" name="embedded" value="@(embedded ? "true" : "false")" />
                     <div class="modal-body">
                         <span class="address-delete-icon"><i class="bi bi-trash3"></i></span>
                         <h2 class="modal-title" id="addressDeleteTitle">@Loc["DeleteAddressTitle"]</h2>
@@ -307,6 +329,24 @@
                         defaultField.checked = button.dataset.addressDefault === 'true';
                     }
                     openEditor();
+                });
+            });
+
+            document.querySelectorAll('[data-use-address]').forEach(function (button) {
+                button.addEventListener('click', function () {
+                    window.parent.postMessage({
+                        type: 'checkout-select-address',
+                        address: {
+                            id: button.dataset.addressId,
+                            recipientName: button.dataset.addressRecipient,
+                            phoneNumber: button.dataset.addressPhone,
+                            addressLine1: button.dataset.addressLine1,
+                            addressLine2: button.dataset.addressLine2,
+                            city: button.dataset.addressCity,
+                            postalCode: button.dataset.addressPostal,
+                            country: button.dataset.addressCountry
+                        }
+                    }, window.location.origin);
                 });
             });
 

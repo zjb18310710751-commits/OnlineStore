@@ -46,9 +46,11 @@ public class OrdersController : Controller
 
         var user = await _userManager.GetUserAsync(User);
         DeliveryAddress? defaultAddress = null;
+        IReadOnlyList<DeliveryAddress> savedAddresses = Array.Empty<DeliveryAddress>();
         if (user is not null)
         {
             await _deliveryAddressService.EnsureLegacyAddressAsync(user);
+            savedAddresses = await _deliveryAddressService.GetAsync(user.Id);
             defaultAddress = await _deliveryAddressService.GetDefaultAsync(user.Id);
         }
 
@@ -56,16 +58,15 @@ public class OrdersController : Controller
         {
             Items = cart.Items,
             Total = cart.Total,
+            AddressId = defaultAddress?.Id,
+            HasSavedAddresses = savedAddresses.Count > 0,
             UserName = defaultAddress?.RecipientName ?? $"{user?.LastName}{user?.FirstName}".Trim(),
             Phone = defaultAddress?.PhoneNumber ?? user?.PhoneNumber ?? string.Empty,
-            Address = defaultAddress is null
-                ? user?.Address ?? string.Empty
-                : AddressFormatter.Combine(
-                    defaultAddress.AddressLine1,
-                    defaultAddress.AddressLine2,
-                    defaultAddress.City,
-                    defaultAddress.PostalCode,
-                    defaultAddress.Country)
+            Address = defaultAddress?.AddressLine1 ?? user?.Address ?? string.Empty,
+            AddressLine2 = defaultAddress?.AddressLine2,
+            City = defaultAddress?.City ?? string.Empty,
+            PostalCode = defaultAddress?.PostalCode ?? string.Empty,
+            Country = defaultAddress?.Country ?? string.Empty
         };
         return View(vm);
     }
@@ -82,6 +83,13 @@ public class OrdersController : Controller
 
         vm.Items = cart.Items;
         vm.Total = cart.Total;
+
+        var user = await _userManager.GetUserAsync(User);
+        if (user is not null)
+        {
+            await _deliveryAddressService.EnsureLegacyAddressAsync(user);
+            vm.HasSavedAddresses = (await _deliveryAddressService.GetAsync(user.Id)).Count > 0;
+        }
 
         ValidateCheckoutDetails(vm);
         if (!ModelState.IsValid)
@@ -104,7 +112,26 @@ public class OrdersController : Controller
             applied = result.Coupon;
         }
 
-        var user = await _userManager.GetUserAsync(User);
+        if (vm.SaveAsDefaultAddress && user is not null)
+        {
+            var savedAddress = await _deliveryAddressService.SaveAsync(
+                user.Id,
+                vm.AddressId,
+                new DeliveryAddressInput(
+                    vm.UserName,
+                    vm.Phone,
+                    vm.Address,
+                    vm.AddressLine2,
+                    vm.City,
+                    vm.PostalCode,
+                    vm.Country,
+                    IsDefault: true));
+            if (savedAddress is null)
+            {
+                ModelState.AddModelError(string.Empty, _loc["AddressSaveFailed"].Value);
+                return View(vm);
+            }
+        }
 
         var order = new Order
         {

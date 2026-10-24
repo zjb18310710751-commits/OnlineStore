@@ -10,6 +10,15 @@ public class CheckoutViewModel
 
     public decimal Total { get; set; }
 
+    /// <summary>结算页当前选中的地址簿地址；为空表示用户尚未选择或使用旧地址。</summary>
+    public int? AddressId { get; set; }
+
+    /// <summary>用户是否已经保存过结构化收货地址（用于决定是否显示“保存为默认地址”）。</summary>
+    public bool HasSavedAddresses { get; set; }
+
+    /// <summary>新用户结算时是否把当前填写的地址保存为默认地址。</summary>
+    public bool SaveAsDefaultAddress { get; set; }
+
     [StringLength(50)]
     public string? CouponCode { get; set; }
 

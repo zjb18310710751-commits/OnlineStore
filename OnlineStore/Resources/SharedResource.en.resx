@@ -235,6 +235,12 @@
   <data name="PrimaryAddress" xml:space="preserve"><value>Primary address</value></data>
   <data name="ActiveDelivery" xml:space="preserve"><value>Active delivery address</value></data>
   <data name="AddAddress" xml:space="preserve"><value>Add address</value></data>
+  <data name="UseAddress" xml:space="preserve"><value>Use this address</value></data>
+  <data name="SwitchAddress" xml:space="preserve"><value>Switch address</value></data>
+  <data name="SaveAddressAsDefault" xml:space="preserve"><value>Save as default delivery address</value></data>
+  <data name="SaveAddressAsDefaultHint" xml:space="preserve"><value>This address will be used automatically at your next checkout.</value></data>
+  <data name="SelectDeliveryAddress" xml:space="preserve"><value>Select delivery address</value></data>
+  <data name="SelectDeliveryAddressHint" xml:space="preserve"><value>Choose an address from your book, or add a new delivery address.</value></data>
   <data name="RecipientName" xml:space="preserve"><value>Recipient name</value></data>
   <data name="RecipientNameRequired" xml:space="preserve"><value>Please enter the recipient name</value></data>
   <data name="EditDeliveryAddress" xml:space="preserve"><value>Edit delivery address</value></data>

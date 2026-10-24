@@ -385,6 +385,48 @@ body {
     font-size: .85rem;
 }
 
+.checkout-save-address {
+    display: flex;
+    align-items: flex-start;
+    gap: .7rem;
+    padding: .9rem 1rem;
+    border: 1px solid #d5d9d9;
+    border-radius: .5rem;
+    background: #fff;
+    cursor: pointer;
+}
+
+.checkout-save-address .form-check-input {
+    flex: 0 0 auto;
+    margin-top: .22rem;
+}
+
+.checkout-save-address .form-check-input:checked {
+    border-color: var(--amazon-orange);
+    background-color: var(--amazon-orange);
+}
+
+.checkout-save-address-title {
+    display: block;
+    color: #0f1111;
+    font-weight: 650;
+}
+
+.checkout-save-address-hint {
+    display: block;
+    margin-top: .15rem;
+    color: #6b7280;
+    font-size: .85rem;
+}
+
+.checkout-address-frame {
+    display: block;
+    width: 100%;
+    height: min(72vh, 680px);
+    border: 0;
+    background: #f7f8f8;
+}
+
 @media (max-width: 991.98px) {
     .checkout-summary-card {
         position: static;
@@ -705,6 +747,23 @@ body {
     border-color: #cb7772;
     background: #fff5f4;
     color: #9c1c15;
+}
+
+.address-use-btn {
+    padding: .36rem .7rem;
+    border: 1px solid var(--amazon-orange);
+    border-radius: .35rem;
+    background: var(--brand-light);
+    color: #7a4a00;
+    font-size: .82rem;
+    font-weight: 700;
+}
+
+.address-use-btn:hover,
+.address-use-btn:focus-visible {
+    border-color: var(--brand-dark);
+    background: #ffedc7;
+    color: #5f3900;
 }
 
 .delivery-address-empty {
