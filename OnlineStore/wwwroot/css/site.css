@@ -463,6 +463,30 @@ body {
     padding: 1.35rem;
 }
 
+.profile-section-heading {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.profile-section-title {
+    margin: 0;
+    color: #0f1111;
+    font-size: clamp(1.45rem, 2.5vw, 1.85rem);
+    font-weight: 700;
+    letter-spacing: -.03em;
+    line-height: 1.2;
+}
+
+.profile-section-subtitle {
+    max-width: 44rem;
+    margin-top: .45rem;
+    color: #667078;
+    font-size: .92rem;
+    line-height: 1.5;
+}
+
 .profile-readonly-input:disabled {
     border-color: #e0e3e5;
     background: #f0f2f2;
