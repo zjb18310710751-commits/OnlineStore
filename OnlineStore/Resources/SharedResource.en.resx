@@ -390,6 +390,7 @@
   <data name="CartAdded" xml:space="preserve"><value>Added to cart.</value></data>
   <data name="FavoriteAdded" xml:space="preserve"><value>Added to favorites.</value></data>
   <data name="FavoriteRemoved" xml:space="preserve"><value>Removed from favorites.</value></data>
+  <data name="Unfavorite" xml:space="preserve"><value>Remove favorite</value></data>
   <data name="ReviewSubmitted" xml:space="preserve"><value>Review submitted. Thanks for sharing!</value></data>
   <data name="LoginFailed" xml:space="preserve"><value>Invalid username or password.</value></data>
   <data name="AccountLocked" xml:space="preserve"><value>Too many failed login attempts. Your account is locked. Try again later.</value></data>

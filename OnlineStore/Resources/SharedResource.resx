@@ -390,6 +390,7 @@
   <data name="CartAdded" xml:space="preserve"><value>已加入购物车。</value></data>
   <data name="FavoriteAdded" xml:space="preserve"><value>已加入收藏。</value></data>
   <data name="FavoriteRemoved" xml:space="preserve"><value>已取消收藏。</value></data>
+  <data name="Unfavorite" xml:space="preserve"><value>取消喜欢</value></data>
   <data name="ReviewSubmitted" xml:space="preserve"><value>评价已提交，感谢分享！</value></data>
   <data name="LoginFailed" xml:space="preserve"><value>账号或密码错误。</value></data>
   <data name="AccountLocked" xml:space="preserve"><value>登录失败次数过多，账号已锁定，请稍后再试。</value></data>
