@@ -1,51 +1,226 @@
+@using System.Text.Json
+@model AdminDashboardData
 @{
     ViewData["Title"] = Loc["Dashboard"].Value;
 }
-<h1 class="h4 mb-4">@Loc["Dashboard"]</h1>
-<div class="row g-3">
-    <div class="col-sm-6 col-lg-3">
-        <div class="card stat-card shadow-sm h-100">
-            <div class="card-body">
-                <div class="stat-icon bg-primary-subtle text-primary"><i class="bi bi-box-seam"></i></div>
-                <div class="stat-label">@Loc["TotalProducts"]</div>
-                <div class="stat-value">@ViewBag.ProductCount</div>
-            </div>
+
+<div class="overview">
+    <header class="overview-head">
+        <div>
+            <h1>@Loc["StoreOverview"]</h1>
+            <p>@Loc["OverviewSubtitle"]</p>
         </div>
-    </div>
-    <div class="col-sm-6 col-lg-3">
-        <div class="card stat-card shadow-sm h-100">
-            <div class="card-body">
-                <div class="stat-icon bg-success-subtle text-success"><i class="bi bi-check-circle"></i></div>
-                <div class="stat-label">@Loc["ActiveProducts"]</div>
-                <div class="stat-value">@ViewBag.ActiveProductCount</div>
-            </div>
+        <a asp-area="Admin" asp-controller="Orders" asp-action="Index" class="overview-text-link">
+            @Loc["OrderManagement"] <i class="bi bi-arrow-right"></i>
+        </a>
+    </header>
+
+    <section class="overview-metrics">
+        <div class="overview-metric">
+            <span class="overview-metric-label">@Loc["TotalRevenue"]</span>
+            <span class="overview-metric-value">¥@Model.TotalRevenue.ToString("N2")</span>
         </div>
-    </div>
-    <div class="col-sm-6 col-lg-3">
-        <div class="card stat-card shadow-sm h-100">
-            <div class="card-body">
-                <div class="stat-icon bg-warning-subtle text-warning"><i class="bi bi-exclamation-triangle"></i></div>
-                <div class="stat-label">@Loc["LowStock"]</div>
-                <div class="stat-value">@ViewBag.LowStockCount</div>
-            </div>
+        <div class="overview-metric">
+            <span class="overview-metric-label">@Loc["TotalOrders"]</span>
+            <span class="overview-metric-value">@Model.TotalOrderCount</span>
         </div>
-    </div>
-    <div class="col-sm-6 col-lg-3">
-        <div class="card stat-card shadow-sm h-100">
-            <div class="card-body">
-                <div class="stat-icon bg-info-subtle text-info"><i class="bi bi-tags"></i></div>
-                <div class="stat-label">@Loc["CategoryCount"]</div>
-                <div class="stat-value">@ViewBag.CategoryCount</div>
-            </div>
+        <div class="overview-metric">
+            <span class="overview-metric-label">@Loc["CustomerCount"]</span>
+            <span class="overview-metric-value">@Model.CustomerCount</span>
         </div>
+        <div class="overview-metric">
+            <span class="overview-metric-label">@Loc["UnitsSold"]</span>
+            <span class="overview-metric-value">@Model.UnitsSold</span>
+        </div>
+        <div class="overview-metric is-alert">
+            <span class="overview-metric-label">@Loc["PendingShipment"]</span>
+            <span class="overview-metric-value">@Model.PendingShipmentCount</span>
+        </div>
+        <div class="overview-metric is-alert">
+            <span class="overview-metric-label">@Loc["LowStock"]</span>
+            <span class="overview-metric-value">@Model.LowStockCount</span>
+        </div>
+    </section>
+
+    <div class="overview-grid">
+        <section class="overview-panel">
+            <div class="overview-panel-head">
+                <h2>@Loc["RevenueTrend"]</h2>
+            </div>
+            <div class="overview-panel-body">
+                <div class="overview-chart"><canvas id="overviewRevenueChart"></canvas></div>
+            </div>
+        </section>
+
+        <section class="overview-panel">
+            <div class="overview-panel-head">
+                <h2>@Loc["TopProducts"]</h2>
+                <a asp-area="Admin" asp-controller="Products" asp-action="Index">@Loc["ViewAll"]</a>
+            </div>
+            <div class="overview-panel-body">
+                @if (Model.TopProducts.Count == 0)
+                {
+                    <div class="overview-empty">@Loc["NoProducts"]</div>
+                }
+                else
+                {
+                    <ol class="overview-product-list">
+                        @for (var i = 0; i < Model.TopProducts.Count; i++)
+                        {
+                            var row = Model.TopProducts[i];
+                            <li>
+                                <span class="overview-product-rank">@(i + 1)</span>
+                                <span class="overview-product-thumb">
+                                    @if (!string.IsNullOrEmpty(row.Product.ImageUrl))
+                                    {
+                                        <img src="@row.Product.ImageUrl" alt="@L10n.Name(row.Product)" />
+                                    }
+                                    else
+                                    {
+                                        <i class="bi bi-image"></i>
+                                    }
+                                </span>
+                                <span class="overview-product-info">
+                                    <span class="overview-product-name">@L10n.Name(row.Product)</span>
+                                    <span class="overview-product-meta">¥@row.Product.Price.ToString("N2") · @Loc["SoldCount", row.UnitsSold]</span>
+                                </span>
+                                <span class="overview-product-revenue">¥@row.Revenue.ToString("N2")</span>
+                            </li>
+                        }
+                    </ol>
+                }
+            </div>
+        </section>
+
+        <section class="overview-panel">
+            <div class="overview-panel-head">
+                <h2>@Loc["RecentOrders"]</h2>
+                <a asp-area="Admin" asp-controller="Orders" asp-action="Index">@Loc["ViewAll"]</a>
+            </div>
+            <div class="overview-panel-body">
+                @if (Model.RecentOrders.Count == 0)
+                {
+                    <div class="overview-empty">@Loc["NoOrders"]</div>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                        <table class="table overview-table align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th>@Loc["OrderNo"]</th>
+                                    <th>@Loc["Receiver"]</th>
+                                    <th>@Loc["OrderStatus"]</th>
+                                    <th class="text-end">@Loc["Total"]</th>
+                                    <th class="text-end">@Loc["CreatedAt"]</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var order in Model.RecentOrders)
+                                {
+                                    <tr>
+                                        <td class="overview-mono">@order.OrderNo</td>
+                                        <td>@order.UserName</td>
+                                        <td><span class="overview-status @Overview.StatusClass(order.Status)">@L10n.Status(order.Status)</span></td>
+                                        <td class="text-end fw-semibold">¥@order.Total.ToString("N2")</td>
+                                        <td class="text-end text-muted small">@order.CreatedAt.ToLocalTime().ToString("MM-dd HH:mm")</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        </section>
+
+        <section class="overview-panel">
+            <div class="overview-panel-head">
+                <h2>@Loc["LatestReviews"]</h2>
+                <a asp-area="Admin" asp-controller="Reviews" asp-action="Index">@Loc["ViewAll"]</a>
+            </div>
+            <div class="overview-panel-body">
+                @if (Model.LatestReviews.Count == 0)
+                {
+                    <div class="overview-empty">@Loc["NoReviews"]</div>
+                }
+                else
+                {
+                    <ul class="overview-review-list">
+                        @foreach (var row in Model.LatestReviews)
+                        {
+                            <li>
+                                <span class="overview-avatar">@row.Review.UserName.Substring(0, 1).ToUpperInvariant()</span>
+                                <span class="overview-review-info">
+                                    <span class="overview-review-top">
+                                        <strong>@L10n.Text(row.Review.UserName, row.Review.UserNameEn)</strong>
+                                        <time class="overview-review-date">@row.Review.CreatedAt.ToLocalTime().ToString("MM-dd HH:mm")</time>
+                                    </span>
+                                    <span class="overview-stars">@Overview.Stars(row.Review.Rating)</span>
+                                    <span class="overview-review-text">@L10n.Text(row.Review.Comment ?? "", row.Review.CommentEn)</span>
+                                    <span class="overview-review-product">@row.ProductName</span>
+                                </span>
+                            </li>
+                        }
+                    </ul>
+                }
+            </div>
+        </section>
     </div>
 </div>
 
-<div class="card shadow-sm mt-4">
-    <div class="card-header fw-semibold">@Loc["QuickActions"]</div>
-    <div class="card-body d-flex gap-2 flex-wrap">
-        <a asp-area="Admin" asp-controller="Products" asp-action="Create" class="btn btn-primary btn-sm"><i class="bi bi-plus-lg me-1"></i>@Loc["AddProduct"]</a>
-        <a asp-area="Admin" asp-controller="Categories" asp-action="Create" class="btn btn-outline-primary btn-sm"><i class="bi bi-plus-lg me-1"></i>@Loc["AddCategory"]</a>
-        <a asp-area="Admin" asp-controller="Products" asp-action="Index" class="btn btn-outline-secondary btn-sm">@Loc["ManageProducts"]</a>
-    </div>
-</div>
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const labels = @Html.Raw(JsonSerializer.Serialize(Model.Trend.Select(p => p.Label)));
+            const data = @Html.Raw(JsonSerializer.Serialize(Model.Trend.Select(p => p.Revenue)));
+
+            new Chart(document.getElementById('overviewRevenueChart'), {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        borderColor: '#d9412a',
+                        backgroundColor: 'rgba(217, 65, 42, .06)',
+                        fill: true,
+                        tension: .35,
+                        pointRadius: 0,
+                        pointHoverRadius: 4,
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { callbacks: { label: ctx => '¥' + Number(ctx.parsed.y).toFixed(2) } }
+                    },
+                    scales: {
+                        x: { grid: { display: false }, ticks: { color: '#9ca3af', maxTicksLimit: 8 } },
+                        y: { beginAtZero: true, grid: { color: '#eef0f3' }, ticks: { color: '#9ca3af', callback: v => '¥' + v } }
+                    }
+                }
+            });
+        });
+    </script>
+}
+
+@functions {
+    static class Overview
+    {
+        public static string StatusClass(string status) => status switch
+        {
+            "待发货" => "is-warning",
+            "已发货" => "is-info",
+            "已完成" => "is-success",
+            "已退款" => "is-danger",
+            _ => "is-muted"
+        };
+
+        public static string Stars(int rating) =>
+            new string('★', Math.Max(1, Math.Min(5, rating)));
+    }
+}

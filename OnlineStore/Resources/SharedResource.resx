@@ -14,6 +14,10 @@
   <data name="FooterQualities" xml:space="preserve"><value>正品保障 · 极速发货 · 售后无忧</value></data>
   <data name="HeroTitle" xml:space="preserve"><value>好物不多，件件用心挑</value></data>
   <data name="HeroSubtitle" xml:space="preserve"><value>数码 · 服饰 · 图书 · 家居 · 户外，值得慢慢逛</value></data>
+  <data name="CuratedSelection" xml:space="preserve"><value>编辑精选</value></data>
+  <data name="BrowseByMood" xml:space="preserve"><value>按生活场景发现</value></data>
+  <data name="ShopByCategory" xml:space="preserve"><value>浏览分类</value></data>
+  <data name="Search" xml:space="preserve"><value>搜索</value></data>
   <data name="StartShopping" xml:space="preserve"><value>开始逛</value></data>
   <data name="NewArrivals" xml:space="preserve"><value>最新上架</value></data>
   <data name="ViewAll" xml:space="preserve"><value>查看全部</value></data>
@@ -98,6 +102,27 @@
   <data name="RequestId" xml:space="preserve"><value>请求 ID：</value></data>
   <data name="ManagementConsole" xml:space="preserve"><value>管理后台</value></data>
   <data name="Dashboard" xml:space="preserve"><value>仪表盘</value></data>
+  <data name="StoreOverview" xml:space="preserve"><value>店铺概览</value></data>
+  <data name="OverviewSubtitle" xml:space="preserve"><value>销售、订单、商品与评价概览</value></data>
+  <data name="TotalRevenue" xml:space="preserve"><value>总收入</value></data>
+  <data name="TotalOrders" xml:space="preserve"><value>订单总数</value></data>
+  <data name="CustomerCount" xml:space="preserve"><value>客户数</value></data>
+  <data name="UnitsSold" xml:space="preserve"><value>已售件数</value></data>
+  <data name="RecentOrders" xml:space="preserve"><value>近期订单</value></data>
+  <data name="TopProducts" xml:space="preserve"><value>热销商品</value></data>
+  <data name="LatestReviews" xml:space="preserve"><value>最新评价</value></data>
+  <data name="DashboardRevenueSubtitle" xml:space="preserve"><value>近 30 天营收、订单状态与待办事项概览。</value></data>
+  <data name="TodayRevenue" xml:space="preserve"><value>今日营收</value></data>
+  <data name="TodayOrders" xml:space="preserve"><value>今日订单</value></data>
+  <data name="Today" xml:space="preserve"><value>今日</value></data>
+  <data name="AverageOrderValue" xml:space="preserve"><value>客单价</value></data>
+  <data name="TodayRefund" xml:space="preserve"><value>今日退款</value></data>
+  <data name="ComparedToYesterday" xml:space="preserve"><value>较昨日</value></data>
+  <data name="RevenueTrend" xml:space="preserve"><value>营收趋势（近30天）</value></data>
+  <data name="OrderStatusDistribution" xml:space="preserve"><value>订单状态分布</value></data>
+  <data name="CategoryRevenue" xml:space="preserve"><value>分类营收</value></data>
+  <data name="NeedsAttention" xml:space="preserve"><value>待处理事项</value></data>
+  <data name="PendingShipment" xml:space="preserve"><value>待发货</value></data>
   <data name="ProductManagement" xml:space="preserve"><value>商品管理</value></data>
   <data name="CategoryManagement" xml:space="preserve"><value>分类管理</value></data>
   <data name="BackToStore" xml:space="preserve"><value>返回前台</value></data>
@@ -232,6 +257,7 @@
   <data name="AddressDetailsHint" xml:space="preserve"><value>维护用于订单配送的地址信息。</value></data>
   <data name="AddressBookTitle" xml:space="preserve"><value>我的收货地址</value></data>
   <data name="AddressBookHint" xml:space="preserve"><value>管理用于订单配送的收货地址，结算时会自动带入。</value></data>
+  <data name="RegisterAddressHint" xml:space="preserve"><value>填写收货地址，注册后将自动保存到你的地址簿。</value></data>
   <data name="PrimaryAddress" xml:space="preserve"><value>主要地址</value></data>
   <data name="ActiveDelivery" xml:space="preserve"><value>当前配送地址</value></data>
   <data name="AddAddress" xml:space="preserve"><value>添加地址</value></data>
@@ -389,6 +415,7 @@
   <data name="CartAdded" xml:space="preserve"><value>已加入购物车。</value></data>
   <data name="FavoriteAdded" xml:space="preserve"><value>已加入收藏。</value></data>
   <data name="FavoriteRemoved" xml:space="preserve"><value>已取消收藏。</value></data>
+  <data name="Unfavorite" xml:space="preserve"><value>取消喜欢</value></data>
   <data name="ReviewSubmitted" xml:space="preserve"><value>评价已提交，感谢分享！</value></data>
   <data name="LoginFailed" xml:space="preserve"><value>账号或密码错误。</value></data>
   <data name="AccountLocked" xml:space="preserve"><value>登录失败次数过多，账号已锁定，请稍后再试。</value></data>

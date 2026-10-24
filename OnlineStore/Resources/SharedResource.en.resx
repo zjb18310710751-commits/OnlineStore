@@ -14,6 +14,10 @@
   <data name="FooterQualities" xml:space="preserve"><value>Genuine · Fast shipping · Easy returns</value></data>
   <data name="HeroTitle" xml:space="preserve"><value>Fewer things, better things</value></data>
   <data name="HeroSubtitle" xml:space="preserve"><value>Gadgets · Fashion · Books · Home · Outdoors</value></data>
+  <data name="CuratedSelection" xml:space="preserve"><value>Curated selection</value></data>
+  <data name="BrowseByMood" xml:space="preserve"><value>Shop by mood</value></data>
+  <data name="ShopByCategory" xml:space="preserve"><value>Browse categories</value></data>
+  <data name="Search" xml:space="preserve"><value>Search</value></data>
   <data name="StartShopping" xml:space="preserve"><value>Start Shopping</value></data>
   <data name="NewArrivals" xml:space="preserve"><value>New Arrivals</value></data>
   <data name="ViewAll" xml:space="preserve"><value>View All</value></data>
@@ -98,6 +102,27 @@
   <data name="RequestId" xml:space="preserve"><value>Request ID: </value></data>
   <data name="ManagementConsole" xml:space="preserve"><value>Admin Console</value></data>
   <data name="Dashboard" xml:space="preserve"><value>Dashboard</value></data>
+  <data name="StoreOverview" xml:space="preserve"><value>Store overview</value></data>
+  <data name="OverviewSubtitle" xml:space="preserve"><value>Sales, orders, products and reviews at a glance.</value></data>
+  <data name="TotalRevenue" xml:space="preserve"><value>Total revenue</value></data>
+  <data name="TotalOrders" xml:space="preserve"><value>Total orders</value></data>
+  <data name="CustomerCount" xml:space="preserve"><value>Customers</value></data>
+  <data name="UnitsSold" xml:space="preserve"><value>Units sold</value></data>
+  <data name="RecentOrders" xml:space="preserve"><value>Recent orders</value></data>
+  <data name="TopProducts" xml:space="preserve"><value>Top products</value></data>
+  <data name="LatestReviews" xml:space="preserve"><value>Latest reviews</value></data>
+  <data name="DashboardRevenueSubtitle" xml:space="preserve"><value>Revenue, order status and pending tasks for the last 30 days.</value></data>
+  <data name="TodayRevenue" xml:space="preserve"><value>Today's revenue</value></data>
+  <data name="TodayOrders" xml:space="preserve"><value>Today's orders</value></data>
+  <data name="Today" xml:space="preserve"><value>Today</value></data>
+  <data name="AverageOrderValue" xml:space="preserve"><value>Average order value</value></data>
+  <data name="TodayRefund" xml:space="preserve"><value>Today's refunds</value></data>
+  <data name="ComparedToYesterday" xml:space="preserve"><value>vs yesterday</value></data>
+  <data name="RevenueTrend" xml:space="preserve"><value>Revenue trend (30 days)</value></data>
+  <data name="OrderStatusDistribution" xml:space="preserve"><value>Order status distribution</value></data>
+  <data name="CategoryRevenue" xml:space="preserve"><value>Revenue by category</value></data>
+  <data name="NeedsAttention" xml:space="preserve"><value>Needs attention</value></data>
+  <data name="PendingShipment" xml:space="preserve"><value>Pending shipment</value></data>
   <data name="ProductManagement" xml:space="preserve"><value>Products</value></data>
   <data name="CategoryManagement" xml:space="preserve"><value>Categories</value></data>
   <data name="BackToStore" xml:space="preserve"><value>Back to Store</value></data>
@@ -232,6 +257,7 @@
   <data name="AddressDetailsHint" xml:space="preserve"><value>Maintain the address used for order delivery.</value></data>
   <data name="AddressBookTitle" xml:space="preserve"><value>My delivery addresses</value></data>
   <data name="AddressBookHint" xml:space="preserve"><value>Manage the address used for delivery. It will be filled in automatically at checkout.</value></data>
+  <data name="RegisterAddressHint" xml:space="preserve"><value>Add your delivery address. It will be saved to your address book after registration.</value></data>
   <data name="PrimaryAddress" xml:space="preserve"><value>Primary address</value></data>
   <data name="ActiveDelivery" xml:space="preserve"><value>Active delivery address</value></data>
   <data name="AddAddress" xml:space="preserve"><value>Add address</value></data>
@@ -389,6 +415,7 @@
   <data name="CartAdded" xml:space="preserve"><value>Added to cart.</value></data>
   <data name="FavoriteAdded" xml:space="preserve"><value>Added to favorites.</value></data>
   <data name="FavoriteRemoved" xml:space="preserve"><value>Removed from favorites.</value></data>
+  <data name="Unfavorite" xml:space="preserve"><value>Remove favorite</value></data>
   <data name="ReviewSubmitted" xml:space="preserve"><value>Review submitted. Thanks for sharing!</value></data>
   <data name="LoginFailed" xml:space="preserve"><value>Invalid username or password.</value></data>
   <data name="AccountLocked" xml:space="preserve"><value>Too many failed login attempts. Your account is locked. Try again later.</value></data>
