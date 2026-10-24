@@ -45,42 +45,10 @@
     <div class="overview-grid">
         <section class="overview-panel">
             <div class="overview-panel-head">
-                <h2>@Loc["RecentOrders"]</h2>
-                <a asp-area="Admin" asp-controller="Orders" asp-action="Index">@Loc["ViewAll"]</a>
+                <h2>@Loc["RevenueTrend"]</h2>
             </div>
             <div class="overview-panel-body">
-                @if (Model.RecentOrders.Count == 0)
-                {
-                    <div class="overview-empty">@Loc["NoOrders"]</div>
-                }
-                else
-                {
-                    <div class="table-responsive">
-                        <table class="table overview-table align-middle mb-0">
-                            <thead>
-                                <tr>
-                                    <th>@Loc["OrderNo"]</th>
-                                    <th>@Loc["Receiver"]</th>
-                                    <th>@Loc["OrderStatus"]</th>
-                                    <th class="text-end">@Loc["Total"]</th>
-                                    <th class="text-end">@Loc["CreatedAt"]</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var order in Model.RecentOrders)
-                                {
-                                    <tr>
-                                        <td class="overview-mono">@order.OrderNo</td>
-                                        <td>@order.UserName</td>
-                                        <td><span class="overview-status @Overview.StatusClass(order.Status)">@L10n.Status(order.Status)</span></td>
-                                        <td class="text-end fw-semibold">¥@order.Total.ToString("N2")</td>
-                                        <td class="text-end text-muted small">@order.CreatedAt.ToLocalTime().ToString("MM-dd HH:mm")</td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-                    </div>
-                }
+                <div class="overview-chart"><canvas id="overviewRevenueChart"></canvas></div>
             </div>
         </section>
 
@@ -126,10 +94,42 @@
 
         <section class="overview-panel">
             <div class="overview-panel-head">
-                <h2>@Loc["RevenueTrend"]</h2>
+                <h2>@Loc["RecentOrders"]</h2>
+                <a asp-area="Admin" asp-controller="Orders" asp-action="Index">@Loc["ViewAll"]</a>
             </div>
             <div class="overview-panel-body">
-                <div class="overview-chart"><canvas id="overviewRevenueChart"></canvas></div>
+                @if (Model.RecentOrders.Count == 0)
+                {
+                    <div class="overview-empty">@Loc["NoOrders"]</div>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                        <table class="table overview-table align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th>@Loc["OrderNo"]</th>
+                                    <th>@Loc["Receiver"]</th>
+                                    <th>@Loc["OrderStatus"]</th>
+                                    <th class="text-end">@Loc["Total"]</th>
+                                    <th class="text-end">@Loc["CreatedAt"]</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var order in Model.RecentOrders)
+                                {
+                                    <tr>
+                                        <td class="overview-mono">@order.OrderNo</td>
+                                        <td>@order.UserName</td>
+                                        <td><span class="overview-status @Overview.StatusClass(order.Status)">@L10n.Status(order.Status)</span></td>
+                                        <td class="text-end fw-semibold">¥@order.Total.ToString("N2")</td>
+                                        <td class="text-end text-muted small">@order.CreatedAt.ToLocalTime().ToString("MM-dd HH:mm")</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
             </div>
         </section>
 
