@@ -26,10 +26,10 @@
                 @foreach (var s in Model)
                 {
                     <tr>
-                        <td class="fw-semibold">@s.Name</td>
+                        <td class="fw-semibold">@L10n.Name(s)</td>
                         <td><span class="text-warning">★</span> @s.Rating.ToString("0.0")</td>
                         <td>@s.SalesCount</td>
-                        <td class="text-muted">@s.Description</td>
+                        <td class="text-muted">@L10n.Description(s)</td>
                         <td class="text-end text-nowrap">
                             <a asp-action="Edit" asp-route-id="@s.Id" class="btn btn-sm btn-outline-primary" title="@Loc["Edit"]"><i class="bi bi-pencil"></i></a>
                             <form asp-action="Delete" asp-route-id="@s.Id" method="post" class="d-inline" onsubmit="return confirm('@Loc["ConfirmDeleteShop"]');">

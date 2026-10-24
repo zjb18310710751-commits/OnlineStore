@@ -221,9 +221,9 @@ public class ProductsController : Controller
     private async Task PopulateFormAsync(ProductFormViewModel vm)
     {
         var shops = await _shopService.GetAllAsync();
-        vm.Shops = shops.Select(s => new SelectListItem(s.Name, s.Id.ToString()));
+        vm.Shops = shops.Select(s => new SelectListItem(L10n.Name(s), s.Id.ToString()));
 
         var categories = await _categoryService.GetAllAsync();
-        vm.Categories = categories.Select(c => new SelectListItem(c.Name, c.Id.ToString()));
+        vm.Categories = categories.Select(c => new SelectListItem(L10n.Name(c), c.Id.ToString()));
     }
 }
