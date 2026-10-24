@@ -16,6 +16,11 @@
     --bs-link-hover-color: #c7511f;
 }
 
+html {
+    /* 页面高度变化时始终保留滚动条槽位，避免个人中心切换页面时内容区宽度跳动。 */
+    scrollbar-gutter: stable;
+}
+
 body {
     font-family: -apple-system, "Segoe UI", "Microsoft YaHei", Roboto, sans-serif;
     background-color: #eaeded;
@@ -450,6 +455,7 @@ body {
 }
 
 .profile-section-card {
+    min-width: 0;
     border: 1px solid #e4e7ea;
     border-radius: .75rem;
 }
@@ -468,6 +474,10 @@ body {
     align-items: flex-start;
     justify-content: space-between;
     gap: 1rem;
+}
+
+.profile-section-heading > div {
+    min-width: 0;
 }
 
 .profile-section-title {
@@ -513,6 +523,7 @@ body {
 
 .address-book-grid {
     display: grid;
+    min-width: 0;
     grid-template-columns: repeat(auto-fill, minmax(min(100%, 330px), 1fr));
     gap: 1.1rem;
     margin-top: 0;
