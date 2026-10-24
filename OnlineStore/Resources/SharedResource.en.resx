@@ -232,6 +232,7 @@
   <data name="AddressDetailsHint" xml:space="preserve"><value>Maintain the address used for order delivery.</value></data>
   <data name="AddressBookTitle" xml:space="preserve"><value>My delivery addresses</value></data>
   <data name="AddressBookHint" xml:space="preserve"><value>Manage the address used for delivery. It will be filled in automatically at checkout.</value></data>
+  <data name="RegisterAddressHint" xml:space="preserve"><value>Add your delivery address. It will be saved to your address book after registration.</value></data>
   <data name="PrimaryAddress" xml:space="preserve"><value>Primary address</value></data>
   <data name="ActiveDelivery" xml:space="preserve"><value>Active delivery address</value></data>
   <data name="AddAddress" xml:space="preserve"><value>Add address</value></data>

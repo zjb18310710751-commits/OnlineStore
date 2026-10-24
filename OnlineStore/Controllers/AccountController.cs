@@ -280,6 +280,9 @@ public class AccountController : Controller
             return View(model);
         }
 
+        // 将注册时收集的地址写入结构化地址簿，后续 Profile 与结算直接使用。
+        await _deliveryAddressService.EnsureLegacyAddressAsync(user);
+
         // 注册成功后自动登录并跳转首页
         await _signInManager.SignInAsync(user, isPersistent: false);
         TempData["Success"] = _loc["RegisterSuccess"].Value;

@@ -86,8 +86,15 @@
                             </div>
                         </div>
                         <div class="mb-3">
-                            <label asp-for="Address" class="form-label">@Loc["Address"]</label>
-                            <input asp-for="Address" class="form-control" autocomplete="street-address" />
+                            <label class="form-label">@Loc["Address"]</label>
+                            <button type="button" class="register-address-trigger"
+                                    data-bs-toggle="modal" data-bs-target="#registerAddressModal">
+                                <span id="registerAddressSummary">
+                                    @(string.IsNullOrWhiteSpace(Model.Address) ? Loc["AddAddress"].Value : Model.Address)
+                                </span>
+                                <i class="bi bi-chevron-right"></i>
+                            </button>
+                            <input asp-for="Address" id="registerAddressHidden" type="hidden" autocomplete="street-address" />
                             <span asp-validation-for="Address" class="text-danger small"></span>
                         </div>
                         <div class="mb-3">
@@ -112,6 +119,70 @@
     </div>
 </div>
 
+<div class="modal fade address-modal register-address-modal" id="registerAddressModal" tabindex="-1"
+     aria-labelledby="registerAddressModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div>
+                    <span class="address-modal-kicker">@Loc["AddressDetails"]</span>
+                    <h2 class="modal-title" id="registerAddressModalTitle">@Loc["AddAddress"]</h2>
+                    <p class="address-modal-subtitle mb-0">@Loc["RegisterAddressHint"]</p>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="@Loc["Cancel"]"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-3">
+                    <div class="col-12">
+                        <label for="registerAddressLine1" class="form-label">
+                            @Loc["AddressLine1"] <span class="address-required">*</span>
+                        </label>
+                        <input id="registerAddressLine1" class="form-control address-form-control"
+                               value="@Model.AddressLine1" autocomplete="address-line1"
+                               placeholder="@Loc["AddressLine1"]" />
+                    </div>
+                    <div class="col-12">
+                        <label for="registerAddressLine2" class="form-label">@Loc["AddressLine2Optional"]</label>
+                        <input id="registerAddressLine2" class="form-control address-form-control"
+                               value="@Model.AddressLine2" autocomplete="address-line2"
+                               placeholder="@Loc["AddressLine2Optional"]" />
+                    </div>
+                    <div class="col-6 col-md-4">
+                        <label for="registerAddressCity" class="form-label">
+                            @Loc["City"] <span class="address-required">*</span>
+                        </label>
+                        <input id="registerAddressCity" class="form-control address-form-control"
+                               value="@Model.City" autocomplete="address-level2"
+                               placeholder="@Loc["City"]" />
+                    </div>
+                    <div class="col-6 col-md-4">
+                        <label for="registerAddressPostal" class="form-label">
+                            @Loc["PostalCode"] <span class="address-required">*</span>
+                        </label>
+                        <input id="registerAddressPostal" class="form-control address-form-control"
+                               value="@Model.PostalCode" autocomplete="postal-code"
+                               placeholder="@Loc["PostalCode"]" />
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <label for="registerAddressCountry" class="form-label">
+                            @Loc["Country"] <span class="address-required">*</span>
+                        </label>
+                        <input id="registerAddressCountry" class="form-control address-form-control"
+                               value="@Model.Country" autocomplete="country-name"
+                               placeholder="@Loc["Country"]" />
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn address-modal-cancel" data-bs-dismiss="modal">@Loc["Cancel"]</button>
+                <button type="button" id="registerAddressSave" class="btn btn-primary address-modal-save">
+                    <i class="bi bi-check2 me-1"></i>@Loc["UpdateAddress"]
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
     <script>
@@ -124,6 +195,21 @@
                         registerBy.value = btn.id === 'email-register-tab' ? 'email' : 'phone';
                     }
                 });
+            });
+
+            var addressModal = document.getElementById('registerAddressModal');
+            document.getElementById('registerAddressSave').addEventListener('click', function () {
+                var parts = [
+                    document.getElementById('registerAddressLine1').value,
+                    document.getElementById('registerAddressLine2').value,
+                    document.getElementById('registerAddressCity').value,
+                    document.getElementById('registerAddressPostal').value,
+                    document.getElementById('registerAddressCountry').value
+                ].map(function (value) { return value.trim(); }).filter(Boolean);
+
+                document.getElementById('registerAddressHidden').value = parts.join(', ');
+                document.getElementById('registerAddressSummary').textContent = parts.join(', ') || '@Loc["AddAddress"]';
+                bootstrap.Modal.getOrCreateInstance(addressModal).hide();
             });
         });
     </script>

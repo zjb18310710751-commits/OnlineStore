@@ -898,6 +898,38 @@ body {
     background-color: var(--amazon-orange);
 }
 
+.register-address-trigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .75rem;
+    width: 100%;
+    min-height: 42px;
+    padding: .55rem .8rem;
+    border: 1px solid #d8dde1;
+    border-radius: .45rem;
+    background: #fff;
+    color: #30363b;
+    text-align: left;
+}
+
+.register-address-trigger:hover,
+.register-address-trigger:focus-visible {
+    border-color: var(--amazon-orange);
+    background: #fffaf0;
+    color: #111;
+}
+
+.register-address-trigger span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.register-address-modal .modal-dialog {
+    max-width: 540px;
+}
+
 .address-modal .modal-footer {
     flex: 0 0 auto;
     gap: .65rem;

@@ -36,6 +36,21 @@ public class RegisterViewModel
     [Display(Name = "地址")]
     public string Address { get; set; } = string.Empty;
 
+    [StringLength(200)]
+    public string? AddressLine1 { get; set; }
+
+    [StringLength(200)]
+    public string? AddressLine2 { get; set; }
+
+    [StringLength(100)]
+    public string? City { get; set; }
+
+    [StringLength(100)]
+    public string? PostalCode { get; set; }
+
+    [StringLength(100)]
+    public string? Country { get; set; }
+
     [Required(ErrorMessage = "PasswordRequired")]
     [StringLength(100, ErrorMessage = "PasswordTooLong")]
     [RegularExpression(PasswordPolicy.Pattern, ErrorMessage = "PasswordPolicyError")]

@@ -232,6 +232,7 @@
   <data name="AddressDetailsHint" xml:space="preserve"><value>维护用于订单配送的地址信息。</value></data>
   <data name="AddressBookTitle" xml:space="preserve"><value>我的收货地址</value></data>
   <data name="AddressBookHint" xml:space="preserve"><value>管理用于订单配送的收货地址，结算时会自动带入。</value></data>
+  <data name="RegisterAddressHint" xml:space="preserve"><value>填写收货地址，注册后将自动保存到你的地址簿。</value></data>
   <data name="PrimaryAddress" xml:space="preserve"><value>主要地址</value></data>
   <data name="ActiveDelivery" xml:space="preserve"><value>当前配送地址</value></data>
   <data name="AddAddress" xml:space="preserve"><value>添加地址</value></data>
