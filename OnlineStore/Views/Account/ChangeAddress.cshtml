@@ -10,26 +10,27 @@
             <partial name="_ProfileSidebar" model="Model" />
         </div>
         <div class="col-lg-9">
-            <section class="address-book-shell" aria-labelledby="addressBookTitle"
+            <section class="card shadow-sm profile-section-card" aria-labelledby="addressBookTitle"
                      data-has-addresses="@(Model.Addresses.Count > 0 ? "true" : "false")">
-                <header class="address-book-header">
-                    <div>
-                        <div class="address-book-kicker">@Loc["AddressDetails"]</div>
-                        <h1 id="addressBookTitle" class="address-book-title">@Loc["AddressBookTitle"]</h1>
-                        <p class="address-book-subtitle mb-0">@Loc["AddressBookHint"]</p>
+                <div class="card-header bg-white">
+                    <div class="profile-section-heading address-section-heading">
+                        <div>
+                            <h1 id="addressBookTitle" class="profile-section-title">@Loc["AddressBookTitle"]</h1>
+                            <p class="profile-section-subtitle mb-0">@Loc["AddressBookHint"]</p>
+                        </div>
+                        <button type="button" class="btn btn-primary address-book-primary-action"
+                                data-address-add>
+                            <i class="bi bi-plus-lg me-2"></i>@Loc["AddAddress"]
+                        </button>
                     </div>
-                    <button type="button" class="btn btn-primary address-book-primary-action"
-                            data-address-add>
-                        <i class="bi bi-plus-lg me-2"></i>@Loc["AddAddress"]
-                    </button>
-                </header>
-
-                <div class="address-book-grid">
-                    @if (Model.Addresses.Count > 0)
-                    {
-                        @foreach (var address in Model.Addresses)
+                </div>
+                <div class="card-body">
+                    <div class="address-book-grid">
+                        @if (Model.Addresses.Count > 0)
                         {
-                            <article class="delivery-address-card @(address.IsDefault ? "is-primary" : "")">
+                            @foreach (var address in Model.Addresses)
+                            {
+                                <article class="delivery-address-card @(address.IsDefault ? "is-primary" : "")">
                                 <div class="delivery-address-card-top">
                                     @if (address.IsDefault)
                                     {
@@ -117,22 +118,23 @@
                                         </button>
                                     </div>
                                 </footer>
-                            </article>
+                                </article>
+                            }
                         }
-                    }
-                    else
-                    {
-                        <div class="delivery-address-empty">
-                            <span class="delivery-address-empty-icon">
-                                <i class="bi bi-geo-alt"></i>
-                            </span>
-                            <h2>@Loc["NoAddressTitle"]</h2>
-                            <p>@Loc["NoAddressHint"]</p>
-                            <button type="button" class="btn btn-primary" data-address-add>
-                                <i class="bi bi-plus-lg me-2"></i>@Loc["AddAddress"]
-                            </button>
-                        </div>
-                    }
+                        else
+                        {
+                            <div class="delivery-address-empty">
+                                <span class="delivery-address-empty-icon">
+                                    <i class="bi bi-geo-alt"></i>
+                                </span>
+                                <h2>@Loc["NoAddressTitle"]</h2>
+                                <p>@Loc["NoAddressHint"]</p>
+                                <button type="button" class="btn btn-primary" data-address-add>
+                                    <i class="bi bi-plus-lg me-2"></i>@Loc["AddAddress"]
+                                </button>
+                            </div>
+                        }
+                    </div>
                 </div>
             </section>
         </div>
@@ -260,7 +262,7 @@
             const editorModal = document.getElementById('addressEditorModal');
             const editorForm = document.getElementById('addressEditorForm');
             const editorTitle = document.getElementById('addressEditorTitle');
-            const hasAddresses = document.querySelector('.address-book-shell')?.dataset.hasAddresses === 'true';
+            const hasAddresses = document.querySelector('[data-has-addresses]')?.dataset.hasAddresses === 'true';
             const addTitle = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Loc["AddAddress"].Value));
             const editTitle = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Loc["EditDeliveryAddress"].Value));
 

@@ -495,22 +495,6 @@ body {
 }
 
 /* 个人中心：收货地址簿 */
-.address-book-shell {
-    padding: 1.55rem;
-    border: 1px solid #e4e7ea;
-    border-radius: .85rem;
-    background: #fff;
-    box-shadow: 0 .35rem 1.1rem rgba(15, 17, 17, .06);
-}
-
-.address-book-header {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 1.5rem;
-}
-
-.address-book-kicker,
 .address-modal-kicker {
     margin-bottom: .35rem;
     color: #7b858e;
@@ -518,22 +502,6 @@ body {
     font-weight: 700;
     letter-spacing: .12em;
     text-transform: uppercase;
-}
-
-.address-book-title {
-    margin: 0;
-    color: #0f1111;
-    font-size: clamp(1.65rem, 3vw, 2.35rem);
-    font-weight: 700;
-    letter-spacing: -.035em;
-    line-height: 1.12;
-}
-
-.address-book-subtitle {
-    max-width: 42rem;
-    margin-top: .45rem;
-    color: #667078;
-    font-size: .92rem;
 }
 
 .address-book-primary-action {
@@ -547,7 +515,7 @@ body {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(min(100%, 330px), 1fr));
     gap: 1.1rem;
-    margin-top: 1.55rem;
+    margin-top: 0;
 }
 
 .delivery-address-card {
@@ -945,11 +913,7 @@ body {
 }
 
 @media (max-width: 575.98px) {
-    .address-book-shell {
-        padding: 1.1rem;
-    }
-
-    .address-book-header {
+    .address-section-heading {
         flex-direction: column;
         gap: 1rem;
     }
