@@ -153,10 +153,11 @@
                                 <span class="overview-review-info">
                                     <span class="overview-review-top">
                                         <strong>@L10n.Text(row.Review.UserName, row.Review.UserNameEn)</strong>
-                                        <span class="overview-stars">@Overview.Stars(row.Review.Rating)</span>
+                                        <time class="overview-review-date">@row.Review.CreatedAt.ToLocalTime().ToString("MM-dd HH:mm")</time>
                                     </span>
+                                    <span class="overview-stars">@Overview.Stars(row.Review.Rating)</span>
                                     <span class="overview-review-text">@L10n.Text(row.Review.Comment ?? "", row.Review.CommentEn)</span>
-                                    <span class="overview-review-meta">@row.ProductName · @row.Review.CreatedAt.ToLocalTime().ToString("MM-dd HH:mm")</span>
+                                    <span class="overview-review-product">@row.ProductName</span>
                                 </span>
                             </li>
                         }

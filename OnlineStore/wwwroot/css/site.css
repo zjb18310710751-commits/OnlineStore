@@ -1881,8 +1881,9 @@ body {
 
 .overview-review-list li {
     display: flex;
+    align-items: flex-start;
     gap: .8rem;
-    padding: .75rem 0;
+    padding: .9rem 0;
     border-bottom: 1px solid #f2f3f5;
 }
 
@@ -1894,8 +1895,8 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 38px;
-    height: 38px;
+    width: 34px;
+    height: 34px;
     flex: 0 0 auto;
     border-radius: 50%;
     background: #111827;
@@ -1907,38 +1908,63 @@ body {
 .overview-review-info {
     display: flex;
     min-width: 0;
+    flex: 1 1 auto;
     flex-direction: column;
+    gap: .2rem;
 }
 
 .overview-review-top {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: .75rem;
+    gap: .35rem .75rem;
+    flex-wrap: wrap;
 }
 
 .overview-review-top strong {
+    min-width: 0;
+    flex: 1 1 8rem;
+    overflow: hidden;
     color: #1f2937;
     font-size: .88rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.overview-review-date {
+    margin-left: auto;
+    color: #9ca3af;
+    font-size: .72rem;
+    white-space: nowrap;
 }
 
 .overview-stars {
+    display: block;
     color: #d97706;
-    font-size: .82rem;
+    font-size: .78rem;
     letter-spacing: .05em;
+    line-height: 1.2;
 }
 
 .overview-review-text {
-    margin-top: .25rem;
+    display: block;
+    overflow-wrap: anywhere;
     color: #4b5563;
     font-size: .85rem;
     line-height: 1.45;
 }
 
-.overview-review-meta {
-    margin-top: .25rem;
-    color: #9ca3af;
+.overview-review-product {
+    display: inline-flex;
+    align-self: flex-start;
+    margin-top: .2rem;
+    padding: .16rem .48rem;
+    overflow-wrap: anywhere;
+    border-radius: 999px;
+    background: #f3f4f6;
+    color: #6b7280;
     font-size: .76rem;
+    line-height: 1.35;
 }
 
 .overview-chart {
