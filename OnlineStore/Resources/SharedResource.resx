@@ -98,6 +98,15 @@
   <data name="RequestId" xml:space="preserve"><value>请求 ID：</value></data>
   <data name="ManagementConsole" xml:space="preserve"><value>管理后台</value></data>
   <data name="Dashboard" xml:space="preserve"><value>仪表盘</value></data>
+  <data name="StoreOverview" xml:space="preserve"><value>店铺概览</value></data>
+  <data name="OverviewSubtitle" xml:space="preserve"><value>销售、订单、商品与评价概览</value></data>
+  <data name="TotalRevenue" xml:space="preserve"><value>总收入</value></data>
+  <data name="TotalOrders" xml:space="preserve"><value>订单总数</value></data>
+  <data name="CustomerCount" xml:space="preserve"><value>客户数</value></data>
+  <data name="UnitsSold" xml:space="preserve"><value>已售件数</value></data>
+  <data name="RecentOrders" xml:space="preserve"><value>近期订单</value></data>
+  <data name="TopProducts" xml:space="preserve"><value>热销商品</value></data>
+  <data name="LatestReviews" xml:space="preserve"><value>最新评价</value></data>
   <data name="DashboardRevenueSubtitle" xml:space="preserve"><value>近 30 天营收、订单状态与待办事项概览。</value></data>
   <data name="TodayRevenue" xml:space="preserve"><value>今日营收</value></data>
   <data name="TodayOrders" xml:space="preserve"><value>今日订单</value></data>

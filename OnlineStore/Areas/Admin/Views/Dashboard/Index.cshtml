@@ -2,130 +2,168 @@
 @model AdminDashboardData
 @{
     ViewData["Title"] = Loc["Dashboard"].Value;
-    var revenueDelta = Model.YesterdayRevenue == 0m
-        ? 0m
-        : (Model.TodayRevenue - Model.YesterdayRevenue) / Model.YesterdayRevenue * 100m;
-    var revenueIsUp = revenueDelta >= 0m;
-    var statusKeys = new[] { "待发货", "已发货", "已完成", "已取消", "已退款" };
-    var statusLabels = statusKeys.Select(L10n.Status).ToList();
-    var statusValues = statusKeys
-        .Select(key => Model.OrderStatusCounts.GetValueOrDefault(key))
-        .ToList();
 }
 
-<div class="dashboard-page">
-    <div class="dashboard-page-heading">
+<div class="overview">
+    <header class="overview-head">
         <div>
-            <h1 class="h3 mb-1">@Loc["Dashboard"]</h1>
-            <p class="text-muted small mb-0">@Loc["DashboardRevenueSubtitle"]</p>
+            <h1>@Loc["StoreOverview"]</h1>
+            <p>@Loc["OverviewSubtitle"]</p>
         </div>
-        <span class="dashboard-live-label"><span></span>@Loc["ComparedToYesterday"]</span>
-    </div>
+        <a asp-area="Admin" asp-controller="Orders" asp-action="Index" class="overview-text-link">
+            @Loc["OrderManagement"] <i class="bi bi-arrow-right"></i>
+        </a>
+    </header>
 
-    <div class="row g-3">
-        <div class="col-sm-6 col-xl-3">
-            <div class="card dashboard-kpi shadow-sm h-100">
-                <div class="card-body">
-                    <div class="dashboard-kpi-label">@Loc["TodayRevenue"]</div>
-                    <div class="dashboard-kpi-value">¥@Model.TodayRevenue.ToString("N2")</div>
-                    <div class="dashboard-kpi-delta @(revenueIsUp ? "is-up" : "is-down")">
-                        <i class="bi @(revenueIsUp ? "bi-arrow-up-right" : "bi-arrow-down-right")"></i>
-                        @revenueDelta.ToString("0.0")% <span>@Loc["ComparedToYesterday"]</span>
+    <section class="overview-metrics">
+        <div class="overview-metric">
+            <span class="overview-metric-label">@Loc["TotalRevenue"]</span>
+            <span class="overview-metric-value">¥@Model.TotalRevenue.ToString("N2")</span>
+        </div>
+        <div class="overview-metric">
+            <span class="overview-metric-label">@Loc["TotalOrders"]</span>
+            <span class="overview-metric-value">@Model.TotalOrderCount</span>
+        </div>
+        <div class="overview-metric">
+            <span class="overview-metric-label">@Loc["CustomerCount"]</span>
+            <span class="overview-metric-value">@Model.CustomerCount</span>
+        </div>
+        <div class="overview-metric">
+            <span class="overview-metric-label">@Loc["UnitsSold"]</span>
+            <span class="overview-metric-value">@Model.UnitsSold</span>
+        </div>
+        <div class="overview-metric is-alert">
+            <span class="overview-metric-label">@Loc["PendingShipment"]</span>
+            <span class="overview-metric-value">@Model.PendingShipmentCount</span>
+        </div>
+        <div class="overview-metric is-alert">
+            <span class="overview-metric-label">@Loc["LowStock"]</span>
+            <span class="overview-metric-value">@Model.LowStockCount</span>
+        </div>
+    </section>
+
+    <div class="overview-grid">
+        <section class="overview-panel">
+            <div class="overview-panel-head">
+                <h2>@Loc["RecentOrders"]</h2>
+                <a asp-area="Admin" asp-controller="Orders" asp-action="Index">@Loc["ViewAll"]</a>
+            </div>
+            <div class="overview-panel-body">
+                @if (Model.RecentOrders.Count == 0)
+                {
+                    <div class="overview-empty">@Loc["NoOrders"]</div>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                        <table class="table overview-table align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th>@Loc["OrderNo"]</th>
+                                    <th>@Loc["Receiver"]</th>
+                                    <th>@Loc["OrderStatus"]</th>
+                                    <th class="text-end">@Loc["Total"]</th>
+                                    <th class="text-end">@Loc["CreatedAt"]</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var order in Model.RecentOrders)
+                                {
+                                    <tr>
+                                        <td class="overview-mono">@order.OrderNo</td>
+                                        <td>@order.UserName</td>
+                                        <td><span class="overview-status @Overview.StatusClass(order.Status)">@L10n.Status(order.Status)</span></td>
+                                        <td class="text-end fw-semibold">¥@order.Total.ToString("N2")</td>
+                                        <td class="text-end text-muted small">@order.CreatedAt.ToLocalTime().ToString("MM-dd HH:mm")</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
                     </div>
-                </div>
+                }
             </div>
-        </div>
-        <div class="col-sm-6 col-xl-3">
-            <div class="card dashboard-kpi shadow-sm h-100">
-                <div class="card-body">
-                    <div class="dashboard-kpi-label">@Loc["TodayOrders"]</div>
-                    <div class="dashboard-kpi-value">@Model.TodayOrderCount</div>
-                    <div class="dashboard-kpi-note"><i class="bi bi-receipt me-1"></i>@Loc["OrderManagement"]</div>
-                </div>
-            </div>
-        </div>
-        <div class="col-sm-6 col-xl-3">
-            <div class="card dashboard-kpi shadow-sm h-100">
-                <div class="card-body">
-                    <div class="dashboard-kpi-label">@Loc["AverageOrderValue"]</div>
-                    <div class="dashboard-kpi-value">¥@Model.TodayAverageOrderValue.ToString("N2")</div>
-                    <div class="dashboard-kpi-note"><i class="bi bi-people me-1"></i>@Loc["Today"]</div>
-                </div>
-            </div>
-        </div>
-        <div class="col-sm-6 col-xl-3">
-            <div class="card dashboard-kpi shadow-sm h-100">
-                <div class="card-body">
-                    <div class="dashboard-kpi-label">@Loc["TodayRefund"]</div>
-                    <div class="dashboard-kpi-value text-danger">¥@Model.TodayRefundAmount.ToString("N2")</div>
-                    <div class="dashboard-kpi-note"><i class="bi bi-arrow-counterclockwise me-1"></i>@Loc["Refund"]</div>
-                </div>
-            </div>
-        </div>
-    </div>
+        </section>
 
-    <div class="row g-3 mt-1">
-        <div class="col-lg-8">
-            <div class="card dashboard-chart-card shadow-sm h-100">
-                <div class="card-header bg-white fw-semibold">@Loc["RevenueTrend"]</div>
-                <div class="card-body">
-                    <div class="dashboard-chart-box"><canvas id="revenueTrendChart"></canvas></div>
-                </div>
+        <section class="overview-panel">
+            <div class="overview-panel-head">
+                <h2>@Loc["TopProducts"]</h2>
+                <a asp-area="Admin" asp-controller="Products" asp-action="Index">@Loc["ViewAll"]</a>
             </div>
-        </div>
-        <div class="col-lg-4">
-            <div class="card dashboard-chart-card shadow-sm h-100">
-                <div class="card-header bg-white fw-semibold">@Loc["OrderStatusDistribution"]</div>
-                <div class="card-body">
-                    <div class="dashboard-chart-box"><canvas id="orderStatusChart"></canvas></div>
-                </div>
+            <div class="overview-panel-body">
+                @if (Model.TopProducts.Count == 0)
+                {
+                    <div class="overview-empty">@Loc["NoProducts"]</div>
+                }
+                else
+                {
+                    <ol class="overview-product-list">
+                        @for (var i = 0; i < Model.TopProducts.Count; i++)
+                        {
+                            var row = Model.TopProducts[i];
+                            <li>
+                                <span class="overview-product-rank">@(i + 1)</span>
+                                <span class="overview-product-thumb">
+                                    @if (!string.IsNullOrEmpty(row.Product.ImageUrl))
+                                    {
+                                        <img src="@row.Product.ImageUrl" alt="@L10n.Name(row.Product)" />
+                                    }
+                                    else
+                                    {
+                                        <i class="bi bi-image"></i>
+                                    }
+                                </span>
+                                <span class="overview-product-info">
+                                    <span class="overview-product-name">@L10n.Name(row.Product)</span>
+                                    <span class="overview-product-meta">¥@row.Product.Price.ToString("N2") · @Loc["SoldCount", row.UnitsSold]</span>
+                                </span>
+                                <span class="overview-product-revenue">¥@row.Revenue.ToString("N2")</span>
+                            </li>
+                        }
+                    </ol>
+                }
             </div>
-        </div>
-    </div>
+        </section>
 
-    <div class="row g-3 mt-1">
-        <div class="col-lg-7">
-            <div class="card dashboard-chart-card shadow-sm h-100">
-                <div class="card-header bg-white fw-semibold">@Loc["CategoryRevenue"]</div>
-                <div class="card-body">
-                    <div class="dashboard-chart-box"><canvas id="categoryRevenueChart"></canvas></div>
-                </div>
+        <section class="overview-panel">
+            <div class="overview-panel-head">
+                <h2>@Loc["RevenueTrend"]</h2>
             </div>
-        </div>
-        <div class="col-lg-5">
-            <div class="card shadow-sm h-100">
-                <div class="card-header bg-white fw-semibold">@Loc["NeedsAttention"]</div>
-                <div class="list-group list-group-flush">
-                    <a asp-area="Admin" asp-controller="Orders" asp-action="Index"
-                       class="list-group-item list-group-item-action dashboard-task">
-                        <span class="dashboard-task-icon bg-warning-subtle text-warning"><i class="bi bi-box-seam"></i></span>
-                        <span class="dashboard-task-body">
-                            <strong>@Model.PendingShipmentCount</strong>
-                            <span>@Loc["PendingShipment"]</span>
-                        </span>
-                        <i class="bi bi-chevron-right"></i>
-                    </a>
-                    <a asp-area="Admin" asp-controller="Products" asp-action="Index"
-                       class="list-group-item list-group-item-action dashboard-task">
-                        <span class="dashboard-task-icon bg-danger-subtle text-danger"><i class="bi bi-exclamation-triangle"></i></span>
-                        <span class="dashboard-task-body">
-                            <strong>@Model.LowStockCount</strong>
-                            <span>@Loc["LowStock"]</span>
-                        </span>
-                        <i class="bi bi-chevron-right"></i>
-                    </a>
-                    <a asp-area="Admin" asp-controller="Orders" asp-action="Index"
-                       class="list-group-item list-group-item-action dashboard-task">
-                        <span class="dashboard-task-icon bg-info-subtle text-info"><i class="bi bi-arrow-counterclockwise"></i></span>
-                        <span class="dashboard-task-body">
-                            <strong>¥@Model.TodayRefundAmount.ToString("N2")</strong>
-                            <span>@Loc["TodayRefund"]</span>
-                        </span>
-                        <i class="bi bi-chevron-right"></i>
-                    </a>
-                </div>
+            <div class="overview-panel-body">
+                <div class="overview-chart"><canvas id="overviewRevenueChart"></canvas></div>
             </div>
-        </div>
+        </section>
+
+        <section class="overview-panel">
+            <div class="overview-panel-head">
+                <h2>@Loc["LatestReviews"]</h2>
+                <a asp-area="Admin" asp-controller="Reviews" asp-action="Index">@Loc["ViewAll"]</a>
+            </div>
+            <div class="overview-panel-body">
+                @if (Model.LatestReviews.Count == 0)
+                {
+                    <div class="overview-empty">@Loc["NoReviews"]</div>
+                }
+                else
+                {
+                    <ul class="overview-review-list">
+                        @foreach (var row in Model.LatestReviews)
+                        {
+                            <li>
+                                <span class="overview-avatar">@row.Review.UserName.Substring(0, 1).ToUpperInvariant()</span>
+                                <span class="overview-review-info">
+                                    <span class="overview-review-top">
+                                        <strong>@L10n.Text(row.Review.UserName, row.Review.UserNameEn)</strong>
+                                        <span class="overview-stars">@Overview.Stars(row.Review.Rating)</span>
+                                    </span>
+                                    <span class="overview-review-text">@L10n.Text(row.Review.Comment ?? "", row.Review.CommentEn)</span>
+                                    <span class="overview-review-meta">@row.ProductName · @row.Review.CreatedAt.ToLocalTime().ToString("MM-dd HH:mm")</span>
+                                </span>
+                            </li>
+                        }
+                    </ul>
+                }
+            </div>
+        </section>
     </div>
 </div>
 
@@ -133,29 +171,22 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            const trendLabels = @Html.Raw(JsonSerializer.Serialize(Model.Trend.Select(p => p.Label)));
-            const trendData = @Html.Raw(JsonSerializer.Serialize(Model.Trend.Select(p => p.Revenue)));
-            const statusLabels = @Html.Raw(JsonSerializer.Serialize(statusLabels));
-            const statusData = @Html.Raw(JsonSerializer.Serialize(statusValues));
-            const categoryLabels = @Html.Raw(JsonSerializer.Serialize(Model.CategoryRevenues.Select(p => p.Name)));
-            const categoryData = @Html.Raw(JsonSerializer.Serialize(Model.CategoryRevenues.Select(p => p.Revenue)));
+            const labels = @Html.Raw(JsonSerializer.Serialize(Model.Trend.Select(p => p.Label)));
+            const data = @Html.Raw(JsonSerializer.Serialize(Model.Trend.Select(p => p.Revenue)));
 
-            const currency = value => '¥' + Number(value).toFixed(2);
-
-            new Chart(document.getElementById('revenueTrendChart'), {
+            new Chart(document.getElementById('overviewRevenueChart'), {
                 type: 'line',
                 data: {
-                    labels: trendLabels,
+                    labels: labels,
                     datasets: [{
-                        label: '@Loc["TodayRevenue"]',
-                        data: trendData,
-                        borderColor: '#ff9900',
-                        backgroundColor: 'rgba(255, 153, 0, .12)',
+                        data: data,
+                        borderColor: '#d9412a',
+                        backgroundColor: 'rgba(217, 65, 42, .06)',
                         fill: true,
                         tension: .35,
                         pointRadius: 0,
                         pointHoverRadius: 4,
-                        borderWidth: 2.5
+                        borderWidth: 2
                     }]
                 },
                 options: {
@@ -164,64 +195,31 @@
                     interaction: { mode: 'index', intersect: false },
                     plugins: {
                         legend: { display: false },
-                        tooltip: { callbacks: { label: ctx => currency(ctx.parsed.y) } }
+                        tooltip: { callbacks: { label: ctx => '¥' + Number(ctx.parsed.y).toFixed(2) } }
                     },
                     scales: {
-                        x: { grid: { display: false }, ticks: { maxTicksLimit: 10 } },
-                        y: { beginAtZero: true, ticks: { callback: v => currency(v) } }
-                    }
-                }
-            });
-
-            new Chart(document.getElementById('orderStatusChart'), {
-                type: 'doughnut',
-                data: {
-                    labels: statusLabels,
-                    datasets: [{
-                        data: statusData,
-                        backgroundColor: ['#f6c343', '#17a2b8', '#28a745', '#9aa4b2', '#dc3545'],
-                        borderWidth: 2,
-                        borderColor: '#fff'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    cutout: '68%',
-                    plugins: {
-                        legend: { position: 'bottom', labels: { usePointStyle: true, padding: 14 } },
-                        tooltip: { callbacks: { label: ctx => `${ctx.label}: ${ctx.raw}` } }
-                    }
-                }
-            });
-
-            new Chart(document.getElementById('categoryRevenueChart'), {
-                type: 'bar',
-                data: {
-                    labels: categoryLabels,
-                    datasets: [{
-                        label: '@Loc["TodayRevenue"]',
-                        data: categoryData,
-                        backgroundColor: 'rgba(255, 153, 0, .78)',
-                        borderColor: '#ff9900',
-                        borderRadius: 6,
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    indexAxis: 'y',
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: { callbacks: { label: ctx => currency(ctx.parsed.x) } }
-                    },
-                    scales: {
-                        x: { beginAtZero: true, ticks: { callback: v => currency(v) } },
-                        y: { grid: { display: false } }
+                        x: { grid: { display: false }, ticks: { color: '#9ca3af', maxTicksLimit: 8 } },
+                        y: { beginAtZero: true, grid: { color: '#eef0f3' }, ticks: { color: '#9ca3af', callback: v => '¥' + v } }
                     }
                 }
             });
         });
     </script>
+}
+
+@functions {
+    static class Overview
+    {
+        public static string StatusClass(string status) => status switch
+        {
+            "待发货" => "is-warning",
+            "已发货" => "is-info",
+            "已完成" => "is-success",
+            "已退款" => "is-danger",
+            _ => "is-muted"
+        };
+
+        public static string Stars(int rating) =>
+            new string('★', Math.Max(1, Math.Min(5, rating)));
+    }
 }

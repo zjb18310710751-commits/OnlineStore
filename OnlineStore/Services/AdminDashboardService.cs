@@ -31,18 +31,10 @@ public class AdminDashboardService : IAdminDashboardService
             .Include(o => o.Items)
             .ToListAsync();
 
-        var today = DateTime.Now.Date;
         var revenueOrders = orders
             .Where(o => ValidRevenueStatuses.Contains(o.Status))
             .ToList();
-
-        var todayRevenue = revenueOrders
-            .Where(o => o.CreatedAt.ToLocalTime().Date == today)
-            .Sum(o => o.Total);
-        var yesterdayRevenue = revenueOrders
-            .Where(o => o.CreatedAt.ToLocalTime().Date == today.AddDays(-1))
-            .Sum(o => o.Total);
-        var todayOrders = revenueOrders.Count(o => o.CreatedAt.ToLocalTime().Date == today);
+        var today = DateTime.Now.Date;
 
         var trend = Enumerable.Range(0, 30)
             .Select(offset => today.AddDays(offset - 29))
@@ -53,79 +45,88 @@ public class AdminDashboardService : IAdminDashboardService
                     .Sum(o => o.Total)))
             .ToList();
 
-        var statusCounts = orders
-            .GroupBy(o => o.Status)
-            .ToDictionary(group => group.Key, group => group.Count());
+        var unitsSold = revenueOrders
+            .SelectMany(o => o.Items)
+            .Sum(i => i.Quantity);
 
-        var categoryRevenues = await BuildCategoryRevenuesAsync(revenueOrders, today);
+        var topProducts = await BuildTopProductsAsync(revenueOrders);
+        var latestReviews = await BuildLatestReviewsAsync();
 
         return new AdminDashboardData
         {
-            TodayRevenue = todayRevenue,
-            YesterdayRevenue = yesterdayRevenue,
-            TodayOrderCount = todayOrders,
-            TodayAverageOrderValue = todayOrders == 0 ? 0m : todayRevenue / todayOrders,
-            TodayRefundAmount = orders
-                .Where(o => o.Status == OrderStatus.Refunded &&
-                             o.CreatedAt.ToLocalTime().Date == today)
-                .Sum(o => o.Total),
-            Trend = trend,
-            OrderStatusCounts = statusCounts,
-            CategoryRevenues = categoryRevenues,
+            TotalRevenue = revenueOrders.Sum(o => o.Total),
+            TotalOrderCount = revenueOrders.Count,
+            CustomerCount = revenueOrders
+                .Where(o => !string.IsNullOrWhiteSpace(o.UserId))
+                .Select(o => o.UserId!)
+                .Distinct()
+                .Count(),
+            UnitsSold = unitsSold,
             PendingShipmentCount = orders.Count(o => o.Status == OrderStatus.PendingShipment),
-            LowStockCount = await _productService.CountLowStockAsync()
+            LowStockCount = await _productService.CountLowStockAsync(),
+            Trend = trend,
+            RecentOrders = orders
+                .OrderByDescending(o => o.CreatedAt)
+                .Take(6)
+                .ToList(),
+            TopProducts = topProducts,
+            LatestReviews = latestReviews
         };
     }
 
-    private async Task<IReadOnlyList<CategoryRevenuePoint>> BuildCategoryRevenuesAsync(
-        IReadOnlyList<Order> revenueOrders,
-        DateTime today)
+    private async Task<IReadOnlyList<TopProductRow>> BuildTopProductsAsync(
+        IReadOnlyList<Order> revenueOrders)
     {
-        var start = today.AddDays(-29);
-        var productIds = revenueOrders
-            .Where(o => o.CreatedAt.ToLocalTime().Date >= start)
-            .SelectMany(o => o.Items)
-            .Select(i => i.ProductId)
-            .Distinct()
-            .ToList();
-        if (productIds.Count == 0)
-        {
-            return Array.Empty<CategoryRevenuePoint>();
-        }
-
-        var products = await _context.Products
-            .AsNoTracking()
-            .Include(p => p.Categories)
-            .Where(p => productIds.Contains(p.Id))
-            .ToListAsync();
-        var productsById = products.ToDictionary(p => p.Id);
-        var categoryTotals = new Dictionary<int, decimal>();
-        var categoryNames = new Dictionary<int, string>();
-
-        foreach (var order in revenueOrders.Where(o => o.CreatedAt.ToLocalTime().Date >= start))
+        var totals = new Dictionary<int, (int Quantity, decimal Revenue)>();
+        foreach (var order in revenueOrders)
         {
             foreach (var item in order.Items)
             {
-                if (!productsById.TryGetValue(item.ProductId, out var product))
+                if (!totals.TryGetValue(item.ProductId, out var current))
                 {
-                    continue;
+                    current = (0, 0m);
                 }
 
-                foreach (var category in product.Categories)
-                {
-                    categoryTotals[category.Id] =
-                        categoryTotals.GetValueOrDefault(category.Id) + item.LineTotal;
-                    categoryNames.TryAdd(category.Id, L10n.Name(category));
-                }
+                totals[item.ProductId] = (
+                    current.Quantity + item.Quantity,
+                    current.Revenue + item.LineTotal);
             }
         }
 
-        return categoryTotals
-            .OrderByDescending(kv => kv.Value)
-            .Take(6)
-            .Select(kv => new CategoryRevenuePoint(
-                categoryNames.GetValueOrDefault(kv.Key, "—"),
-                kv.Value))
+        if (totals.Count == 0)
+        {
+            return Array.Empty<TopProductRow>();
+        }
+
+        var productIds = totals.Keys.ToList();
+        var products = await _context.Products
+            .AsNoTracking()
+            .Where(p => productIds.Contains(p.Id))
+            .ToListAsync();
+
+        return totals
+            .OrderByDescending(kv => kv.Value.Revenue)
+            .Take(5)
+            .Select(kv => new TopProductRow(
+                products.First(p => p.Id == kv.Key),
+                kv.Value.Quantity,
+                kv.Value.Revenue))
+            .ToList();
+    }
+
+    private async Task<IReadOnlyList<ReviewRow>> BuildLatestReviewsAsync()
+    {
+        var reviews = await _context.Reviews
+            .AsNoTracking()
+            .Include(r => r.Product)
+            .OrderByDescending(r => r.CreatedAt)
+            .Take(5)
+            .ToListAsync();
+
+        return reviews
+            .Select(r => new ReviewRow(
+                r,
+                r.Product is null ? "—" : L10n.Name(r.Product)))
             .ToList();
     }
 }

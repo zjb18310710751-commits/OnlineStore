@@ -98,6 +98,15 @@
   <data name="RequestId" xml:space="preserve"><value>Request ID: </value></data>
   <data name="ManagementConsole" xml:space="preserve"><value>Admin Console</value></data>
   <data name="Dashboard" xml:space="preserve"><value>Dashboard</value></data>
+  <data name="StoreOverview" xml:space="preserve"><value>Store overview</value></data>
+  <data name="OverviewSubtitle" xml:space="preserve"><value>Sales, orders, products and reviews at a glance.</value></data>
+  <data name="TotalRevenue" xml:space="preserve"><value>Total revenue</value></data>
+  <data name="TotalOrders" xml:space="preserve"><value>Total orders</value></data>
+  <data name="CustomerCount" xml:space="preserve"><value>Customers</value></data>
+  <data name="UnitsSold" xml:space="preserve"><value>Units sold</value></data>
+  <data name="RecentOrders" xml:space="preserve"><value>Recent orders</value></data>
+  <data name="TopProducts" xml:space="preserve"><value>Top products</value></data>
+  <data name="LatestReviews" xml:space="preserve"><value>Latest reviews</value></data>
   <data name="DashboardRevenueSubtitle" xml:space="preserve"><value>Revenue, order status and pending tasks for the last 30 days.</value></data>
   <data name="TodayRevenue" xml:space="preserve"><value>Today's revenue</value></data>
   <data name="TodayOrders" xml:space="preserve"><value>Today's orders</value></data>
