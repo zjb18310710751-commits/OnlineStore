@@ -24,28 +24,22 @@
     <header>
         <nav class="navbar navbar-expand-lg navbar-light editorial-nav sticky-top">
             <div class="container">
-                <a class="navbar-brand fw-bold" asp-controller="Home" asp-action="Index">
-                    <i class="bi bi-bag-heart-fill me-1"></i>@Loc["Brand"]
+                <a class="navbar-brand zhy-brand" asp-controller="Home" asp-action="Index" title="@Loc["Brand"]">
+                    <!-- ZHY 潮流数字商店标：黑色斜切 Box + 铬金属字 + 酸性绿硬投影与星芒 -->
+                    <span class="zhy-box">
+                        <span class="zhy-chrome">ZHY</span>
+                        <span class="zhy-spark">✦</span>
+                    </span>
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="mainNav">
-                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                        <li class="nav-item"><a class="nav-link" asp-controller="Home" asp-action="Index">@Loc["Home"]</a></li>
-                        <li class="nav-item"><a class="nav-link" asp-controller="Products" asp-action="Index">@Loc["AllProducts"]</a></li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">@Loc["Categories"]</a>
-                            <ul class="dropdown-menu">
-                                @foreach (var c in categories)
-                                {
-                                    <li><a class="dropdown-item" asp-controller="Products" asp-action="Index" asp-route-categoryId="@c.Id">@L10n.Name(c)</a></li>
-                                }
-                                @if (categories.Count == 0)
-                                {
-                                    <li><span class="dropdown-item text-muted">@Loc["NoCategories"]</span></li>
-                                }
-                            </ul>
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0 align-items-lg-center">
+                        <li class="nav-item">
+                            <a class="nav-link nav-pill-btn" asp-controller="Home" asp-action="Index">
+                                <span>@Loc["Home"]</span>
+                            </a>
                         </li>
                     </ul>
                     <form asp-controller="Products" asp-action="Index" method="get" class="d-flex my-2 my-lg-0 me-lg-3" style="width: 240px;" role="search">
@@ -102,10 +96,14 @@
                         else
                         {
                             <li class="nav-item">
-                                <a class="nav-link" asp-controller="Account" asp-action="Register"><i class="bi bi-person-plus me-1"></i>@Loc["Register"]</a>
+                                <a class="nav-link nav-pill-btn" asp-controller="Account" asp-action="Register">
+                                    <i class="bi bi-person-plus"></i><span>@Loc["Register"]</span>
+                                </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" asp-controller="Account" asp-action="Login"><i class="bi bi-person me-1"></i>@Loc["Login"]</a>
+                                <a class="nav-link nav-pill-btn" asp-controller="Account" asp-action="Login">
+                                    <i class="bi bi-person"></i><span>@Loc["Login"]</span>
+                                </a>
                             </li>
                         }
                     </ul>
