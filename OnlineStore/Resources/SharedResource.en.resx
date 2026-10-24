@@ -14,6 +14,10 @@
   <data name="FooterQualities" xml:space="preserve"><value>Genuine · Fast shipping · Easy returns</value></data>
   <data name="HeroTitle" xml:space="preserve"><value>Fewer things, better things</value></data>
   <data name="HeroSubtitle" xml:space="preserve"><value>Gadgets · Fashion · Books · Home · Outdoors</value></data>
+  <data name="CuratedSelection" xml:space="preserve"><value>Curated selection</value></data>
+  <data name="BrowseByMood" xml:space="preserve"><value>Shop by mood</value></data>
+  <data name="ShopByCategory" xml:space="preserve"><value>Browse categories</value></data>
+  <data name="Search" xml:space="preserve"><value>Search</value></data>
   <data name="StartShopping" xml:space="preserve"><value>Start Shopping</value></data>
   <data name="NewArrivals" xml:space="preserve"><value>New Arrivals</value></data>
   <data name="ViewAll" xml:space="preserve"><value>View All</value></data>
