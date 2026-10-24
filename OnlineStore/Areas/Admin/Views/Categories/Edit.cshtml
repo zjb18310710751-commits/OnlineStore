@@ -11,9 +11,19 @@
         <span asp-validation-for="Name" class="text-danger small"></span>
     </div>
     <div class="mb-3">
+        <label asp-for="NameEn" class="form-label">@Loc["CategoryNameEn"]</label>
+        <input asp-for="NameEn" class="form-control" />
+        <span asp-validation-for="NameEn" class="text-danger small"></span>
+    </div>
+    <div class="mb-3">
         <label asp-for="Description" class="form-label">@Loc["CategoryDescription"]</label>
         <textarea asp-for="Description" class="form-control" rows="3"></textarea>
         <span asp-validation-for="Description" class="text-danger small"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="DescriptionEn" class="form-label">@Loc["CategoryDescriptionEn"]</label>
+        <textarea asp-for="DescriptionEn" class="form-control" rows="3"></textarea>
+        <span asp-validation-for="DescriptionEn" class="text-danger small"></span>
     </div>
     <div class="mb-3">
         <label asp-for="DisplayOrder" class="form-label">@Loc["DisplayOrder"]</label>

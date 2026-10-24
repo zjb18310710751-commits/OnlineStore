@@ -15,36 +15,36 @@ public class RegisterViewModel
     [Display(Name = "手机号")]
     public string? PhoneNumber { get; set; }
 
-    [Required(ErrorMessage = "请输入验证码")]
-    [StringLength(6, MinimumLength = 6, ErrorMessage = "验证码为 6 位数字")]
-    [RegularExpression(@"^\d{6}$", ErrorMessage = "验证码为 6 位数字")]
+    [Required(ErrorMessage = "VerificationCodeRequired")]
+    [StringLength(6, MinimumLength = 6, ErrorMessage = "VerificationCodeFormat")]
+    [RegularExpression(@"^\d{6}$", ErrorMessage = "VerificationCodeFormat")]
     [Display(Name = "验证码")]
     public string VerificationCode { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "请输入名")]
+    [Required(ErrorMessage = "FirstNameRequired")]
     [StringLength(100)]
     [Display(Name = "名")]
     public string FirstName { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "请输入姓")]
+    [Required(ErrorMessage = "LastNameRequired")]
     [StringLength(100)]
     [Display(Name = "姓")]
     public string LastName { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "请输入地址")]
+    [Required(ErrorMessage = "AddressRequired")]
     [StringLength(500)]
     [Display(Name = "地址")]
     public string Address { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "请输入密码")]
-    [StringLength(100, ErrorMessage = "密码最长 100 位")]
-    [RegularExpression(PasswordPolicy.Pattern, ErrorMessage = "密码至少 6 位，须包含大写字母、小写字母、数字和特殊字符")]
+    [Required(ErrorMessage = "PasswordRequired")]
+    [StringLength(100, ErrorMessage = "PasswordTooLong")]
+    [RegularExpression(PasswordPolicy.Pattern, ErrorMessage = "PasswordPolicyError")]
     [DataType(DataType.Password)]
     [Display(Name = "密码")]
     public string Password { get; set; } = string.Empty;
 
     [DataType(DataType.Password)]
     [Display(Name = "确认密码")]
-    [Compare(nameof(Password), ErrorMessage = "两次输入的密码不一致")]
+    [Compare(nameof(Password), ErrorMessage = "PasswordsDoNotMatch")]
     public string ConfirmPassword { get; set; } = string.Empty;
 }

@@ -11,7 +11,7 @@ public class ProductSku
 
     public Product? Product { get; set; }
 
-    [Required(ErrorMessage = "请填写颜色")]
+    [Required(ErrorMessage = "ColorRequired")]
     [StringLength(50)]
     [Display(Name = "颜色")]
     public string Color { get; set; } = string.Empty;
@@ -20,7 +20,7 @@ public class ProductSku
     [Display(Name = "颜色（英文）")]
     public string? ColorEn { get; set; }
 
-    [Required(ErrorMessage = "请填写规格")]
+    [Required(ErrorMessage = "SpecRequired")]
     [StringLength(50)]
     [Display(Name = "规格")]
     public string Spec { get; set; } = string.Empty;
@@ -29,11 +29,11 @@ public class ProductSku
     [Display(Name = "规格（英文）")]
     public string? SpecEn { get; set; }
 
-    [Range(0, 9999999, ErrorMessage = "价格不能为负")]
+    [Range(0, 9999999, ErrorMessage = "PriceInvalid")]
     [Display(Name = "价格")]
     public decimal Price { get; set; }
 
-    [Range(0, int.MaxValue, ErrorMessage = "库存不能为负")]
+    [Range(0, int.MaxValue, ErrorMessage = "StockInvalid")]
     [Display(Name = "库存")]
     public int Stock { get; set; }
 

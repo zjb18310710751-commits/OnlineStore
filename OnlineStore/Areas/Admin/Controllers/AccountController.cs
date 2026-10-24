@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 using OnlineStore.Models;
 using OnlineStore.Services;
 using OnlineStore.ViewModels;
@@ -15,15 +16,18 @@ public class AccountController : Controller
     private readonly SignInManager<ApplicationUser> _signInManager;
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly IRememberedLoginService _rememberedLogin;
+    private readonly IStringLocalizer<SharedResource> _loc;
 
     public AccountController(
         SignInManager<ApplicationUser> signInManager,
         UserManager<ApplicationUser> userManager,
-        IRememberedLoginService rememberedLogin)
+        IRememberedLoginService rememberedLogin,
+        IStringLocalizer<SharedResource> localizer)
     {
         _signInManager = signInManager;
         _userManager = userManager;
         _rememberedLogin = rememberedLogin;
+        _loc = localizer;
     }
 
     [HttpGet]
@@ -55,14 +59,14 @@ public class AccountController : Controller
         if (user is null)
         {
             // 统一错误信息，避免泄露账号是否存在（安全性）
-            ModelState.AddModelError(string.Empty, "邮箱或密码错误。");
+            ModelState.AddModelError(string.Empty, _loc["EmailOrPasswordIncorrect"].Value);
             return View(model);
         }
 
         // 后台登录的核心隔离：普通用户不具备管理员角色，直接拒绝
         if (!await _userManager.IsInRoleAsync(user, AdminRole))
         {
-            ModelState.AddModelError(string.Empty, "该账号无管理员权限。");
+            ModelState.AddModelError(string.Empty, _loc["NotAdmin"].Value);
             return View(model);
         }
 
@@ -85,11 +89,11 @@ public class AccountController : Controller
 
         if (result.IsLockedOut)
         {
-            ModelState.AddModelError(string.Empty, "登录失败次数过多，账号已锁定，请稍后再试。");
+            ModelState.AddModelError(string.Empty, _loc["AccountLocked"].Value);
             return View(model);
         }
 
-        ModelState.AddModelError(string.Empty, "邮箱或密码错误。");
+        ModelState.AddModelError(string.Empty, _loc["EmailOrPasswordIncorrect"].Value);
         return View(model);
     }
 

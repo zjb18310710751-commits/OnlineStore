@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Extensions.Localization;
 using OnlineStore.Models;
 using OnlineStore.Services;
 using OnlineStore.ViewModels;
@@ -17,17 +18,20 @@ public class ProductsController : Controller
     private readonly ICategoryService _categoryService;
     private readonly IShopService _shopService;
     private readonly IImageStorageService _imageStorage;
+    private readonly IStringLocalizer<SharedResource> _loc;
 
     public ProductsController(
         IProductService productService,
         ICategoryService categoryService,
         IShopService shopService,
-        IImageStorageService imageStorage)
+        IImageStorageService imageStorage,
+        IStringLocalizer<SharedResource> localizer)
     {
         _productService = productService;
         _categoryService = categoryService;
         _shopService = shopService;
         _imageStorage = imageStorage;
+        _loc = localizer;
     }
 
     public async Task<IActionResult> Index(string? search, int? categoryId, int page = 1)
@@ -98,7 +102,7 @@ public class ProductsController : Controller
 
         await _productService.SetCategoriesAsync(product, vm.CategoryIds);
         await _productService.CreateAsync(product);
-        TempData["Success"] = "商品已创建。";
+        TempData["Success"] = _loc["ProductCreated"].Value;
         return RedirectToAction(nameof(Index));
     }
 
@@ -190,7 +194,7 @@ public class ProductsController : Controller
 
         await _productService.SetCategoriesAsync(product, vm.CategoryIds);
         await _productService.UpdateAsync(product);
-        TempData["Success"] = "商品已更新。";
+        TempData["Success"] = _loc["ProductUpdated"].Value;
         return RedirectToAction(nameof(Index));
     }
 
@@ -199,7 +203,7 @@ public class ProductsController : Controller
     public async Task<IActionResult> Delete(int id)
     {
         await _productService.DeleteAsync(id);
-        TempData["Success"] = "商品已删除。";
+        TempData["Success"] = _loc["ProductDeleted"].Value;
         return RedirectToAction(nameof(Index));
     }
 
@@ -217,9 +221,9 @@ public class ProductsController : Controller
     private async Task PopulateFormAsync(ProductFormViewModel vm)
     {
         var shops = await _shopService.GetAllAsync();
-        vm.Shops = shops.Select(s => new SelectListItem(s.Name, s.Id.ToString()));
+        vm.Shops = shops.Select(s => new SelectListItem(L10n.Name(s), s.Id.ToString()));
 
         var categories = await _categoryService.GetAllAsync();
-        vm.Categories = categories.Select(c => new SelectListItem(c.Name, c.Id.ToString()));
+        vm.Categories = categories.Select(c => new SelectListItem(L10n.Name(c), c.Id.ToString()));
     }
 }

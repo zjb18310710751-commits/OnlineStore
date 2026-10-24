@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Localization;
 
 namespace OnlineStore.Services;
 
@@ -14,10 +15,12 @@ public class ImageStorageService : IImageStorageService
     private const long MaxFileSizeBytes = 5 * 1024 * 1024; // 5 MB
 
     private readonly IWebHostEnvironment _env;
+    private readonly IStringLocalizer<SharedResource> _loc;
 
-    public ImageStorageService(IWebHostEnvironment env)
+    public ImageStorageService(IWebHostEnvironment env, IStringLocalizer<SharedResource>? localizer = null)
     {
         _env = env;
+        _loc = localizer ?? FallbackStringLocalizer<SharedResource>.Instance;
     }
 
     public async Task<string> SaveAsync(IFormFile file, CancellationToken cancellationToken = default)
@@ -25,24 +28,24 @@ public class ImageStorageService : IImageStorageService
         var ext = Path.GetExtension(file.FileName);
         if (!AllowedExtensions.Contains(ext))
         {
-            throw new InvalidOperationException($"不支持的图片格式：{ext}。仅支持 jpg / png / webp / gif。");
+            throw new InvalidOperationException(_loc["UnsupportedImageFormat", ext].Value);
         }
 
         if (file.Length <= 0)
         {
-            throw new InvalidOperationException("图片文件为空。");
+            throw new InvalidOperationException(_loc["ImageEmpty"].Value);
         }
 
         if (file.Length > MaxFileSizeBytes)
         {
-            throw new InvalidOperationException("图片大小不能超过 5 MB。");
+            throw new InvalidOperationException(_loc["ImageTooLarge"].Value);
         }
 
         // 防御性校验：Content-Type 需为图片（浏览器可伪造，作为扩展名校验之外的补充）
         if (!string.IsNullOrWhiteSpace(file.ContentType) &&
             !file.ContentType.StartsWith("image/", StringComparison.OrdinalIgnoreCase))
         {
-            throw new InvalidOperationException("请上传图片文件。");
+            throw new InvalidOperationException(_loc["ImageInvalid"].Value);
         }
 
         var uploadsDir = Path.Combine(_env.WebRootPath, "uploads");

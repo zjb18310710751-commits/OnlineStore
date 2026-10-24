@@ -117,9 +117,20 @@
             {
                 <div class="mb-3">
                     <span class="text-muted small me-2"><i class="bi bi-fire"></i>@Loc["HotKeywords"]</span>
-                    @foreach (var kw in new[] { "耳机", "键盘", "帐篷", "T恤", "图书" })
+                    @{
+                        var hotKeywords = new[] { "耳机", "键盘", "帐篷", "T恤", "图书" };
+                        var hotKeywordLabels = new[]
+                        {
+                            Loc["HotKwHeadphones"].Value,
+                            Loc["HotKwKeyboard"].Value,
+                            Loc["HotKwTent"].Value,
+                            Loc["HotKwTshirt"].Value,
+                            Loc["HotKwBooks"].Value
+                        };
+                    }
+                    @for (var i = 0; i < hotKeywords.Length; i++)
                     {
-                        <a asp-controller="Products" asp-action="Index" asp-route-searchTerm="@kw" class="badge bg-light text-dark text-decoration-none me-1">@kw</a>
+                        <a asp-controller="Products" asp-action="Index" asp-route-searchTerm="@hotKeywords[i]" class="badge bg-light text-dark text-decoration-none me-1">@hotKeywordLabels[i]</a>
                     }
                 </div>
             }

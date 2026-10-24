@@ -22,7 +22,7 @@
             <option value="">@Loc["AllCategories"]</option>
             @foreach (var c in categories)
             {
-                <option value="@c.Id" selected="@(categoryId == c.Id)">@c.Name</option>
+                <option value="@c.Id" selected="@(categoryId == c.Id)">@L10n.Name(c)</option>
             }
         </select>
     </div>
@@ -65,11 +65,11 @@
                             }
                         </td>
                         <td>
-                            <div class="fw-semibold">@p.Name</div>
+                            <div class="fw-semibold">@L10n.Name(p)</div>
                             <small class="text-muted">@p.Sku</small>
                         </td>
-                        <td>@p.Shop?.Name</td>
-                        <td>@string.Join(" / ", p.Categories.Select(c => c.Name))</td>
+                        <td>@L10n.Name(p.Shop)</td>
+                        <td>@string.Join(" / ", p.Categories.Select(c => L10n.Name(c)))</td>
                         <td>¥@p.Price.ToString("F2")</td>
                         <td>@p.Stock</td>
                         <td>

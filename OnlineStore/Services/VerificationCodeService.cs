@@ -1,6 +1,7 @@
 using System.Security.Cryptography;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Localization;
 using OnlineStore.Data;
 using OnlineStore.Models;
 
@@ -12,10 +13,12 @@ public class VerificationCodeService : IVerificationCodeService
     private static readonly TimeSpan Validity = TimeSpan.FromMinutes(10);
 
     private readonly ApplicationDbContext _context;
+    private readonly IStringLocalizer<SharedResource> _loc;
 
-    public VerificationCodeService(ApplicationDbContext context)
+    public VerificationCodeService(ApplicationDbContext context, IStringLocalizer<SharedResource>? localizer = null)
     {
         _context = context;
+        _loc = localizer ?? FallbackStringLocalizer<SharedResource>.Instance;
     }
 
     public async Task<string> GenerateAsync(string target)
@@ -30,7 +33,7 @@ public class VerificationCodeService : IVerificationCodeService
 
         if (latest is not null && latest.CreatedAt > DateTime.UtcNow - Cooldown)
         {
-            throw new InvalidOperationException("验证码发送过于频繁，请稍后再试。");
+            throw new InvalidOperationException(_loc["VerificationCodeTooFrequent"].Value);
         }
 
         // 删除该目标地址的旧验证码（load+RemoveRange，兼容 InMemory 测试）

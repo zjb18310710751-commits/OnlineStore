@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 using OnlineStore.Models;
 using OnlineStore.Services;
 
@@ -11,11 +12,16 @@ public class ProductSkusController : Controller
 {
     private readonly IProductSkuService _skuService;
     private readonly IProductService _productService;
+    private readonly IStringLocalizer<SharedResource> _loc;
 
-    public ProductSkusController(IProductSkuService skuService, IProductService productService)
+    public ProductSkusController(
+        IProductSkuService skuService,
+        IProductService productService,
+        IStringLocalizer<SharedResource> localizer)
     {
         _skuService = skuService;
         _productService = productService;
+        _loc = localizer;
     }
 
     public async Task<IActionResult> Index(int productId)
@@ -55,7 +61,7 @@ public class ProductSkusController : Controller
         }
 
         await _skuService.CreateAsync(sku);
-        TempData["Success"] = "规格已添加。";
+        TempData["Success"] = _loc["SkuAdded"].Value;
         return RedirectToAction(nameof(Index), new { productId = sku.ProductId });
     }
 
@@ -88,7 +94,7 @@ public class ProductSkusController : Controller
         }
 
         await _skuService.UpdateAsync(sku);
-        TempData["Success"] = "规格已更新。";
+        TempData["Success"] = _loc["SkuUpdated"].Value;
         return RedirectToAction(nameof(Index), new { productId = sku.ProductId });
     }
 
@@ -101,7 +107,7 @@ public class ProductSkusController : Controller
         if (sku is not null)
         {
             await _skuService.DeleteAsync(id);
-            TempData["Success"] = "规格已删除。";
+            TempData["Success"] = _loc["SkuDeleted"].Value;
         }
 
         return RedirectToAction(nameof(Index), new { productId });

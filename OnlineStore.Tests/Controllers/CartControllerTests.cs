@@ -45,7 +45,7 @@ public class CartControllerTests
             new RecordingCartService(),
             new TestStringLocalizer(new Dictionary<string, string>
             {
-                ["AddedToCart"] = "Added to cart."
+                ["CartAdded"] = "Added to cart."
             }))
         {
             TempData = new TempDataDictionary(new DefaultHttpContext(), new NullTempDataProvider())
@@ -100,7 +100,7 @@ public class CartControllerTests
             _values = values ?? new Dictionary<string, string>
             {
                 ["CartQuantityRequired"] = "请输入商品数量",
-                ["AddedToCart"] = "已加入购物车。"
+                ["CartAdded"] = "已加入购物车。"
             };
         }
 

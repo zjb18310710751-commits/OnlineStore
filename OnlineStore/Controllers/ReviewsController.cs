@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 using OnlineStore.Models;
 using OnlineStore.Services;
 
@@ -14,17 +15,20 @@ public class ReviewsController : Controller
     private readonly IProductService _productService;
     private readonly IImageStorageService _imageStorage;
     private readonly UserManager<ApplicationUser> _userManager;
+    private readonly IStringLocalizer<SharedResource> _loc;
 
     public ReviewsController(
         IReviewService reviewService,
         IProductService productService,
         IImageStorageService imageStorage,
-        UserManager<ApplicationUser> userManager)
+        UserManager<ApplicationUser> userManager,
+        IStringLocalizer<SharedResource> localizer)
     {
         _reviewService = reviewService;
         _productService = productService;
         _imageStorage = imageStorage;
         _userManager = userManager;
+        _loc = localizer;
     }
 
     [HttpPost]
@@ -64,7 +68,7 @@ public class ReviewsController : Controller
         };
 
         await _reviewService.CreateAsync(review);
-        TempData["Success"] = "评价已提交，感谢分享！";
+        TempData["Success"] = _loc["ReviewSubmitted"].Value;
         return RedirectToAction("Details", "Products", new { id = productId });
     }
 

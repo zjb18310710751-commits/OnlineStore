@@ -5,12 +5,12 @@
 <div class="row g-3">
     <div class="col-md-5 mb-3">
         <label asp-for="Name" class="form-label">@Loc["ParamName"]</label>
-        <input asp-for="Name" class="form-control" placeholder="如：材质" />
+        <input asp-for="Name" class="form-control" placeholder="@Loc["SpecNamePlaceholder"]" />
         <span asp-validation-for="Name" class="text-danger small"></span>
     </div>
     <div class="col-md-5 mb-3">
         <label asp-for="Value" class="form-label">@Loc["ParamValue"]</label>
-        <input asp-for="Value" class="form-control" placeholder="如：210T 涤纶" />
+        <input asp-for="Value" class="form-control" placeholder="@Loc["SpecValuePlaceholder"]" />
         <span asp-validation-for="Value" class="text-danger small"></span>
     </div>
     <div class="col-md-2 mb-3">

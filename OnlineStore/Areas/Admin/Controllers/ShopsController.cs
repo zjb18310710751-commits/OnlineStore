@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 using OnlineStore.Models;
 using OnlineStore.Services;
 
@@ -10,10 +11,12 @@ namespace OnlineStore.Areas.Admin.Controllers;
 public class ShopsController : Controller
 {
     private readonly IShopService _shopService;
+    private readonly IStringLocalizer<SharedResource> _loc;
 
-    public ShopsController(IShopService shopService)
+    public ShopsController(IShopService shopService, IStringLocalizer<SharedResource> localizer)
     {
         _shopService = shopService;
+        _loc = localizer;
     }
 
     public async Task<IActionResult> Index()
@@ -35,7 +38,7 @@ public class ShopsController : Controller
         }
 
         await _shopService.CreateAsync(shop);
-        TempData["Success"] = "店铺已创建。";
+        TempData["Success"] = _loc["ShopCreated"].Value;
         return RedirectToAction(nameof(Index));
     }
 
@@ -66,7 +69,7 @@ public class ShopsController : Controller
         }
 
         await _shopService.UpdateAsync(shop);
-        TempData["Success"] = "店铺已更新。";
+        TempData["Success"] = _loc["ShopUpdated"].Value;
         return RedirectToAction(nameof(Index));
     }
 
@@ -75,7 +78,7 @@ public class ShopsController : Controller
     public async Task<IActionResult> Delete(int id)
     {
         var ok = await _shopService.DeleteAsync(id);
-        TempData[ok ? "Success" : "Error"] = ok ? "店铺已删除。" : "删除失败：店铺下仍有商品。";
+        TempData[ok ? "Success" : "Error"] = ok ? _loc["ShopDeleted"].Value : _loc["ShopDeleteFailed"].Value;
         return RedirectToAction(nameof(Index));
     }
 }

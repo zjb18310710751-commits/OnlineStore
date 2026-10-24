@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Localization;
 using OnlineStore.Models;
 using OnlineStore.Services;
 
@@ -11,10 +12,12 @@ namespace OnlineStore.Areas.Admin.Controllers;
 public class CouponsController : Controller
 {
     private readonly ICouponService _couponService;
+    private readonly IStringLocalizer<SharedResource> _loc;
 
-    public CouponsController(ICouponService couponService)
+    public CouponsController(ICouponService couponService, IStringLocalizer<SharedResource> localizer)
     {
         _couponService = couponService;
+        _loc = localizer;
     }
 
     public async Task<IActionResult> Index()
@@ -47,11 +50,11 @@ public class CouponsController : Controller
         }
         catch (DbUpdateException)
         {
-            ModelState.AddModelError(nameof(Coupon.Code), "优惠码已存在。");
+            ModelState.AddModelError(nameof(Coupon.Code), _loc["CouponCodeExists"].Value);
             return View(coupon);
         }
 
-        TempData["Success"] = "优惠券已创建。";
+        TempData["Success"] = _loc["CouponCreated"].Value;
         return RedirectToAction(nameof(Index));
     }
 
@@ -103,11 +106,11 @@ public class CouponsController : Controller
         }
         catch (DbUpdateException)
         {
-            ModelState.AddModelError(nameof(Coupon.Code), "优惠码已存在。");
+            ModelState.AddModelError(nameof(Coupon.Code), _loc["CouponCodeExists"].Value);
             return View(coupon);
         }
 
-        TempData["Success"] = "优惠券已更新。";
+        TempData["Success"] = _loc["CouponUpdated"].Value;
         return RedirectToAction(nameof(Index));
     }
 
@@ -116,7 +119,7 @@ public class CouponsController : Controller
     public async Task<IActionResult> Delete(int id)
     {
         var ok = await _couponService.DeleteAsync(id);
-        TempData[ok ? "Success" : "Error"] = ok ? "优惠券已删除。" : "删除失败：优惠券不存在。";
+        TempData[ok ? "Success" : "Error"] = ok ? _loc["CouponDeleted"].Value : _loc["CouponDeleteFailed"].Value;
         return RedirectToAction(nameof(Index));
     }
 }

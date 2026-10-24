@@ -23,11 +23,12 @@
                 }
                 @foreach (var r in Model)
                 {
+                    var comment = L10n.Text(r.Comment ?? "", r.CommentEn);
                     <tr>
-                        <td class="fw-semibold">@r.Product?.Name</td>
-                        <td>@r.UserName</td>
+                        <td class="fw-semibold">@L10n.Name(r.Product)</td>
+                        <td>@L10n.Text(r.UserName, r.UserNameEn)</td>
                         <td><span class="text-warning">@(new string('★', r.Rating))</span></td>
-                        <td class="text-muted">@(r.Comment is { Length: > 30 } ? r.Comment[..30] + "…" : r.Comment)</td>
+                        <td class="text-muted">@(comment.Length > 30 ? comment[..30] + "…" : comment)</td>
                         <td class="text-muted small">@r.CreatedAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</td>
                         <td class="text-end">
                             <form asp-action="Delete" asp-route-id="@r.Id" method="post" class="d-inline" onsubmit="return confirm('@Loc["ConfirmDeleteReview"]');">

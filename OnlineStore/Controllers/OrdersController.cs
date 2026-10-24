@@ -191,7 +191,7 @@ public class OrdersController : Controller
         }
 
         var ok = await _orderService.CancelAsync(id);
-        TempData[ok ? "Success" : "Error"] = ok ? "订单已取消。" : "取消失败：当前状态不可取消。";
+        TempData[ok ? "Success" : "Error"] = ok ? _loc["OrderCancelled"].Value : _loc["OrderCancelFailed"].Value;
         return RedirectToAction(nameof(MyOrders));
     }
 

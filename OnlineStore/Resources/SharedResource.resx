@@ -141,6 +141,8 @@
   <data name="DisplayOrder" xml:space="preserve"><value>排序</value></data>
   <data name="CategoryName" xml:space="preserve"><value>分类名称</value></data>
   <data name="CategoryDescription" xml:space="preserve"><value>分类描述</value></data>
+  <data name="CategoryNameEn" xml:space="preserve"><value>分类名称（英文）</value></data>
+  <data name="CategoryDescriptionEn" xml:space="preserve"><value>分类描述（英文）</value></data>
   <data name="CreateCategory" xml:space="preserve"><value>新增分类</value></data>
   <data name="EditCategory" xml:space="preserve"><value>编辑分类</value></data>
   <data name="Shop" xml:space="preserve"><value>店铺</value></data>
@@ -330,4 +332,100 @@
   <data name="EmailNotRegistered" xml:space="preserve"><value>该邮箱未注册</value></data>
   <data name="PasswordResetSuccess" xml:space="preserve"><value>密码已重置，请用新密码登录</value></data>
   <data name="DemoCode" xml:space="preserve"><value>验证码：{0}</value></data>
+  <data name="AccountRequired" xml:space="preserve"><value>请输入邮箱或手机号</value></data>
+  <data name="PasswordRequired" xml:space="preserve"><value>请输入密码</value></data>
+  <data name="AddressRequired" xml:space="preserve"><value>请输入地址</value></data>
+  <data name="PasswordTooLong" xml:space="preserve"><value>密码最长 100 位</value></data>
+  <data name="ProductNameRequired" xml:space="preserve"><value>请输入商品名称</value></data>
+  <data name="PriceRequired" xml:space="preserve"><value>请输入价格</value></data>
+  <data name="PriceInvalid" xml:space="preserve"><value>价格不能为负</value></data>
+  <data name="OriginalPriceInvalid" xml:space="preserve"><value>原价不能为负</value></data>
+  <data name="StockRequired" xml:space="preserve"><value>请输入库存</value></data>
+  <data name="StockInvalid" xml:space="preserve"><value>库存不能为负</value></data>
+  <data name="ShopRequired" xml:space="preserve"><value>请选择店铺</value></data>
+  <data name="CategoryRequired" xml:space="preserve"><value>请至少选择一个分类</value></data>
+  <data name="CategoryNameRequired" xml:space="preserve"><value>请输入分类名称</value></data>
+  <data name="ShopNameRequired" xml:space="preserve"><value>请输入店铺名称</value></data>
+  <data name="ShopRatingInvalid" xml:space="preserve"><value>评分需在 0~5 之间</value></data>
+  <data name="UserNameRequired" xml:space="preserve"><value>请填写昵称</value></data>
+  <data name="RatingInvalid" xml:space="preserve"><value>评分需在 1~5 星之间</value></data>
+  <data name="ParamNameRequired" xml:space="preserve"><value>请填写参数名</value></data>
+  <data name="ParamValueRequired" xml:space="preserve"><value>请填写参数值</value></data>
+  <data name="ColorRequired" xml:space="preserve"><value>请填写颜色</value></data>
+  <data name="SpecRequired" xml:space="preserve"><value>请填写规格</value></data>
+  <data name="CouponCodeRequired" xml:space="preserve"><value>请输入优惠码</value></data>
+  <data name="CouponValueInvalid" xml:space="preserve"><value>优惠值必须大于 0</value></data>
+  <data name="MinOrderAmountInvalid" xml:space="preserve"><value>最低订单金额不能为负</value></data>
+  <data name="UsageLimitInvalid" xml:space="preserve"><value>使用上限至少为 1</value></data>
+  <data name="CartAdded" xml:space="preserve"><value>已加入购物车。</value></data>
+  <data name="FavoriteAdded" xml:space="preserve"><value>已加入收藏。</value></data>
+  <data name="FavoriteRemoved" xml:space="preserve"><value>已取消收藏。</value></data>
+  <data name="ReviewSubmitted" xml:space="preserve"><value>评价已提交，感谢分享！</value></data>
+  <data name="LoginFailed" xml:space="preserve"><value>账号或密码错误。</value></data>
+  <data name="AccountLocked" xml:space="preserve"><value>登录失败次数过多，账号已锁定，请稍后再试。</value></data>
+  <data name="PhoneRequired" xml:space="preserve"><value>请输入手机号</value></data>
+  <data name="PhoneFormatInvalid" xml:space="preserve"><value>手机号格式不正确</value></data>
+  <data name="RegisterSuccess" xml:space="preserve"><value>注册成功，欢迎使用！</value></data>
+  <data name="EmailOrPasswordIncorrect" xml:space="preserve"><value>邮箱或密码错误。</value></data>
+  <data name="NotAdmin" xml:space="preserve"><value>该账号无管理员权限。</value></data>
+  <data name="OrderCancelled" xml:space="preserve"><value>订单已取消。</value></data>
+  <data name="OrderCancelFailed" xml:space="preserve"><value>取消失败：当前状态不可取消。</value></data>
+  <data name="ShopCreated" xml:space="preserve"><value>店铺已创建。</value></data>
+  <data name="ShopUpdated" xml:space="preserve"><value>店铺已更新。</value></data>
+  <data name="ShopDeleted" xml:space="preserve"><value>店铺已删除。</value></data>
+  <data name="ShopDeleteFailed" xml:space="preserve"><value>删除失败：店铺下仍有商品。</value></data>
+  <data name="ProductCreated" xml:space="preserve"><value>商品已创建。</value></data>
+  <data name="ProductUpdated" xml:space="preserve"><value>商品已更新。</value></data>
+  <data name="ProductDeleted" xml:space="preserve"><value>商品已删除。</value></data>
+  <data name="SkuAdded" xml:space="preserve"><value>规格已添加。</value></data>
+  <data name="SkuUpdated" xml:space="preserve"><value>规格已更新。</value></data>
+  <data name="SkuDeleted" xml:space="preserve"><value>规格已删除。</value></data>
+  <data name="SpecAdded" xml:space="preserve"><value>参数已添加。</value></data>
+  <data name="SpecUpdated" xml:space="preserve"><value>参数已更新。</value></data>
+  <data name="SpecDeleted" xml:space="preserve"><value>参数已删除。</value></data>
+  <data name="ReviewDeleted" xml:space="preserve"><value>评价已删除。</value></data>
+  <data name="CouponCreated" xml:space="preserve"><value>优惠券已创建。</value></data>
+  <data name="CouponUpdated" xml:space="preserve"><value>优惠券已更新。</value></data>
+  <data name="CouponDeleted" xml:space="preserve"><value>优惠券已删除。</value></data>
+  <data name="CouponDeleteFailed" xml:space="preserve"><value>删除失败：优惠券不存在。</value></data>
+  <data name="CouponCodeExists" xml:space="preserve"><value>优惠码已存在。</value></data>
+  <data name="CategoryCreated" xml:space="preserve"><value>分类已创建。</value></data>
+  <data name="CategoryUpdated" xml:space="preserve"><value>分类已更新。</value></data>
+  <data name="CategoryDeleted" xml:space="preserve"><value>分类已删除。</value></data>
+  <data name="CategoryDeleteFailed" xml:space="preserve"><value>删除失败：该分类下仍有商品。</value></data>
+  <data name="OrderShipped" xml:space="preserve"><value>订单已发货。</value></data>
+  <data name="OrderShipFailed" xml:space="preserve"><value>操作失败：订单状态不允许发货。</value></data>
+  <data name="OrderCompleted" xml:space="preserve"><value>订单已完成。</value></data>
+  <data name="OrderCompleteFailed" xml:space="preserve"><value>操作失败：订单状态不允许完成。</value></data>
+  <data name="OrderCancelledRestored" xml:space="preserve"><value>订单已取消，库存已恢复。</value></data>
+  <data name="OrderCancelFailedAdmin" xml:space="preserve"><value>操作失败：订单状态不允许取消。</value></data>
+  <data name="OrderRefunded" xml:space="preserve"><value>订单已退款，库存已恢复。</value></data>
+  <data name="OrderRefundFailed" xml:space="preserve"><value>操作失败：订单状态不允许退款。</value></data>
+  <data name="CouponNotFound" xml:space="preserve"><value>优惠码不存在。</value></data>
+  <data name="CouponDisabled" xml:space="preserve"><value>优惠码已停用。</value></data>
+  <data name="CouponNotStarted" xml:space="preserve"><value>优惠码尚未生效。</value></data>
+  <data name="CouponExpired" xml:space="preserve"><value>优惠码已过期。</value></data>
+  <data name="CouponUsageLimit" xml:space="preserve"><value>优惠码已达使用上限。</value></data>
+  <data name="CouponMinOrder" xml:space="preserve"><value>订单金额需满 ¥{0} 才能使用该优惠码。</value></data>
+  <data name="CouponUnavailable" xml:space="preserve"><value>优惠码不可用。</value></data>
+  <data name="VerificationCodeTooFrequent" xml:space="preserve"><value>验证码发送过于频繁，请稍后再试。</value></data>
+  <data name="UnsupportedImageFormat" xml:space="preserve"><value>不支持的图片格式：{0}。仅支持 jpg / png / webp / gif。</value></data>
+  <data name="ImageEmpty" xml:space="preserve"><value>图片文件为空。</value></data>
+  <data name="ImageTooLarge" xml:space="preserve"><value>图片大小不能超过 5 MB。</value></data>
+  <data name="ImageInvalid" xml:space="preserve"><value>请上传图片文件。</value></data>
+  <data name="NoFileReceived" xml:space="preserve"><value>未收到文件</value></data>
+  <data name="HotKwHeadphones" xml:space="preserve"><value>耳机</value></data>
+  <data name="HotKwKeyboard" xml:space="preserve"><value>键盘</value></data>
+  <data name="HotKwTent" xml:space="preserve"><value>帐篷</value></data>
+  <data name="HotKwTshirt" xml:space="preserve"><value>T恤</value></data>
+  <data name="HotKwBooks" xml:space="preserve"><value>图书</value></data>
+  <data name="OriginalPricePlaceholder" xml:space="preserve"><value>选填，用于划线原价</value></data>
+  <data name="ShippingFromPlaceholder" xml:space="preserve"><value>如：广东深圳</value></data>
+  <data name="ShippingFeePlaceholder" xml:space="preserve"><value>如：包邮 / 运费 ¥8</value></data>
+  <data name="DeliveryTimePlaceholder" xml:space="preserve"><value>如：48小时内发货</value></data>
+  <data name="CouponCodePlaceholder" xml:space="preserve"><value>如：SAVE20</value></data>
+  <data name="SkuColorPlaceholder" xml:space="preserve"><value>如：军绿</value></data>
+  <data name="SkuSpecPlaceholder" xml:space="preserve"><value>如：3-4 人</value></data>
+  <data name="SpecNamePlaceholder" xml:space="preserve"><value>如：材质</value></data>
+  <data name="SpecValuePlaceholder" xml:space="preserve"><value>如：210T 涤纶</value></data>
 </root>

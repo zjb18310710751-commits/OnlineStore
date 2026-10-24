@@ -52,7 +52,10 @@ public static class DbInitializer
             }
         }
 
-        // 3) 分类与示例商品（幂等：仅在分类表为空时写入）
+        // 3) 为既有分类回填英文名称/描述（幂等），保证老库切英文也有英文内容
+        await BackfillCategoryTranslationsAsync(context);
+
+        // 4) 分类与示例商品（幂等：仅在分类表为空时写入）
         if (await context.Categories.AnyAsync())
         {
             return;
@@ -68,11 +71,11 @@ public static class DbInitializer
         var shops = new List<Shop> { outdoor, digital, bookstore, homeStore, clothing };
 
         // 分类
-        var electronics = new Category { Name = "电子产品", NameEn = "Electronics", Slug = "电子产品", Description = "手机、电脑、数码配件", DisplayOrder = 1 };
-        var fashion = new Category { Name = "服装服饰", NameEn = "Fashion", Slug = "服装服饰", Description = "男女装、鞋帽配饰", DisplayOrder = 2 };
-        var books = new Category { Name = "图书", NameEn = "Books", Slug = "图书", Description = "文学、科技、教育", DisplayOrder = 3 };
-        var home = new Category { Name = "家居生活", NameEn = "Home & Living", Slug = "家居生活", Description = "家纺、厨具、日用", DisplayOrder = 4 };
-        var sports = new Category { Name = "运动户外", NameEn = "Sports & Outdoors", Slug = "运动户外", Description = "健身、户外装备", DisplayOrder = 5 };
+        var electronics = new Category { Name = "电子产品", NameEn = "Electronics", Slug = "电子产品", Description = "手机、电脑、数码配件", DescriptionEn = "Phones, computers and digital accessories", DisplayOrder = 1 };
+        var fashion = new Category { Name = "服装服饰", NameEn = "Fashion", Slug = "服装服饰", Description = "男女装、鞋帽配饰", DescriptionEn = "Men's and women's clothing, shoes and accessories", DisplayOrder = 2 };
+        var books = new Category { Name = "图书", NameEn = "Books", Slug = "图书", Description = "文学、科技、教育", DescriptionEn = "Literature, technology and education", DisplayOrder = 3 };
+        var home = new Category { Name = "家居生活", NameEn = "Home & Living", Slug = "家居生活", Description = "家纺、厨具、日用", DescriptionEn = "Textiles, kitchenware and daily necessities", DisplayOrder = 4 };
+        var sports = new Category { Name = "运动户外", NameEn = "Sports & Outdoors", Slug = "运动户外", Description = "健身、户外装备", DescriptionEn = "Fitness and outdoor gear", DisplayOrder = 5 };
 
         var categories = new List<Category> { electronics, fashion, books, home, sports };
 
@@ -385,6 +388,36 @@ public static class DbInitializer
         context.Categories.AddRange(categories);
         context.Products.AddRange(products);
         await context.SaveChangesAsync();
+    }
+
+    private static readonly Dictionary<string, (string NameEn, string DescriptionEn)> CategoryTranslations = new()
+    {
+        ["电子产品"] = ("Electronics", "Phones, computers and digital accessories"),
+        ["服装服饰"] = ("Fashion", "Men's and women's clothing, shoes and accessories"),
+        ["图书"] = ("Books", "Literature, technology and education"),
+        ["家居生活"] = ("Home & Living", "Textiles, kitchenware and daily necessities"),
+        ["运动户外"] = ("Sports & Outdoors", "Fitness and outdoor gear")
+    };
+
+    private static async Task BackfillCategoryTranslationsAsync(ApplicationDbContext context)
+    {
+        var categories = await context.Categories
+            .Where(c => c.NameEn == null || c.DescriptionEn == null)
+            .ToListAsync();
+
+        foreach (var category in categories)
+        {
+            if (CategoryTranslations.TryGetValue(category.Name, out var translation))
+            {
+                category.NameEn ??= translation.NameEn;
+                category.DescriptionEn ??= translation.DescriptionEn;
+            }
+        }
+
+        if (categories.Count > 0)
+        {
+            await context.SaveChangesAsync();
+        }
     }
 
     private static string PickOne(params string[] options) =>

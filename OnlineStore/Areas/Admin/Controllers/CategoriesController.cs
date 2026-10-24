@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 using OnlineStore.Models;
 using OnlineStore.Services;
 using OnlineStore.ViewModels;
@@ -11,10 +12,12 @@ namespace OnlineStore.Areas.Admin.Controllers;
 public class CategoriesController : Controller
 {
     private readonly ICategoryService _categoryService;
+    private readonly IStringLocalizer<SharedResource> _loc;
 
-    public CategoriesController(ICategoryService categoryService)
+    public CategoriesController(ICategoryService categoryService, IStringLocalizer<SharedResource> localizer)
     {
         _categoryService = categoryService;
+        _loc = localizer;
     }
 
     public async Task<IActionResult> Index()
@@ -38,13 +41,15 @@ public class CategoriesController : Controller
         var category = new Category
         {
             Name = vm.Name,
+            NameEn = vm.NameEn,
             Slug = SlugHelper.ToSlug(vm.Name),
             Description = vm.Description,
+            DescriptionEn = vm.DescriptionEn,
             DisplayOrder = vm.DisplayOrder
         };
 
         await _categoryService.CreateAsync(category);
-        TempData["Success"] = "分类已创建。";
+        TempData["Success"] = _loc["CategoryCreated"].Value;
         return RedirectToAction(nameof(Index));
     }
 
@@ -61,7 +66,9 @@ public class CategoriesController : Controller
         {
             Id = category.Id,
             Name = category.Name,
+            NameEn = category.NameEn,
             Description = category.Description,
+            DescriptionEn = category.DescriptionEn,
             DisplayOrder = category.DisplayOrder
         });
     }
@@ -87,12 +94,14 @@ public class CategoriesController : Controller
         }
 
         category.Name = vm.Name;
+        category.NameEn = vm.NameEn;
         category.Slug = SlugHelper.ToSlug(vm.Name);
         category.Description = vm.Description;
+        category.DescriptionEn = vm.DescriptionEn;
         category.DisplayOrder = vm.DisplayOrder;
 
         await _categoryService.UpdateAsync(category);
-        TempData["Success"] = "分类已更新。";
+        TempData["Success"] = _loc["CategoryUpdated"].Value;
         return RedirectToAction(nameof(Index));
     }
 
@@ -101,8 +110,8 @@ public class CategoriesController : Controller
     public async Task<IActionResult> Delete(int id)
     {
         var ok = await _categoryService.DeleteAsync(id);
-        TempData["Success"] = ok ? "分类已删除。" : null;
-        TempData["Error"] = ok ? null : "删除失败：该分类下仍有商品。";
+        TempData["Success"] = ok ? _loc["CategoryDeleted"].Value : null;
+        TempData["Error"] = ok ? null : _loc["CategoryDeleteFailed"].Value;
         return RedirectToAction(nameof(Index));
     }
 }
