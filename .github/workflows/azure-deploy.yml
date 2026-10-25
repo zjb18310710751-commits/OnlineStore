@@ -1,0 +1,50 @@
+name: Build, test and deploy to Azure
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  DOTNET_VERSION: "8.0.x"
+  AZURE_WEBAPP_NAME: "zhy-onlinestore-31072"
+  PUBLISH_PATH: "${{ github.workspace }}/publish"
+
+jobs:
+  build-test-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore
+        run: dotnet restore OnlineStore.sln
+
+      - name: Build
+        run: dotnet build OnlineStore.sln --configuration Release --no-restore
+
+      - name: Backend tests
+        run: dotnet test OnlineStore.Tests/OnlineStore.Tests.csproj --configuration Release --no-build --no-restore
+
+      - name: Frontend regression tests
+        run: node --test OnlineStore.Tests/Frontend/product-details.test.cjs
+
+      - name: Publish
+        run: dotnet publish OnlineStore/OnlineStore.csproj --configuration Release --no-restore --output "$PUBLISH_PATH"
+
+      - name: Deploy to Azure App Service
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          package: ${{ env.PUBLISH_PATH }}

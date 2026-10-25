@@ -22,6 +22,12 @@ az webapp deploy \
 az group delete --name rg-onlinestore-demo --yes --no-wait
 ```
 
+### 自动化部署
+
+- 推送到 `main` 后，GitHub Actions 会依次执行还原、构建、138 个后端测试、4 个前端回归测试，并发布到 Azure App Service。
+- 仓库的 Actions Secrets 需要配置 `AZURE_WEBAPP_PUBLISH_PROFILE`，内容来自 Azure App Service 概览页的「获取发布配置文件 / Get publish profile」。
+- 本地仓库配置了 `post-commit` hook：在 `main` 分支提交后会自动执行 `git push origin main`；未提交的修改不会自动推送。
+
 ## 技术栈
 
 - ASP.NET Core 8 MVC（Razor 视图）
