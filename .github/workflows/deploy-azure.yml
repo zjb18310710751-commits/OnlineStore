@@ -1,0 +1,70 @@
+name: Deploy to Azure
+
+on:
+  push:
+    branches:
+      - HUZHANHAO
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: azure-production
+  cancel-in-progress: true
+
+jobs:
+  test-build-deploy:
+    name: Test, build and deploy
+    runs-on: ubuntu-latest
+
+    env:
+      DOTNET_VERSION: 8.0.x
+      AZURE_WEBAPP_NAME: onlinestore-cc1f53
+      AZURE_WEBAPP_URL: https://onlinestore-cc1f53.azurewebsites.net
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore
+        run: dotnet restore OnlineStore.sln
+
+      - name: Build
+        run: dotnet build OnlineStore.sln --configuration Release --no-restore
+
+      - name: Run .NET tests
+        run: dotnet test OnlineStore.sln --configuration Release --no-build --no-restore
+
+      - name: Run frontend tests
+        run: node --test OnlineStore.Tests/Frontend/product-details.test.cjs
+
+      - name: Publish
+        run: dotnet publish OnlineStore/OnlineStore.csproj --configuration Release --no-restore --output "${{ runner.temp }}/publish"
+
+      - name: Deploy to Azure App Service
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          package: ${{ runner.temp }}/publish
+
+      - name: Verify health
+        shell: bash
+        run: |
+          for attempt in {1..12}; do
+            status="$(curl --silent --output /dev/null --write-out '%{http_code}' "${AZURE_WEBAPP_URL}/health" || true)"
+            echo "Health check attempt ${attempt}: HTTP ${status}"
+            if [ "${status}" = "200" ]; then
+              exit 0
+            fi
+            sleep 10
+          done
+
+          echo "The application did not become healthy within 120 seconds."
+          exit 1
