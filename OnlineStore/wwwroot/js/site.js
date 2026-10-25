@@ -40,7 +40,43 @@ function switchImage(btn, url) {
 
 document.addEventListener('DOMContentLoaded', function () {
     document.querySelectorAll('[data-send-code-url]').forEach(initSendCodeButton);
+    initPasswordToggles();
 });
+
+function initPasswordToggles() {
+    document.querySelectorAll('.password-toggle').forEach(function (btn) {
+        if (btn.dataset.passwordToggleInit) {
+            return;
+        }
+        btn.dataset.passwordToggleInit = 'true';
+
+        var input = document.getElementById(btn.getAttribute('data-password-target'));
+        if (!input) {
+            return;
+        }
+
+        var showLabel = btn.getAttribute('data-show-label') || 'Show password';
+        var hideLabel = btn.getAttribute('data-hide-label') || 'Hide password';
+
+        function renderToggle() {
+            var visible = input.type === 'text';
+            var icon = btn.querySelector('i');
+            if (icon) {
+                icon.className = 'bi ' + (visible ? 'bi-eye-slash' : 'bi-eye');
+            }
+            btn.setAttribute('aria-pressed', visible ? 'true' : 'false');
+            btn.setAttribute('aria-label', visible ? hideLabel : showLabel);
+        }
+
+        btn.addEventListener('click', function () {
+            input.type = input.type === 'password' ? 'text' : 'password';
+            input.focus();
+            renderToggle();
+        });
+
+        renderToggle();
+    });
+}
 
 function initSendCodeButton(btn) {
     var targetSelector = btn.getAttribute('data-send-code-target') || btn.getAttribute('data-send-code-email');

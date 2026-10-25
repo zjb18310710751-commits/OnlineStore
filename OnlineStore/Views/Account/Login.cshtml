@@ -3,43 +3,51 @@
     ViewData["Title"] = Loc["Login"].Value;
     var returnUrl = ViewData["ReturnUrl"] as string;
 }
-<div class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-md-6 col-lg-4">
-            <div class="card shadow-sm">
-                <div class="card-body p-4">
-                    <h1 class="h4 mb-3 text-center">@Loc["Login"]</h1>
-                    <form method="post" asp-controller="Account" asp-action="Login" asp-route-returnUrl="@returnUrl">
-                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
-                        <div class="mb-3">
-                            <label asp-for="Email" class="form-label">@Loc["EmailOrPhone"]</label>
-                            <input asp-for="Email" class="form-control" autocomplete="username" placeholder="@Loc["EmailOrPhone"]" />
-                            <span asp-validation-for="Email" class="text-danger small"></span>
-                        </div>
-                        <div class="mb-3">
-                            <label asp-for="Password" class="form-label">@Loc["Password"]</label>
-                            <input asp-for="Password" class="form-control" autocomplete="current-password" />
-                            <span asp-validation-for="Password" class="text-danger small"></span>
-                        </div>
-                        <div class="form-check mb-3">
-                            <input asp-for="RememberMe" class="form-check-input" />
-                            <label asp-for="RememberMe" class="form-check-label">@Loc["RememberMe"]</label>
-                        </div>
-                        <div class="form-check mb-3">
-                            <input asp-for="RememberCredentials" class="form-check-input" />
-                            <label asp-for="RememberCredentials" class="form-check-label">@Loc["RememberCredentials"]</label>
-                        </div>
-                        <button type="submit" class="btn btn-primary w-100">@Loc["Login"]</button>
-                        <div class="text-end mt-2">
-                            <a asp-controller="Account" asp-action="ForgotPassword" class="small text-muted">@Loc["ForgotPassword"]</a>
-                        </div>
-                    </form>
-                </div>
+<div class="account-auth-page">
+    <div class="account-auth-panel">
+        <header class="account-auth-header">
+            <a class="account-auth-wordmark" asp-controller="Home" asp-action="Index" aria-label="ZHY">ZHY.</a>
+            <h1 class="account-auth-title">@L10n.Text("欢迎回来，请登录你的账户。", "Welcome back. Sign in to your account.")</h1>
+            <p class="account-auth-subtitle">@L10n.Text("使用邮箱或手机号与密码，继续你的购物之旅。", "Use your email or phone and password to continue shopping.")</p>
+        </header>
+
+        <form class="account-auth-form" method="post" asp-controller="Account" asp-action="Login" asp-route-returnUrl="@returnUrl">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div>
+                <label asp-for="Email" class="account-auth-label">@Loc["EmailOrPhone"]</label>
+                <input asp-for="Email" class="form-control account-auth-control" autocomplete="username" placeholder="@Loc["EmailOrPhone"]" />
+                <span asp-validation-for="Email" class="text-danger small"></span>
             </div>
-            <p class="text-center small mt-3">
-                @Loc["NoAccount"] <a asp-controller="Account" asp-action="Register">@Loc["Register"]</a>
-            </p>
-        </div>
+
+            <div>
+                <label asp-for="Password" class="account-auth-label">@Loc["Password"]</label>
+                <div class="password-field">
+                    <input asp-for="Password" class="form-control account-auth-control" autocomplete="current-password" />
+                    <button type="button" class="password-toggle" data-password-target="Password"
+                            data-show-label="@L10n.Text("显示密码", "Show password")"
+                            data-hide-label="@L10n.Text("隐藏密码", "Hide password")"
+                            aria-label="@L10n.Text("显示密码", "Show password")" aria-pressed="false">
+                        <i class="bi bi-eye" aria-hidden="true"></i>
+                    </button>
+                </div>
+                <span asp-validation-for="Password" class="text-danger small"></span>
+            </div>
+
+            <div class="account-auth-inline-links">
+                <div class="form-check mb-0">
+                    <input asp-for="RememberMe" class="form-check-input" />
+                    <label asp-for="RememberMe" class="form-check-label">@Loc["RememberMe"]</label>
+                </div>
+                <a asp-controller="Account" asp-action="ForgotPassword">@Loc["ForgotPassword"]</a>
+            </div>
+
+            <button type="submit" class="btn btn-primary account-auth-submit">@Loc["Login"]</button>
+        </form>
+
+        <p class="account-auth-footer">
+            @Loc["NoAccount"] <a asp-controller="Account" asp-action="Register">@Loc["Register"]</a>
+        </p>
     </div>
 </div>
 
