@@ -21,18 +21,32 @@ public class SmtpEmailService : IEmailService
     {
         var section = _configuration.GetSection("Email");
         var host = section["Host"];
+        var username = section["Username"];
+        var password = section["Password"];
         var senderEmail = section["SenderEmail"];
-
-        if (string.IsNullOrWhiteSpace(host) || string.IsNullOrWhiteSpace(senderEmail))
+        if (string.IsNullOrWhiteSpace(senderEmail))
         {
-            throw new InvalidOperationException("邮件服务未配置，请联系管理员。");
+            senderEmail = username;
+        }
+
+        if (string.IsNullOrWhiteSpace(host))
+        {
+            throw new InvalidOperationException("邮件服务未配置 SMTP 主机。");
+        }
+
+        if (string.IsNullOrWhiteSpace(senderEmail))
+        {
+            throw new InvalidOperationException("邮件服务未配置发件邮箱。");
+        }
+
+        if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
+        {
+            throw new InvalidOperationException("邮件服务未配置 SMTP 登录邮箱或授权码。");
         }
 
         var port = section.GetValue("Port", 587);
         var enableSsl = section.GetValue("EnableSsl", true);
         var senderName = section["SenderName"] ?? "Online Store";
-        var username = section["Username"];
-        var password = section["Password"];
 
         var message = new MimeMessage();
         message.From.Add(new MailboxAddress(senderName, senderEmail));
@@ -40,7 +54,10 @@ public class SmtpEmailService : IEmailService
         message.Subject = subject;
         message.Body = new BodyBuilder { HtmlBody = htmlBody }.ToMessageBody();
 
-        using var client = new SmtpClient();
+        using var client = new SmtpClient
+        {
+            Timeout = 20_000
+        };
         try
         {
 
@@ -50,10 +67,7 @@ public class SmtpEmailService : IEmailService
 
             await client.ConnectAsync(host, port, secureOptions, cancellationToken);
 
-            if (!string.IsNullOrWhiteSpace(username))
-            {
-                await client.AuthenticateAsync(username, password ?? string.Empty, cancellationToken);
-            }
+            await client.AuthenticateAsync(username, password, cancellationToken);
 
             await client.SendAsync(message, cancellationToken);
         }

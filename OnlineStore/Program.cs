@@ -51,7 +51,20 @@ builder.Services.AddScoped<IDeliveryAddressService, DeliveryAddressService>();
 builder.Services.AddScoped<ICartStore, SessionCartStore>();
 builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<IImageStorageService, ImageStorageService>();
-builder.Services.AddScoped<IEmailService, BrevoApiEmailService>();
+builder.Services.AddScoped<BrevoApiEmailService>();
+builder.Services.AddScoped<SmtpEmailService>();
+builder.Services.AddScoped<IEmailService>(serviceProvider =>
+{
+    var configuration = serviceProvider.GetRequiredService<IConfiguration>();
+    var provider = configuration["Email:Provider"]?.Trim();
+    var useSmtp = string.Equals(provider, "Smtp", StringComparison.OrdinalIgnoreCase)
+        || (string.IsNullOrWhiteSpace(provider)
+            && !string.IsNullOrWhiteSpace(configuration["Email:Host"]));
+
+    return useSmtp
+        ? serviceProvider.GetRequiredService<SmtpEmailService>()
+        : serviceProvider.GetRequiredService<BrevoApiEmailService>();
+});
 builder.Services.AddScoped<IVerificationCodeService, VerificationCodeService>();
 builder.Services.AddScoped<ICouponService, CouponService>();
 builder.Services.AddScoped<IRememberedLoginService, RememberedLoginCookieService>();

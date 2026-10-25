@@ -116,6 +116,32 @@ OnlineStore.Tests/  xUnit 单元测试项目（引用 OnlineStore，使用 EF Co
 
 > `appsettings.json` 与 `appsettings.Development.json` 默认都指向 `OnlineStore_Main`。如果你使用其他数据库名，请同时修改这两个文件，或通过环境变量覆盖连接串。
 
+## 配置真实邮箱发送验证码
+
+项目支持两种真实邮件发送方式：个人邮箱 SMTP 和 Brevo API。当前默认使用 SMTP；不要把邮箱密码或授权码写入 `appsettings.json` 或提交到 GitHub。
+
+在 Azure App Service 的 **Configuration → Environment variables** 中添加以下应用设置（双下划线对应配置层级）：
+
+| 应用设置 | 示例 | 说明 |
+| --- | --- | --- |
+| `Email__Provider` | `Smtp` | 使用个人邮箱 SMTP |
+| `Email__Host` | `smtp.gmail.com` | 邮箱服务商的 SMTP 地址 |
+| `Email__Port` | `587` | 通常使用 STARTTLS 的 587 端口 |
+| `Email__EnableSsl` | `true` | 启用 TLS 加密 |
+| `Email__SenderEmail` | `yourname@gmail.com` | 收件人看到的发件邮箱 |
+| `Email__SenderName` | `ZHY Store` | 收件人看到的发件人名称 |
+| `Email__Username` | `yourname@gmail.com` | SMTP 登录账号 |
+| `Email__Password` | 邮箱授权码 | Gmail/QQ 邮箱应填写应用专用密码，不是网页登录密码 |
+
+常见服务商配置：
+
+- Gmail：`smtp.gmail.com`、端口 `587`，需先在 Google 账号中开启两步验证并创建“应用专用密码”。
+- QQ 邮箱：`smtp.qq.com`、端口 `587`，需在邮箱设置中开启 SMTP 服务并生成“授权码”。
+- Outlook/学校邮箱：`smtp-mail.outlook.com`、端口 `587`；部分学校或组织会禁止 SMTP 登录，需要管理员开放。
+- 如继续使用 Brevo：把 `Email__Provider` 设为 `Brevo`，并配置 `Email__ApiKey`、`Email__SenderEmail` 和 `Email__SenderName`。
+
+配置后，注册、找回密码和修改资料时发送的 6 位验证码会从所配置的邮箱发出。发件凭据只存放在部署环境的 App Settings 中，不会随源码上传。
+
 ## 运行
 
 命令行（在项目目录 `OnlineStore` 下）：
@@ -181,7 +207,7 @@ dotnet test
 - 支付（下单已实现，支付环节为模拟，未接入真实支付网关）
 - 分类层级（父子分类）
 - 购物车从 Session 持久化到数据库/Redis（实现 `ICartStore` 接口即可）
-- 真实邮件发送需配置发件域名（当前为演示模式，代码已预留 Brevo API）
+- 真实邮件发送需要在 Azure App Settings 中配置个人邮箱 SMTP 授权码，或配置 Brevo API
 
 ## 数据库迁移（EF Core Migrations）
 
