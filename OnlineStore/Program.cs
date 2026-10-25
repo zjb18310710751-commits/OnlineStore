@@ -51,7 +51,15 @@ builder.Services.AddScoped<IDeliveryAddressService, DeliveryAddressService>();
 builder.Services.AddScoped<ICartStore, SessionCartStore>();
 builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<IImageStorageService, ImageStorageService>();
-builder.Services.AddScoped<IEmailService, BrevoApiEmailService>();
+builder.Services.AddScoped<IEmailService>(serviceProvider =>
+{
+    var configuration = serviceProvider.GetRequiredService<IConfiguration>();
+    var provider = configuration["Email:Provider"];
+
+    return string.Equals(provider, "Brevo", StringComparison.OrdinalIgnoreCase)
+        ? ActivatorUtilities.CreateInstance<BrevoApiEmailService>(serviceProvider)
+        : ActivatorUtilities.CreateInstance<SmtpEmailService>(serviceProvider);
+});
 builder.Services.AddScoped<IVerificationCodeService, VerificationCodeService>();
 builder.Services.AddScoped<ICouponService, CouponService>();
 builder.Services.AddScoped<IRememberedLoginService, RememberedLoginCookieService>();
