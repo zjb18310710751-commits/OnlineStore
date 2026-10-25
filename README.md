@@ -2,6 +2,12 @@
 
 基于 **ASP.NET Core 8 MVC** 的在线商店演示项目，采用分层架构与 SQL Server 数据库。系统围绕五项质量属性设计：**可用性（Availability）、可修改性（Modifiability）、可测试性（Testability）、易用性（Usability）、安全性（Security）**。
 
+## 在线演示
+
+- Azure App Service：<https://zhy-onlinestore-31072.azurewebsites.net/>
+- 部署环境：Azure App Service（Linux F1）+ Azure SQL Database（Basic）
+- 首次访问可能需要等待片刻（F1 免费档冷启动），应用启动时会自动建表并写入种子数据。
+
 ## 技术栈
 
 - ASP.NET Core 8 MVC（Razor 视图）
