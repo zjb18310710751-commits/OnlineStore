@@ -7,11 +7,26 @@
 - Azure App Service：<https://zhy-onlinestore-31072.azurewebsites.net/>
 - 部署环境：Azure App Service（Linux F1）+ Azure SQL Database（Basic）
 - 首次访问可能需要等待片刻（F1 免费档冷启动），应用启动时会自动建表并写入种子数据。
+- 资源组：`rg-onlinestore-demo`；删除该资源组会同时删除 Azure 网站和 Azure SQL，停止相关计费（本地数据库不受影响）。
+- 重新部署：本地执行 `dotnet publish` 生成 zip，通过 Azure Cloud Shell 的 `az webapp deploy --type zip` 上传；不依赖 GitHub 推送。
+
+```bash
+# 在 Azure Cloud Shell 中重新部署（先完成 az login）
+az webapp deploy \
+  --resource-group rg-onlinestore-demo \
+  --name zhy-onlinestore-31072 \
+  --src-path ./app.zip \
+  --type zip
+
+# 回滚：删除整个演示资源组
+az group delete --name rg-onlinestore-demo --yes --no-wait
+```
 
 ## 技术栈
 
 - ASP.NET Core 8 MVC（Razor 视图）
 - Entity Framework Core 8 + **Microsoft.EntityFrameworkCore.SqlServer**（SQL Server Express，SSMS 管理）
+- Azure SQL Database（Azure 演示环境，通过 App Service 连接串配置）
 - ASP.NET Core Identity（Cookie 认证 + 角色授权）
 - Bootstrap 5.3 + Bootstrap Icons（前端主题）
 - ASP.NET Core Health Checks（健康检查）
@@ -32,6 +47,9 @@
 | 产品参数 | 商品参数（键值对）增删改查，详情页展示 |
 | 用户评价 | 预置评价展示 + 登录用户可提交星级评价；后台可管理/删除；详情页评价分布（星级占比） |
 | 下单结算 | 购物车 → 结算（预填收货信息）→ 提交订单 → 订单确认 → 我的订单 |
+| 多收货地址 | 个人中心地址簿的新增、编辑、删除；结算页选择默认地址并支持保存为默认地址 |
+| 首页轮播管理 | 后台 HeroSlides 管理轮播图、中英文标题/说明、跳转地址、排序与显示开关；首页自动轮播 |
+| 订单明细与结算校验 | 订单明细保存 SKU 颜色/规格快照；下单时复核价格、库存、商品状态和优惠券，取消/退款恢复库存 |
 | 多分类 | 一个商品可属于多个分类（多对多） |
 | 购物车 | 加入（支持所选颜色/规格）、查看、更新数量、移除、清空（基于 Session） |
 | 账号注册与登录 | 支持邮箱验证码注册，注册后自动登录；短信服务尚未接入，手机号注册明确提示暂不可用，已有手机号账号仍可登录；所有账号共用邮箱或手机号登录入口，登录后返回原站内页面，后台通过管理员角色授权限制访问；登出使用统一账号流程（ASP.NET Core Identity，密码策略+失败锁定） |
@@ -49,15 +67,15 @@
 
 ```
 OnlineStore/
-├── Models/         领域实体（Product、Category、Shop、ProductSku、ProductSpec、Review、CartItem、Cart、ApplicationUser）
+├── Models/         领域实体（Product、Category、Shop、ProductSku、ProductSpec、Review、CartItem、Cart、Order、Coupon、DeliveryAddress、HeroSlide、ApplicationUser）
 ├── Data/           数据上下文（ApplicationDbContext）与数据库初始化（DbInitializer）
-├── Services/       业务抽象层（IProductService、ICategoryService、IShopService、IProductSkuService、IProductSpecService、IReviewService、ICartService、ICartStore 等接口 + 实现）
+├── Services/       业务抽象层（IProductService、ICategoryService、IShopService、IProductSkuService、IProductSpecService、IReviewService、ICartService、ICartStore、IHeroSlideService、IDeliveryAddressService 等接口 + 实现）
 ├── ViewModels/     表单与列表视图模型
-├── ViewComponents/ 购物车徽标组件（CartSummary）
-├── Controllers/    前台控制器（Home、Products、Cart、Reviews、Account、Language）
+├── ViewComponents/ 购物车徽标、首页轮播与分类导航组件（CartSummary、HeroCarousel、CategoryNavigation）
+├── Controllers/    前台控制器（Home、Products、Cart、Reviews、Account、Language、Shops、Favorites、Orders）
 ├── Areas/Admin/    后台管理区（Dashboard、Products、Categories、Shops、ProductSkus、ProductSpecs、Reviews、Orders、Coupons、Images、HeroSlides，管理员角色授权）
-├── Views/          Razor 视图（前台，含 Cart、Shared/Components）
-└── wwwroot/        静态资源（css/site.css、js/site.js）
+├── Views/          Razor 视图（前台，含 Home/_HeroCarousel、Products/_ProductReviews、_ProductStory、Shared 反馈与确认组件）
+└── wwwroot/        静态资源（site/storefront/catalog/hero-carousel/admin 等 CSS 与对应 JS）
 
 OnlineStore.Tests/  xUnit 单元测试项目（引用 OnlineStore，使用 EF Core InMemory）
 ```
@@ -85,10 +103,12 @@ OnlineStore.Tests/  xUnit 单元测试项目（引用 OnlineStore，使用 EF Co
 默认连接串已在 `OnlineStore/appsettings.json` 中配置为 SQL Server Express（Windows 集成认证）：
 
 ```json
-"DefaultConnection": "Server=localhost\\SQLEXPRESS;Database=OnlineStore;Trusted_Connection=True;TrustServerCertificate=True;"
+"DefaultConnection": "Server=localhost\\SQLEXPRESS;Database=OnlineStore_Main;Trusted_Connection=True;TrustServerCertificate=True;"
 ```
 
-首次运行会经 EF Migrations 自动创建 `OnlineStore` 数据库与全部表，并写入种子数据（5 个分类、100 个示例商品、5 家店铺与管理员账号）。用 SSMS 连接 `localhost\SQLEXPRESS` 即可查看/管理数据库；也可先在 SSMS 中建好空库 `OnlineStore`，应用首次启动时会自动建表并写入种子数据。
+首次运行会经 EF Migrations 自动创建 `OnlineStore_Main` 数据库与全部表，并写入种子数据（5 个分类、100 个示例商品、5 家店铺与管理员账号）。用 SSMS 连接 `localhost\SQLEXPRESS` 即可查看/管理数据库；也可先在 SSMS 中建好空库 `OnlineStore_Main`，应用首次启动时会自动建表并写入种子数据。
+
+> `appsettings.json` 与 `appsettings.Development.json` 默认都指向 `OnlineStore_Main`。如果你使用其他数据库名，请同时修改这两个文件，或通过环境变量覆盖连接串。
 
 ## 运行
 
