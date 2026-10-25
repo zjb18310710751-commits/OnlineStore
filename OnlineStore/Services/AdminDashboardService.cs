@@ -105,6 +105,7 @@ public class AdminDashboardService : IAdminDashboardService
             .ToListAsync();
 
         return totals
+            .Where(kv => products.Any(p => p.Id == kv.Key))
             .OrderByDescending(kv => kv.Value.Revenue)
             .Take(5)
             .Select(kv => new TopProductRow(

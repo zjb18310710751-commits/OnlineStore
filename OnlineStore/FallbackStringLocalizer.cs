@@ -2,10 +2,6 @@ using Microsoft.Extensions.Localization;
 
 namespace OnlineStore;
 
-/// <summary>
-/// 回退本地化器：当未注入 <see cref="IStringLocalizer{T}"/> 时（如单元测试），
-/// 直接返回资源键本身，避免空引用。
-/// </summary>
 internal sealed class FallbackStringLocalizer<T> : IStringLocalizer<T>
 {
     public static FallbackStringLocalizer<T> Instance { get; } = new();

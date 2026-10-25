@@ -7,6 +7,12 @@
     var isZh = CultureInfo.CurrentUICulture.Name.StartsWith("zh", StringComparison.OrdinalIgnoreCase);
     var returnUrl = $"{Context.Request.Path}{Context.Request.QueryString}";
     var embeddedLayout = ViewData["Embedded"] as bool? == true;
+    var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
+    var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
+    var isHomePage = string.Equals(currentController, "Home", StringComparison.OrdinalIgnoreCase) &&
+        string.Equals(currentAction, "Index", StringComparison.OrdinalIgnoreCase);
+    var isCatalogPage = string.Equals(currentController, "Products", StringComparison.OrdinalIgnoreCase) &&
+        string.Equals(currentAction, "Index", StringComparison.OrdinalIgnoreCase);
 }
 <!DOCTYPE html>
 <html lang="@CultureInfo.CurrentUICulture.Name">
@@ -17,136 +23,119 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/storefront.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/category-navigation.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/hero-carousel.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/catalog.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/ui-feedback.css" asp-append-version="true" />
+    @await RenderSectionAsync("Styles", required: false)
 </head>
-<body class="d-flex flex-column min-vh-100">
+<body class="storefront ui-feedback-scope @(embeddedLayout ? "ui-feedback-embedded" : "") d-flex flex-column min-vh-100">
+    <a class="sf-skip-link" href="#main-content">@L10n.Text("跳至主要内容", "Skip to content")</a>
     @if (!embeddedLayout)
     {
-    <header>
-        <nav class="navbar navbar-expand-lg navbar-light editorial-nav sticky-top">
-            <div class="container">
-                <a class="navbar-brand zhy-brand" asp-controller="Home" asp-action="Index" title="@Loc["Brand"]">
-                    <!-- ZHY 潮流数字商店标：黑色斜切 Box + 铬金属字 + 酸性绿硬投影与星芒 -->
-                    <span class="zhy-box">
-                        <span class="zhy-chrome">ZHY</span>
-                        <span class="zhy-spark">✦</span>
-                    </span>
-                </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="mainNav">
-                    <ul class="navbar-nav me-auto mb-2 mb-lg-0 align-items-lg-center">
-                        <li class="nav-item">
-                            <a class="nav-link nav-pill-btn" asp-controller="Home" asp-action="Index">
-                                <span>@Loc["Home"]</span>
-                            </a>
-                        </li>
-                    </ul>
-                    <form asp-controller="Products" asp-action="Index" method="get" class="d-flex my-2 my-lg-0 me-lg-3" style="width: 240px;" role="search">
-                        <div class="input-group">
-                            <input class="form-control" type="search" name="searchTerm" placeholder="@Loc["SearchPlaceholder"]" aria-label="Search" value="@Context.Request.Query["searchTerm"]" />
-                            <button class="btn search-btn-amazon" type="submit"><i class="bi bi-search"></i></button>
+        <header class="sf-header">
+            <nav class="sf-nav" aria-label="@L10n.Text("产品分类导航", "Product category navigation")">
+                <div class="sf-container sf-nav-inner">
+                    <div class="sf-brand-nav">
+                        <a class="sf-wordmark" asp-controller="Home" asp-action="Index" aria-label="ZHY · @Loc["Home"]">ZHY.</a>
+                        <div class="sf-quick-links">
+                            <a class="sf-quick-link" asp-controller="Home" asp-action="Index" aria-current="@(isHomePage ? "page" : null)">Home</a>
+                            @if (!isCatalogPage)
+                            {
+                                <a class="sf-quick-link sf-quick-link-catalog" asp-controller="Products" asp-action="Index">@Loc["AllProducts"]</a>
+                            }
                         </div>
-                    </form>
-                    <ul class="navbar-nav align-items-lg-center">
-                        <li class="nav-item d-flex align-items-center me-2">
-                            @await Component.InvokeAsync("CartSummary")
-                        </li>
-                        <li class="nav-item d-flex align-items-center me-2">
-                            <form asp-controller="Language" asp-action="Set" method="post">
-                                <input type="hidden" name="culture" value="@(isZh ? "en" : "zh-CN")" />
-                                <input type="hidden" name="returnUrl" value="@returnUrl" />
-                                <button type="submit" class="btn btn-sm btn-outline-light" title="@Loc["Language"]">
-                                    <i class="bi bi-translate me-1"></i>@(isZh ? "EN" : "中文")
-                                </button>
-                            </form>
-                        </li>
-                        @if (User.Identity?.IsAuthenticated == true)
-                        {
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    @if (!string.IsNullOrEmpty(currentUser?.AvatarUrl))
-                                    {
-                                        <img src="@currentUser.AvatarUrl" class="nav-user-avatar me-1" alt="" />
-                                    }
-                                    else
-                                    {
-                                        <i class="bi bi-person-circle me-1"></i>
-                                    }
-                                    @Loc["Profile"]
-                                </a>
-                                <ul class="dropdown-menu dropdown-menu-end">
-                                    <li><a class="dropdown-item" asp-controller="Account" asp-action="Profile"><i class="bi bi-person me-2"></i>@Loc["Profile"]</a></li>
-                                    <li><a class="dropdown-item" asp-controller="Favorites" asp-action="Index"><i class="bi bi-heart me-2"></i>@Loc["MyFavorites"]</a></li>
-                                    <li><a class="dropdown-item" asp-controller="Orders" asp-action="MyOrders"><i class="bi bi-receipt me-2"></i>@Loc["MyOrders"]</a></li>
+                    </div>
+                    @await Component.InvokeAsync("CategoryNavigation")
+                    <div class="sf-nav-tools">
+                        <form asp-controller="Products" asp-action="Index" method="get" class="sf-search" role="search">
+                            <button type="submit" aria-label="@Loc["Search"]"><i class="bi bi-search" aria-hidden="true"></i></button>
+                            <input type="search" name="searchTerm" placeholder="@Loc["Search"]" aria-label="@Loc["SearchPlaceholder"]" value="@Context.Request.Query["searchTerm"]" />
+                        </form>
+                        <a class="sf-icon-link sf-nav-favorites" asp-controller="Favorites" asp-action="Index" aria-label="@Loc["MyFavorites"]"><i class="bi bi-heart" aria-hidden="true"></i></a>
+                        @await Component.InvokeAsync("CartSummary")
+                        <div class="dropdown">
+                            <button class="sf-icon-link" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="@Loc["Profile"]">
+                                @if (!string.IsNullOrEmpty(currentUser?.AvatarUrl))
+                                {
+                                    <img src="@currentUser.AvatarUrl" class="sf-avatar" alt="" />
+                                }
+                                else
+                                {
+                                    <i class="bi bi-person" aria-hidden="true"></i>
+                                }
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                @if (User.Identity?.IsAuthenticated == true)
+                                {
+                                    <li><a class="dropdown-item" asp-controller="Account" asp-action="Profile">@Loc["Profile"]</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Orders" asp-action="MyOrders">@Loc["MyOrders"]</a></li>
+                                }
+                                else
+                                {
+                                    <li><a class="dropdown-item" asp-controller="Account" asp-action="Login">@Loc["Login"]</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Account" asp-action="Register">@Loc["Register"]</a></li>
+                                }
+                                <li><a class="dropdown-item" asp-controller="Favorites" asp-action="Index">@Loc["MyFavorites"]</a></li>
+                                @if (!isCatalogPage)
+                                {
+                                    <li><a class="dropdown-item" asp-controller="Products" asp-action="Index">@Loc["AllProducts"]</a></li>
+                                }
+                                @if (User.Identity?.IsAuthenticated == true)
+                                {
                                     @if (isAdmin)
                                     {
                                         <li><hr class="dropdown-divider" /></li>
-                                        <li><a class="dropdown-item" asp-area="Admin" asp-controller="Dashboard" asp-action="Index"><i class="bi bi-speedometer2 me-2"></i>@Loc["AdminPanel"]</a></li>
+                                        <li><a class="dropdown-item" asp-area="Admin" asp-controller="Dashboard" asp-action="Index">@Loc["AdminPanel"]</a></li>
                                     }
                                     <li><hr class="dropdown-divider" /></li>
-                                    <li>
-                                        <form asp-controller="Account" asp-action="Logout" method="post" class="m-0">
-                                            <button type="submit" class="dropdown-item"><i class="bi bi-box-arrow-right me-2"></i>@Loc["Logout"]</button>
-                                        </form>
-                                    </li>
-                                </ul>
-                            </li>
-                        }
-                        else
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link nav-pill-btn" asp-controller="Account" asp-action="Register">
-                                    <i class="bi bi-person-plus"></i><span>@Loc["Register"]</span>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link nav-pill-btn" asp-controller="Account" asp-action="Login">
-                                    <i class="bi bi-person"></i><span>@Loc["Login"]</span>
-                                </a>
-                            </li>
-                        }
-                    </ul>
+                                    <li><form asp-controller="Account" asp-action="Logout" method="post"><button type="submit" class="dropdown-item">@Loc["Logout"]</button></form></li>
+                                }
+                            </ul>
+                        </div>
+                        <form asp-controller="Language" asp-action="Set" method="post" class="sf-language-form">
+                            <input type="hidden" name="culture" value="@(isZh ? "en" : "zh-CN")" />
+                            <input type="hidden" name="returnUrl" value="@returnUrl" />
+                            <button type="submit" class="sf-language" aria-label="@(isZh ? "Switch to English" : "切换到中文")">@(isZh ? "EN" : "中文")</button>
+                        </form>
+                    </div>
                 </div>
-            </div>
-        </nav>
-    </header>
+            </nav>
+        </header>
     }
-
-    <main class="flex-grow-1">
-        @if (TempData["Success"] is string success)
-        {
-            <div class="container mt-3">
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    @success
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            </div>
-        }
-        @if (TempData["Error"] is string error)
-        {
-            <div class="container mt-3">
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    @error
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            </div>
-        }
+    <main id="main-content" class="flex-grow-1" tabindex="-1">
+        <partial name="~/Views/Shared/_FeedbackMessages.cshtml" />
         @RenderBody()
     </main>
-
     @if (!embeddedLayout)
     {
-    <footer class="footer bg-dark text-light py-4">
-        <div class="container text-center">
-            <p class="mb-1">&copy; @DateTime.Now.Year @Loc["FooterCopyright"]</p>
-            <small class="text-secondary">@Loc["FooterQualities"]</small>
-        </div>
-    </footer>
+        <footer class="sf-footer">
+            <div class="sf-container">
+                <div class="sf-footer-grid">
+                    <div class="sf-footer-brand"><a class="sf-wordmark" asp-controller="Home" asp-action="Index">ZHY.</a><p>@L10n.Text("为日常，选更好的。", "A little better. Every day.")</p></div>
+                    <div>
+                        <h2>@Loc["ShopByCategory"]</h2>
+                        <ul>
+                            @foreach (var category in categories)
+                            {
+                                <li><a asp-controller="Products" asp-action="Index" asp-route-categoryId="@category.Id">@L10n.Name(category)</a></li>
+                            }
+                        </ul>
+                    </div>
+                    <div><h2>@L10n.Text("你的商店", "Your store")</h2><ul><li><a asp-controller="Account" asp-action="Profile">@Loc["Profile"]</a></li><li><a asp-controller="Orders" asp-action="MyOrders">@Loc["MyOrders"]</a></li><li><a asp-controller="Favorites" asp-action="Index">@Loc["MyFavorites"]</a></li><li><a asp-controller="Cart" asp-action="Index">@Loc["Cart"]</a></li></ul></div>
+                </div>
+                <div class="sf-footer-bottom"><span>&copy; @DateTime.Now.Year ZHY · @Loc["Brand"]</span><span>@L10n.Text("发现喜欢，留住日常。", "Find your everyday favourites.")</span></div>
+            </div>
+        </footer>
     }
-
+    <partial name="~/Views/Shared/_ConfirmDialog.cshtml" />
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/ui-feedback.js" asp-append-version="true"></script>
+    <script src="~/js/confirm-dialog.js" asp-append-version="true"></script>
+    <script src="~/js/catalog.js" asp-append-version="true"></script>
+    <script src="~/js/category-navigation.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

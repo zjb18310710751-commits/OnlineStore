@@ -1,0 +1,81 @@
+@model HeroSlideFormViewModel
+@{
+    var defaultHeading = L10n.Text("让好物，成为主角。", "YOUR NEXT FAVOURITE.");
+    var defaultDescription = L10n.Text("在左侧填写文字，预览这张轮播图。", "Your image and message will appear here.");
+    var isEnglish = !CultureInfo.CurrentUICulture.Name.StartsWith("zh", StringComparison.OrdinalIgnoreCase);
+    var previewHeading = L10n.Text(Model.Heading, Model.HeadingEn);
+    var previewDescription = L10n.Text(Model.Description ?? "", Model.DescriptionEn);
+}
+<input asp-for="Id" type="hidden" />
+<div asp-validation-summary="All" class="text-danger ac-validation" role="alert"></div>
+<div class="ac-editor-grid">
+    <div class="ac-editor-fields">
+        <section class="card card-body ac-form-section" aria-labelledby="ac-image-title">
+            <h2 id="ac-image-title">@L10n.Text("宣传图片", "Campaign image")</h2>
+            <p class="ac-field-help">@L10n.Text("建议使用清晰的横版图片，主体靠中间，底部留出文字空间。", "Use a landscape image with a centred subject and space for copy near the bottom.")</p>
+            <label asp-for="ImageFile" class="form-label">@(string.IsNullOrWhiteSpace(Model.ImageUrl) ? L10n.Text("上传图片", "Upload image") : L10n.Text("更换图片", "Replace image"))</label>
+            <input asp-for="ImageFile" type="file" accept="image/jpeg,image/png,image/webp,image/gif" class="form-control" aria-describedby="ac-upload-help" data-image-input />
+            <span asp-validation-for="ImageFile" class="text-danger small"></span>
+            <p id="ac-upload-help" class="ac-field-help ac-upload-help">@L10n.Text("JPG、PNG、WebP 或 GIF，最大 5 MB。编辑时不选新图片即可保留原图。", "JPG, PNG, WebP or GIF, up to 5 MB. Leave empty when editing to keep the current image.")</p>
+            <label asp-for="ImageAlt" class="form-label">@L10n.Text("图片描述", "Image description") <span class="ac-optional">@L10n.Text("选填", "Optional")</span></label>
+            <input asp-for="ImageAlt" maxlength="200" class="form-control" aria-describedby="ac-alt-help" />
+            <span asp-validation-for="ImageAlt" class="text-danger small"></span>
+            <p id="ac-alt-help" class="ac-field-help">@L10n.Text("简短描述图片内容，方便使用屏幕阅读器的顾客理解。", "Briefly describe the image for customers using screen readers.")</p>
+        </section>
+        <section class="card card-body ac-form-section" aria-labelledby="ac-copy-title">
+            <h2 id="ac-copy-title">@L10n.Text("轮播信息", "Slide content")</h2>
+            <div class="ac-field">
+                <label asp-for="Title" class="form-label">@L10n.Text("轮播名称", "Slide name") <span class="ac-required">*</span></label>
+                <input asp-for="Title" maxlength="100" class="form-control" placeholder="@L10n.Text("例如：数码精选", "e.g. Audio essentials")" />
+                <span asp-validation-for="Title" class="text-danger small"></span>
+            </div>
+            <div class="ac-field">
+                <label asp-for="Heading" class="form-label">@L10n.Text("宣传标题", "Headline") <span class="ac-required">*</span></label>
+                <input asp-for="Heading" maxlength="120" class="form-control" data-copy-heading />
+                <span asp-validation-for="Heading" class="text-danger small"></span>
+            </div>
+            <div class="ac-field">
+                <label asp-for="Description" class="form-label">@L10n.Text("宣传说明", "Description") <span class="ac-optional">@L10n.Text("选填", "Optional")</span></label>
+                <textarea asp-for="Description" maxlength="240" class="form-control" rows="3" data-copy-description></textarea>
+                <span asp-validation-for="Description" class="text-danger small"></span>
+            </div>
+            <details class="ac-translations" open="@((!string.IsNullOrWhiteSpace(Model.HeadingEn) || !string.IsNullOrWhiteSpace(Model.TitleEn)) ? "open" : null)">
+                <summary>@L10n.Text("英文内容", "English content") <span>@L10n.Text("选填 · 未填写时使用上方内容", "Optional · falls back to the main content")</span></summary>
+                <div class="ac-field"><label asp-for="TitleEn" class="form-label">@L10n.Text("轮播名称（英文）", "Slide name in English")</label><input asp-for="TitleEn" maxlength="100" class="form-control" /><span asp-validation-for="TitleEn" class="text-danger small"></span></div>
+                <div class="ac-field"><label asp-for="HeadingEn" class="form-label">@L10n.Text("宣传标题（英文）", "Headline in English")</label><input asp-for="HeadingEn" maxlength="120" class="form-control" data-copy-heading-en /><span asp-validation-for="HeadingEn" class="text-danger small"></span></div>
+                <div class="ac-field"><label asp-for="DescriptionEn" class="form-label">@L10n.Text("宣传说明（英文）", "Description in English")</label><textarea asp-for="DescriptionEn" maxlength="240" class="form-control" rows="3" data-copy-description-en></textarea><span asp-validation-for="DescriptionEn" class="text-danger small"></span></div>
+                <div class="ac-field"><label asp-for="ImageAltEn" class="form-label">@L10n.Text("图片描述（英文）", "Image description in English")</label><input asp-for="ImageAltEn" maxlength="200" class="form-control" /><span asp-validation-for="ImageAltEn" class="text-danger small"></span></div>
+            </details>
+        </section>
+        <section class="card card-body ac-form-section" aria-labelledby="ac-display-title">
+            <h2 id="ac-display-title">@L10n.Text("展示设置", "Display settings")</h2>
+            <div class="ac-field">
+                <label asp-for="LinkUrl" class="form-label">@L10n.Text("Shop 跳转地址", "Shop destination") <span class="ac-required">*</span></label>
+                <input asp-for="LinkUrl" maxlength="500" class="form-control" placeholder="/Products" aria-describedby="ac-link-help" />
+                <span asp-validation-for="LinkUrl" class="text-danger small"></span>
+                <p id="ac-link-help" class="ac-field-help">@L10n.Text("填写站内地址，例如 /Products（全部商品）或 /Products/Details/1（商品详情）。", "Use a store URL, such as /Products for all products or /Products/Details/1 for a product.")</p>
+            </div>
+            <div class="ac-display-row">
+                <div class="ac-field"><label asp-for="DisplayOrder" class="form-label">@L10n.Text("显示顺序", "Display order")</label><input asp-for="DisplayOrder" type="number" min="0" max="9999" class="form-control" /><span asp-validation-for="DisplayOrder" class="text-danger small"></span><p class="ac-field-help">@L10n.Text("数字越小，越靠前。", "Lower numbers appear first.")</p></div>
+                <div class="ac-visibility"><div class="form-check form-switch"><input asp-for="IsActive" class="form-check-input" role="switch" /><label asp-for="IsActive" class="form-check-label">@L10n.Text("在首页展示", "Show on homepage")</label></div><p class="ac-field-help">@L10n.Text("关闭后保留内容，暂不展示。", "Turn off to keep this slide hidden.")</p></div>
+            </div>
+        </section>
+        <div class="ac-form-actions"><button type="submit" class="btn btn-primary">@L10n.Text("保存轮播图", "Save slide")</button><a asp-action="Index" class="btn btn-outline-secondary">@Loc["Cancel"]</a><span>@L10n.Text("保存后生效", "Changes take effect when saved")</span></div>
+    </div>
+    <aside class="ac-preview-panel" aria-labelledby="ac-preview-title">
+        <div class="ac-preview-top"><h2 id="ac-preview-title">@L10n.Text("效果预览", "Live preview")</h2><label class="visually-hidden" for="ac-preview-language">@L10n.Text("预览语言", "Preview language")</label><select id="ac-preview-language" class="form-select" data-preview-language><option value="main" selected="@(!isEnglish ? "selected" : null)">@L10n.Text("主要内容", "Main content")</option><option value="en" selected="@(isEnglish ? "selected" : null)">English</option></select></div>
+        <div class="ac-preview-stage" data-preview-stage>
+            @if (!string.IsNullOrWhiteSpace(Model.ImageUrl))
+            {
+                <img src="@Model.ImageUrl" alt="" class="ac-preview-image" data-preview-image data-original-src="@Model.ImageUrl" />
+            }
+            else
+            {
+                <img alt="" class="ac-preview-image" data-preview-image data-original-src="" hidden />
+            }
+            <div class="ac-preview-placeholder" data-preview-placeholder hidden="@(!string.IsNullOrWhiteSpace(Model.ImageUrl) ? "hidden" : null)"><i class="bi bi-image" aria-hidden="true"></i><span>@L10n.Text("选择一张宣传图片", "Choose a campaign image")</span></div>
+            <div class="ac-preview-copy"><h3 data-preview-heading data-placeholder="@defaultHeading">@(string.IsNullOrWhiteSpace(previewHeading) ? defaultHeading : previewHeading)</h3><p data-preview-description data-placeholder="@defaultDescription">@(string.IsNullOrWhiteSpace(previewDescription) ? defaultDescription : previewDescription)</p><span class="ac-preview-shop">Shop</span></div>
+        </div>
+        <p class="ac-field-help">@L10n.Text("文字叠加在图片上。首页会按屏幕大小自动裁切图片。", "Copy sits over the image. The homepage crops the image to fit each screen.")</p>
+    </aside>
+</div>

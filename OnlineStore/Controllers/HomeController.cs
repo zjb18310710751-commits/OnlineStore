@@ -20,7 +20,7 @@ public class HomeController : Controller
 
     public async Task<IActionResult> Index()
     {
-        // 首页展示最新上架的商品
+
         var vm = await _productService.GetPagedAsync(new ProductQuery
         {
             PageSize = 8,

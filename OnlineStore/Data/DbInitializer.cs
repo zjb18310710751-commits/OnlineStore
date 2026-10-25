@@ -4,9 +4,6 @@ using OnlineStore.Models;
 
 namespace OnlineStore.Data;
 
-/// <summary>
-/// 首次运行初始化：应用 EF Core Migrations 建库建表，并写入种子数据。
-/// </summary>
 public static class DbInitializer
 {
     public const string AdminEmail = "admin@store.com";
@@ -30,13 +27,12 @@ public static class DbInitializer
         UserManager<ApplicationUser> userManager,
         RoleManager<IdentityRole> roleManager)
     {
-        // 1) 角色
+
         if (!await roleManager.RoleExistsAsync(AdminRole))
         {
             await roleManager.CreateAsync(new IdentityRole(AdminRole));
         }
 
-        // 2) 管理员账号（幂等）
         if (await userManager.FindByEmailAsync(AdminEmail) is null)
         {
             var admin = new ApplicationUser
@@ -52,16 +48,13 @@ public static class DbInitializer
             }
         }
 
-        // 3) 为既有数据回填英文字段（幂等），保证老库切英文时各类内容都有英文
         await BackfillContentTranslationsAsync(context);
 
-        // 4) 分类与示例商品（幂等：仅在分类表为空时写入）
         if (await context.Categories.AnyAsync())
         {
             return;
         }
 
-        // 店铺
         var outdoor = new Shop { Name = "山野户外旗舰店", NameEn = "Mountain Outdoors Flagship Store", Rating = 4.9m, SalesCount = 12800, Description = "专注户外装备 12 年，只卖靠谱的。", DescriptionEn = "12 years of outdoor gear expertise — only dependable gear." };
         var digital = new Shop { Name = "极客数码自营店", NameEn = "Geek Digital Store", Rating = 4.8m, SalesCount = 8600, Description = "正品数码，官方直营。", DescriptionEn = "Genuine digital products, direct from official channels." };
         var bookstore = new Shop { Name = "悦读图书专营店", NameEn = "Joyful Reading Bookstore", Rating = 4.9m, SalesCount = 32000, Description = "好书，认真选每一本。", DescriptionEn = "Good books, carefully selected." };
@@ -70,7 +63,6 @@ public static class DbInitializer
 
         var shops = new List<Shop> { outdoor, digital, bookstore, homeStore, clothing };
 
-        // 分类
         var electronics = new Category { Name = "电子产品", NameEn = "Electronics", Slug = "电子产品", Description = "手机、电脑、数码配件", DescriptionEn = "Phones, computers and digital accessories", DisplayOrder = 1 };
         var fashion = new Category { Name = "服装服饰", NameEn = "Fashion", Slug = "服装服饰", Description = "男女装、鞋帽配饰", DescriptionEn = "Men's and women's clothing, shoes and accessories", DisplayOrder = 2 };
         var books = new Category { Name = "图书", NameEn = "Books", Slug = "图书", Description = "文学、科技、教育", DescriptionEn = "Literature, technology and education", DisplayOrder = 3 };
@@ -280,7 +272,6 @@ public static class DbInitializer
             }
         };
 
-        // 追加 88 件商品：覆盖各类目、价格从低到高，模拟真实商城
         var extraItems = new (string Name, string NameEn, Category Category, Shop Shop, decimal Price)[]
         {
             ("手机支架", "Phone Holder", electronics, digital, 19.90m), ("三合一数据线", "3-in-1 Data Cable", electronics, digital, 29.00m),
@@ -359,7 +350,6 @@ public static class DbInitializer
             });
         }
 
-        // 为种子商品配占位图（每件商品固定一张，可随后台图片上传替换为真实商品图）
         foreach (var p in products)
         {
             p.ImageUrl = $"https://picsum.photos/seed/{p.Sku}/600/400";
@@ -373,7 +363,6 @@ public static class DbInitializer
             p.DetailHtml = BuildDetailHtml(p.Name, p.Description ?? "", images[0].ImageUrl, images[1].ImageUrl);
             p.DetailHtmlEn = BuildDetailHtmlEn(p.NameEn ?? p.Name, p.DescriptionEn ?? p.Description ?? "", images[0].ImageUrl, images[1].ImageUrl);
 
-            // 每个 SKU 配一张不同图，选择颜色/规格时主图随之切换
             var skuIndex = 0;
             foreach (var sku in p.Skus)
             {
@@ -381,7 +370,6 @@ public static class DbInitializer
             }
         }
 
-        // 为种子数据补充英文（快递/参数/规格颜色/评价）
         ApplyEnglishTranslations(products);
 
         context.Shops.AddRange(shops);
@@ -410,7 +398,7 @@ public static class DbInitializer
 
     private static async Task BackfillContentTranslationsAsync(ApplicationDbContext context)
     {
-        // 分类
+
         var categories = await context.Categories
             .Where(c => c.NameEn == null || c.DescriptionEn == null)
             .ToListAsync();
@@ -423,7 +411,6 @@ public static class DbInitializer
             }
         }
 
-        // 店铺
         var shops = await context.Shops.ToListAsync();
         foreach (var shop in shops)
         {
@@ -434,7 +421,6 @@ public static class DbInitializer
             }
         }
 
-        // 商品（含快递信息、参数、规格颜色、评价）
         var products = await context.Products
             .Include(p => p.Specs)
             .Include(p => p.Skus)
@@ -563,7 +549,6 @@ public static class DbInitializer
     private static Review Review(string userName, int rating, string comment, int daysAgo = 0, string? imageUrl = null)
         => new() { UserName = userName, Rating = rating, Comment = comment, ImageUrl = imageUrl, CreatedAt = DateTime.UtcNow.AddDays(-daysAgo) };
 
-    /// <summary>按中文值查字典，为种子数据的快递/参数/规格/评价填充英文字段。</summary>
     private static void ApplyEnglishTranslations(List<Product> products)
     {
         var specName = new Dictionary<string, string>

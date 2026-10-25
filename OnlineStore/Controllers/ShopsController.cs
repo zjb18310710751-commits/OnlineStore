@@ -4,7 +4,6 @@ using OnlineStore.ViewModels;
 
 namespace OnlineStore.Controllers;
 
-/// <summary>前台店铺主页：展示店铺信息与在售商品。</summary>
 public class ShopsController : Controller
 {
     private readonly IShopService _shopService;

@@ -5,7 +5,6 @@ using OnlineStore.Services;
 
 namespace OnlineStore.Tests.Services;
 
-/// <summary>邮箱验证码服务单元测试：生成/校验/过期/一次性/冷却。</summary>
 public class VerificationCodeServiceTests
 {
     private static ApplicationDbContext CreateContext()

@@ -7,7 +7,6 @@ using OnlineStore.Services;
 
 namespace OnlineStore.Controllers;
 
-/// <summary>收藏（心愿单）：登录用户可收藏/取消收藏商品，并查看我的收藏。</summary>
 [Authorize]
 public class FavoritesController : Controller
 {

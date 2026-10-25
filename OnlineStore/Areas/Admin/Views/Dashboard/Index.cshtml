@@ -2,65 +2,86 @@
 @model AdminDashboardData
 @{
     ViewData["Title"] = Loc["Dashboard"].Value;
+    var recentRevenue = Model.Trend.Sum(point => point.Revenue);
 }
-
-<div class="overview">
+<div class="overview" data-admin-overview>
     <header class="overview-head">
         <div>
+            <span class="overview-eyebrow">@L10n.Text("经营概览", "STORE PERFORMANCE")</span>
             <h1>@Loc["StoreOverview"]</h1>
-            <p>@Loc["OverviewSubtitle"]</p>
+            <p>@L10n.Text("从关键数据，到每一笔订单。", "Your store, from the big picture to every order.")</p>
         </div>
-        <a asp-area="Admin" asp-controller="Orders" asp-action="Index" class="overview-text-link">
-            @Loc["OrderManagement"] <i class="bi bi-arrow-right"></i>
-        </a>
+        <a asp-area="Admin" asp-controller="Products" asp-action="Create" class="btn btn-primary overview-primary-action"><i class="bi bi-plus-lg" aria-hidden="true"></i> @Loc["AddProduct"]</a>
     </header>
-
-    <section class="overview-metrics">
-        <div class="overview-metric">
-            <span class="overview-metric-label">@Loc["TotalRevenue"]</span>
-            <span class="overview-metric-value">¥@Model.TotalRevenue.ToString("N2")</span>
-        </div>
-        <div class="overview-metric">
-            <span class="overview-metric-label">@Loc["TotalOrders"]</span>
-            <span class="overview-metric-value">@Model.TotalOrderCount</span>
-        </div>
-        <div class="overview-metric">
-            <span class="overview-metric-label">@Loc["CustomerCount"]</span>
-            <span class="overview-metric-value">@Model.CustomerCount</span>
-        </div>
-        <div class="overview-metric">
-            <span class="overview-metric-label">@Loc["UnitsSold"]</span>
-            <span class="overview-metric-value">@Model.UnitsSold</span>
-        </div>
-        <div class="overview-metric is-alert">
-            <span class="overview-metric-label">@Loc["PendingShipment"]</span>
-            <span class="overview-metric-value">@Model.PendingShipmentCount</span>
-        </div>
-        <div class="overview-metric is-alert">
-            <span class="overview-metric-label">@Loc["LowStock"]</span>
-            <span class="overview-metric-value">@Model.LowStockCount</span>
-        </div>
+    <section class="overview-metrics" aria-label="@L10n.Text("累计经营数据", "All-time store metrics")">
+        <article class="overview-metric">
+            <div class="overview-metric-top"><span class="overview-metric-label">@L10n.Text("累计收入", "Total revenue")</span><i class="bi bi-wallet2" aria-hidden="true"></i></div>
+            <strong class="overview-metric-value"><span class="overview-currency">¥</span>@Model.TotalRevenue.ToString("N2")</strong>
+            <span class="overview-metric-note">@L10n.Text("有效订单的实付总额", "Revenue from valid orders")</span>
+        </article>
+        <article class="overview-metric">
+            <div class="overview-metric-top"><span class="overview-metric-label">@L10n.Text("有效订单", "Valid orders")</span><i class="bi bi-receipt" aria-hidden="true"></i></div>
+            <strong class="overview-metric-value">@Model.TotalOrderCount.ToString("N0")</strong>
+            <span class="overview-metric-note">@L10n.Text("不含取消与退款订单", "Excludes cancelled and refunded orders")</span>
+        </article>
+        <article class="overview-metric">
+            <div class="overview-metric-top"><span class="overview-metric-label">@L10n.Text("成交客户", "Paying customers")</span><i class="bi bi-people" aria-hidden="true"></i></div>
+            <strong class="overview-metric-value">@Model.CustomerCount.ToString("N0")</strong>
+            <span class="overview-metric-note">@L10n.Text("有效订单的独立客户", "Unique customers with valid orders")</span>
+        </article>
+        <article class="overview-metric">
+            <div class="overview-metric-top"><span class="overview-metric-label">@L10n.Text("售出件数", "Units sold")</span><i class="bi bi-box-seam" aria-hidden="true"></i></div>
+            <strong class="overview-metric-value">@Model.UnitsSold.ToString("N0")</strong>
+            <span class="overview-metric-note">@L10n.Text("有效订单中的商品数量", "Items across valid orders")</span>
+        </article>
     </section>
-
+    <section class="overview-tasks" aria-label="@L10n.Text("经营待办", "Store tasks")">
+        <a class="overview-task" asp-area="Admin" asp-controller="Orders" asp-action="Index">
+            <span class="overview-task-icon"><i class="bi bi-box-seam" aria-hidden="true"></i></span>
+            <span class="overview-task-copy"><strong>@Loc["PendingShipment"] <span class="overview-task-count">@Model.PendingShipmentCount</span></strong><span>@L10n.Text("查看订单，安排发货", "Review orders and arrange shipping")</span></span>
+            <i class="bi bi-arrow-right" aria-hidden="true"></i>
+        </a>
+        <a class="overview-task" asp-area="Admin" asp-controller="Products" asp-action="Index">
+            <span class="overview-task-icon"><i class="bi bi-boxes" aria-hidden="true"></i></span>
+            <span class="overview-task-copy"><strong>@Loc["LowStock"] <span class="overview-task-count">@Model.LowStockCount</span></strong><span>@L10n.Text("查看商品，及时补充库存", "Review products and replenish stock")</span></span>
+            <i class="bi bi-arrow-right" aria-hidden="true"></i>
+        </a>
+    </section>
     <div class="overview-grid">
-        <section class="overview-panel">
+        <section class="overview-panel overview-revenue-panel" aria-labelledby="revenue-heading">
             <div class="overview-panel-head">
-                <h2>@Loc["RevenueTrend"]</h2>
+                <h2 id="revenue-heading">@L10n.Text("收入趋势", "Revenue trend")</h2>
+                <div class="overview-periods" role="group" aria-label="@L10n.Text("选择收入统计时段", "Choose revenue period")" data-revenue-periods hidden>
+                    <button type="button" data-revenue-days="7" aria-pressed="false">@L10n.Text("近 7 天", "7 days")</button>
+                    <button type="button" data-revenue-days="30" aria-pressed="true">@L10n.Text("近 30 天", "30 days")</button>
+                </div>
             </div>
-            <div class="overview-panel-body">
-                <div class="overview-chart"><canvas id="overviewRevenueChart"></canvas></div>
+            <div class="overview-panel-body overview-revenue-body">
+                <div class="overview-revenue-summary" aria-live="polite" aria-atomic="true"><strong data-revenue-total>¥@recentRevenue.ToString("N2")</strong><span data-revenue-period>@L10n.Text("近 30 天收入", "Revenue in the last 30 days")</span></div>
+                <p class="overview-chart-note" id="revenue-description">@L10n.Text("按订单创建日期统计，包含待发货、已发货和已完成订单。", "By order date, including orders awaiting shipment, shipped and completed.")</p>
+                <div class="overview-chart" data-revenue-chart hidden><canvas id="overviewRevenueChart" role="img" aria-label="@L10n.Text("每日收入折线图", "Daily revenue line chart")" aria-describedby="revenue-description"></canvas></div>
+                <div class="overview-revenue-fallback" data-revenue-fallback>
+                    <p>@L10n.Text("每日收入明细", "Daily revenue details")</p>
+                    <dl data-revenue-values>
+                        @foreach (var point in Model.Trend)
+                        {
+                            <div><dt>@point.Label</dt><dd>¥@point.Revenue.ToString("N2")</dd></div>
+                        }
+                    </dl>
+                </div>
+                <p class="overview-chart-empty" data-revenue-empty hidden>@L10n.Text("这个时段还没有收入。首笔有效订单产生后，趋势将显示在这里。", "No revenue in this period yet. Your first valid order will appear here.")</p>
+                <details class="overview-chart-data" data-revenue-data-details hidden><summary>@L10n.Text("查看每日数据", "View daily data")</summary><dl data-revenue-accessible-values></dl></details>
             </div>
         </section>
-
-        <section class="overview-panel">
+        <section class="overview-panel" aria-labelledby="top-products-heading">
             <div class="overview-panel-head">
-                <h2>@Loc["TopProducts"]</h2>
-                <a asp-area="Admin" asp-controller="Products" asp-action="Index">@Loc["ViewAll"]</a>
+                <div><h2 id="top-products-heading">@Loc["TopProducts"]</h2><p>@L10n.Text("按累计销售额排名", "Ranked by all-time sales")</p></div>
+                <a asp-area="Admin" asp-controller="Products" asp-action="Index">@Loc["ViewAll"] <i class="bi bi-arrow-up-right" aria-hidden="true"></i></a>
             </div>
             <div class="overview-panel-body">
                 @if (Model.TopProducts.Count == 0)
                 {
-                    <div class="overview-empty">@Loc["NoProducts"]</div>
+                    <div class="overview-empty"><i class="bi bi-box-seam" aria-hidden="true"></i><strong>@L10n.Text("热销榜，等待第一笔成交", "Your bestsellers start here")</strong><p>@L10n.Text("商品产生销售后，会在这里按销售额展示。", "Products will appear here as your store makes sales.")</p><a asp-area="Admin" asp-controller="Products" asp-action="Index">@Loc["ProductManagement"] <i class="bi bi-arrow-right" aria-hidden="true"></i></a></div>
                 }
                 else
                 {
@@ -69,21 +90,18 @@
                         {
                             var row = Model.TopProducts[i];
                             <li>
-                                <span class="overview-product-rank">@(i + 1)</span>
+                                <span class="overview-product-rank">@((i + 1).ToString("00"))</span>
                                 <span class="overview-product-thumb">
                                     @if (!string.IsNullOrEmpty(row.Product.ImageUrl))
                                     {
-                                        <img src="@row.Product.ImageUrl" alt="@L10n.Name(row.Product)" />
+                                        <img src="@row.Product.ImageUrl" alt="" loading="lazy" />
                                     }
                                     else
                                     {
-                                        <i class="bi bi-image"></i>
+                                        <i class="bi bi-image" aria-hidden="true"></i>
                                     }
                                 </span>
-                                <span class="overview-product-info">
-                                    <span class="overview-product-name">@L10n.Name(row.Product)</span>
-                                    <span class="overview-product-meta">¥@row.Product.Price.ToString("N2") · @Loc["SoldCount", row.UnitsSold]</span>
-                                </span>
+                                <span class="overview-product-info"><a class="overview-product-name" asp-area="Admin" asp-controller="Products" asp-action="Details" asp-route-id="@row.Product.Id">@L10n.Name(row.Product)</a><span class="overview-product-meta">@Loc["SoldCount", row.UnitsSold]</span></span>
                                 <span class="overview-product-revenue">¥@row.Revenue.ToString("N2")</span>
                             </li>
                         }
@@ -91,40 +109,22 @@
                 }
             </div>
         </section>
-
-        <section class="overview-panel">
-            <div class="overview-panel-head">
-                <h2>@Loc["RecentOrders"]</h2>
-                <a asp-area="Admin" asp-controller="Orders" asp-action="Index">@Loc["ViewAll"]</a>
-            </div>
-            <div class="overview-panel-body">
+        <section class="overview-panel overview-orders-panel" aria-labelledby="recent-orders-heading">
+            <div class="overview-panel-head"><div><h2 id="recent-orders-heading">@Loc["RecentOrders"]</h2><p>@L10n.Text("最新订单与处理状态", "Latest activity and order status")</p></div><a asp-area="Admin" asp-controller="Orders" asp-action="Index">@Loc["ViewAll"] <i class="bi bi-arrow-up-right" aria-hidden="true"></i></a></div>
+            <div class="overview-panel-body overview-orders-body">
                 @if (Model.RecentOrders.Count == 0)
                 {
-                    <div class="overview-empty">@Loc["NoOrders"]</div>
+                    <div class="overview-empty"><i class="bi bi-receipt" aria-hidden="true"></i><strong>@L10n.Text("还没有订单", "No orders yet")</strong><p>@L10n.Text("顾客下单后，你可以在这里查看最新进展。", "New orders and their latest status will appear here.")</p><a asp-area="Admin" asp-controller="Orders" asp-action="Index">@Loc["OrderManagement"] <i class="bi bi-arrow-right" aria-hidden="true"></i></a></div>
                 }
                 else
                 {
-                    <div class="table-responsive">
+                    <div class="table-responsive" tabindex="0" role="region" aria-label="@Loc["RecentOrders"]">
                         <table class="table overview-table align-middle mb-0">
-                            <thead>
-                                <tr>
-                                    <th>@Loc["OrderNo"]</th>
-                                    <th>@Loc["Receiver"]</th>
-                                    <th>@Loc["OrderStatus"]</th>
-                                    <th class="text-end">@Loc["Total"]</th>
-                                    <th class="text-end">@Loc["CreatedAt"]</th>
-                                </tr>
-                            </thead>
+                            <thead><tr><th scope="col">@Loc["OrderNo"]</th><th scope="col">@Loc["Receiver"]</th><th scope="col">@Loc["OrderStatus"]</th><th scope="col" class="text-end">@Loc["Total"]</th><th scope="col" class="text-end">@Loc["CreatedAt"]</th></tr></thead>
                             <tbody>
                                 @foreach (var order in Model.RecentOrders)
                                 {
-                                    <tr>
-                                        <td class="overview-mono">@order.OrderNo</td>
-                                        <td>@order.UserName</td>
-                                        <td><span class="overview-status @Overview.StatusClass(order.Status)">@L10n.Status(order.Status)</span></td>
-                                        <td class="text-end fw-semibold">¥@order.Total.ToString("N2")</td>
-                                        <td class="text-end text-muted small">@order.CreatedAt.ToLocalTime().ToString("MM-dd HH:mm")</td>
-                                    </tr>
+                                    <tr><td class="overview-mono">@order.OrderNo</td><td>@order.UserName</td><td><span class="overview-status @Overview.StatusClass(order.Status)">@L10n.Status(order.Status)</span></td><td class="text-end fw-semibold overview-mono">¥@order.Total.ToString("N2")</td><td class="text-end overview-order-date"><time datetime="@order.CreatedAt.ToString("o")">@order.CreatedAt.ToLocalTime().ToString("MM-dd HH:mm")</time></td></tr>
                                 }
                             </tbody>
                         </table>
@@ -132,30 +132,24 @@
                 }
             </div>
         </section>
-
-        <section class="overview-panel">
-            <div class="overview-panel-head">
-                <h2>@Loc["LatestReviews"]</h2>
-                <a asp-area="Admin" asp-controller="Reviews" asp-action="Index">@Loc["ViewAll"]</a>
-            </div>
+        <section class="overview-panel" aria-labelledby="latest-reviews-heading">
+            <div class="overview-panel-head"><div><h2 id="latest-reviews-heading">@Loc["LatestReviews"]</h2><p>@L10n.Text("倾听顾客的真实反馈", "The latest from your customers")</p></div><a asp-area="Admin" asp-controller="Reviews" asp-action="Index">@Loc["ViewAll"] <i class="bi bi-arrow-up-right" aria-hidden="true"></i></a></div>
             <div class="overview-panel-body">
                 @if (Model.LatestReviews.Count == 0)
                 {
-                    <div class="overview-empty">@Loc["NoReviews"]</div>
+                    <div class="overview-empty"><i class="bi bi-chat-square-text" aria-hidden="true"></i><strong>@L10n.Text("还没有顾客评价", "No reviews yet")</strong><p>@L10n.Text("顾客分享的使用体验会显示在这里。", "Customer experiences and feedback will appear here.")</p></div>
                 }
                 else
                 {
                     <ul class="overview-review-list">
                         @foreach (var row in Model.LatestReviews)
                         {
+                            var reviewName = L10n.Text(row.Review.UserName, row.Review.UserNameEn);
                             <li>
-                                <span class="overview-avatar">@row.Review.UserName.Substring(0, 1).ToUpperInvariant()</span>
+                                <span class="overview-avatar" aria-hidden="true">@(string.IsNullOrWhiteSpace(reviewName) ? "?" : reviewName.Trim()[..1].ToUpperInvariant())</span>
                                 <span class="overview-review-info">
-                                    <span class="overview-review-top">
-                                        <strong>@L10n.Text(row.Review.UserName, row.Review.UserNameEn)</strong>
-                                        <time class="overview-review-date">@row.Review.CreatedAt.ToLocalTime().ToString("MM-dd HH:mm")</time>
-                                    </span>
-                                    <span class="overview-stars">@Overview.Stars(row.Review.Rating)</span>
+                                    <span class="overview-review-top"><strong>@reviewName</strong><time class="overview-review-date" datetime="@row.Review.CreatedAt.ToString("o")">@row.Review.CreatedAt.ToLocalTime().ToString("MM-dd")</time></span>
+                                    <span class="overview-stars" aria-label="@L10n.Text($"评分 {row.Review.Rating} / 5", $"Rated {row.Review.Rating} out of 5")"><span aria-hidden="true">@Overview.Stars(row.Review.Rating)</span></span>
                                     <span class="overview-review-text">@L10n.Text(row.Review.Comment ?? "", row.Review.CommentEn)</span>
                                     <span class="overview-review-product">@row.ProductName</span>
                                 </span>
@@ -166,61 +160,28 @@
             </div>
         </section>
     </div>
+    <p class="overview-data-note"><i class="bi bi-info-circle" aria-hidden="true"></i> @L10n.Text("累计指标仅统计待发货、已发货和已完成订单；待办与最新订单展示当前状态。", "All-time metrics include orders awaiting shipment, shipped and completed. Tasks and recent orders show current status.")</p>
 </div>
-
 @section Scripts {
+    <script type="application/json" id="overview-revenue-data">@Html.Raw(JsonSerializer.Serialize(new {
+        points = Model.Trend.Select(point => new { label = point.Label, revenue = point.Revenue }),
+        locale = CultureInfo.CurrentUICulture.Name,
+        periods = new Dictionary<string, string> { ["7"] = L10n.Text("近 7 天收入", "Revenue in the last 7 days"), ["30"] = L10n.Text("近 30 天收入", "Revenue in the last 30 days") }
+    }))</script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const labels = @Html.Raw(JsonSerializer.Serialize(Model.Trend.Select(p => p.Label)));
-            const data = @Html.Raw(JsonSerializer.Serialize(Model.Trend.Select(p => p.Revenue)));
-
-            new Chart(document.getElementById('overviewRevenueChart'), {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        data: data,
-                        borderColor: '#d9412a',
-                        backgroundColor: 'rgba(217, 65, 42, .06)',
-                        fill: true,
-                        tension: .35,
-                        pointRadius: 0,
-                        pointHoverRadius: 4,
-                        borderWidth: 2
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    interaction: { mode: 'index', intersect: false },
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: { callbacks: { label: ctx => '¥' + Number(ctx.parsed.y).toFixed(2) } }
-                    },
-                    scales: {
-                        x: { grid: { display: false }, ticks: { color: '#9ca3af', maxTicksLimit: 8 } },
-                        y: { beginAtZero: true, grid: { color: '#eef0f3' }, ticks: { color: '#9ca3af', callback: v => '¥' + v } }
-                    }
-                }
-            });
-        });
-    </script>
+    <script src="~/js/admin-dashboard.js" asp-append-version="true"></script>
 }
-
 @functions {
     static class Overview
     {
         public static string StatusClass(string status) => status switch
         {
-            "待发货" => "is-warning",
-            "已发货" => "is-info",
-            "已完成" => "is-success",
-            "已退款" => "is-danger",
+            OrderStatus.PendingShipment => "is-warning",
+            OrderStatus.Shipped => "is-info",
+            OrderStatus.Completed => "is-success",
+            OrderStatus.Refunded => "is-danger",
             _ => "is-muted"
         };
-
-        public static string Stars(int rating) =>
-            new string('★', Math.Max(1, Math.Min(5, rating)));
+        public static string Stars(int rating) => new string('★', Math.Clamp(rating, 0, 5));
     }
 }

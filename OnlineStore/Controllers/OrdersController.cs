@@ -8,7 +8,6 @@ using OnlineStore.ViewModels;
 
 namespace OnlineStore.Controllers;
 
-/// <summary>订单：结算、下单、订单确认与我的订单（需登录）。</summary>
 [Authorize]
 public class OrdersController : Controller
 {
@@ -83,13 +82,15 @@ public class OrdersController : Controller
 
         vm.Items = cart.Items;
         vm.Total = cart.Total;
+        vm.DiscountAmount = 0;
 
         var user = await _userManager.GetUserAsync(User);
-        if (user is not null)
+        if (user is null)
         {
-            await _deliveryAddressService.EnsureLegacyAddressAsync(user);
-            vm.HasSavedAddresses = (await _deliveryAddressService.GetAsync(user.Id)).Count > 0;
+            return Challenge();
         }
+        await _deliveryAddressService.EnsureLegacyAddressAsync(user);
+        vm.HasSavedAddresses = (await _deliveryAddressService.GetAsync(user.Id)).Count > 0;
 
         ValidateCheckoutDetails(vm);
         if (!ModelState.IsValid)
@@ -97,7 +98,6 @@ public class OrdersController : Controller
             return View(vm);
         }
 
-        // 校验并应用优惠码
         decimal discount = 0;
         Coupon? applied = null;
         if (!string.IsNullOrWhiteSpace(vm.CouponCode))
@@ -109,10 +109,11 @@ public class OrdersController : Controller
                 return View(vm);
             }
             discount = result.DiscountAmount;
+            vm.DiscountAmount = discount;
             applied = result.Coupon;
         }
 
-        if (vm.SaveAsDefaultAddress && user is not null)
+        if (vm.SaveAsDefaultAddress)
         {
             var savedAddress = await _deliveryAddressService.SaveAsync(
                 user.Id,
@@ -136,17 +137,18 @@ public class OrdersController : Controller
         var order = new Order
         {
             OrderNo = GenerateOrderNo(),
-            UserId = user?.Id,
+            UserId = user.Id,
             UserName = vm.UserName!.Trim(),
             Phone = vm.Phone?.Trim(),
             Address = BuildFullAddress(vm),
             Total = cart.Total - discount,
             CouponCode = applied?.Code,
             DiscountAmount = discount,
-            Status = "待发货",
+            Status = OrderStatus.PendingShipment,
             Items = cart.Items.Select(i => new OrderItem
             {
                 ProductId = i.ProductId,
+                SkuId = i.SkuId,
                 ProductName = i.Name,
                 ProductNameEn = i.NameEn,
                 Color = i.Color,
@@ -158,10 +160,26 @@ public class OrdersController : Controller
             }).ToList()
         };
 
-        await _orderService.CreateAsync(order);
-        if (applied is not null)
+        try
         {
-            await _couponService.IncrementUsageAsync(applied.Id);
+            await _orderService.CreateAsync(order);
+        }
+        catch (OrderValidationException exception)
+        {
+            var refreshedCart = await _cartService.RefreshAsync();
+            vm.Items = refreshedCart.Items;
+            vm.Total = refreshedCart.Total;
+            vm.DiscountAmount = 0;
+            if (!string.IsNullOrWhiteSpace(vm.CouponCode) && refreshedCart.Items.Count > 0)
+            {
+                var refreshedCoupon = await _couponService.ValidateAsync(vm.CouponCode, refreshedCart.Total);
+                if (refreshedCoupon.Success)
+                {
+                    vm.DiscountAmount = refreshedCoupon.DiscountAmount;
+                }
+            }
+            ModelState.AddModelError(string.Empty, _loc[exception.ResourceKey].Value);
+            return View(vm);
         }
         await _cartService.ClearAsync();
 
@@ -202,7 +220,7 @@ public class OrdersController : Controller
     {
         var user = await _userManager.GetUserAsync(User);
         var order = await _orderService.GetByIdAsync(id);
-        if (order is null || order.UserId != user?.Id)
+        if (user is null || order is null || order.UserId != user.Id)
         {
             return NotFound();
         }
@@ -229,7 +247,7 @@ public class OrdersController : Controller
     {
         var user = await _userManager.GetUserAsync(User);
         var order = await _orderService.GetByIdAsync(id);
-        if (order is null || order.UserId != user?.Id)
+        if (user is null || order is null || order.UserId != user.Id)
         {
             return NotFound();
         }

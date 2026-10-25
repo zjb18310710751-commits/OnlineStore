@@ -5,9 +5,6 @@ using OnlineStore.Services;
 
 namespace OnlineStore.Tests.Services;
 
-/// <summary>
-/// 图片存储服务单元测试：验证上传落盘、相对路径生成，以及扩展名/大小/内容类型校验（可测试性）。
-/// </summary>
 public class ImageStorageServiceTests
 {
     private sealed class FakeFormFile : IFormFile

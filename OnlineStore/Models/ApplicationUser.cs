@@ -3,10 +3,6 @@ using Microsoft.AspNetCore.Identity;
 
 namespace OnlineStore.Models;
 
-/// <summary>
-/// 应用用户（基于 ASP.NET Core Identity）。
-/// 在 IdentityUser 基础上扩展姓名与地址；Address 保留为默认收货地址的兼容字段。
-/// </summary>
 public class ApplicationUser : IdentityUser
 {
     [PersonalData]

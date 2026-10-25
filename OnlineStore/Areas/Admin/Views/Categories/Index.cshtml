@@ -30,7 +30,7 @@
                     <td class="text-muted">@L10n.Description(c)</td>
                     <td class="text-end text-nowrap">
                         <a asp-area="Admin" asp-controller="Categories" asp-action="Edit" asp-route-id="@c.Id" class="btn btn-sm btn-outline-primary" title="@Loc["Edit"]"><i class="bi bi-pencil"></i></a>
-                        <form asp-area="Admin" asp-controller="Categories" asp-action="Delete" asp-route-id="@c.Id" method="post" class="d-inline" onsubmit="return confirm('@Loc["ConfirmDeleteCategory"]');">
+                        <form asp-area="Admin" asp-controller="Categories" asp-action="Delete" asp-route-id="@c.Id" method="post" class="d-inline" data-confirm="@Loc["ConfirmDeleteCategory"]" onsubmit="return confirm(this.dataset.confirm);">
                             <button type="submit" class="btn btn-sm btn-outline-danger" title="@Loc["Delete"]"><i class="bi bi-trash"></i></button>
                         </form>
                     </td>

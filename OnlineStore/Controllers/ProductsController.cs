@@ -6,7 +6,6 @@ using OnlineStore.ViewModels;
 
 namespace OnlineStore.Controllers;
 
-/// <summary>公开商品浏览、筛选与详情。</summary>
 public class ProductsController : Controller
 {
     private readonly IProductService _productService;

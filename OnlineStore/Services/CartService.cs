@@ -21,13 +21,23 @@ public class CartService : ICartService
         return new Cart { Items = items };
     }
 
-    public async Task AddAsync(int productId, int quantity = 1, int? skuId = null)
+    public async Task<Cart> RefreshAsync()
     {
-        // 只允许上架且库存大于 0 的商品加入（安全性/业务校验）
-        var product = await _productService.GetByIdAsync(productId);
-        if (product is null || !product.IsActive)
+        var cart = await GetCartAsync();
+        foreach (var item in cart.Items.ToArray())
         {
-            return;
+            await UpdateAsync(item.ProductId, item.SkuId, item.Quantity);
+        }
+        return await GetCartAsync();
+    }
+
+    public async Task<bool> AddAsync(int productId, int quantity = 1, int? skuId = null)
+    {
+
+        var product = await _productService.GetByIdAsync(productId);
+        if (product is null || !product.IsActive || quantity <= 0)
+        {
+            return false;
         }
 
         ProductSku? sku = null;
@@ -36,24 +46,23 @@ public class CartService : ICartService
             sku = await _skuService.GetByIdAsync(skuId.Value);
             if (sku is null || sku.ProductId != productId || !sku.IsActive)
             {
-                sku = null; // 无效的规格回退到商品本身
+                return false;
             }
         }
 
         var price = sku?.Price ?? product.Price;
-        var stock = sku?.Stock ?? product.Stock;
+        var stock = sku is null ? product.Stock : Math.Min(product.Stock, sku.Stock);
         if (stock <= 0)
         {
-            return;
+            return false;
         }
 
-        quantity = Math.Max(1, quantity);
         var items = await _store.GetAsync();
         var existing = items.FirstOrDefault(i => i.ProductId == productId && i.SkuId == skuId);
 
         if (existing is not null)
         {
-            existing.Quantity = Math.Min(existing.Quantity + quantity, stock);
+            existing.Quantity = (int)Math.Min((long)Math.Max(0, existing.Quantity) + quantity, stock);
             existing.Price = price;
             existing.Stock = stock;
         }
@@ -77,6 +86,7 @@ public class CartService : ICartService
         }
 
         await _store.SaveAsync(items);
+        return true;
     }
 
     public async Task UpdateAsync(int productId, int? skuId, int quantity)
@@ -94,7 +104,19 @@ public class CartService : ICartService
         }
         else
         {
-            item.Quantity = Math.Min(quantity, Math.Max(1, item.Stock));
+            var product = await _productService.GetByIdAsync(productId);
+            var sku = skuId.HasValue ? await _skuService.GetByIdAsync(skuId.Value) : null;
+            if (product is null || !product.IsActive || product.Stock <= 0
+                || (skuId.HasValue && (sku is null || !sku.IsActive || sku.ProductId != productId || sku.Stock <= 0)))
+            {
+                items.Remove(item);
+            }
+            else
+            {
+                item.Stock = sku is null ? product.Stock : Math.Min(product.Stock, sku.Stock);
+                item.Price = sku?.Price ?? product.Price;
+                item.Quantity = Math.Min(quantity, item.Stock);
+            }
         }
 
         await _store.SaveAsync(items);

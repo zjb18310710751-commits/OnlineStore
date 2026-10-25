@@ -3,7 +3,6 @@ using System.Text.RegularExpressions;
 
 namespace OnlineStore.Services;
 
-/// <summary>生成 URL 友好的 Slug（保留中文等 Unicode 字符，仅规范分隔符）。</summary>
 public static class SlugHelper
 {
     public static string ToSlug(string? input)

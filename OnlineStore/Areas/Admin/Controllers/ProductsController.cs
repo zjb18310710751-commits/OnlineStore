@@ -90,7 +90,6 @@ public class ProductsController : Controller
             DetailHtml = vm.DetailHtml
         };
 
-        // 若上传了图片，则覆盖表单中的图片地址
         if (vm.ImageFile is { Length: > 0 })
         {
             try
@@ -190,14 +189,11 @@ public class ProductsController : Controller
         product.DeliveryTimeEn = vm.DeliveryTimeEn;
         product.DetailHtml = vm.DetailHtml;
 
-        // 若上传了新图片，保存成功后清理被替换的旧本地图片
         if (vm.ImageFile is { Length: > 0 })
         {
-            var previousImageUrl = product.ImageUrl;
             try
             {
                 product.ImageUrl = await _imageStorage.SaveAsync(vm.ImageFile);
-                _imageStorage.Delete(previousImageUrl);
             }
             catch (InvalidOperationException ex)
             {

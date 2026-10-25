@@ -84,7 +84,6 @@ public class CouponsController : Controller
             return View(coupon);
         }
 
-        // 只更新可编辑字段，保留已用次数与创建时间
         var existing = await _couponService.GetByIdAsync(id);
         if (existing is null)
         {

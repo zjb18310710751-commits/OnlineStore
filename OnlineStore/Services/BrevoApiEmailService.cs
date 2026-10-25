@@ -5,10 +5,6 @@ using Microsoft.Extensions.Logging;
 
 namespace OnlineStore.Services;
 
-/// <summary>
-/// 通过 Brevo 事务邮件 API（HTTPS）发送邮件。
-/// 相比 SMTP，HTTPS 走 443 端口，不会被云平台（如 Render 免费版）封锁出站 SMTP 端口。
-/// </summary>
 public class BrevoApiEmailService : IEmailService
 {
     private const string ApiEndpoint = "https://api.brevo.com/v3/smtp/email";

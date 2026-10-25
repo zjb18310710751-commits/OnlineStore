@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace OnlineStore.Controllers;
 
-/// <summary>语言切换：设置本地化 Cookie 后返回原页面。</summary>
 public class LanguageController : Controller
 {
     private static readonly string[] SupportedCultures = { "zh-CN", "en" };

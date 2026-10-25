@@ -15,63 +15,69 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/admin-shell.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/admin-dashboard.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/admin-carousel.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/ui-feedback.css" asp-append-version="true" />
 </head>
-<body>
+<body class="admin-app ui-feedback-scope">
+    <a class="admin-skip-link" href="#admin-content">@L10n.Text("跳至主要内容", "Skip to content")</a>
     <div class="admin-wrapper">
-        <aside class="admin-sidebar">
+        <aside class="admin-sidebar offcanvas-lg offcanvas-start" tabindex="-1" id="adminSidebar" aria-labelledby="admin-nav-title">
+          <div class="admin-sidebar-inner">
             <div class="admin-brand">
-                <i class="bi bi-bag-heart-fill me-1"></i>@Loc["Brand"]
-                <span class="d-block small text-secondary-emphasis">@Loc["ManagementConsole"]</span>
+                <a asp-area="Admin" asp-controller="Dashboard" asp-action="Index" class="admin-wordmark" aria-label="ZHY · @Loc["Dashboard"]">ZHY.</a>
+                <span id="admin-nav-title" class="admin-brand-caption">@Loc["ManagementConsole"]</span>
+                <button type="button" class="btn-close d-lg-none" data-bs-dismiss="offcanvas" data-bs-target="#adminSidebar" aria-label="@L10n.Text("关闭菜单", "Close navigation")"></button>
             </div>
-            <nav class="admin-nav">
-                <a asp-area="Admin" asp-controller="Dashboard" asp-action="Index" class="admin-nav-link @Active("Dashboard")"><i class="bi bi-speedometer2 me-2"></i>@Loc["Dashboard"]</a>
-                <a asp-area="Admin" asp-controller="Products" asp-action="Index" class="admin-nav-link @Active("Products")"><i class="bi bi-box-seam me-2"></i>@Loc["ProductManagement"]</a>
-                <a asp-area="Admin" asp-controller="Categories" asp-action="Index" class="admin-nav-link @Active("Categories")"><i class="bi bi-tags me-2"></i>@Loc["CategoryManagement"]</a>
-                <a asp-area="Admin" asp-controller="Shops" asp-action="Index" class="admin-nav-link @Active("Shops")"><i class="bi bi-shop me-2"></i>@Loc["ShopManagement"]</a>
-                <a asp-area="Admin" asp-controller="Coupons" asp-action="Index" class="admin-nav-link @Active("Coupons")"><i class="bi bi-ticket-perforated me-2"></i>@Loc["CouponManagement"]</a>
-                <a asp-area="Admin" asp-controller="Orders" asp-action="Index" class="admin-nav-link @Active("Orders")"><i class="bi bi-receipt me-2"></i>@Loc["OrderManagement"]</a>
-                <a asp-area="Admin" asp-controller="Reviews" asp-action="Index" class="admin-nav-link @Active("Reviews")"><i class="bi bi-chat-square-text me-2"></i>@Loc["ReviewManagement"]</a>
-                <hr />
-                <a asp-area="" asp-controller="Home" asp-action="Index" class="admin-nav-link"><i class="bi bi-shop me-2"></i>@Loc["BackToStore"]</a>
-                <form asp-area="Admin" asp-controller="Account" asp-action="Logout" method="post">
-                    <button type="submit" class="admin-nav-link w-100 text-start border-0 bg-transparent"><i class="bi bi-box-arrow-right me-2"></i>@Loc["Logout"]</button>
-                </form>
-                <hr />
-                <div class="d-flex gap-1 px-1">
-                    <form asp-area="" asp-controller="Language" asp-action="Set" method="post" class="flex-fill">
-                        <input type="hidden" name="culture" value="zh-CN" />
-                        <input type="hidden" name="returnUrl" value="@returnUrl" />
-                        <button type="submit" class="btn btn-sm w-100 @(isZh ? "btn-primary" : "btn-outline-secondary")">中文</button>
-                    </form>
-                    <form asp-area="" asp-controller="Language" asp-action="Set" method="post" class="flex-fill">
-                        <input type="hidden" name="culture" value="en" />
-                        <input type="hidden" name="returnUrl" value="@returnUrl" />
-                        <button type="submit" class="btn btn-sm w-100 @(isZh ? "btn-outline-secondary" : "btn-primary")">EN</button>
-                    </form>
-                </div>
+            <nav class="admin-nav" aria-label="@L10n.Text("后台管理导航", "Admin navigation")">
+                <span class="admin-nav-caption">@L10n.Text("工作空间", "Workspace")</span>
+                <a asp-area="Admin" asp-controller="Dashboard" asp-action="Index" class="admin-nav-link @Active("Dashboard")" aria-current="@(Active("Dashboard") == "active" ? "page" : null)"><i class="bi bi-grid" aria-hidden="true"></i>@Loc["Dashboard"]</a>
+                <span class="admin-nav-caption">@L10n.Text("商店管理", "Store management")</span>
+                <a asp-area="Admin" asp-controller="HeroSlides" asp-action="Index" class="admin-nav-link @Active("HeroSlides")" aria-current="@(Active("HeroSlides") == "active" ? "page" : null)"><i class="bi bi-images" aria-hidden="true"></i>@L10n.Text("首页轮播图", "Homepage carousel")</a>
+                <a asp-area="Admin" asp-controller="Products" asp-action="Index" class="admin-nav-link @Active("Products")" aria-current="@(Active("Products") == "active" ? "page" : null)"><i class="bi bi-box-seam" aria-hidden="true"></i>@Loc["ProductManagement"]</a>
+                <a asp-area="Admin" asp-controller="Categories" asp-action="Index" class="admin-nav-link @Active("Categories")" aria-current="@(Active("Categories") == "active" ? "page" : null)"><i class="bi bi-grid-3x3-gap" aria-hidden="true"></i>@Loc["CategoryManagement"]</a>
+                <a asp-area="Admin" asp-controller="Shops" asp-action="Index" class="admin-nav-link @Active("Shops")" aria-current="@(Active("Shops") == "active" ? "page" : null)"><i class="bi bi-shop" aria-hidden="true"></i>@Loc["ShopManagement"]</a>
+                <a asp-area="Admin" asp-controller="Coupons" asp-action="Index" class="admin-nav-link @Active("Coupons")" aria-current="@(Active("Coupons") == "active" ? "page" : null)"><i class="bi bi-ticket-perforated" aria-hidden="true"></i>@Loc["CouponManagement"]</a>
+                <a asp-area="Admin" asp-controller="Orders" asp-action="Index" class="admin-nav-link @Active("Orders")" aria-current="@(Active("Orders") == "active" ? "page" : null)"><i class="bi bi-receipt" aria-hidden="true"></i>@Loc["OrderManagement"]</a>
+                <a asp-area="Admin" asp-controller="Reviews" asp-action="Index" class="admin-nav-link @Active("Reviews")" aria-current="@(Active("Reviews") == "active" ? "page" : null)"><i class="bi bi-chat-square-text" aria-hidden="true"></i>@Loc["ReviewManagement"]</a>
             </nav>
+            <div class="admin-sidebar-footer">
+                <a asp-area="" asp-controller="Home" asp-action="Index" class="admin-nav-link"><i class="bi bi-arrow-up-right" aria-hidden="true"></i>@Loc["BackToStore"]</a>
+                <form asp-area="" asp-controller="Account" asp-action="Logout" method="post">
+                    <button type="submit" class="admin-nav-link w-100 text-start border-0"><i class="bi bi-box-arrow-right" aria-hidden="true"></i>@Loc["Logout"]</button>
+                </form>
+            </div>
+          </div>
         </aside>
-        <main class="admin-main">
-            @if (TempData["Success"] is string success)
-            {
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    @success
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        <div class="admin-main">
+            <header class="admin-topbar">
+                <div class="admin-topbar-heading">
+                    <button class="admin-menu-toggle d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#adminSidebar" aria-controls="adminSidebar" aria-label="@L10n.Text("打开管理菜单", "Open admin navigation")"><i class="bi bi-list" aria-hidden="true"></i></button>
+                    <div class="admin-breadcrumb"><span>@Loc["ManagementConsole"]</span><i class="bi bi-chevron-right" aria-hidden="true"></i><strong>@ViewData["Title"]</strong></div>
                 </div>
-            }
-            @if (TempData["Error"] is string error)
-            {
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    @error
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                <div class="admin-topbar-tools">
+                    <a asp-area="" asp-controller="Home" asp-action="Index" class="admin-store-link">@Loc["BackToStore"] <i class="bi bi-arrow-up-right" aria-hidden="true"></i></a>
+                    <form asp-area="" asp-controller="Language" asp-action="Set" method="post" class="admin-language-form">
+                        <input type="hidden" name="culture" value="@(isZh ? "en" : "zh-CN")" />
+                        <input type="hidden" name="returnUrl" value="@returnUrl" />
+                        <button type="submit" class="admin-language" aria-label="@(isZh ? "Switch to English" : "切换到中文")">@(isZh ? "EN" : "中文")</button>
+                    </form>
+                    <span class="admin-user-mark" aria-label="@L10n.Text("管理员", "Administrator")"><i class="bi bi-person" aria-hidden="true"></i></span>
                 </div>
-            }
+            </header>
+          <main class="admin-content" id="admin-content" tabindex="-1">
+            <partial name="~/Views/Shared/_FeedbackMessages.cshtml" />
             @RenderBody()
-        </main>
+          </main>
+        </div>
     </div>
 
+    <partial name="~/Views/Shared/_ConfirmDialog.cshtml" />
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/ui-feedback.js" asp-append-version="true"></script>
+    <script src="~/js/confirm-dialog.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

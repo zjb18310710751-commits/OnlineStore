@@ -1,6 +1,6 @@
 @model int
-<a class="nav-link position-relative" asp-controller="Cart" asp-action="Index" title="@Loc["Cart"].Value">
-    <i class="bi bi-cart3"></i>
+<a class="nav-link sf-cart-link position-relative" asp-controller="Cart" asp-action="Index" title="@Loc["Cart"].Value" aria-label="@Loc["Cart"] (@Model)">
+    <i class="bi bi-bag" aria-hidden="true"></i>
     @if (Model > 0)
     {
         <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">

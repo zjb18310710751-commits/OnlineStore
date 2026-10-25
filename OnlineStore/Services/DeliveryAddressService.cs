@@ -37,20 +37,31 @@ public class DeliveryAddressService : IDeliveryAddressService
             return;
         }
 
-        var parts = user.Address.Split(", ", 5, StringSplitOptions.None);
+        var parts = user.Address.Split(", ", StringSplitOptions.None);
+        var hasLocation = parts.Length >= 4;
+        var addressLine1 = parts[0];
+        var addressLine2 = hasLocation && parts.Length > 4 ? string.Join(", ", parts[1..^3]) : null;
+        var city = hasLocation ? parts[^3] : string.Empty;
+        var postalCode = hasLocation ? parts[^2] : string.Empty;
+        var country = hasLocation ? parts[^1] : string.Empty;
+        if (!hasLocation) addressLine1 = user.Address;
+        if (addressLine1.Length > 200 || addressLine2?.Length > 200 || city.Length > 100 ||
+            postalCode.Length > 100 || country.Length > 100 || user.PhoneNumber?.Length > 20)
+        {
+            return;
+        }
         var recipientName = $"{user.LastName}{user.FirstName}".Trim();
+        if (string.IsNullOrWhiteSpace(recipientName)) recipientName = user.UserName ?? "—";
         _context.DeliveryAddresses.Add(new DeliveryAddress
         {
             UserId = user.Id,
-            RecipientName = string.IsNullOrWhiteSpace(recipientName)
-                ? user.UserName ?? "—"
-                : recipientName,
+            RecipientName = recipientName[..Math.Min(recipientName.Length, 100)],
             PhoneNumber = user.PhoneNumber ?? string.Empty,
-            AddressLine1 = parts.ElementAtOrDefault(0) ?? user.Address,
-            AddressLine2 = parts.ElementAtOrDefault(1),
-            City = parts.ElementAtOrDefault(2) ?? string.Empty,
-            PostalCode = parts.ElementAtOrDefault(3) ?? string.Empty,
-            Country = parts.ElementAtOrDefault(4) ?? string.Empty,
+            AddressLine1 = addressLine1,
+            AddressLine2 = addressLine2,
+            City = city,
+            PostalCode = postalCode,
+            Country = country,
             IsDefault = true
         });
         await _context.SaveChangesAsync();

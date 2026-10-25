@@ -59,7 +59,7 @@
                         <div class="d-flex justify-content-between align-items-center mt-2">
                             @if (o.Status == OrderStatus.PendingShipment)
                             {
-                                <form asp-controller="Orders" asp-action="Cancel" asp-route-id="@o.Id" method="post" onsubmit="return confirm('@Loc["ConfirmCancelOrder"]');">
+                                <form asp-controller="Orders" asp-action="Cancel" asp-route-id="@o.Id" method="post" data-confirm="@Loc["ConfirmCancelOrder"]" onsubmit="return confirm(this.dataset.confirm);">
                                     <button type="submit" class="btn btn-sm btn-outline-danger">@Loc["CancelOrder"]</button>
                                 </form>
                             }

@@ -3,7 +3,6 @@ using OnlineStore.Services;
 
 namespace OnlineStore.Tests.Services;
 
-/// <summary>优惠券金额计算纯函数单元测试。</summary>
 public class CouponCalculatorTests
 {
     private static Coupon Percent(decimal value) => new()

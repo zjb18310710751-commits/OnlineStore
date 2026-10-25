@@ -1,0 +1,71 @@
+.ui-feedback-scope {
+    --feedback-ink: #171717;
+    --feedback-muted: #646464;
+    --feedback-line: #e3e3e3;
+    --feedback-error: #963d39;
+    --feedback-warning: #865c1e;
+    --feedback-radius: 12px;
+    --feedback-top: calc(var(--sf-header-height, var(--admin-header-height, 64px)) + 16px);
+}
+.ui-feedback-embedded { --feedback-top: 16px; }
+.ui-notification-stack { display: grid; gap: 12px; pointer-events: none; }
+.ui-notification-stack:not(.is-enhanced) .ui-notice { max-width: 380px; margin: 16px 24px; }
+.ui-notification-stack.is-enhanced { position: fixed; top: var(--feedback-top, 24px); right: 24px; z-index: 1080; width: min(380px, calc(100% - 48px)); max-height: calc(100dvh - var(--feedback-top, 24px) - 24px); overflow-y: auto; padding: 4px; }
+.ui-notice { position: relative; display: flex; align-items: flex-start; gap: 14px; min-width: 0; padding: 20px 12px 20px 20px; overflow: hidden; border: 1px solid var(--feedback-line); border-radius: var(--feedback-radius); background: #fff; box-shadow: 0 8px 30px #00000012; color: var(--feedback-ink); pointer-events: auto; animation: notice-enter 180ms ease-out both; }
+.ui-notice-icon { display: inline-flex; align-items: center; justify-content: center; flex: 0 0 32px; width: 32px; height: 32px; margin-top: 2px; border-radius: 50%; color: #fff; background: var(--feedback-ink); font-size: 19px; }
+.ui-notice[data-tone="error"] .ui-notice-icon { color: var(--feedback-error); background: #f8eeee; }
+.ui-notice[data-tone="warning"] .ui-notice-icon { color: var(--feedback-warning); background: #f8f3e9; font-size: 17px; }
+.ui-notice[data-tone="info"] .ui-notice-icon { color: var(--feedback-ink); background: #f1f1f1; }
+.ui-notice-copy { flex: 1; min-width: 0; padding-top: 2px; }
+.ui-notice-copy strong { display: block; margin: 0; color: var(--feedback-ink); font-size: 14px; font-weight: 600; line-height: 1.5; }
+.ui-notice-copy p { margin: 5px 0 0; color: var(--feedback-muted); font-size: 13px; line-height: 1.65; overflow-wrap: anywhere; }
+.ui-notice-close, .ui-dialog-close { display: inline-flex; align-items: center; justify-content: center; flex: 0 0 44px; width: 44px; height: 44px; margin-top: -6px; padding: 0; border: 0; border-radius: 50%; color: var(--feedback-muted); background: transparent; font-size: 14px; }
+.ui-notice-close:hover, .ui-dialog-close:hover { color: var(--feedback-ink); background: #f4f4f4; }
+.ui-notice-close:focus-visible, .ui-dialog-close:focus-visible, .ui-button:focus-visible { outline: 2px solid var(--feedback-ink); outline-offset: 2px; }
+.ui-notice-close[hidden], .ui-notice-progress[hidden] { display: none; }
+.ui-notice-progress { position: absolute; right: 0; bottom: 0; left: 0; height: 2px; background: #eeeeee; }
+.ui-notice-progress::after { content: ''; display: block; width: 100%; height: 100%; background: #9a9a9a; transform-origin: left; animation: notice-duration var(--notice-duration, 6000ms) linear forwards; }
+.ui-notice.is-paused .ui-notice-progress::after { animation-play-state: paused; }
+@keyframes notice-enter { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes notice-duration { to { transform: scaleX(0); } }
+
+.ui-feedback-scope .validation-summary-valid, .ui-feedback-scope .field-validation-valid { display: none; }
+.ui-feedback-scope .validation-summary-errors { padding: 14px 16px; border: 1px solid #ebd7d5; border-left: 3px solid var(--feedback-error); border-radius: 8px; color: var(--feedback-error) !important; background: #fffafa; font-size: 13px; line-height: 1.65; }
+.ui-feedback-scope .validation-summary-errors ul { margin: 0; padding-left: 18px; }
+.ui-feedback-scope .validation-summary-errors li + li { margin-top: 5px; }
+.ui-feedback-scope .field-validation-error, .ui-feedback-scope .cart-quantity-error { display: block; margin-top: 7px; color: var(--feedback-error) !important; font-size: 12px; font-weight: 500; line-height: 1.6; }
+.ui-feedback-scope :is(.input-validation-error, .form-control.is-invalid, .form-select.is-invalid) { border-color: var(--feedback-error); background-image: none; }
+.ui-feedback-scope :is(.input-validation-error, .form-control.is-invalid, .form-select.is-invalid):focus { box-shadow: 0 0 0 2px #963d3912; }
+.ui-feedback-scope .ui-inline-feedback { padding: 10px 12px; border: 1px solid var(--feedback-line); border-left: 3px solid var(--feedback-ink); border-radius: 6px; color: var(--feedback-muted); background: #fafafa; font-size: 12px; line-height: 1.65; overflow-wrap: anywhere; }
+.ui-feedback-scope .ui-inline-feedback:empty { display: none; }
+.ui-feedback-scope .ui-inline-feedback[data-tone="error"] { color: var(--feedback-error); border-color: #ebd7d5; border-left-color: var(--feedback-error); background: #fffafa; }
+.ui-feedback-scope .alert { border: 1px solid var(--feedback-line); border-radius: 8px; color: var(--feedback-muted); background: #fafafa; font-size: 14px; }
+.ui-feedback-scope .alert-danger { border-left: 3px solid var(--feedback-error); color: var(--feedback-error); background: #fffafa; }
+.ui-feedback-scope .alert-warning { border-left: 3px solid var(--feedback-warning); color: var(--feedback-warning); background: #fffcf7; }
+
+.ui-confirm-dialog { width: min(420px, calc(100vw - 32px)); max-width: none; max-height: calc(100dvh - 32px); margin: auto; padding: 28px; overflow-y: auto; border: 1px solid var(--feedback-line); border-radius: 16px; background: #fff; color: var(--feedback-ink); box-shadow: 0 24px 80px #00000024; }
+.ui-confirm-dialog:not([open]) { display: none; }
+.ui-confirm-dialog::backdrop { background: #00000066; backdrop-filter: blur(3px); }
+.ui-confirm-dialog .ui-dialog-close { position: absolute; top: 12px; right: 12px; margin: 0; }
+.ui-dialog-icon { display: inline-flex; align-items: center; justify-content: center; width: 48px; height: 48px; border: 1px solid #eee1df; border-radius: 50%; color: var(--feedback-error); background: #fcf7f6; font-size: 22px; }
+.ui-dialog-title { margin: 20px 0 10px; color: var(--feedback-ink); font-size: 24px; font-weight: 700; line-height: 1.3; letter-spacing: -.03em; }
+.ui-dialog-message { margin: 0; color: var(--feedback-muted); font-size: 14px; line-height: 1.75; overflow-wrap: anywhere; }
+.ui-dialog-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 28px; }
+.ui-button { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 20px; border: 1px solid transparent; border-radius: 999px; font: inherit; font-size: 14px; font-weight: 600; line-height: 1.5; }
+.ui-button-secondary { border-color: var(--feedback-line); color: var(--feedback-ink); background: #fff; }
+.ui-button-secondary:hover { background: #f4f4f4; }
+.ui-button-primary { border-color: var(--feedback-ink); color: #fff; background: var(--feedback-ink); }
+.ui-button-primary:hover { background: #3f3f3f; }
+.ui-button:disabled { opacity: .55; cursor: wait; }
+.ui-feedback-scope .address-delete-modal .modal-content { border: 1px solid var(--feedback-line); border-radius: 16px; box-shadow: 0 24px 80px #00000024; }
+.ui-feedback-scope .address-delete-icon { color: var(--feedback-error); background: #fcf7f6; }
+.ui-feedback-scope .address-delete-confirm { border-color: var(--feedback-ink); background: var(--feedback-ink); color: #fff; }
+@media (max-width: 575px) {
+    .ui-notification-stack.is-enhanced { right: 12px; width: calc(100% - 24px); }
+    .ui-notice { gap: 10px; padding: 16px 8px 16px 16px; }
+    .ui-confirm-dialog { padding: 24px; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .ui-notice, .ui-notice-progress::after { animation: none; }
+    .ui-notice-progress { display: none; }
+}

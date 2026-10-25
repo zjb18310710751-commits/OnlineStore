@@ -89,7 +89,7 @@
                     </ul>
                 </div>
                 <form asp-controller="Cart" asp-action="Clear" method="post" class="mt-2"
-                      onsubmit="return confirm('@Loc["ConfirmClearCart"].Value');">
+                      data-confirm="@Loc["ConfirmClearCart"].Value" onsubmit="return confirm(this.dataset.confirm);">
                     <button type="submit" class="btn btn-link text-muted p-0 text-decoration-none">
                         @Loc["ClearCart"]
                     </button>

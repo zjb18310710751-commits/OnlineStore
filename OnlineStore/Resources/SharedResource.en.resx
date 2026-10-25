@@ -71,7 +71,6 @@
   <data name="StockLimit" xml:space="preserve"><value>Max {0} in stock</value></data>
   <data name="OrderSummary" xml:space="preserve"><value>Order Summary</value></data>
   <data name="CartItemCount" xml:space="preserve"><value>Items</value></data>
-  <data name="AdminLogin" xml:space="preserve"><value>Admin Login</value></data>
   <data name="Email" xml:space="preserve"><value>Email</value></data>
   <data name="Password" xml:space="preserve"><value>Password</value></data>
   <data name="RememberMe" xml:space="preserve"><value>Remember me</value></data>
@@ -81,7 +80,6 @@
   <data name="EmailOrPhone" xml:space="preserve"><value>Email or phone</value></data>
   <data name="PhoneAlreadyRegistered" xml:space="preserve"><value>This phone number is already registered</value></data>
   <data name="InvalidPhone" xml:space="preserve"><value>Enter a valid phone number</value></data>
-  <data name="LoginHint" xml:space="preserve"><value>Default account: see README.md (change password after first login)</value></data>
   <data name="Register" xml:space="preserve"><value>Register</value></data>
   <data name="RegisterTitle" xml:space="preserve"><value>Create Account</value></data>
   <data name="ConfirmPassword" xml:space="preserve"><value>Confirm password</value></data>
@@ -422,8 +420,6 @@
   <data name="PhoneRequired" xml:space="preserve"><value>Please enter a phone number</value></data>
   <data name="PhoneFormatInvalid" xml:space="preserve"><value>Invalid phone number format</value></data>
   <data name="RegisterSuccess" xml:space="preserve"><value>Registration successful. Welcome!</value></data>
-  <data name="EmailOrPasswordIncorrect" xml:space="preserve"><value>Incorrect email or password.</value></data>
-  <data name="NotAdmin" xml:space="preserve"><value>This account does not have admin privileges.</value></data>
   <data name="OrderCancelled" xml:space="preserve"><value>Order cancelled.</value></data>
   <data name="OrderCancelFailed" xml:space="preserve"><value>Cancellation failed: the order cannot be cancelled in its current state.</value></data>
   <data name="ShopCreated" xml:space="preserve"><value>Shop created.</value></data>
@@ -495,4 +491,10 @@
   <data name="ShippingFromEn" xml:space="preserve"><value>Ships from (English)</value></data>
   <data name="ShippingFeeEn" xml:space="preserve"><value>Shipping fee (English)</value></data>
   <data name="DeliveryTimeEn" xml:space="preserve"><value>Delivery time (English)</value></data>
+  <data name="CheckoutCartUnavailable" xml:space="preserve"><value>A product or variant in your cart is no longer available. Please update your cart.</value></data>
+  <data name="CheckoutPriceChanged" xml:space="preserve"><value>A product price has changed. Please review the latest price in your cart before ordering.</value></data>
+  <data name="CheckoutStockUnavailable" xml:space="preserve"><value>There is not enough stock for this order. Please update the quantities in your cart.</value></data>
+  <data name="CheckoutRetry" xml:space="preserve"><value>Stock or order status has just changed. Please refresh and try again.</value></data>
+  <data name="CheckoutQuantityInvalid" xml:space="preserve"><value>A purchase quantity is invalid. Please update your cart.</value></data>
+  <data name="CartUnavailable" xml:space="preserve"><value>The product or variant is unavailable, stock is insufficient, or the quantity is invalid. Please check your selection.</value></data>
 </root>

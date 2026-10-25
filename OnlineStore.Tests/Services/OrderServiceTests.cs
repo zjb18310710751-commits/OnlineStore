@@ -5,7 +5,6 @@ using OnlineStore.Services;
 
 namespace OnlineStore.Tests.Services;
 
-/// <summary>订单服务单元测试：取消/退款/发货/完成的状态流转与库存恢复。</summary>
 public class OrderServiceTests
 {
     private static async Task<(ApplicationDbContext Context, Order Order, Product Product)> SeedAsync()
@@ -46,7 +45,7 @@ public class OrderServiceTests
 
         Assert.True(ok);
         Assert.Equal(OrderStatus.Cancelled, order.Status);
-        Assert.Equal(7, product.Stock); // 5 + 2
+        Assert.Equal(7, product.Stock);
     }
 
     [Fact]
@@ -135,6 +134,6 @@ public class OrderServiceTests
         await service.CreateAsync(order);
 
         var product = await context.Products.FindAsync(1);
-        Assert.Equal(8, product!.Stock); // 10 - 2
+        Assert.Equal(8, product!.Stock);
     }
 }

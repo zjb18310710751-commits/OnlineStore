@@ -2,7 +2,6 @@ using System.ComponentModel.DataAnnotations;
 
 namespace OnlineStore.Models;
 
-/// <summary>商品规格变体（SKU）：颜色 × 规格 两维，每个组合有独立价格、库存与图片。</summary>
 public class ProductSku
 {
     public int Id { get; set; }

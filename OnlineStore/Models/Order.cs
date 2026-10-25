@@ -2,7 +2,6 @@ using System.ComponentModel.DataAnnotations;
 
 namespace OnlineStore.Models;
 
-/// <summary>订单：用户从购物车提交后生成，含收货信息与订单明细。</summary>
 public class Order
 {
     public int Id { get; set; }
@@ -11,7 +10,6 @@ public class Order
     [Display(Name = "订单号")]
     public string OrderNo { get; set; } = string.Empty;
 
-    /// <summary>下单用户 Id。</summary>
     public string? UserId { get; set; }
 
     [StringLength(50)]
@@ -29,11 +27,9 @@ public class Order
     [Display(Name = "订单金额")]
     public decimal Total { get; set; }
 
-    /// <summary>使用的优惠码（如有）。</summary>
     [StringLength(50)]
     public string? CouponCode { get; set; }
 
-    /// <summary>优惠金额（无优惠为 0）。</summary>
     public decimal DiscountAmount { get; set; }
 
     [StringLength(20)]

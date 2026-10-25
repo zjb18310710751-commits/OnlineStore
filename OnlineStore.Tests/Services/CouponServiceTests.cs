@@ -5,7 +5,6 @@ using OnlineStore.Services;
 
 namespace OnlineStore.Tests.Services;
 
-/// <summary>优惠券服务单元测试：校验有效期/状态/上限/最低金额/大小写与计数。</summary>
 public class CouponServiceTests
 {
     private static ApplicationDbContext CreateContext()

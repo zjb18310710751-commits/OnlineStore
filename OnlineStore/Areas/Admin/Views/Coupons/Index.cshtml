@@ -38,7 +38,7 @@
                         <td><span class="badge @(c.IsActive ? "bg-success-subtle text-success" : "bg-secondary-subtle text-secondary")">@(c.IsActive ? Loc["Enabled"].Value : Loc["Disabled"].Value)</span></td>
                         <td class="text-end text-nowrap">
                             <a asp-action="Edit" asp-route-id="@c.Id" class="btn btn-sm btn-outline-primary" title="@Loc["Edit"]"><i class="bi bi-pencil"></i></a>
-                            <form asp-action="Delete" asp-route-id="@c.Id" method="post" class="d-inline" onsubmit="return confirm('@Loc["ConfirmDeleteCoupon"]');">
+                            <form asp-action="Delete" asp-route-id="@c.Id" method="post" class="d-inline" data-confirm="@Loc["ConfirmDeleteCoupon"]" onsubmit="return confirm(this.dataset.confirm);">
                                 <button type="submit" class="btn btn-sm btn-outline-danger" title="@Loc["Delete"]"><i class="bi bi-trash"></i></button>
                             </form>
                         </td>

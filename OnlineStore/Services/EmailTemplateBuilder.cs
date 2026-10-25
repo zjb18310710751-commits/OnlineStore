@@ -1,9 +1,8 @@
 namespace OnlineStore.Services;
 
-/// <summary>邮件 HTML 模板构建。</summary>
 public static class EmailTemplateBuilder
 {
-    /// <summary>构建验证码邮件（内联样式，兼容邮件客户端）。</summary>
+
     public static string BuildVerificationCode(string code, int expiryMinutes = 10)
     {
         return $"""

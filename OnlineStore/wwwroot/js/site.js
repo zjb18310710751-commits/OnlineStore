@@ -1,14 +1,3 @@
-// 站点脚本：自动隐藏可关闭的提示信息
-document.addEventListener('DOMContentLoaded', function () {
-    document.querySelectorAll('.alert-dismissible').forEach(function (el) {
-        setTimeout(function () {
-            var alert = bootstrap.Alert.getOrCreateInstance(el);
-            alert.close();
-        }, 5000);
-    });
-});
-
-// 商品详情页数量步进器：点击 +/- 调整数量，并受输入框 min/max 约束
 function stepQty(btn, delta) {
     var input = btn.closest('.input-group').querySelector('input[type="number"]');
     if (!input) {
@@ -20,7 +9,6 @@ function stepQty(btn, delta) {
     input.value = Math.min(Math.max(next, min), max);
 }
 
-// 平滑切换主图：预加载目标图，再淡出→换图→淡入，避免白屏闪烁
 function setMainImage(url) {
     var main = document.getElementById('mainImage');
     if (!main) {
@@ -42,7 +30,6 @@ function setMainImage(url) {
     preload.src = url;
 }
 
-// 详情页多图画廊：点击缩略图切换主图
 function switchImage(btn, url) {
     setMainImage(url);
     document.querySelectorAll('.gallery-thumb').forEach(function (t) {
@@ -51,13 +38,11 @@ function switchImage(btn, url) {
     btn.classList.add('active');
 }
 
-// 发送验证码按钮：通用组件（注册/找回密码共用），通过 data-* 属性配置
 document.addEventListener('DOMContentLoaded', function () {
     document.querySelectorAll('[data-send-code-url]').forEach(initSendCodeButton);
 });
 
 function initSendCodeButton(btn) {
-    // 目标输入框：优先 data-send-code-target，兼容旧 data-send-code-email
     var targetSelector = btn.getAttribute('data-send-code-target') || btn.getAttribute('data-send-code-email');
     var targetInput = document.querySelector(targetSelector);
     var statusEl = document.querySelector(btn.getAttribute('data-send-code-status'));
@@ -73,14 +58,19 @@ function initSendCodeButton(btn) {
     var demoMsg = btn.getAttribute('data-send-code-demo') || '';
     var cooldown = 60;
 
-    function setStatus(msg) {
-        if (statusEl) statusEl.textContent = msg;
+    function setStatus(msg, tone) {
+        if (!statusEl) return;
+        statusEl.classList.add('ui-inline-feedback');
+        statusEl.dataset.tone = tone || 'info';
+        statusEl.setAttribute('role', tone === 'error' ? 'alert' : 'status');
+        statusEl.setAttribute('aria-atomic', 'true');
+        statusEl.textContent = msg;
     }
 
     btn.addEventListener('click', function () {
         var target = targetInput.value.trim();
         if (!target) {
-            setStatus(invalidMsg);
+            setStatus(invalidMsg, 'error');
             return;
         }
 
@@ -101,16 +91,16 @@ function initSendCodeButton(btn) {
                 if (data.code) {
                     setStatus(demoMsg.replace('{0}', data.code));
                 } else {
-                    setStatus(successMsg);
+                    setStatus(successMsg, 'success');
                 }
                 startCountdown();
             } else {
-                setStatus(data.error || failedMsg);
+                setStatus(data.error || failedMsg, 'error');
                 btn.disabled = false;
             }
         })
         .catch(function () {
-            setStatus(failedMsg);
+            setStatus(failedMsg, 'error');
             btn.disabled = false;
         });
     });

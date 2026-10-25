@@ -1,0 +1,29 @@
+@{
+    var notices = new[]
+    {
+        new { Key = "Success", Tone = "success", Icon = "bi-check2", Title = L10n.Text("操作成功", "All done"), Duration = 6000 },
+        new { Key = "Error", Tone = "error", Icon = "bi-exclamation-lg", Title = L10n.Text("操作未完成", "Something needs attention"), Duration = 0 },
+        new { Key = "Warning", Tone = "warning", Icon = "bi-exclamation-triangle", Title = L10n.Text("请留意", "Please note"), Duration = 0 },
+        new { Key = "Info", Tone = "info", Icon = "bi-info-lg", Title = L10n.Text("温馨提示", "Good to know"), Duration = 0 }
+    };
+}
+<div class="ui-notification-stack" data-notification-stack role="region" aria-label="@L10n.Text("操作提示", "Notifications")">
+    @foreach (var notice in notices)
+    {
+        if (TempData[notice.Key] is string message && !string.IsNullOrWhiteSpace(message))
+        {
+            <article class="ui-notice" data-notice data-tone="@notice.Tone" data-duration="@notice.Duration">
+                <span class="ui-notice-icon" aria-hidden="true"><i class="bi @notice.Icon"></i></span>
+                <div class="ui-notice-copy" role="@(notice.Tone == "error" ? "alert" : "status")" aria-atomic="true">
+                    <strong>@notice.Title</strong>
+                    <p>@message</p>
+                </div>
+                <button type="button" class="ui-notice-close" data-notice-close aria-label="@L10n.Text("关闭提示", "Dismiss notification")" hidden><i class="bi bi-x-lg" aria-hidden="true"></i></button>
+                @if (notice.Duration > 0)
+                {
+                    <span class="ui-notice-progress" data-notice-progress aria-hidden="true" hidden></span>
+                }
+            </article>
+        }
+    }
+</div>

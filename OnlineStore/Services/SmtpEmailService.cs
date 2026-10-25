@@ -6,7 +6,6 @@ using MimeKit;
 
 namespace OnlineStore.Services;
 
-/// <summary>基于 SMTP 的邮件发送实现（MailKit），配置从 Email 段读取。</summary>
 public class SmtpEmailService : IEmailService
 {
     private readonly IConfiguration _configuration;
@@ -44,7 +43,7 @@ public class SmtpEmailService : IEmailService
         using var client = new SmtpClient();
         try
         {
-            // 465 端口是隐式 SSL（SMTPS）；其余端口按配置走 STARTTLS
+
             var secureOptions = port == 465
                 ? SecureSocketOptions.SslOnConnect
                 : (enableSsl ? SecureSocketOptions.StartTls : SecureSocketOptions.None);

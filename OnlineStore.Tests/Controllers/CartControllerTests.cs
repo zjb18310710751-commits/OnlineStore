@@ -56,6 +56,26 @@ public class CartControllerTests
         Assert.Equal("Added to cart.", controller.TempData["Success"]);
     }
 
+    [Fact]
+    public async Task Add_WhenRejected_DoesNotReportSuccessOrProceedToCheckout()
+    {
+        var controller = CreateController(new RecordingCartService { AddResult = false });
+
+        var result = Assert.IsType<RedirectToActionResult>(await controller.Add(999, 1, buyNow: true));
+
+        Assert.Equal("Products", result.ControllerName);
+        Assert.Null(controller.TempData["Success"]);
+        Assert.NotNull(controller.TempData["Error"]);
+    }
+
+    [Fact]
+    public async Task Index_RefreshesCartBeforeShowingPrices()
+    {
+        var service = new RecordingCartService();
+        await CreateController(service).Index();
+        Assert.True(service.Refreshed);
+    }
+
     private static CartController CreateController(ICartService cartService) =>
         new(cartService, new TestStringLocalizer())
         {
@@ -65,10 +85,18 @@ public class CartControllerTests
     private sealed class RecordingCartService : ICartService
     {
         public int? UpdatedQuantity { get; private set; }
+        public bool AddResult { get; set; } = true;
+        public bool Refreshed { get; private set; }
 
         public Task<Cart> GetCartAsync() => Task.FromResult(new Cart());
 
-        public Task AddAsync(int productId, int quantity = 1, int? skuId = null) => Task.CompletedTask;
+        public Task<bool> AddAsync(int productId, int quantity = 1, int? skuId = null) => Task.FromResult(AddResult);
+
+        public Task<Cart> RefreshAsync()
+        {
+            Refreshed = true;
+            return Task.FromResult(new Cart());
+        }
 
         public Task UpdateAsync(int productId, int? skuId, int quantity)
         {

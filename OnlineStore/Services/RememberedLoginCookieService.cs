@@ -4,10 +4,6 @@ using Microsoft.AspNetCore.Http;
 
 namespace OnlineStore.Services;
 
-/// <summary>
-/// 记住账号密码的实现：把邮箱与密码用 Data Protection 加密后写入 HttpOnly 持久化 Cookie，
-/// 下次访问登录页时读取并回填表单。密码不以明文存储（安全性）。
-/// </summary>
 public class RememberedLoginCookieService : IRememberedLoginService
 {
     private const string CookieName = "OnlineStore.RememberedLogin";
@@ -65,7 +61,7 @@ public class RememberedLoginCookieService : IRememberedLoginService
         }
         catch
         {
-            // 数据被篡改、密钥轮换或反序列化失败时，按未记住处理（安全性）
+
             return null;
         }
     }

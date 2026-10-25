@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace OnlineStore.ViewModels;
 
-/// <summary>商品创建/编辑表单视图模型。</summary>
 public class ProductFormViewModel
 {
     public int Id { get; set; }

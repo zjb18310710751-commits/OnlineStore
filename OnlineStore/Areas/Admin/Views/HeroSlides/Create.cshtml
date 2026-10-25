@@ -1,0 +1,15 @@
+@model HeroSlideFormViewModel
+@{
+    ViewData["Title"] = L10n.Text("添加轮播图", "Add slide");
+}
+<div class="admin-carousel-manager">
+    <a asp-action="Index" class="ac-back-link"><i class="bi bi-arrow-left" aria-hidden="true"></i>@L10n.Text("首页轮播图", "Homepage carousel")</a>
+    <div class="ac-page-heading"><div><h1>@ViewData["Title"]</h1><p class="ac-intro">@L10n.Text("上传图片，写下这次想推荐的好物。", "Add the image and message for your next featured collection.")</p></div></div>
+    <form asp-action="Create" method="post" enctype="multipart/form-data" data-carousel-editor>
+        <partial name="_Form" model="Model" />
+    </form>
+</div>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/admin-carousel.js" asp-append-version="true"></script>
+}

@@ -2,7 +2,6 @@ using System.ComponentModel.DataAnnotations;
 
 namespace OnlineStore.ViewModels;
 
-/// <summary>登录表单视图模型。</summary>
 public class LoginViewModel
 {
     [Required(ErrorMessage = "AccountRequired")]

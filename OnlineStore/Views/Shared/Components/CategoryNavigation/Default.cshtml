@@ -1,0 +1,76 @@
+@model CategoryNavigationViewModel
+<div class="sf-category-navigation-root" data-category-navigation>
+<ul class="navbar-nav sf-main-links sf-category-navigation">
+    @foreach (var category in Model.Categories)
+    {
+        var categoryName = L10n.Text(category.Name, category.NameEn);
+        var panelId = $"category-panel-{category.Id}";
+        <li class="nav-item sf-category-item" data-category-item>
+            <a class="nav-link sf-category-fallback" data-category-fallback
+               asp-area="" asp-controller="Products" asp-action="Index" asp-route-categoryId="@category.Id">@categoryName</a>
+            <button class="nav-link sf-category-trigger" type="button" hidden data-category-trigger
+                    aria-expanded="false" aria-controls="@panelId">
+                <span>@categoryName</span><i class="bi bi-chevron-down" aria-hidden="true"></i>
+            </button>
+        </li>
+    }
+</ul>
+    @foreach (var category in Model.Categories)
+    {
+        var categoryName = L10n.Text(category.Name, category.NameEn);
+        var panelId = $"category-panel-{category.Id}";
+        var headingId = $"category-heading-{category.Id}";
+            <section id="@panelId" class="sf-category-panel" hidden inert data-category-panel aria-labelledby="@headingId">
+                <div class="sf-container sf-category-panel-grid">
+                    <div class="sf-category-intro">
+                        <p class="sf-category-overline">@Loc["ShopByCategory"]</p>
+                        <h2 id="@headingId">@categoryName</h2>
+                        <p class="sf-category-description">@L10n.Text("找到适合你的下一件好物。", "Find your next everyday favourite.")</p>
+                        <a class="sf-category-view-all" asp-area="" asp-controller="Products" asp-action="Index" asp-route-categoryId="@category.Id">
+                            @L10n.Text("浏览全部", "Explore all")<i class="bi bi-arrow-right" aria-hidden="true"></i>
+                        </a>
+                    </div>
+                    @if (category.Products.Count > 0)
+                    {
+                        <div class="sf-category-product-column">
+                            <h3>@Loc["NewArrivals"]</h3>
+                            <ul class="sf-category-product-links">
+                                @foreach (var product in category.Products.Take(6))
+                                {
+                                    <li><a asp-area="" asp-controller="Products" asp-action="Details" asp-route-id="@product.Id">@L10n.Text(product.Name, product.NameEn)</a></li>
+                                }
+                            </ul>
+                        </div>
+                        @if (category.Products.Count > 6)
+                        {
+                            <div class="sf-category-product-column">
+                                <h3>@L10n.Text("更多好物", "More to discover")</h3>
+                                <ul class="sf-category-product-links">
+                                    @foreach (var product in category.Products.Skip(6))
+                                    {
+                                        <li><a asp-area="" asp-controller="Products" asp-action="Details" asp-route-id="@product.Id">@L10n.Text(product.Name, product.NameEn)</a></li>
+                                    }
+                                </ul>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="sf-category-empty"><p>@L10n.Text("此分类暂时没有在售商品。", "There are no products available in this category yet.")</p></div>
+                    }
+                    @if (Model.Categories.Count > 1)
+                    {
+                        <div class="sf-category-more">
+                            <h3>@L10n.Text("探索其他分类", "Explore more categories")</h3>
+                            <ul class="sf-category-product-links">
+                                @foreach (var other in Model.Categories.Where(item => item.Id != category.Id))
+                                {
+                                    <li><a asp-area="" asp-controller="Products" asp-action="Index" asp-route-categoryId="@other.Id">@L10n.Text(other.Name, other.NameEn)</a></li>
+                                }
+                            </ul>
+                        </div>
+                    }
+                </div>
+            </section>
+    }
+</div>

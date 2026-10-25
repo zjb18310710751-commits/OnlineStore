@@ -1,147 +1,30 @@
 @model ProductListViewModel
 @{
     ViewData["Title"] = Loc["Home"].Value;
-    var heroProducts = Model.SaleItems.Concat(Model.Items).Take(3).ToList();
-    var editorialCategories = Model.Categories.Take(5).ToList();
 }
-
-<section class="editorial-hero">
-    <div class="container">
-        <div class="editorial-topline">
-            <span>@Loc["CuratedSelection"]</span>
-            <span>ONLINE STORE / 2026</span>
+@await Component.InvokeAsync("HeroCarousel")
+<section class="sf-product-section sf-container sf-home-products">
+    <div class="sf-section-heading"><h2>@Loc["NewArrivals"]</h2><a asp-controller="Products" asp-action="Index" asp-route-sortBy="newest">@Loc["ViewAll"] <i class="bi bi-arrow-right" aria-hidden="true"></i></a></div>
+    @if (Model.Items.Count == 0)
+    {
+        <p class="sf-empty">@Loc["NoProducts"]</p>
+    }
+    else
+    {
+        <div class="row row-cols-2 row-cols-lg-4 sf-product-grid">
+            @foreach (var product in Model.Items) { <partial name="_ProductCard" model="@product" /> }
         </div>
-
-        <div class="row align-items-center g-4 g-lg-5">
-            <div class="col-lg-6">
-                <div class="editorial-hero-copy">
-                    <p class="editorial-overline">@Loc["BrowseByMood"]</p>
-                    <h1>@Loc["HeroTitle"]</h1>
-                    <p class="editorial-lead">@Loc["HeroSubtitle"]</p>
-
-                    <form asp-controller="Products" asp-action="Index" method="get" class="editorial-search">
-                        <input type="search" name="searchTerm" placeholder="@Loc["SearchPlaceholder"]" aria-label="Search" />
-                        <button type="submit" aria-label="@Loc["Search"]"><i class="bi bi-arrow-right"></i></button>
-                    </form>
-
-                    <a class="editorial-cta" asp-controller="Products" asp-action="Index">
-                        @Loc["StartShopping"] <i class="bi bi-arrow-up-right"></i>
-                    </a>
-                </div>
-            </div>
-            <div class="col-lg-6">
-                <div class="editorial-collage">
-                    @for (var i = 0; i < 3; i++)
-                    {
-                        if (i < heroProducts.Count)
-                        {
-                            var product = heroProducts[i];
-                            <a class="editorial-collage-item collage-@i"
-                               asp-controller="Products" asp-action="Details" asp-route-id="@product.Id">
-                                @if (!string.IsNullOrEmpty(product.ImageUrl))
-                                {
-                                    <img src="@product.ImageUrl" alt="@L10n.Name(product)" />
-                                }
-                                else
-                                {
-                                    <span class="editorial-image-placeholder"><i class="bi bi-image"></i></span>
-                                }
-                                <span class="editorial-collage-caption">
-                                    <span>0@(i + 1)</span>
-                                    <span>@L10n.Name(product)</span>
-                                </span>
-                            </a>
-                        }
-                    }
-                </div>
-            </div>
-        </div>
-
-        @if (editorialCategories.Count > 0)
-        {
-            <div class="editorial-category-ticker">
-                @foreach (var category in editorialCategories)
-                {
-                    <a asp-controller="Products" asp-action="Index" asp-route-categoryId="@category.Id">
-                        @L10n.Name(category) <span>↗</span>
-                    </a>
-                }
-            </div>
-        }
-    </div>
+    }
 </section>
-
-@if (editorialCategories.Count > 0)
-{
-    <section class="editorial-section category-story-section">
-        <div class="container">
-            <div class="editorial-section-heading">
-                <div>
-                    <p>@Loc["ShopByCategory"]</p>
-                    <h2>@Loc["BrowseByMood"]</h2>
-                </div>
-                <span class="editorial-index">01—0@(editorialCategories.Count)</span>
-            </div>
-            <div class="category-story-grid">
-                @for (var i = 0; i < editorialCategories.Count; i++)
-                {
-                    var category = editorialCategories[i];
-                    <a class="category-story-card category-story-@i"
-                       asp-controller="Products" asp-action="Index" asp-route-categoryId="@category.Id">
-                        <span class="category-story-number">0@(i + 1)</span>
-                        <span class="category-story-name">@L10n.Name(category)</span>
-                        <span class="category-story-description">@L10n.Description(category)</span>
-                        <i class="bi bi-arrow-up-right"></i>
-                    </a>
-                }
-            </div>
-        </div>
-    </section>
-}
-
 @if (Model.SaleItems.Count > 0)
 {
-    <section class="editorial-section home-product-section">
-        <div class="container">
-            <div class="editorial-section-heading">
-                <div>
-                    <p>@Loc["CuratedSelection"]</p>
-                    <h2>@Loc["LimitedTimeDiscount"]</h2>
-                </div>
-                <a asp-controller="Products" asp-action="Index">@Loc["ViewAll"] <i class="bi bi-arrow-right"></i></a>
-            </div>
-            <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3 g-lg-4">
-                @foreach (var product in Model.SaleItems)
-                {
-                    <partial name="_ProductCard" model="@product" />
-                }
-            </div>
+    <section class="sf-product-section sf-container">
+        <div class="sf-section-heading"><h2>@Loc["LimitedTimeDiscount"]</h2><a asp-controller="Products" asp-action="Index">@Loc["ViewAll"] <i class="bi bi-arrow-right" aria-hidden="true"></i></a></div>
+        <div class="row row-cols-2 row-cols-lg-4 sf-product-grid">
+            @foreach (var product in Model.SaleItems) { <partial name="_ProductCard" model="@product" /> }
         </div>
     </section>
 }
-
-<section class="editorial-section home-product-section">
-    <div class="container">
-        <div class="editorial-section-heading">
-            <div>
-                <p>@Loc["CuratedSelection"]</p>
-                <h2>@Loc["NewArrivals"]</h2>
-            </div>
-            <a asp-controller="Products" asp-action="Index">@Loc["ViewAll"] <i class="bi bi-arrow-right"></i></a>
-        </div>
-
-        @if (Model.Items.Count == 0)
-        {
-            <div class="editorial-empty">@Loc["NoProducts"]</div>
-        }
-        else
-        {
-            <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3 g-lg-4">
-                @foreach (var product in Model.Items)
-                {
-                    <partial name="_ProductCard" model="@product" />
-                }
-            </div>
-        }
-    </div>
-</section>
+@section Scripts {
+    <script src="~/js/hero-carousel.js" asp-append-version="true"></script>
+}

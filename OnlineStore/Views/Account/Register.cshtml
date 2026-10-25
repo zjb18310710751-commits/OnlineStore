@@ -1,7 +1,7 @@
 @model RegisterViewModel
 @{
     ViewData["Title"] = Loc["RegisterTitle"].Value;
-    var isPhone = string.Equals(Model.RegisterBy, "phone", StringComparison.OrdinalIgnoreCase);
+    var isPhone = false;
 }
 <div class="container py-5">
     <div class="row justify-content-center">
@@ -15,13 +15,14 @@
                             <button class="nav-link @(isPhone ? "" : "active")" id="email-register-tab" data-bs-toggle="pill" data-bs-target="#email-register" type="button" role="tab" aria-selected="@(!isPhone)">@Loc["EmailRegister"]</button>
                         </li>
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link @(isPhone ? "active" : "")" id="phone-register-tab" data-bs-toggle="pill" data-bs-target="#phone-register" type="button" role="tab" aria-selected="@(isPhone)">@Loc["PhoneRegister"]</button>
+                            <button class="nav-link" id="phone-register-tab" type="button" role="tab" aria-selected="false" disabled
+                                    title="@L10n.Text("短信验证暂不可用，请使用邮箱注册。", "SMS verification is unavailable. Please register with email.")">@Loc["PhoneRegister"]</button>
                         </li>
                     </ul>
 
-                    <form method="post" asp-controller="Account" asp-action="Register">
-                        <input type="hidden" asp-for="RegisterBy" />
-                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                    <form id="registerForm" method="post" asp-controller="Account" asp-action="Register">
+                        <input type="hidden" id="RegisterBy" name="RegisterBy" value="email" />
+                        <div asp-validation-summary="All" class="text-danger mb-3"></div>
 
                         <div class="tab-content">
                             <div class="tab-pane fade @(isPhone ? "" : "show active")" id="email-register" role="tabpanel" aria-labelledby="email-register-tab">
@@ -137,38 +138,38 @@
                         <label for="registerAddressLine1" class="form-label">
                             @Loc["AddressLine1"] <span class="address-required">*</span>
                         </label>
-                        <input id="registerAddressLine1" class="form-control address-form-control"
-                               value="@Model.AddressLine1" autocomplete="address-line1"
+                        <input asp-for="AddressLine1" id="registerAddressLine1" form="registerForm" maxlength="200" class="form-control address-form-control"
+                               autocomplete="address-line1"
                                placeholder="@Loc["AddressLine1"]" />
                     </div>
                     <div class="col-12">
                         <label for="registerAddressLine2" class="form-label">@Loc["AddressLine2Optional"]</label>
-                        <input id="registerAddressLine2" class="form-control address-form-control"
-                               value="@Model.AddressLine2" autocomplete="address-line2"
+                        <input asp-for="AddressLine2" id="registerAddressLine2" form="registerForm" maxlength="200" class="form-control address-form-control"
+                               autocomplete="address-line2"
                                placeholder="@Loc["AddressLine2Optional"]" />
                     </div>
                     <div class="col-6 col-md-4">
                         <label for="registerAddressCity" class="form-label">
                             @Loc["City"] <span class="address-required">*</span>
                         </label>
-                        <input id="registerAddressCity" class="form-control address-form-control"
-                               value="@Model.City" autocomplete="address-level2"
+                        <input asp-for="City" id="registerAddressCity" form="registerForm" maxlength="100" class="form-control address-form-control"
+                               autocomplete="address-level2"
                                placeholder="@Loc["City"]" />
                     </div>
                     <div class="col-6 col-md-4">
                         <label for="registerAddressPostal" class="form-label">
                             @Loc["PostalCode"] <span class="address-required">*</span>
                         </label>
-                        <input id="registerAddressPostal" class="form-control address-form-control"
-                               value="@Model.PostalCode" autocomplete="postal-code"
+                        <input asp-for="PostalCode" id="registerAddressPostal" form="registerForm" maxlength="100" class="form-control address-form-control"
+                               autocomplete="postal-code"
                                placeholder="@Loc["PostalCode"]" />
                     </div>
                     <div class="col-12 col-md-4">
                         <label for="registerAddressCountry" class="form-label">
                             @Loc["Country"] <span class="address-required">*</span>
                         </label>
-                        <input id="registerAddressCountry" class="form-control address-form-control"
-                               value="@Model.Country" autocomplete="country-name"
+                        <input asp-for="Country" id="registerAddressCountry" form="registerForm" maxlength="100" class="form-control address-form-control"
+                               autocomplete="country-name"
                                placeholder="@Loc["Country"]" />
                     </div>
                 </div>
@@ -186,7 +187,6 @@
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
     <script>
-        // 切换邮箱/手机号 Tab 时，同步隐藏字段 RegisterBy 的值，供后端判断账号标识
         document.addEventListener('DOMContentLoaded', function () {
             document.querySelectorAll('#email-register-tab, #phone-register-tab').forEach(function (btn) {
                 btn.addEventListener('shown.bs.tab', function () {

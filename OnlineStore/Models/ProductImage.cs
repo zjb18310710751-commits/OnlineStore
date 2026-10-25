@@ -2,7 +2,6 @@ using System.ComponentModel.DataAnnotations;
 
 namespace OnlineStore.Models;
 
-/// <summary>商品图片（支持多图，按 SortOrder 排序）。</summary>
 public class ProductImage
 {
     public int Id { get; set; }

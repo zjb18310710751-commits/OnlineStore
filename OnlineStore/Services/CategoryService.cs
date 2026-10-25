@@ -49,7 +49,7 @@ public class CategoryService : ICategoryService
 
         if (category.Products.Any())
         {
-            return false; // 分类下仍有商品，不允许删除
+            return false;
         }
 
         _context.Categories.Remove(category);

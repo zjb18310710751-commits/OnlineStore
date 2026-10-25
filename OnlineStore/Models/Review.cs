@@ -2,7 +2,6 @@ using System.ComponentModel.DataAnnotations;
 
 namespace OnlineStore.Models;
 
-/// <summary>商品评价：星级 + 文字 + 时间，支持种子演示数据与登录用户提交。</summary>
 public class Review
 {
     public int Id { get; set; }
@@ -11,7 +10,6 @@ public class Review
 
     public Product? Product { get; set; }
 
-    /// <summary>提交评价的用户 Id；种子数据为空。</summary>
     public string? UserId { get; set; }
 
     [Required(ErrorMessage = "UserNameRequired")]

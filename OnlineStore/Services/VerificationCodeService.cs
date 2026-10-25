@@ -23,7 +23,7 @@ public class VerificationCodeService : IVerificationCodeService
 
     public async Task<string> GenerateAsync(string target)
     {
-        // 目标地址：邮箱（转小写）或手机号（去首尾空格）；统一复用 EmailVerificationCodes 表存储，避免 EnsureCreated 下改表结构
+
         var normalized = target.Trim().ToLowerInvariant();
 
         var latest = await _context.EmailVerificationCodes
@@ -36,7 +36,6 @@ public class VerificationCodeService : IVerificationCodeService
             throw new InvalidOperationException(_loc["VerificationCodeTooFrequent"].Value);
         }
 
-        // 删除该目标地址的旧验证码（load+RemoveRange，兼容 InMemory 测试）
         var olds = await _context.EmailVerificationCodes.Where(c => c.Email == normalized).ToListAsync();
         if (olds.Count > 0)
         {
@@ -75,7 +74,6 @@ public class VerificationCodeService : IVerificationCodeService
             return false;
         }
 
-        // 验证通过后消费该码（一次性）
         _context.EmailVerificationCodes.Remove(record);
         await _context.SaveChangesAsync();
         return true;

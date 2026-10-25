@@ -49,7 +49,7 @@ public class ShopService : IShopService
 
         if (shop.Products.Any())
         {
-            return false; // 店铺下仍有商品，不允许删除
+            return false;
         }
 
         _context.Shops.Remove(shop);

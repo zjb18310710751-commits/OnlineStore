@@ -1,5 +1,5 @@
-using Microsoft.AspNetCore.Localization;//本地化多语言
-using Microsoft.AspNetCore.Identity;//身份认证
+using Microsoft.AspNetCore.Localization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using OnlineStore;
 using OnlineStore.Data;
@@ -11,11 +11,9 @@ var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
     ?? throw new InvalidOperationException("未配置连接字符串 ConnectionStrings:DefaultConnection。");
 
-// 数据访问：EF Core + SQL Server（SQL Server Express，经 SSMS 管理）
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
 
-// 身份认证与角色授权（安全性）
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 {
     options.SignIn.RequireConfirmedAccount = false;
@@ -39,10 +37,10 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.SlidingExpiration = true;
 });
 
-// 业务服务（通过接口注入，便于替换与测试 —— 可修改性）
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IAdminDashboardService, AdminDashboardService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<IHeroSlideService, HeroSlideService>();
 builder.Services.AddScoped<IShopService, ShopService>();
 builder.Services.AddScoped<IProductSkuService, ProductSkuService>();
 builder.Services.AddScoped<IProductSpecService, ProductSpecService>();
@@ -58,7 +56,6 @@ builder.Services.AddScoped<IVerificationCodeService, VerificationCodeService>();
 builder.Services.AddScoped<ICouponService, CouponService>();
 builder.Services.AddScoped<IRememberedLoginService, RememberedLoginCookieService>();
 
-// 购物车会话存储：内存缓存 + Session（无需外部服务；生产可替换为 Redis —— 可修改性）
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddSession(options =>
@@ -68,23 +65,20 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 
-// 健康检查（可用性）
 builder.Services.AddHealthChecks()
     .AddDbContextCheck<ApplicationDbContext>("database");
 
-// 本地化（多语言）：资源文件位于 Resources/ 目录
 builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
 
 builder.Services.AddHttpClient();
 
 builder.Services.AddControllersWithViews()
-    // 数据注解（校验错误消息）也跟随界面语言切换
+
     .AddDataAnnotationsLocalization(options =>
         options.DataAnnotationLocalizerProvider = (type, factory) => factory.Create(typeof(SharedResource)));
 
 var app = builder.Build();
 
-// 中间件管线
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
@@ -97,8 +91,6 @@ else
 
 app.UseStatusCodePagesWithReExecute("/Home/Error", "?code={0}");
 
-// 云托管平台（如 Render）在边缘已终止 TLS，再向容器转发 HTTP；
-// 此时若仍强制 HTTPS 重定向会导致重定向死循环，故仅本地开发环境启用。
 if (app.Environment.IsDevelopment())
 {
     app.UseHttpsRedirection();
@@ -106,7 +98,6 @@ if (app.Environment.IsDevelopment())
 
 app.UseStaticFiles();
 
-// 请求本地化：根据 Query 参数(?culture=en) 或 Cookie 决定语言，默认中文
 var supportedCultures = new[] { "zh-CN", "en" };
 app.UseRequestLocalization(new RequestLocalizationOptions()
     .SetDefaultCulture("zh-CN")
@@ -130,7 +121,6 @@ app.MapControllerRoute(
 
 app.MapHealthChecks("/health");
 
-// 首次运行初始化数据库与种子数据；数据库不可用时仅记录日志、不阻塞启动（可用性）
 try
 {
     await DbInitializer.InitializeAsync(app.Services);

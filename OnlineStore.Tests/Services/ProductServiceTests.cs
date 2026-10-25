@@ -6,10 +6,6 @@ using OnlineStore.ViewModels;
 
 namespace OnlineStore.Tests.Services;
 
-/// <summary>
-/// 商品业务层单元测试：验证公开目录的分页、分类/关键词/价格筛选与排序。
-/// 使用 EF Core InMemory 提供程序，不依赖真实数据库（可测试性）。
-/// </summary>
 public class ProductServiceTests
 {
     private static ApplicationDbContext CreateContext(string? databaseName = null)
@@ -153,7 +149,7 @@ public class ProductServiceTests
 
         Assert.Equal(3, result.TotalItems);
         Assert.Equal(2, result.TotalPages);
-        Assert.Single(result.Items); // 第 2 页只剩 1 件
+        Assert.Single(result.Items);
     }
 
     [Fact]

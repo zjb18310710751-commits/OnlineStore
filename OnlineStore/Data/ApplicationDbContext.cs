@@ -24,10 +24,33 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<Coupon> Coupons => Set<Coupon>();
     public DbSet<EmailVerificationCode> EmailVerificationCodes => Set<EmailVerificationCode>();
     public DbSet<DeliveryAddress> DeliveryAddresses => Set<DeliveryAddress>();
+    public DbSet<HeroSlide> HeroSlides => Set<HeroSlide>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
+
+        builder.Entity<Product>().Property(p => p.Stock).IsConcurrencyToken();
+        builder.Entity<Product>().Property(p => p.Price).IsConcurrencyToken();
+        builder.Entity<Product>().Property(p => p.IsActive).IsConcurrencyToken();
+        builder.Entity<ProductSku>().Property(s => s.Stock).IsConcurrencyToken();
+        builder.Entity<ProductSku>().Property(s => s.Price).IsConcurrencyToken();
+        builder.Entity<ProductSku>().Property(s => s.IsActive).IsConcurrencyToken();
+        builder.Entity<ProductSku>().Property(s => s.ProductId).IsConcurrencyToken();
+        builder.Entity<Order>().Property(o => o.Status).IsConcurrencyToken();
+        builder.Entity<Coupon>().Property(c => c.UsedCount).IsConcurrencyToken();
+        builder.Entity<Coupon>().Property(c => c.IsActive).IsConcurrencyToken();
+        builder.Entity<Coupon>().Property(c => c.DiscountValue).IsConcurrencyToken();
+        builder.Entity<Coupon>().Property(c => c.DiscountType).IsConcurrencyToken();
+        builder.Entity<Coupon>().Property(c => c.StartDate).IsConcurrencyToken();
+        builder.Entity<Coupon>().Property(c => c.EndDate).IsConcurrencyToken();
+        builder.Entity<Coupon>().Property(c => c.UsageLimit).IsConcurrencyToken();
+        builder.Entity<Coupon>().Property(c => c.MinOrderAmount).IsConcurrencyToken();
+
+        builder.Entity<HeroSlide>(entity =>
+        {
+            entity.HasIndex(s => new { s.IsActive, s.DisplayOrder });
+        });
 
         builder.Entity<ApplicationUser>(entity =>
         {
@@ -65,7 +88,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
             entity.HasIndex(s => s.Name);
             entity.Property(s => s.Name).HasMaxLength(100).IsRequired();
             entity.Property(s => s.Description).HasMaxLength(500);
-            // SQLite 无原生 decimal 类型，转 double(REAL) 存储，保证排序/比较正确
+
             entity.Property(s => s.Rating).HasConversion<double>();
         });
 
@@ -83,7 +106,6 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
             entity.Property(p => p.DetailHtml).HasMaxLength(10000);
             entity.Property(p => p.DetailHtmlEn).HasMaxLength(10000);
 
-            // 多分类（多对多，自动生成 ProductCategory 联结表）
             entity.HasMany(p => p.Categories)
                   .WithMany(c => c.Products)
                   .UsingEntity<Dictionary<string, object>>(
@@ -91,7 +113,6 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
                       j => j.HasOne<Category>().WithMany().HasForeignKey("CategoryId"),
                       j => j.HasOne<Product>().WithMany().HasForeignKey("ProductId"));
 
-            // 店铺：店铺下仍有商品时禁止删除（Restrict）
             entity.HasOne(p => p.Shop)
                   .WithMany(s => s.Products)
                   .HasForeignKey(p => p.ShopId)

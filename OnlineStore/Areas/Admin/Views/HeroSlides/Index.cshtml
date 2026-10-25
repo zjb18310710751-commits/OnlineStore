@@ -1,0 +1,56 @@
+@model IReadOnlyList<HeroSlide>
+@{
+    ViewData["Title"] = L10n.Text("首页轮播图", "Homepage carousel");
+}
+<section class="admin-carousel-manager" aria-labelledby="carousel-page-title">
+    <div class="ac-page-heading">
+        <div>
+            <p class="ac-eyebrow">@L10n.Text("首页内容", "Storefront content")</p>
+            <h1 id="carousel-page-title">@ViewData["Title"]</h1>
+            <p class="ac-intro">@L10n.Text("用图片和文字，讲好首页的第一句话。", "Make your first impression count, with images and words.")</p>
+        </div>
+        <a asp-action="Create" class="btn btn-primary"><i class="bi bi-plus-lg" aria-hidden="true"></i>@L10n.Text("添加轮播图", "Add slide")</a>
+    </div>
+    <div class="ac-list-meta">
+        <p><strong>@Model.Count</strong> @L10n.Text("张轮播图", "slides") <span aria-hidden="true">·</span> <strong>@Model.Count(s => s.IsActive)</strong> @L10n.Text("张正在展示", "visible on homepage")</p>
+        <a asp-area="" asp-controller="Home" asp-action="Index">@L10n.Text("查看首页", "View homepage") <i class="bi bi-arrow-up-right" aria-hidden="true"></i></a>
+    </div>
+    @if (Model.Count == 0)
+    {
+        <div class="card ac-empty">
+            <i class="bi bi-images" aria-hidden="true"></i>
+            <h2>@L10n.Text("还没有轮播图", "Your homepage starts here")</h2>
+            <p>@L10n.Text("添加一张产品宣传图片，再配上标题和说明。", "Upload a product campaign image, then add a headline and description.")</p>
+            <a asp-action="Create" class="btn btn-primary">@L10n.Text("添加第一张轮播图", "Add your first slide")</a>
+        </div>
+    }
+    else
+    {
+        <div class="ac-slide-list">
+            @foreach (var slide in Model)
+            {
+                var title = L10n.Text(slide.Title, slide.TitleEn);
+                var heading = L10n.Text(slide.Heading, slide.HeadingEn);
+                <article class="card ac-slide-row">
+                    <a asp-action="Edit" asp-route-id="@slide.Id" class="ac-slide-image" aria-label="@L10n.Text("编辑", "Edit") · @title">
+                        <img src="@slide.ImageUrl" alt="@L10n.Text(slide.ImageAlt ?? slide.Title, slide.ImageAltEn)" loading="lazy" />
+                    </a>
+                    <div class="ac-slide-info">
+                        <div class="ac-slide-meta"><span class="ac-status @(slide.IsActive ? "is-visible" : "")"><span aria-hidden="true"></span>@(slide.IsActive ? L10n.Text("展示中", "Visible") : L10n.Text("已隐藏", "Hidden"))</span><span>@L10n.Text("排序", "Order") @slide.DisplayOrder.ToString("D2")</span></div>
+                        <h2><a asp-action="Edit" asp-route-id="@slide.Id">@title</a></h2>
+                        <p class="ac-slide-heading">@heading</p>
+                        <p class="ac-slide-description">@L10n.Text(slide.Description ?? "", slide.DescriptionEn)</p>
+                        <p class="ac-slide-destination"><span>Shop</span><i class="bi bi-arrow-right" aria-hidden="true"></i><span>@slide.LinkUrl</span></p>
+                    </div>
+                    <div class="ac-row-actions">
+                        <a asp-action="Edit" asp-route-id="@slide.Id" class="btn btn-outline-secondary" aria-label="@L10n.Text("编辑", "Edit") · @title"><i class="bi bi-pencil" aria-hidden="true"></i>@Loc["Edit"]</a>
+                        <form asp-action="Delete" asp-route-id="@slide.Id" method="post" data-confirm="@L10n.Text($"删除“{title}”？删除后，首页将不再显示这张轮播图。", $"Delete “{title}”? This slide will be removed from the homepage.")" onsubmit="return confirm(this.dataset.confirm);">
+                            <button type="submit" class="btn ac-delete-button" aria-label="@L10n.Text("删除", "Delete") · @title"><i class="bi bi-trash" aria-hidden="true"></i>@Loc["Delete"]</button>
+                        </form>
+                    </div>
+                </article>
+            }
+        </div>
+        <p class="ac-list-note"><i class="bi bi-info-circle" aria-hidden="true"></i>@L10n.Text("排序数字越小越靠前；隐藏的轮播图不会在首页显示。", "Lower order numbers appear first. Hidden slides stay off the homepage.")</p>
+    }
+</section>

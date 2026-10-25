@@ -1,0 +1,68 @@
+@model IReadOnlyList<HeroSlide>
+@if (Model.Count == 0)
+{
+    <h1 class="visually-hidden">@L10n.Text("日常，自有风格。", "Make every day yours.")</h1>
+}
+else
+{
+<section class="sf-home-hero" aria-labelledby="hero-title">
+    <h1 id="hero-title" class="visually-hidden">@L10n.Text("日常，自有风格。", "Make every day yours.")</h1>
+    <div class="sf-carousel" data-hero-carousel data-interval="5000"
+         role="region" aria-roledescription="@L10n.Text("轮播图", "carousel")"
+         aria-label="@L10n.Text("精选产品推荐", "Featured product collections")"
+         data-pause-label="@L10n.Text("暂停轮播", "Pause slideshow")"
+         data-play-label="@L10n.Text("播放轮播", "Play slideshow")">
+        <div class="sf-carousel-stage">
+            @for (var i = 0; i < Model.Count; i++)
+            {
+                var campaign = Model[i];
+                var label = L10n.Text(campaign.Title, campaign.TitleEn);
+                var copy = L10n.Text(campaign.Description ?? "", campaign.DescriptionEn);
+                var alt = L10n.Text(campaign.ImageAlt ?? "", campaign.ImageAltEn);
+                <article id="hero-slide-@i" class="sf-campaign @(i == 0 ? "is-active" : "")"
+                         data-hero-slide data-slide-label="@($"{i + 1} / {Model.Count} · {label}")"
+                         role="group" aria-roledescription="@L10n.Text("幻灯片", "slide")"
+                         aria-label="@($"{i + 1} / {Model.Count} · {label}")"
+                         aria-hidden="@(i == 0 ? "false" : "true")" inert="@(i == 0 ? null : "inert")">
+                    <div class="sf-campaign-media">
+                        <img src="@Url.Content(campaign.ImageUrl)" asp-append-version="true" alt="@(string.IsNullOrWhiteSpace(alt) ? label : alt)"
+                             width="2160" height="720" fetchpriority="@(i == 0 ? "high" : "low")" />
+                    </div>
+                    <div class="sf-campaign-copy">
+                        <h2>@L10n.Text(campaign.Heading, campaign.HeadingEn)</h2>
+                        @if (!string.IsNullOrWhiteSpace(copy))
+                        {
+                            <p class="sf-campaign-description">@copy</p>
+                        }
+                        <a class="sf-button" href="@(Url.IsLocalUrl(campaign.LinkUrl) ? Url.Content(campaign.LinkUrl) : Url.Action("Index", "Products"))"
+                           aria-label="Shop · @label">
+                            Shop
+                        </a>
+                    </div>
+                </article>
+            }
+        </div>
+        <div class="sf-carousel-controls" data-hero-controls hidden>
+            <div class="sf-carousel-navigation" aria-label="@L10n.Text("选择宣传图", "Choose a collection")">
+                @for (var i = 0; i < Model.Count; i++)
+                {
+                    <button class="sf-carousel-dot" type="button" data-hero-dot data-slide-index="@i"
+                            aria-label="@L10n.Text("切换至", "Show") @L10n.Text(Model[i].Title, Model[i].TitleEn)"
+                            aria-controls="hero-slide-@i" aria-current="@(i == 0 ? "true" : "false")">
+                        <span class="sf-carousel-dot-mark" aria-hidden="true"></span>
+                    </button>
+                }
+            </div>
+            <div class="sf-carousel-playback">
+                <span class="visually-hidden" aria-hidden="true"><span data-hero-current>01</span><span> / @Model.Count.ToString("00")</span></span>
+                <button class="sf-carousel-icon" type="button" data-hero-prev aria-label="@L10n.Text("上一张", "Previous slide")"><i class="bi bi-arrow-left" aria-hidden="true"></i></button>
+                <button class="sf-carousel-icon" type="button" data-hero-next aria-label="@L10n.Text("下一张", "Next slide")"><i class="bi bi-arrow-right" aria-hidden="true"></i></button>
+                <button class="sf-carousel-pause" type="button" data-hero-pause aria-label="@L10n.Text("暂停轮播", "Pause slideshow")">
+                    <i class="bi bi-pause-fill" data-hero-pause-icon aria-hidden="true"></i><span class="visually-hidden" data-hero-pause-text>@L10n.Text("暂停轮播", "Pause slideshow")</span>
+                </button>
+            </div>
+        </div>
+        <span class="visually-hidden" aria-live="polite" aria-atomic="true" data-hero-status></span>
+    </div>
+</section>
+}

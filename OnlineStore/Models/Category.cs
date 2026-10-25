@@ -2,7 +2,6 @@ using System.ComponentModel.DataAnnotations;
 
 namespace OnlineStore.Models;
 
-/// <summary>商品分类。</summary>
 public class Category
 {
     public int Id { get; set; }

@@ -3,7 +3,6 @@ using OnlineStore.Validation;
 
 namespace OnlineStore.ViewModels;
 
-/// <summary>忘记密码：用邮箱验证码重置密码的表单。</summary>
 public class ForgotPasswordViewModel
 {
     [Required(ErrorMessage = "EmailRequired")]

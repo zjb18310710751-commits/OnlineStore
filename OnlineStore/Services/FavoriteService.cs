@@ -28,6 +28,11 @@ public class FavoriteService : IFavoriteService
             return false;
         }
 
+        if (!await _context.Products.AnyAsync(p => p.Id == productId && p.IsActive))
+        {
+            return false;
+        }
+
         _context.Favorites.Add(new Favorite { UserId = userId, ProductId = productId });
         await _context.SaveChangesAsync();
         return true;
@@ -44,7 +49,7 @@ public class FavoriteService : IFavoriteService
         var products = await _context.Products
             .AsNoTracking()
             .Include(p => p.Categories)
-            .Where(p => ids.Contains(p.Id))
+            .Where(p => ids.Contains(p.Id) && p.IsActive)
             .ToListAsync();
 
         var dict = products.ToDictionary(p => p.Id);

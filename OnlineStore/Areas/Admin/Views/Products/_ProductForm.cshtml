@@ -173,7 +173,6 @@
         var hidden = document.getElementById('DetailHtmlInput');
         if (!editor || !hidden) return;
 
-        // 提交前把编辑器内容写回隐藏字段
         var form = editor.closest('form');
         if (form) {
             form.addEventListener('submit', function () {
@@ -181,7 +180,6 @@
             });
         }
 
-        // 粘贴图片：拦截后上传，再插入 <img>
         editor.addEventListener('paste', function (e) {
             var items = (e.clipboardData || window.clipboardData).items;
             if (!items) return;
@@ -214,7 +212,7 @@
                     editor.appendChild(document.createElement('br'));
                 }
             })
-            .catch(function () { /* 上传失败静默处理 */ });
+            .catch(function () {                });
         }
     })();
 </script>

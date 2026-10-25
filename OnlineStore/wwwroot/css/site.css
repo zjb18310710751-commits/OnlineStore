@@ -17,7 +17,6 @@
 }
 
 html {
-    /* 页面高度变化时始终保留滚动条槽位，避免个人中心切换页面时内容区宽度跳动。 */
     scrollbar-gutter: stable;
 }
 
@@ -27,7 +26,6 @@ body {
     color: #0f1111;
 }
 
-/* 主按钮 = 亚马逊橙 */
 .btn-primary {
     --bs-btn-bg: #ff9900;
     --bs-btn-border-color: #ff9900;
@@ -50,7 +48,6 @@ body {
     --bs-btn-active-color: #0f1111;
 }
 
-/* 亚马逊「加入购物车」黄按钮 */
 .btn-amazon {
     --bs-btn-bg: #ffd814;
     --bs-btn-border-color: #fcd200;
@@ -64,7 +61,6 @@ body {
     border-radius: 50rem;
 }
 
-/* 亚马逊「立即购买」橙按钮 */
 .btn-buy-now {
     --bs-btn-bg: #ffa41c;
     --bs-btn-border-color: #ff8f00;
@@ -86,7 +82,6 @@ body {
     color: var(--amazon-orange) !important;
 }
 
-/* 深色导航条内的下拉菜单文字可读 */
 .navbar-dark .nav-link {
     color: #fff;
 }
@@ -96,7 +91,6 @@ body {
     text-decoration: underline;
 }
 
-/* 亚马逊式搜索按钮 */
 .search-btn-amazon {
     background-color: #febd69;
     border-color: #febd69;
@@ -109,7 +103,6 @@ body {
     color: #0f1111;
 }
 
-/* 前台编辑式视觉 */
 .editorial-nav {
     border-bottom: 1px solid rgba(17, 24, 39, .1);
     background: #f7f4ed;
@@ -634,12 +627,10 @@ body {
     }
 }
 
-/* 首页 Hero：亚马逊深色渐变横幅 */
 .hero {
     background: linear-gradient(135deg, #232f3e 0%, #37475a 100%);
 }
 
-/* 商品卡片 */
 .product-card {
     border: 0;
     border-radius: .5rem;
@@ -685,7 +676,6 @@ body {
     color: #6b7280;
 }
 
-/* 全部商品：筛选面板 */
 .catalog-filter-card {
     border: 1px solid #e4e7ea;
     border-radius: 14px;
@@ -825,7 +815,6 @@ body {
     color: #181818 !important;
 }
 
-/* 结算页 */
 .checkout-summary-card {
     position: sticky;
     top: 88px;
@@ -958,7 +947,6 @@ body {
     }
 }
 
-/* 个人中心 */
 .profile-sidebar {
     position: sticky;
     top: 88px;
@@ -1071,7 +1059,6 @@ body {
     opacity: 1;
 }
 
-/* 个人中心：收货地址簿 */
 .address-modal-kicker {
     margin-bottom: .35rem;
     color: #7b858e;
@@ -1593,12 +1580,10 @@ body {
     font-weight: 700;
 }
 
-/* 划线原价（促销） */
 .text-decoration-line-through {
     color: #565959;
 }
 
-/* 商品详情 */
 .product-detail-thumb {
     min-height: 320px;
     background: #fff;
@@ -1618,7 +1603,6 @@ body {
     color: #cbd2dc;
 }
 
-/* 购物车条目缩略图 */
 .cart-thumb {
     width: 64px;
     height: 64px;
@@ -1635,7 +1619,6 @@ body {
     object-fit: cover;
 }
 
-/* 购物车：商品表格与订单摘要 */
 .cart-products-card {
     overflow: hidden;
 }
@@ -1766,7 +1749,6 @@ body {
     }
 }
 
-/* 商品详情页 */
 .sku-label {
     font-weight: 600;
     color: #0f1111;
@@ -1841,7 +1823,6 @@ body {
     border-color: #f1f3f6 !important;
 }
 
-/* 买家秀图片 */
 .review-img {
     max-width: 120px;
     max-height: 120px;
@@ -1850,7 +1831,6 @@ body {
     cursor: pointer;
 }
 
-/* 后台图文编辑器 */
 .detail-editor {
     min-height: 180px;
     max-height: 420px;
@@ -1862,7 +1842,6 @@ body {
     line-height: 1.7;
 }
 
-/* 规格图片粘贴框 */
 .sku-image-box {
     min-height: 110px;
     border: 2px dashed #ced4da;
@@ -1903,7 +1882,6 @@ body {
     height: auto;
 }
 
-/* 多图画廊缩略图 */
 .gallery-thumb {
     width: 64px;
     height: 64px;
@@ -1925,7 +1903,6 @@ body {
     border-color: var(--amazon-orange);
 }
 
-/* 后台布局 */
 .admin-wrapper {
     display: flex;
     min-height: 100vh;
@@ -1990,7 +1967,6 @@ body {
     border-radius: .375rem;
 }
 
-/* 统计卡片 */
 .stat-card .stat-icon {
     width: 44px;
     height: 44px;
@@ -2515,7 +2491,6 @@ body {
     }
 }
 
-/* 响应式后台 */
 @media (max-width: 768px) {
     .admin-wrapper {
         flex-direction: column;
@@ -2531,7 +2506,6 @@ body {
     }
 }
 
-/* ZHY 潮流数字商店标 */
 .zhy-brand {
     display: flex;
     align-items: center;
@@ -2597,7 +2571,6 @@ body {
     transform: rotate(90deg);
 }
 
-/* 首页按钮：软圆角细描边胶囊 */
 .navbar-nav .nav-item .nav-pill-btn {
     display: inline-flex;
     align-items: center;

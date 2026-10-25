@@ -4,7 +4,6 @@ using OnlineStore.Services;
 
 namespace OnlineStore.Tests.Services;
 
-/// <summary>记住账号密码服务单元测试：保存/读取/清除，以及密码不以明文落盘。</summary>
 public class RememberedLoginCookieServiceTests
 {
     private const string CookieName = "OnlineStore.RememberedLogin";
@@ -25,7 +24,6 @@ public class RememberedLoginCookieServiceTests
 
         service.Save("user@store.com", "Passw0rd@123");
 
-        // 模拟浏览器把响应 Set-Cookie 回传给下一次请求
         var setCookie = context.Response.Headers["Set-Cookie"].ToString();
         context.Request.Headers["Cookie"] = setCookie.Split(';')[0];
 

@@ -52,13 +52,6 @@ public class AccountController : Controller
             return RedirectToAction("Index", "Home");
         }
 
-        // 后台地址的登录请求，引导到后台专属登录页（管理员/用户两套入口分离）
-        if (!string.IsNullOrEmpty(returnUrl) &&
-            returnUrl.StartsWith("/Admin", StringComparison.OrdinalIgnoreCase))
-        {
-            return RedirectToAction("Login", "Account", new { area = "Admin", returnUrl });
-        }
-
         ViewData["ReturnUrl"] = returnUrl;
         return View(BuildLoginViewModel());
     }
@@ -74,7 +67,6 @@ public class AccountController : Controller
             return View(model);
         }
 
-        // 登录框支持邮箱或手机号：含 @ 视为邮箱，否则视为手机号（手机注册账号的 UserName 即手机号）
         var identifier = model.Email.Trim();
         var user = identifier.Contains('@')
             ? await _userManager.FindByEmailAsync(identifier)
@@ -82,7 +74,7 @@ public class AccountController : Controller
 
         if (user is null)
         {
-            // 统一错误信息，避免泄露账号是否存在（安全性）
+
             ModelState.AddModelError(string.Empty, _loc["LoginFailed"].Value);
             return View(model);
         }
@@ -92,7 +84,7 @@ public class AccountController : Controller
 
         if (result.Succeeded)
         {
-            // 勾选「记住账号密码」时加密保存凭据，否则清除旧凭据
+
             if (model.RememberCredentials)
             {
                 _rememberedLogin.Save(model.Email, model.Password);
@@ -102,7 +94,6 @@ public class AccountController : Controller
                 _rememberedLogin.Clear();
             }
 
-            // 前台登录面向普通用户，默认回到首页（不再跳后台）
             return RedirectToLocal(returnUrl) ?? RedirectToAction("Index", "Home");
         }
 
@@ -147,21 +138,23 @@ public class AccountController : Controller
             return Json(new { ok = false, error = _loc["InvalidEmail"].Value });
         }
 
-        var isPhone = string.Equals(model.Channel, "sms", StringComparison.OrdinalIgnoreCase);
-        var target = (model.Target ?? string.Empty).Trim();
-        if (!isPhone)
+        if (!string.Equals(model.Channel, "email", StringComparison.OrdinalIgnoreCase))
         {
-            target = target.ToLowerInvariant();
+            return Json(new { ok = false, error = PhoneRegistrationUnavailable() });
         }
 
-        // 手机注册账号的 UserName 即手机号，按 UserName 查重；邮箱按邮箱查重
-        var user = isPhone
-            ? await _userManager.FindByNameAsync(target)
-            : await _userManager.FindByEmailAsync(target);
+        var target = (model.Target ?? string.Empty).Trim().ToLowerInvariant();
+        if (target.Length > 256 || !new EmailAddressAttribute().IsValid(target) ||
+            (model.Purpose != "reset" && model.Purpose != "register"))
+        {
+            return Json(new { ok = false, error = _loc["InvalidEmail"].Value });
+        }
+
+        var user = await _userManager.FindByEmailAsync(target);
 
         if (model.Purpose == "reset")
         {
-            // 找回密码：邮箱必须已注册（仅支持邮箱）
+
             if (user is null)
             {
                 return Json(new { ok = false, error = _loc["EmailNotRegistered"].Value });
@@ -169,68 +162,46 @@ public class AccountController : Controller
         }
         else
         {
-            // 注册：目标地址必须未注册
+
             if (user is not null)
             {
-                return Json(new { ok = false, error = isPhone ? _loc["PhoneAlreadyRegistered"].Value : _loc["EmailAlreadyRegistered"].Value });
+                return Json(new { ok = false, error = _loc["EmailAlreadyRegistered"].Value });
             }
         }
 
-        try
-        {
-            var code = await _verificationCodeService.GenerateAsync(target);
-
-            // 演示模式：验证码始终随响应返回给页面显示；邮箱渠道再尽力而为补发邮件（能发就发，失败不影响注册）
-            if (!isPhone)
-            {
-                try
-                {
-                    var subject = _loc["VerificationEmailSubject"].Value;
-                    var body = EmailTemplateBuilder.BuildVerificationCode(code);
-                    await _emailService.SendAsync(target, subject, body);
-                }
-                catch
-                {
-                    // 忽略邮件发送失败：演示模式下验证码已在页面展示
-                }
-            }
-
-            return Json(new { ok = true, code });
-        }
-        catch (InvalidOperationException ex)
-        {
-            return Json(new { ok = false, error = ex.Message });
-        }
+        return await SendEmailVerificationCodeAsync(target);
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Register(RegisterViewModel model)
     {
-        var isPhone = string.Equals(model.RegisterBy, "phone", StringComparison.OrdinalIgnoreCase);
-
-        // 邮箱/手机号二选一为账号标识：DataAnnotations 无法表达「二选一必填」，故在此手动校验
-        if (isPhone)
+        if (!string.Equals(model.RegisterBy, "email", StringComparison.OrdinalIgnoreCase))
         {
-            if (string.IsNullOrWhiteSpace(model.PhoneNumber))
-            {
-                ModelState.AddModelError(nameof(model.PhoneNumber), _loc["PhoneRequired"].Value);
-            }
-            else if (!Regex.IsMatch(model.PhoneNumber, PhonePattern))
-            {
-                ModelState.AddModelError(nameof(model.PhoneNumber), _loc["PhoneFormatInvalid"].Value);
-            }
+            ModelState.AddModelError(string.Empty, PhoneRegistrationUnavailable());
+            return View(model);
         }
-        else
+
+        if (string.IsNullOrWhiteSpace(model.Email))
         {
-            if (string.IsNullOrWhiteSpace(model.Email))
-            {
-                ModelState.AddModelError(nameof(model.Email), _loc["EmailRequired"].Value);
-            }
-            else if (!new EmailAddressAttribute().IsValid(model.Email))
-            {
-                ModelState.AddModelError(nameof(model.Email), _loc["InvalidEmail"].Value);
-            }
+            ModelState.AddModelError(nameof(model.Email), _loc["EmailRequired"].Value);
+        }
+        else if (model.Email.Length > 256 || !new EmailAddressAttribute().IsValid(model.Email))
+        {
+            ModelState.AddModelError(nameof(model.Email), _loc["InvalidEmail"].Value);
+        }
+
+        model.Address = AddressFormatter.Combine(
+            model.AddressLine1, model.AddressLine2, model.City, model.PostalCode, model.Country);
+        ModelState.Remove(nameof(model.Address));
+        if (string.IsNullOrWhiteSpace(model.AddressLine1) || string.IsNullOrWhiteSpace(model.City) ||
+            string.IsNullOrWhiteSpace(model.PostalCode) || string.IsNullOrWhiteSpace(model.Country))
+        {
+            ModelState.AddModelError(nameof(model.Address), _loc["AddressRequired"].Value);
+        }
+        if (model.Address.Length > 500)
+        {
+            ModelState.AddModelError(nameof(model.Address), _loc["CheckoutAddressTooLong"].Value);
         }
 
         if (!ModelState.IsValid)
@@ -238,20 +209,15 @@ public class AccountController : Controller
             return View(model);
         }
 
-        var identifier = isPhone ? model.PhoneNumber!.Trim() : model.Email!.Trim().ToLowerInvariant();
+        var identifier = model.Email!.Trim().ToLowerInvariant();
 
-        // 目标地址唯一性校验（统一提示，避免泄露账号是否已存在）
-        var existing = isPhone
-            ? await _userManager.FindByNameAsync(identifier)
-            : await _userManager.FindByEmailAsync(identifier);
+        var existing = await _userManager.FindByEmailAsync(identifier);
         if (existing is not null)
         {
-            ModelState.AddModelError(isPhone ? nameof(model.PhoneNumber) : nameof(model.Email),
-                isPhone ? _loc["PhoneAlreadyRegistered"].Value : _loc["EmailAlreadyRegistered"].Value);
+            ModelState.AddModelError(nameof(model.Email), _loc["EmailAlreadyRegistered"].Value);
             return View(model);
         }
 
-        // 校验验证码（邮箱/手机号共用同一验证码服务）
         if (!await _verificationCodeService.VerifyAsync(identifier, model.VerificationCode))
         {
             ModelState.AddModelError(nameof(model.VerificationCode), _loc["InvalidVerificationCode"].Value);
@@ -261,12 +227,12 @@ public class AccountController : Controller
         var user = new ApplicationUser
         {
             UserName = identifier,
-            Email = isPhone ? NullIfBlank(model.Email) : identifier,
-            EmailConfirmed = true, // 通过验证码校验即视为已验证
+            Email = identifier,
+            EmailConfirmed = true,
             FirstName = model.FirstName,
             LastName = model.LastName,
             Address = model.Address,
-            PhoneNumber = isPhone ? identifier : NullIfBlank(model.PhoneNumber)
+            PhoneNumber = NullIfBlank(model.PhoneNumber)
         };
 
         var result = await _userManager.CreateAsync(user, model.Password);
@@ -280,10 +246,11 @@ public class AccountController : Controller
             return View(model);
         }
 
-        // 将注册时收集的地址写入结构化地址簿，后续 Profile 与结算直接使用。
-        await _deliveryAddressService.EnsureLegacyAddressAsync(user);
+        var recipientName = $"{model.LastName}{model.FirstName}".Trim();
+        await _deliveryAddressService.SaveAsync(user.Id, null, new DeliveryAddressInput(
+            recipientName[..Math.Min(recipientName.Length, 100)], model.PhoneNumber ?? string.Empty,
+            model.AddressLine1, model.AddressLine2, model.City, model.PostalCode, model.Country, true));
 
-        // 注册成功后自动登录并跳转首页
         await _signInManager.SignInAsync(user, isPersistent: false);
         TempData["Success"] = _loc["RegisterSuccess"].Value;
         return RedirectToAction("Index", "Home");
@@ -479,7 +446,7 @@ public class AccountController : Controller
         }
 
         var target = model?.Target?.Trim().ToLowerInvariant() ?? string.Empty;
-        if (string.IsNullOrWhiteSpace(target) || !new EmailAddressAttribute().IsValid(target))
+        if (string.IsNullOrWhiteSpace(target) || target.Length > 256 || !new EmailAddressAttribute().IsValid(target))
         {
             return Json(new { ok = false, error = _loc["InvalidEmail"].Value });
         }
@@ -490,28 +457,36 @@ public class AccountController : Controller
             return Json(new { ok = false, error = _loc["EmailAlreadyRegistered"].Value });
         }
 
+        return await SendEmailVerificationCodeAsync(target);
+    }
+
+    private async Task<IActionResult> SendEmailVerificationCodeAsync(string target)
+    {
+        string code;
         try
         {
-            var code = await _verificationCodeService.GenerateAsync(target);
-            try
-            {
-                await _emailService.SendAsync(
-                    target,
-                    _loc["VerificationEmailSubject"].Value,
-                    EmailTemplateBuilder.BuildVerificationCode(code));
-            }
-            catch
-            {
-                // 演示模式：验证码直接返回页面显示。
-            }
-
-            return Json(new { ok = true, code });
+            code = await _verificationCodeService.GenerateAsync(target);
         }
         catch (InvalidOperationException ex)
         {
             return Json(new { ok = false, error = ex.Message });
         }
+
+        try
+        {
+            await _emailService.SendAsync(target, _loc["VerificationEmailSubject"].Value,
+                EmailTemplateBuilder.BuildVerificationCode(code));
+        }
+        catch (Exception)
+        {
+            return Json(new { ok = false, error = _loc["SendCodeFailed"].Value });
+        }
+
+        return Json(new { ok = true });
     }
+
+    private static string PhoneRegistrationUnavailable() => L10n.Text(
+        "短信验证暂不可用，请使用邮箱注册。", "SMS verification is unavailable. Please register with email.");
 
     [HttpGet]
     [Authorize]

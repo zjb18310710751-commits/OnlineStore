@@ -3,16 +3,17 @@ using OnlineStore.Validation;
 
 namespace OnlineStore.ViewModels;
 
-/// <summary>注册表单视图模型（邮箱注册与手机号注册共用，通过 <see cref="RegisterBy"/> 区分）。</summary>
 public class RegisterViewModel
 {
-    /// <summary>注册方式：email（邮箱注册）或 phone（手机号注册）。</summary>
+
     public string RegisterBy { get; set; } = "email";
 
     [Display(Name = "邮箱")]
+    [StringLength(256)]
     public string? Email { get; set; }
 
     [Display(Name = "手机号")]
+    [StringLength(20)]
     public string? PhoneNumber { get; set; }
 
     [Required(ErrorMessage = "VerificationCodeRequired")]
@@ -31,24 +32,23 @@ public class RegisterViewModel
     [Display(Name = "姓")]
     public string LastName { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "AddressRequired")]
     [StringLength(500)]
     [Display(Name = "地址")]
     public string Address { get; set; } = string.Empty;
 
-    [StringLength(200)]
+    [Required(ErrorMessage = "AddressRequired"), StringLength(200)]
     public string? AddressLine1 { get; set; }
 
     [StringLength(200)]
     public string? AddressLine2 { get; set; }
 
-    [StringLength(100)]
+    [Required(ErrorMessage = "CityRequired"), StringLength(100)]
     public string? City { get; set; }
 
-    [StringLength(100)]
+    [Required(ErrorMessage = "PostalCodeRequired"), StringLength(100)]
     public string? PostalCode { get; set; }
 
-    [StringLength(100)]
+    [Required(ErrorMessage = "CountryRequired"), StringLength(100)]
     public string? Country { get; set; }
 
     [Required(ErrorMessage = "PasswordRequired")]

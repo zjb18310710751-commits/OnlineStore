@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Identity;
 
 namespace OnlineStore.Models;
 
-/// <summary>用户保存的收货地址；每个用户可维护多条，其中最多一条为默认地址。</summary>
 public class DeliveryAddress
 {
     public int Id { get; set; }

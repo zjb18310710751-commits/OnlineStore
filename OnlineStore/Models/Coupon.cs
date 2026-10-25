@@ -2,17 +2,14 @@ using System.ComponentModel.DataAnnotations;
 
 namespace OnlineStore.Models;
 
-/// <summary>优惠券折扣类型。</summary>
 public enum CouponDiscountType
 {
-    /// <summary>按订单金额百分比折扣。</summary>
+
     Percent = 0,
 
-    /// <summary>固定金额抵扣。</summary>
     Fixed = 1
 }
 
-/// <summary>优惠券：后台创建，用户下单时输入优惠码抵扣订单金额。</summary>
 public class Coupon
 {
     public int Id { get; set; }

@@ -44,7 +44,7 @@
                                 <form asp-action="Ship" asp-route-id="@o.Id" method="post" class="d-inline">
                                     <button type="submit" class="btn btn-sm btn-outline-primary">@Loc["Ship"]</button>
                                 </form>
-                                <form asp-action="Cancel" asp-route-id="@o.Id" method="post" class="d-inline" onsubmit="return confirm('@Loc["ConfirmCancelOrder"]');">
+                                <form asp-action="Cancel" asp-route-id="@o.Id" method="post" class="d-inline" data-confirm="@Loc["ConfirmCancelOrder"]" onsubmit="return confirm(this.dataset.confirm);">
                                     <button type="submit" class="btn btn-sm btn-outline-danger">@Loc["CancelOrder"]</button>
                                 </form>
                             }
@@ -53,13 +53,13 @@
                                 <form asp-action="Complete" asp-route-id="@o.Id" method="post" class="d-inline">
                                     <button type="submit" class="btn btn-sm btn-outline-success">@Loc["Complete"]</button>
                                 </form>
-                                <form asp-action="Refund" asp-route-id="@o.Id" method="post" class="d-inline" onsubmit="return confirm('@Loc["ConfirmRefundOrder"]');">
+                                <form asp-action="Refund" asp-route-id="@o.Id" method="post" class="d-inline" data-confirm="@Loc["ConfirmRefundOrder"]" onsubmit="return confirm(this.dataset.confirm);">
                                     <button type="submit" class="btn btn-sm btn-outline-danger">@Loc["Refund"]</button>
                                 </form>
                             }
                             else if (o.Status == OrderStatus.Completed)
                             {
-                                <form asp-action="Refund" asp-route-id="@o.Id" method="post" class="d-inline" onsubmit="return confirm('@Loc["ConfirmRefundOrder"]');">
+                                <form asp-action="Refund" asp-route-id="@o.Id" method="post" class="d-inline" data-confirm="@Loc["ConfirmRefundOrder"]" onsubmit="return confirm(this.dataset.confirm);">
                                     <button type="submit" class="btn btn-sm btn-outline-danger">@Loc["Refund"]</button>
                                 </form>
                             }

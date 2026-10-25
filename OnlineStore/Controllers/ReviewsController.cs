@@ -7,7 +7,6 @@ using OnlineStore.Services;
 
 namespace OnlineStore.Controllers;
 
-/// <summary>前台评价：登录用户可为商品提交星级评价。</summary>
 [Authorize]
 public class ReviewsController : Controller
 {
@@ -42,8 +41,16 @@ public class ReviewsController : Controller
         }
 
         var user = await _userManager.GetUserAsync(User);
+        if (user is null) return Challenge();
 
-        // 可选：上传买家秀图片（不合法时忽略图片，评价仍可提交）
+        comment = string.IsNullOrWhiteSpace(comment) ? null : comment.Trim();
+        if (comment?.Length > 1000 || rating is < 1 or > 5 || !ModelState.IsValid)
+        {
+            TempData["Error"] = L10n.Text("请选择有效评分，评价内容不能超过 1000 个字符。",
+                "Choose a valid rating and keep your review within 1,000 characters.");
+            return RedirectToAction("Details", "Products", new { id = productId });
+        }
+
         string? imageUrl = null;
         if (image is { Length: > 0 })
         {
@@ -63,7 +70,7 @@ public class ReviewsController : Controller
             UserId = user?.Id,
             UserName = ResolveUserName(user),
             Rating = Math.Clamp(rating, 1, 5),
-            Comment = string.IsNullOrWhiteSpace(comment) ? null : comment.Trim(),
+            Comment = comment,
             ImageUrl = imageUrl
         };
 
@@ -80,8 +87,9 @@ public class ReviewsController : Controller
         }
 
         var fullName = $"{user.LastName}{user.FirstName}".Trim();
-        return !string.IsNullOrWhiteSpace(fullName)
+        var name = !string.IsNullOrWhiteSpace(fullName)
             ? fullName
             : user.Email?.Split('@')[0] ?? "用户";
+        return name[..Math.Min(name.Length, 50)];
     }
 }
