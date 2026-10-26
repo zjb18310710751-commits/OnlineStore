@@ -41,8 +41,9 @@
 .storefront .sf-search button { flex-shrink: 0; width: 40px; border: 0; background: transparent; color: inherit; font-size: 18px; }
 .storefront .sf-icon-link, .storefront .sf-cart-link { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 44px; padding: 0; background: transparent; color: var(--sf-ink); border: 0; border-radius: var(--sf-radius); text-decoration: none; font-size: 21px; }
 .storefront .sf-icon-link:hover, .storefront .sf-cart-link:hover { background: var(--sf-surface); }
-.storefront .sf-bag-icon { width: 24px; height: 26px; overflow: visible; }
+.storefront .sf-bag-icon { width: 24px; height: 24px; overflow: visible; }
 .storefront .sf-cart-link:hover .sf-bag-icon { color: #000; }
+.storefront .sf-cart-link + .dropdown { margin-left: -5px; }
 .storefront :is(.sf-cart-link, .sf-favorite-link) .badge { left: 80% !important; top: 8px !important; background: #111 !important; font-size: 10px; }
 .storefront .sf-language-form { margin: 0; }
 .storefront .sf-language { border: 0; padding: 0; background: transparent; color: inherit; min-width: 32px; min-height: 44px; font: inherit; font-size: 12px; }
