@@ -52,9 +52,9 @@
                                 </li>
                             }
                         </ul>
-                        @if (o.DiscountAmount > 0)
+                        @if (!string.IsNullOrWhiteSpace(o.CouponName))
                         {
-                            <div class="text-end small text-success">@Loc["Discount"]（@o.CouponCode）：-¥@o.DiscountAmount.ToString("F2")</div>
+                            <div class="text-end small text-success">@Loc["Discount"]（@o.CouponName）：-¥@o.DiscountAmount.ToString("F2")</div>
                         }
                         <div class="d-flex justify-content-between align-items-center mt-2">
                             @if (o.Status == OrderStatus.PendingShipment)

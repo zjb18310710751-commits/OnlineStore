@@ -347,6 +347,7 @@
   <data name="EditCoupon" xml:space="preserve"><value>Edit Coupon</value></data>
   <data name="NoCoupons" xml:space="preserve"><value>No coupons yet</value></data>
   <data name="CouponCode" xml:space="preserve"><value>Coupon Code</value></data>
+  <data name="CouponName" xml:space="preserve"><value>Coupon name</value></data>
   <data name="CouponType" xml:space="preserve"><value>Type</value></data>
   <data name="CouponValue" xml:space="preserve"><value>Value</value></data>
   <data name="MinOrderAmount" xml:space="preserve"><value>Min. Order</value></data>
@@ -406,7 +407,7 @@
   <data name="ParamValueRequired" xml:space="preserve"><value>Please enter a parameter value</value></data>
   <data name="ColorRequired" xml:space="preserve"><value>Please enter a color</value></data>
   <data name="SpecRequired" xml:space="preserve"><value>Please enter a spec</value></data>
-  <data name="CouponCodeRequired" xml:space="preserve"><value>Please enter a coupon code</value></data>
+  <data name="CouponNameRequired" xml:space="preserve"><value>Please enter a coupon name</value></data>
   <data name="CouponValueInvalid" xml:space="preserve"><value>Coupon value must be greater than 0</value></data>
   <data name="MinOrderAmountInvalid" xml:space="preserve"><value>Minimum order amount cannot be negative</value></data>
   <data name="UsageLimitInvalid" xml:space="preserve"><value>Usage limit must be at least 1</value></data>
@@ -440,7 +441,7 @@
   <data name="CouponUpdated" xml:space="preserve"><value>Coupon updated.</value></data>
   <data name="CouponDeleted" xml:space="preserve"><value>Coupon deleted.</value></data>
   <data name="CouponDeleteFailed" xml:space="preserve"><value>Cannot delete: coupon not found.</value></data>
-  <data name="CouponCodeExists" xml:space="preserve"><value>Coupon code already exists.</value></data>
+  <data name="CouponCodeExists" xml:space="preserve"><value>Could not create the coupon. Please try again.</value></data>
   <data name="CategoryCreated" xml:space="preserve"><value>Category created.</value></data>
   <data name="CategoryUpdated" xml:space="preserve"><value>Category updated.</value></data>
   <data name="CategoryDeleted" xml:space="preserve"><value>Category deleted.</value></data>
@@ -453,13 +454,13 @@
   <data name="OrderCancelFailedAdmin" xml:space="preserve"><value>Operation failed: the order cannot be cancelled in its current state.</value></data>
   <data name="OrderRefunded" xml:space="preserve"><value>Order refunded and stock restored.</value></data>
   <data name="OrderRefundFailed" xml:space="preserve"><value>Operation failed: the order cannot be refunded in its current state.</value></data>
-  <data name="CouponNotFound" xml:space="preserve"><value>Coupon code does not exist.</value></data>
-  <data name="CouponDisabled" xml:space="preserve"><value>Coupon code is disabled.</value></data>
-  <data name="CouponNotStarted" xml:space="preserve"><value>Coupon code is not active yet.</value></data>
-  <data name="CouponExpired" xml:space="preserve"><value>Coupon code has expired.</value></data>
-  <data name="CouponUsageLimit" xml:space="preserve"><value>Coupon code has reached its usage limit.</value></data>
+  <data name="CouponNotFound" xml:space="preserve"><value>Coupon does not exist.</value></data>
+  <data name="CouponDisabled" xml:space="preserve"><value>Coupon is disabled.</value></data>
+  <data name="CouponNotStarted" xml:space="preserve"><value>Coupon is not active yet.</value></data>
+  <data name="CouponExpired" xml:space="preserve"><value>Coupon has expired.</value></data>
+  <data name="CouponUsageLimit" xml:space="preserve"><value>Coupon has reached its usage limit.</value></data>
   <data name="CouponMinOrder" xml:space="preserve"><value>Order total must be at least ¥{0} to use this coupon.</value></data>
-  <data name="CouponUnavailable" xml:space="preserve"><value>Coupon code is not available.</value></data>
+  <data name="CouponUnavailable" xml:space="preserve"><value>Coupon is not available.</value></data>
   <data name="VerificationCodeTooFrequent" xml:space="preserve"><value>Verification code sent too frequently. Try again later.</value></data>
   <data name="UnsupportedImageFormat" xml:space="preserve"><value>Unsupported image format: {0}. Only jpg / png / webp / gif are supported.</value></data>
   <data name="ImageEmpty" xml:space="preserve"><value>The image file is empty.</value></data>
@@ -475,7 +476,6 @@
   <data name="ShippingFromPlaceholder" xml:space="preserve"><value>e.g. Shenzhen, Guangdong</value></data>
   <data name="ShippingFeePlaceholder" xml:space="preserve"><value>e.g. Free shipping / ¥8</value></data>
   <data name="DeliveryTimePlaceholder" xml:space="preserve"><value>e.g. Ships within 48 hours</value></data>
-  <data name="CouponCodePlaceholder" xml:space="preserve"><value>e.g. SAVE20</value></data>
   <data name="SkuColorPlaceholder" xml:space="preserve"><value>e.g. Army green</value></data>
   <data name="SkuSpecPlaceholder" xml:space="preserve"><value>e.g. 3-4 persons</value></data>
   <data name="SpecNamePlaceholder" xml:space="preserve"><value>e.g. Material</value></data>
@@ -520,16 +520,14 @@
   <data name="CouponDatesInvalid" xml:space="preserve"><value>The end date cannot be earlier than the start date.</value></data>
   <data name="CouponCategoryRequired" xml:space="preserve"><value>Select at least one eligible category.</value></data>
   <data name="CouponProductRequired" xml:space="preserve"><value>Select at least one eligible product.</value></data>
-  <data name="CouponBatchQuantityInvalid" xml:space="preserve"><value>Generate between 1 and 50 coupon codes at a time.</value></data>
+  <data name="CouponBatchQuantityInvalid" xml:space="preserve"><value>Create between 1 and 50 coupons at a time.</value></data>
   <data name="CouponBatchFailed" xml:space="preserve"><value>Batch generation failed. Check your input and try again.</value></data>
-  <data name="CouponBatchCreated" xml:space="preserve"><value>{0} coupon codes generated.</value></data>
+  <data name="CouponBatchCreated" xml:space="preserve"><value>{0} coupons created.</value></data>
   <data name="ExportCoupons" xml:space="preserve"><value>Export CSV</value></data>
   <data name="BatchGenerate" xml:space="preserve"><value>Generate batch</value></data>
-  <data name="BatchGenerateHint" xml:space="preserve"><value>Copy every rule from this coupon and generate up to 50 unique codes.</value></data>
+  <data name="BatchGenerateHint" xml:space="preserve"><value>Copy every rule from this coupon and create up to 50 coupons in the same campaign.</value></data>
   <data name="BatchQuantity" xml:space="preserve"><value>Number of codes</value></data>
-  <data name="BatchCodePrefix" xml:space="preserve"><value>Code prefix</value></data>
-  <data name="BatchGenerateAction" xml:space="preserve"><value>Generate codes</value></data>
-  <data name="CopyCouponCode" xml:space="preserve"><value>Copy coupon code</value></data>
+  <data name="BatchGenerateAction" xml:space="preserve"><value>Create coupons</value></data>
   <data name="CouponMinOrderShort" xml:space="preserve"><value>Min. ¥{0}</value></data>
   <data name="CouponMaxDiscountShort" xml:space="preserve"><value>Max. ¥{0} off</value></data>
   <data name="PerUserUsageShort" xml:space="preserve"><value>{0} use(s) per customer</value></data>
@@ -554,5 +552,5 @@
   <data name="ViewMyCoupons" xml:space="preserve"><value>My Coupons</value></data>
   <data name="AvailableCouponCount" xml:space="preserve"><value>{0} available</value></data>
   <data name="NoAvailableCoupons" xml:space="preserve"><value>No coupons are available for this order.</value></data>
-  <data name="CouponCodeReadonlyHint" xml:space="preserve"><value>The coupon code stays fixed after creation for recognition and redemption.</value></data>
+  <data name="Coupon" xml:space="preserve"><value>Coupon</value></data>
 </root>

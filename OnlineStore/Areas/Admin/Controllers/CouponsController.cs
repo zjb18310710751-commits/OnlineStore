@@ -147,7 +147,7 @@ public class CouponsController : Controller
 
         try
         {
-            var count = await _couponService.GenerateBatchAsync(model.CouponId, model.Quantity, model.Prefix);
+            var count = await _couponService.GenerateBatchAsync(model.CouponId, model.Quantity, null);
             TempData["Success"] = _loc["CouponBatchCreated", count].Value;
         }
         catch (InvalidOperationException exception)
@@ -163,11 +163,10 @@ public class CouponsController : Controller
     {
         var coupons = await _couponService.GetAllAsync();
         var builder = new StringBuilder();
-        builder.AppendLine("Code,Campaign,Type,Value,MaxDiscount,MinOrder,Start,End,UsageLimit,PerUserLimit,UsedCount,Scope,FirstOrderOnly,ExcludeDiscountedItems,Active");
+        builder.AppendLine("Name,Type,Value,MaxDiscount,MinOrder,Start,End,UsageLimit,PerUserLimit,UsedCount,Scope,FirstOrderOnly,ExcludeDiscountedItems,Active");
         foreach (var coupon in coupons)
         {
             builder.AppendLine(string.Join(',',
-                Csv(coupon.Code),
                 Csv(coupon.CampaignName),
                 Csv(coupon.DiscountType.ToString()),
                 coupon.DiscountValue.ToString("0.##"),
@@ -240,7 +239,7 @@ public class CouponsController : Controller
     {
         Id = coupon.Id,
         Code = coupon.Code,
-        CampaignName = coupon.CampaignName,
+        CampaignName = coupon.CampaignName ?? string.Empty,
         DiscountType = coupon.DiscountType,
         DiscountValue = coupon.DiscountValue,
         MaxDiscountAmount = coupon.MaxDiscountAmount,

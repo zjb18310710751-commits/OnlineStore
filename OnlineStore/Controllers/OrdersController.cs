@@ -35,7 +35,7 @@ public class OrdersController : Controller
     }
 
     [HttpGet]
-    public async Task<IActionResult> Checkout(string? couponCode = null)
+    public async Task<IActionResult> Checkout(string? couponCode = null, int? couponId = null)
     {
         var cart = await _cartService.GetCartAsync();
         if (cart.Items.Count == 0)
@@ -69,6 +69,10 @@ public class OrdersController : Controller
         };
         if (user is not null)
         {
+            if (string.IsNullOrWhiteSpace(couponCode) && couponId.HasValue)
+            {
+                couponCode = (await _couponService.GetByIdAsync(couponId.Value))?.Code;
+            }
             var availableCoupons = await _couponService.GetAvailableAsync(
                 user.Id,
                 cart.Total,

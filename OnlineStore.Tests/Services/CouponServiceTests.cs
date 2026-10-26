@@ -327,8 +327,9 @@ public class CouponServiceTests
         {
             Assert.Equal(12m, coupon.MaxDiscountAmount);
             Assert.Equal(2, coupon.PerUserLimit);
-            Assert.Equal("Autumn", coupon.CampaignName);
+            Assert.StartsWith("Autumn #", coupon.CampaignName);
         });
+        Assert.Equal(3, generated.Select(coupon => coupon.CampaignName).Distinct().Count());
     }
 
     [Fact]

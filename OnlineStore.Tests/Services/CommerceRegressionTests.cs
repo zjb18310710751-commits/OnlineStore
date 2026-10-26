@@ -89,7 +89,7 @@ public class CommerceRegressionTests
     public async Task CreateOrder_RecalculatesTotalAndConsumesCoupon()
     {
         using var context = await CreateContextAsync();
-        var coupon = new Coupon { Code = "SAVE", DiscountType = CouponDiscountType.Fixed, DiscountValue = 2,
+        var coupon = new Coupon { Code = "SAVE", CampaignName = "满减券", DiscountType = CouponDiscountType.Fixed, DiscountValue = 2,
             StartDate = DateTime.UtcNow.AddDays(-1), EndDate = DateTime.UtcNow.AddDays(1), UsageLimit = 1 };
         context.Coupons.Add(coupon);
         await context.SaveChangesAsync();
@@ -99,6 +99,7 @@ public class CommerceRegressionTests
         await new OrderService(context).CreateAsync(order);
         Assert.Equal(18m, order.Total);
         Assert.Equal(2m, order.DiscountAmount);
+        Assert.Equal("满减券", order.CouponName);
         Assert.Equal(1, coupon.UsedCount);
         var redemption = Assert.Single(await context.CouponRedemptions.ToListAsync());
         Assert.Equal(order.Id, redemption.OrderId);

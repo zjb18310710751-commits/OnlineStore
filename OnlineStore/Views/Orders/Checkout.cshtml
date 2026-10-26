@@ -147,7 +147,7 @@
                                                 data-apply-coupon="@coupon.Code">
                                             <span class="checkout-coupon-option-top">
                                                 <span class="checkout-coupon-radio" aria-hidden="true"></span>
-                                                <strong>@coupon.Code</strong>
+                                                <strong>@(string.IsNullOrWhiteSpace(coupon.CampaignName) ? Loc["Coupon"].Value : coupon.CampaignName)</strong>
                                                 @if (coupon.IsBest)
                                                 {
                                                     <span class="checkout-coupon-best">@Loc["BestCoupon"]</span>
@@ -182,13 +182,7 @@
                             {
                                 <p class="checkout-coupon-empty">@Loc["NoAvailableCoupons"]</p>
                             }
-                            <details class="checkout-coupon-code-entry">
-                                <summary>@Loc["EnterCoupon"]</summary>
-                                <div class="input-group mt-2 mb-2">
-                                    <input asp-for="CouponCode" id="couponCode" class="form-control" placeholder="@Loc["EnterCoupon"]" />
-                                    <button type="button" id="couponApply" class="btn btn-outline-primary">@Loc["ApplyCoupon"]</button>
-                                </div>
-                            </details>
+                            <input asp-for="CouponCode" id="couponCode" type="hidden" />
                             <div class="d-flex justify-content-between align-items-start gap-2">
                                 <div id="couponStatus" class="checkout-coupon-status small @(!string.IsNullOrWhiteSpace(Model.CouponCode) ? "text-success" : "")" role="status">
                                     @if (!string.IsNullOrWhiteSpace(Model.CouponCode))
@@ -261,7 +255,6 @@
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             var couponInput = document.getElementById('couponCode');
-            var applyButton = document.getElementById('couponApply');
             var statusEl = document.getElementById('couponStatus');
             var discountRow = document.getElementById('couponDiscountRow');
             var discountText = document.getElementById('couponDiscountText');
@@ -322,10 +315,6 @@
                     showCouponError('@Loc["CouponPreviewFailed"]');
                 });
             }
-
-            applyButton.addEventListener('click', function () {
-                applyCoupon(couponInput.value.trim());
-            });
 
             document.querySelectorAll('[data-apply-coupon]').forEach(function (button) {
                 button.addEventListener('click', function () {

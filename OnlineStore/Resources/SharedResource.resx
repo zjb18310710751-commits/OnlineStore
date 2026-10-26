@@ -232,7 +232,7 @@
   <data name="CheckoutPostalCodeRequired" xml:space="preserve"><value>请输入邮编</value></data>
   <data name="CheckoutCountryRequired" xml:space="preserve"><value>请输入国家</value></data>
   <data name="ApplyCoupon" xml:space="preserve"><value>应用</value></data>
-  <data name="CouponPreviewFailed" xml:space="preserve"><value>优惠码试算失败，请稍后再试。</value></data>
+  <data name="CouponPreviewFailed" xml:space="preserve"><value>优惠券试算失败，请稍后再试。</value></data>
   <data name="OrderPlaced" xml:space="preserve"><value>下单成功</value></data>
   <data name="OrderNo" xml:space="preserve"><value>订单号</value></data>
   <data name="OrderStatus" xml:space="preserve"><value>订单状态</value></data>
@@ -347,6 +347,7 @@
   <data name="EditCoupon" xml:space="preserve"><value>编辑优惠券</value></data>
   <data name="NoCoupons" xml:space="preserve"><value>暂无优惠券</value></data>
   <data name="CouponCode" xml:space="preserve"><value>优惠码</value></data>
+  <data name="CouponName" xml:space="preserve"><value>优惠券名称</value></data>
   <data name="CouponType" xml:space="preserve"><value>优惠类型</value></data>
   <data name="CouponValue" xml:space="preserve"><value>优惠值</value></data>
   <data name="MinOrderAmount" xml:space="preserve"><value>最低订单金额</value></data>
@@ -406,7 +407,7 @@
   <data name="ParamValueRequired" xml:space="preserve"><value>请填写参数值</value></data>
   <data name="ColorRequired" xml:space="preserve"><value>请填写颜色</value></data>
   <data name="SpecRequired" xml:space="preserve"><value>请填写规格</value></data>
-  <data name="CouponCodeRequired" xml:space="preserve"><value>请输入优惠码</value></data>
+  <data name="CouponNameRequired" xml:space="preserve"><value>请输入优惠券名称</value></data>
   <data name="CouponValueInvalid" xml:space="preserve"><value>优惠值必须大于 0</value></data>
   <data name="MinOrderAmountInvalid" xml:space="preserve"><value>最低订单金额不能为负</value></data>
   <data name="UsageLimitInvalid" xml:space="preserve"><value>使用上限至少为 1</value></data>
@@ -440,7 +441,7 @@
   <data name="CouponUpdated" xml:space="preserve"><value>优惠券已更新。</value></data>
   <data name="CouponDeleted" xml:space="preserve"><value>优惠券已删除。</value></data>
   <data name="CouponDeleteFailed" xml:space="preserve"><value>删除失败：优惠券不存在。</value></data>
-  <data name="CouponCodeExists" xml:space="preserve"><value>优惠码已存在。</value></data>
+  <data name="CouponCodeExists" xml:space="preserve"><value>优惠券创建失败，请重试。</value></data>
   <data name="CategoryCreated" xml:space="preserve"><value>分类已创建。</value></data>
   <data name="CategoryUpdated" xml:space="preserve"><value>分类已更新。</value></data>
   <data name="CategoryDeleted" xml:space="preserve"><value>分类已删除。</value></data>
@@ -453,13 +454,13 @@
   <data name="OrderCancelFailedAdmin" xml:space="preserve"><value>操作失败：订单状态不允许取消。</value></data>
   <data name="OrderRefunded" xml:space="preserve"><value>订单已退款，库存已恢复。</value></data>
   <data name="OrderRefundFailed" xml:space="preserve"><value>操作失败：订单状态不允许退款。</value></data>
-  <data name="CouponNotFound" xml:space="preserve"><value>优惠码不存在。</value></data>
-  <data name="CouponDisabled" xml:space="preserve"><value>优惠码已停用。</value></data>
-  <data name="CouponNotStarted" xml:space="preserve"><value>优惠码尚未生效。</value></data>
-  <data name="CouponExpired" xml:space="preserve"><value>优惠码已过期。</value></data>
-  <data name="CouponUsageLimit" xml:space="preserve"><value>优惠码已达使用上限。</value></data>
-  <data name="CouponMinOrder" xml:space="preserve"><value>订单金额需满 ¥{0} 才能使用该优惠码。</value></data>
-  <data name="CouponUnavailable" xml:space="preserve"><value>优惠码不可用。</value></data>
+  <data name="CouponNotFound" xml:space="preserve"><value>优惠券不存在。</value></data>
+  <data name="CouponDisabled" xml:space="preserve"><value>优惠券已停用。</value></data>
+  <data name="CouponNotStarted" xml:space="preserve"><value>优惠券尚未生效。</value></data>
+  <data name="CouponExpired" xml:space="preserve"><value>优惠券已过期。</value></data>
+  <data name="CouponUsageLimit" xml:space="preserve"><value>优惠券已达使用上限。</value></data>
+  <data name="CouponMinOrder" xml:space="preserve"><value>订单金额需满 ¥{0} 才能使用该优惠券。</value></data>
+  <data name="CouponUnavailable" xml:space="preserve"><value>优惠券不可用。</value></data>
   <data name="VerificationCodeTooFrequent" xml:space="preserve"><value>验证码发送过于频繁，请稍后再试。</value></data>
   <data name="UnsupportedImageFormat" xml:space="preserve"><value>不支持的图片格式：{0}。仅支持 jpg / png / webp / gif。</value></data>
   <data name="ImageEmpty" xml:space="preserve"><value>图片文件为空。</value></data>
@@ -475,7 +476,6 @@
   <data name="ShippingFromPlaceholder" xml:space="preserve"><value>如：广东深圳</value></data>
   <data name="ShippingFeePlaceholder" xml:space="preserve"><value>如：包邮 / 运费 ¥8</value></data>
   <data name="DeliveryTimePlaceholder" xml:space="preserve"><value>如：48小时内发货</value></data>
-  <data name="CouponCodePlaceholder" xml:space="preserve"><value>如：SAVE20</value></data>
   <data name="SkuColorPlaceholder" xml:space="preserve"><value>如：军绿</value></data>
   <data name="SkuSpecPlaceholder" xml:space="preserve"><value>如：3-4 人</value></data>
   <data name="SpecNamePlaceholder" xml:space="preserve"><value>如：材质</value></data>
@@ -520,16 +520,14 @@
   <data name="CouponDatesInvalid" xml:space="preserve"><value>结束日期不能早于开始日期。</value></data>
   <data name="CouponCategoryRequired" xml:space="preserve"><value>请至少选择一个适用分类。</value></data>
   <data name="CouponProductRequired" xml:space="preserve"><value>请至少选择一个适用商品。</value></data>
-  <data name="CouponBatchQuantityInvalid" xml:space="preserve"><value>每次可生成 1 到 50 个优惠码。</value></data>
+  <data name="CouponBatchQuantityInvalid" xml:space="preserve"><value>每次可创建 1 到 50 张优惠券。</value></data>
   <data name="CouponBatchFailed" xml:space="preserve"><value>批量生成失败，请检查输入后重试。</value></data>
-  <data name="CouponBatchCreated" xml:space="preserve"><value>已生成 {0} 个优惠码。</value></data>
+  <data name="CouponBatchCreated" xml:space="preserve"><value>已创建 {0} 张优惠券。</value></data>
   <data name="ExportCoupons" xml:space="preserve"><value>导出 CSV</value></data>
   <data name="BatchGenerate" xml:space="preserve"><value>批量生成</value></data>
-  <data name="BatchGenerateHint" xml:space="preserve"><value>复制当前优惠券的全部规则，一次生成最多 50 个唯一优惠码。</value></data>
+  <data name="BatchGenerateHint" xml:space="preserve"><value>复制当前优惠券的全部规则，一次创建最多 50 张同名系列优惠券。</value></data>
   <data name="BatchQuantity" xml:space="preserve"><value>生成数量</value></data>
-  <data name="BatchCodePrefix" xml:space="preserve"><value>优惠码前缀</value></data>
-  <data name="BatchGenerateAction" xml:space="preserve"><value>生成优惠码</value></data>
-  <data name="CopyCouponCode" xml:space="preserve"><value>复制优惠码</value></data>
+  <data name="BatchGenerateAction" xml:space="preserve"><value>批量创建</value></data>
   <data name="CouponMinOrderShort" xml:space="preserve"><value>满 ¥{0}</value></data>
   <data name="CouponMaxDiscountShort" xml:space="preserve"><value>最高减 ¥{0}</value></data>
   <data name="PerUserUsageShort" xml:space="preserve"><value>每人限用 {0} 次</value></data>
@@ -554,5 +552,5 @@
   <data name="ViewMyCoupons" xml:space="preserve"><value>我的优惠券</value></data>
   <data name="AvailableCouponCount" xml:space="preserve"><value>{0} 张可选</value></data>
   <data name="NoAvailableCoupons" xml:space="preserve"><value>当前订单暂时没有可用优惠券。</value></data>
-  <data name="CouponCodeReadonlyHint" xml:space="preserve"><value>优惠码创建后保持不变，便于顾客识别和核销。</value></data>
+  <data name="Coupon" xml:space="preserve"><value>优惠券</value></data>
 </root>
