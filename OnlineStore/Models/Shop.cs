@@ -30,5 +30,9 @@ public class Shop
     [Display(Name = "店铺简介（英文）")]
     public string? DescriptionEn { get; set; }
 
+    [StringLength(500)]
+    [Display(Name = "店铺 Logo")]
+    public string? LogoUrl { get; set; }
+
     public ICollection<Product> Products { get; set; } = new List<Product>();
 }

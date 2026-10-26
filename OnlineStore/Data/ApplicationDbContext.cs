@@ -97,6 +97,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
             entity.HasIndex(s => s.Name);
             entity.Property(s => s.Name).HasMaxLength(100).IsRequired();
             entity.Property(s => s.Description).HasMaxLength(500);
+            entity.Property(s => s.LogoUrl).HasMaxLength(500);
 
             entity.Property(s => s.Rating).HasConversion<double>();
         });

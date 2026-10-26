@@ -8,15 +8,15 @@
         <header class="account-auth-header">
             <a class="account-auth-wordmark" asp-controller="Home" asp-action="Index" aria-label="ZHY">ZHY.</a>
             <h1 class="account-auth-title">@L10n.Text("欢迎回来，请登录你的账户。", "Welcome back. Sign in to your account.")</h1>
-            <p class="account-auth-subtitle">@L10n.Text("使用邮箱或手机号与密码，继续你的购物之旅。", "Use your email or phone and password to continue shopping.")</p>
+            <p class="account-auth-subtitle">@L10n.Text("使用邮箱和密码，继续你的购物之旅。", "Use your email and password to continue shopping.")</p>
         </header>
 
         <form class="account-auth-form" method="post" asp-controller="Account" asp-action="Login" asp-route-returnUrl="@returnUrl">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
             <div>
-                <label asp-for="Email" class="account-auth-label">@Loc["EmailOrPhone"]</label>
-                <input asp-for="Email" class="form-control account-auth-control" autocomplete="username" placeholder="@Loc["EmailOrPhone"]" />
+                <label asp-for="Email" class="account-auth-label">@Loc["Email"]</label>
+                <input asp-for="Email" class="form-control account-auth-control" autocomplete="email" placeholder="@Loc["Email"]" />
                 <span asp-validation-for="Email" class="text-danger small"></span>
             </div>
 

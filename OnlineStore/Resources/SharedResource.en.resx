@@ -387,7 +387,7 @@
   <data name="EmailNotRegistered" xml:space="preserve"><value>This email is not registered</value></data>
   <data name="PasswordResetSuccess" xml:space="preserve"><value>Password reset. Please sign in with your new password.</value></data>
   <data name="DemoCode" xml:space="preserve"><value>Code: {0}</value></data>
-  <data name="AccountRequired" xml:space="preserve"><value>Please enter your email or phone number</value></data>
+  <data name="AccountRequired" xml:space="preserve"><value>Please enter your email</value></data>
   <data name="PasswordRequired" xml:space="preserve"><value>Please enter your password</value></data>
   <data name="AddressRequired" xml:space="preserve"><value>Please enter your address</value></data>
   <data name="PasswordTooLong" xml:space="preserve"><value>Password cannot exceed 100 characters</value></data>
@@ -554,4 +554,8 @@
   <data name="AvailableCouponCount" xml:space="preserve"><value>{0} available</value></data>
   <data name="NoAvailableCoupons" xml:space="preserve"><value>No coupons are available for this order.</value></data>
   <data name="Coupon" xml:space="preserve"><value>Coupon</value></data>
+  <data name="ShopLogo" xml:space="preserve"><value>Shop logo</value></data>
+  <data name="ShopLogoPasteHint" xml:space="preserve"><value>Choose an image or press Ctrl+V to paste a logo</value></data>
+  <data name="ShopLogoHint" xml:space="preserve"><value>Square images work best. JPG, PNG, WebP or GIF, up to 5 MB.</value></data>
+  <data name="ChooseImage" xml:space="preserve"><value>Choose image</value></data>
 </root>

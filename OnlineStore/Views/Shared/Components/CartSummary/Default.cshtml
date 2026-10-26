@@ -1,6 +1,10 @@
 @model int
 <a class="nav-link sf-cart-link position-relative" asp-controller="Cart" asp-action="Index" title="@Loc["Cart"].Value" aria-label="@Loc["Cart"] (@Model)">
-    <i class="bi bi-bag" aria-hidden="true"></i>
+    <svg class="sf-bag-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M5.25 8.25h13.5l-.9 11.25h-11.7z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"></path>
+        <path d="M9 9V6.75a3 3 0 0 1 6 0V9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path>
+        <circle cx="17.1" cy="8.3" r="1.45" fill="#f05a28"></circle>
+    </svg>
     @if (Model > 0)
     {
         <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
