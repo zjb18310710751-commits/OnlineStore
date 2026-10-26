@@ -395,4 +395,19 @@ public class CouponServiceTests
         Assert.Equal(CouponWalletStatus.Used, statuses["USED"]);
         Assert.Equal(CouponWalletStatus.Expired, statuses["EXPIRED"]);
     }
+
+    [Fact]
+    public async Task GenerateUniqueCodeAsync_UsesCampaignPrefixAndFallback()
+    {
+        using var context = CreateContext();
+        var service = new CouponService(context);
+
+        var campaignCode = await service.GenerateUniqueCodeAsync("Autumn Members");
+        var fallbackCode = await service.GenerateUniqueCodeAsync("会员专享");
+
+        Assert.StartsWith("AUTUMNMEMBERS-", campaignCode);
+        Assert.Matches("^[A-Z0-9-]{6,50}$", campaignCode);
+        Assert.StartsWith("ZHY-", fallbackCode);
+        Assert.Matches("^[A-Z0-9-]{6,50}$", fallbackCode);
+    }
 }

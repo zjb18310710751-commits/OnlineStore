@@ -170,6 +170,25 @@ public class CouponService : ICouponService
         await _context.SaveChangesAsync();
     }
 
+    public async Task<string> GenerateUniqueCodeAsync(string? campaignName)
+    {
+        var prefix = NormalizeCodePrefix(campaignName, "ZHY");
+        var existingCodes = (await _context.Coupons
+            .Where(c => c.Code.StartsWith(prefix + "-"))
+            .Select(c => c.Code)
+            .ToListAsync())
+            .ToHashSet();
+
+        string code;
+        do
+        {
+            code = $"{prefix}-{RandomNumberGenerator.GetString(BatchCharacters, 6)}";
+        }
+        while (existingCodes.Contains(code));
+
+        return code;
+    }
+
     public async Task<int> GenerateBatchAsync(int couponId, int quantity, string? prefix)
     {
         if (quantity is < 1 or > 50)
@@ -415,14 +434,21 @@ public class CouponService : ICouponService
     private static string NormalizeBatchPrefix(string? prefix, string sourceCode)
     {
         var source = string.IsNullOrWhiteSpace(prefix) ? sourceCode : prefix;
-        var normalized = new string(source
+        return NormalizeCodePrefix(source, "ZHY");
+    }
+
+    private static string NormalizeCodePrefix(string? source, string fallback)
+    {
+        var normalized = new string((source ?? string.Empty)
             .Trim()
             .ToUpperInvariant()
-            .Where(character => char.IsLetterOrDigit(character) || character == '-')
+            .Where(character => character is >= 'A' and <= 'Z'
+                or >= '0' and <= '9'
+                or '-')
             .Take(30)
             .ToArray())
             .Trim('-');
-        return string.IsNullOrWhiteSpace(normalized) ? "ZHY" : normalized;
+        return string.IsNullOrWhiteSpace(normalized) ? fallback : normalized;
     }
 
     private static string? NormalizeOptional(string? value) =>

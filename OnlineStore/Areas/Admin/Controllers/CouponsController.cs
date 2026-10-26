@@ -49,6 +49,8 @@ public class CouponsController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(CouponFormViewModel form)
     {
+        form.Code = await _couponService.GenerateUniqueCodeAsync(form.CampaignName);
+        ModelState.Remove(nameof(form.Code));
         ValidateForm(form);
         if (!ModelState.IsValid)
         {
@@ -101,6 +103,7 @@ public class CouponsController : Controller
             return NotFound();
         }
 
+        form.Code = existing.Code;
         if (!ModelState.IsValid)
         {
             await PopulateOptionsAsync(form);
