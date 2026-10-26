@@ -8,9 +8,13 @@
     var search = ViewBag.Search as string;
     var categoryId = (int?)ViewBag.CategoryId;
 }
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h1 class="h4 mb-0">@Loc["ProductManagement"] <small class="text-muted fs-6">@Loc["TotalItems", total]</small></h1>
-    <a asp-area="Admin" asp-controller="Products" asp-action="Create" class="btn btn-primary btn-sm"><i class="bi bi-plus-lg me-1"></i>@Loc["AddProduct"]</a>
+<div class="admin-store-heading">
+    <div>
+        <p class="admin-store-eyebrow">@L10n.Text("商品与库存", "Catalog and inventory")</p>
+        <h1>@Loc["ProductManagement"] <small>@Loc["TotalItems", total]</small></h1>
+        <p class="admin-store-intro">@L10n.Text("管理商品信息、价格、库存和上架状态。", "Manage product details, pricing, inventory and visibility.")</p>
+    </div>
+    <a asp-area="Admin" asp-controller="Products" asp-action="Create" class="btn btn-primary"><i class="bi bi-plus-lg"></i>@Loc["AddProduct"]</a>
 </div>
 
 <form method="get" asp-area="Admin" asp-controller="Products" asp-action="Index" class="row g-2 mb-3">

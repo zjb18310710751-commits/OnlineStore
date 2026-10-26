@@ -33,12 +33,50 @@ public static class L10n
     public static string Text(string zh, string? en) =>
         IsEnglish && !string.IsNullOrWhiteSpace(en) ? en : zh;
 
+    public static string Carrier(string? carrier)
+    {
+        if (!IsEnglish || string.IsNullOrWhiteSpace(carrier))
+        {
+            return carrier ?? string.Empty;
+        }
+
+        return carrier switch
+        {
+            "顺丰速运" => "SF Express",
+            "中通快递" => "ZTO Express",
+            "圆通速递" => "YTO Express",
+            "邮政 EMS" => "EMS",
+            "系统默认" => "System default",
+            _ => carrier
+        };
+    }
+
+    public static string AfterSalesStatusLabel(string status)
+    {
+        if (!IsEnglish)
+        {
+            return status;
+        }
+
+        return status switch
+        {
+            AfterSalesStatus.Pending => "Pending review",
+            AfterSalesStatus.Approved => "Approved",
+            AfterSalesStatus.Rejected => "Rejected",
+            AfterSalesStatus.Returning => "Returning",
+            AfterSalesStatus.Received => "Received",
+            AfterSalesStatus.Completed => "Completed",
+            _ => status
+        };
+    }
+
     public static string Status(string zh) =>
         IsEnglish
             ? zh switch
             {
                 OrderStatus.PendingShipment => "Pending shipment",
                 OrderStatus.Shipped => "Shipped",
+                OrderStatus.Delivered => "Delivered",
                 OrderStatus.Completed => "Completed",
                 OrderStatus.Cancelled => "Cancelled",
                 OrderStatus.Refunded => "Refunded",

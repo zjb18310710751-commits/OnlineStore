@@ -61,7 +61,7 @@ namespace OnlineStore.Migrations
             migrationBuilder.Sql(
                 "UPDATE [Coupons] SET [PerUserLimit] = 1 WHERE [PerUserLimit] IS NULL;");
             migrationBuilder.Sql(
-                "UPDATE [Coupons] SET [EndDate] = DATEADD(SECOND, 86399, CAST([EndDate] AS date)) WHERE CAST([EndDate] AS time) = '00:00:00';");
+                "UPDATE [Coupons] SET [EndDate] = DATEADD(SECOND, 86399, CAST(CAST([EndDate] AS date) AS datetime2)) WHERE CAST([EndDate] AS time) = '00:00:00';");
 
             migrationBuilder.CreateTable(
                 name: "CouponCategory",

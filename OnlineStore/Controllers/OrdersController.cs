@@ -325,6 +325,91 @@ public class OrdersController : Controller
         return RedirectToAction(nameof(MyOrders));
     }
 
+    [HttpGet]
+    public async Task<IActionResult> GetOrderTracking(int orderId)
+    {
+        var user = await _userManager.GetUserAsync(User);
+        var order = await _orderService.GetByIdAsync(orderId);
+        if (user is null || order is null || order.UserId != user.Id)
+        {
+            return Json(new { success = false, message = L10n.Text("订单不存在。", "Order not found.") });
+        }
+
+        var tracking = await _orderService.GetTrackingAsync(orderId);
+        if (tracking is null)
+        {
+            return Json(new { success = false, message = L10n.Text("物流信息尚未生成。", "Tracking is not available yet.") });
+        }
+
+        return Json(new { success = true, tracking });
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ConfirmReceipt(int orderId)
+    {
+        var user = await _userManager.GetUserAsync(User);
+        if (user is null)
+        {
+            return Json(new { success = false, message = _loc["AccessDenied"].Value });
+        }
+
+        var ok = await _orderService.ConfirmReceiptAsync(orderId, user.Id);
+        return Json(new
+        {
+            success = ok,
+            message = ok
+                ? L10n.Text("确认收货成功，订单已完成。", "Receipt confirmed. Order completed.")
+                : L10n.Text("当前订单无法确认收货。", "This order cannot be confirmed yet.")
+        });
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> RequestAfterSales(int orderId, string type, string reason)
+    {
+        var user = await _userManager.GetUserAsync(User);
+        if (user is null)
+        {
+            return RedirectToAction("Login", "Account");
+        }
+
+        if (string.IsNullOrWhiteSpace(reason))
+        {
+            TempData["Error"] = L10n.Text("请填写售后原因。", "Please enter a reason.");
+            return RedirectToAction(nameof(MyOrders));
+        }
+
+        try
+        {
+            await _orderService.CreateAfterSalesAsync(orderId, user.Id, type, reason);
+            TempData["Success"] = L10n.Text("售后申请已提交，等待审核。", "After-sales request submitted.");
+        }
+        catch (InvalidOperationException ex)
+        {
+            TempData["Error"] = ex.Message;
+        }
+
+        return RedirectToAction(nameof(MyOrders));
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Delete(int id)
+    {
+        var user = await _userManager.GetUserAsync(User);
+        if (user is null)
+        {
+            return RedirectToAction("Login", "Account");
+        }
+
+        var ok = await _orderService.DeleteForUserAsync(id, user.Id);
+        TempData[ok ? "Success" : "Error"] = ok
+            ? L10n.Text("订单已从你的订单列表中删除。", "The order has been removed from your order list.")
+            : L10n.Text("当前订单不能删除。", "This order cannot be deleted.");
+        return RedirectToAction(nameof(MyOrders));
+    }
+
     private static string GenerateOrderNo() =>
         $"OS{DateTime.UtcNow:yyyyMMddHHmmss}{Random.Shared.Next(100, 999)}";
 
