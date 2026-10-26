@@ -11,8 +11,9 @@ public class CouponFormViewModel
     [StringLength(50)]
     public string Code { get; set; } = string.Empty;
 
+    [Required(ErrorMessage = "CouponNameRequired")]
     [StringLength(100)]
-    public string? CampaignName { get; set; }
+    public string CampaignName { get; set; } = string.Empty;
 
     public CouponDiscountType DiscountType { get; set; } = CouponDiscountType.Percent;
 
@@ -59,7 +60,4 @@ public class CouponBatchViewModel
 
     [Range(1, 50, ErrorMessage = "CouponBatchQuantityInvalid")]
     public int Quantity { get; set; } = 5;
-
-    [StringLength(30)]
-    public string? Prefix { get; set; }
 }

@@ -204,7 +204,7 @@ public class CouponService : ICouponService
             throw new InvalidOperationException(_loc["CouponNotFound"].Value);
         }
 
-        var normalizedPrefix = NormalizeBatchPrefix(prefix, source.Code);
+        var normalizedPrefix = NormalizeBatchPrefix(prefix, source.CampaignName);
         var existingCodes = (await _context.Coupons
             .Where(c => c.Code.StartsWith(normalizedPrefix + "-"))
             .Select(c => c.Code)
@@ -222,7 +222,7 @@ public class CouponService : ICouponService
             while (existingCodes.Contains(code));
 
             existingCodes.Add(code);
-            generated.Add(CloneCoupon(source, code));
+            generated.Add(CloneCoupon(source, code, i + 1));
         }
 
         _context.Coupons.AddRange(generated);
@@ -410,10 +410,10 @@ public class CouponService : ICouponService
             hasPreviousOrder);
     }
 
-    private static Coupon CloneCoupon(Coupon source, string code) => new()
+    private static Coupon CloneCoupon(Coupon source, string code, int batchIndex) => new()
     {
         Code = code,
-        CampaignName = source.CampaignName,
+        CampaignName = $"{source.CampaignName ?? "Coupon"} #{batchIndex}",
         DiscountType = source.DiscountType,
         DiscountValue = source.DiscountValue,
         MaxDiscountAmount = source.MaxDiscountAmount,
@@ -431,9 +431,9 @@ public class CouponService : ICouponService
         Products = source.Products.ToList()
     };
 
-    private static string NormalizeBatchPrefix(string? prefix, string sourceCode)
+    private static string NormalizeBatchPrefix(string? prefix, string? sourceName)
     {
-        var source = string.IsNullOrWhiteSpace(prefix) ? sourceCode : prefix;
+        var source = string.IsNullOrWhiteSpace(prefix) ? sourceName : prefix;
         return NormalizeCodePrefix(source, "ZHY");
     }
 

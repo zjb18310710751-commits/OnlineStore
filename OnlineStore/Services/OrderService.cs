@@ -139,6 +139,7 @@ public class OrderService : IOrderService
             order.Total = subtotal - discount;
             order.DiscountAmount = discount;
             order.CouponCode = coupon?.Code;
+            order.CouponName = coupon?.CampaignName;
             order.Status = OrderStatus.PendingShipment;
             order.CreatedAt = DateTime.UtcNow;
             _context.Orders.Add(order);

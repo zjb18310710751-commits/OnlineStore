@@ -160,6 +160,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
             entity.Property(o => o.Total).HasConversion<double>();
             entity.Property(o => o.DiscountAmount).HasConversion<double>();
             entity.Property(o => o.CouponCode).HasMaxLength(50);
+            entity.Property(o => o.CouponName).HasMaxLength(100);
             entity.HasMany(o => o.Items)
                   .WithOne(i => i.Order)
                   .HasForeignKey(i => i.OrderId)

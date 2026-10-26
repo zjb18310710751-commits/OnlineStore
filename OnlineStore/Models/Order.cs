@@ -30,6 +30,9 @@ public class Order
     [StringLength(50)]
     public string? CouponCode { get; set; }
 
+    [StringLength(100)]
+    public string? CouponName { get; set; }
+
     public decimal DiscountAmount { get; set; }
 
     [StringLength(20)]

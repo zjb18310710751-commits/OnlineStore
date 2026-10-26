@@ -71,8 +71,7 @@
                                 <span>@Loc["CouponRemainingUses", item.RemainingUses.Value]</span>
                             }
                         </div>
-                        <h2>@(string.IsNullOrWhiteSpace(coupon.CampaignName) ? coupon.Code : coupon.CampaignName)</h2>
-                        <p class="coupon-wallet-code">@coupon.Code</p>
+                        <h2>@(string.IsNullOrWhiteSpace(coupon.CampaignName) ? Loc["Coupon"].Value : coupon.CampaignName)</h2>
                         <div class="coupon-wallet-rules">
                             @if (coupon.MinOrderAmount.HasValue)
                             {
@@ -88,7 +87,7 @@
                             <span>@CouponScopeLabel(coupon.Scope)</span>
                             @if (item.Status == CouponWalletStatus.Available)
                             {
-                                <a asp-controller="Orders" asp-action="Checkout" asp-route-couponCode="@coupon.Code">@Loc["UseCoupon"]</a>
+                                <a asp-controller="Orders" asp-action="Checkout" asp-route-couponId="@coupon.Id">@Loc["UseCoupon"]</a>
                             }
                             else
                             {

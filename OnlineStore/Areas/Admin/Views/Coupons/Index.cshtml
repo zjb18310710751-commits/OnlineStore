@@ -32,7 +32,7 @@
                 <table class="table table-hover align-middle mb-0">
                     <thead>
                         <tr>
-                            <th>@Loc["CouponCode"]</th>
+                            <th>@Loc["CouponName"]</th>
                             <th>@Loc["CouponType"]</th>
                             <th>@L10n.Text("规则", "Rules")</th>
                             <th>@L10n.Text("使用情况", "Usage")</th>
@@ -60,14 +60,7 @@
                                     : "is-muted";
                             <tr>
                                 <td>
-                                    <div class="coupon-code-cell">
-                                        <strong>@coupon.Code</strong>
-                                        <button type="button" class="coupon-copy-button" data-coupon-copy="@coupon.Code"
-                                                title="@Loc["CopyCouponCode"]" aria-label="@Loc["CopyCouponCode"]">
-                                            <i class="bi bi-copy"></i>
-                                        </button>
-                                    </div>
-                                    <span class="coupon-campaign">@(string.IsNullOrWhiteSpace(coupon.CampaignName) ? L10n.Text("未命名活动", "Untitled campaign") : coupon.CampaignName)</span>
+                                    <strong class="coupon-name-cell">@CouponDisplayName(coupon)</strong>
                                 </td>
                                 <td>
                                     <div class="coupon-benefit">
@@ -114,7 +107,7 @@
                                 <td class="text-end text-nowrap">
                                     <button type="button" class="btn btn-sm btn-outline-secondary" title="@Loc["BatchGenerate"]"
                                             data-bs-toggle="modal" data-bs-target="#couponBatchModal"
-                                            data-coupon-batch="@coupon.Id" data-coupon-code="@coupon.Code">
+                                            data-coupon-batch="@coupon.Id" data-coupon-name="@CouponDisplayName(coupon)">
                                         <i class="bi bi-collection"></i>
                                     </button>
                                     <a asp-action="Edit" asp-route-id="@coupon.Id" class="btn btn-sm btn-outline-primary" title="@Loc["Edit"]"><i class="bi bi-pencil"></i></a>
@@ -148,10 +141,6 @@
                     <input type="number" class="form-control" id="couponBatchQuantity" name="Quantity" value="5" min="1" max="50" required />
                     <div class="form-text">@Loc["BatchGenerateHint"]</div>
                 </div>
-                <div>
-                    <label for="couponBatchPrefix" class="form-label">@Loc["BatchCodePrefix"]</label>
-                    <input type="text" class="form-control text-uppercase" id="couponBatchPrefix" name="Prefix" maxlength="30" />
-                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">@Loc["Cancel"]</button>
@@ -168,34 +157,22 @@
         CouponScope.Products => Loc["ScopeProducts"].Value,
         _ => Loc["ScopeAllProducts"].Value
     };
+
+    private string CouponDisplayName(Coupon coupon) =>
+        string.IsNullOrWhiteSpace(coupon.CampaignName) ? Loc["Coupon"].Value : coupon.CampaignName;
 }
 
 @section Scripts {
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            document.querySelectorAll('[data-coupon-copy]').forEach(function (button) {
-                button.addEventListener('click', function () {
-                    navigator.clipboard.writeText(button.getAttribute('data-coupon-copy')).then(function () {
-                        var original = button.innerHTML;
-                        button.innerHTML = '<i class="bi bi-check2"></i>';
-                        button.classList.add('is-copied');
-                        window.setTimeout(function () {
-                            button.innerHTML = original;
-                            button.classList.remove('is-copied');
-                        }, 1400);
-                    });
-                });
-            });
-
             var batchModal = document.getElementById('couponBatchModal');
             if (!batchModal) return;
             batchModal.addEventListener('show.bs.modal', function (event) {
                 var trigger = event.relatedTarget;
                 if (!trigger) return;
-                var code = trigger.getAttribute('data-coupon-code') || '';
+                var name = trigger.getAttribute('data-coupon-name') || '';
                 document.getElementById('couponBatchId').value = trigger.getAttribute('data-coupon-batch') || '';
-                document.getElementById('couponBatchPrefix').value = code;
-                document.getElementById('couponBatchSubtitle').textContent = code;
+                document.getElementById('couponBatchSubtitle').textContent = name;
             });
         });
     </script>
