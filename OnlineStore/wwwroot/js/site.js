@@ -73,6 +73,7 @@ function initCustomSelects() {
 
         var trigger = document.createElement('button');
         trigger.type = 'button';
+        trigger.id = listboxId + '-trigger';
         trigger.className = 'sf-select__trigger';
         trigger.setAttribute('role', 'combobox');
         trigger.setAttribute('aria-haspopup', 'listbox');
@@ -120,15 +121,37 @@ function initCustomSelects() {
 
         wrapper.append(trigger, menu);
 
+        var linkedLabels = select.id
+            ? Array.prototype.slice.call(document.querySelectorAll('label[for]'))
+                .filter(function (label) { return label.htmlFor === select.id; })
+            : [];
+        linkedLabels.forEach(function (label, index) {
+            if (!label.id) label.id = listboxId + '-label-' + index;
+            label.htmlFor = trigger.id;
+        });
+        if (linkedLabels.length > 0) {
+            trigger.setAttribute('aria-labelledby', linkedLabels.map(function (label) { return label.id; }).join(' '));
+        }
+
         function syncSelection() {
             var index = select.selectedIndex;
             var selected = index >= 0 ? options[index] : null;
             value.textContent = selected ? selected.text : '';
-            trigger.setAttribute('aria-label', selected ? selected.text : '');
+            if (linkedLabels.length === 0) {
+                trigger.setAttribute('aria-label', selected ? selected.text : '');
+            }
             optionButtons.forEach(function (item, optionIndex) {
                 item.setAttribute('aria-selected', String(optionIndex === index));
                 item.classList.toggle('is-selected', optionIndex === index);
             });
+            trigger.disabled = select.disabled;
+            trigger.setAttribute('aria-required', select.required ? 'true' : 'false');
+            trigger.setAttribute('aria-invalid', select.matches(':invalid') ? 'true' : 'false');
+            if (select.getAttribute('aria-describedby')) {
+                trigger.setAttribute('aria-describedby', select.getAttribute('aria-describedby'));
+            } else {
+                trigger.removeAttribute('aria-describedby');
+            }
         }
 
         function highlight(index) {
@@ -246,6 +269,10 @@ function initCustomSelects() {
         });
 
         select.addEventListener('change', syncSelection);
+        new MutationObserver(syncSelection).observe(select, {
+            attributes: true,
+            attributeFilter: ['disabled', 'required', 'aria-describedby', 'class']
+        });
         select.form?.addEventListener('reset', function () {
             window.setTimeout(syncSelection, 0);
         });

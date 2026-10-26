@@ -874,6 +874,7 @@ public static class DbInitializer
         {
             p.ShippingFromEn ??= Tr(shipping, p.ShippingFrom);
             p.ShippingFeeEn ??= Tr(shipping, p.ShippingFee);
+            p.ShippingFeeAmount = ParseShippingFeeAmount(p.ShippingFee);
             p.DeliveryTimeEn ??= Tr(shipping, p.DeliveryTime);
 
             foreach (var spec in p.Specs)
@@ -894,5 +895,27 @@ public static class DbInitializer
                 r.CommentEn ??= Tr(comment, r.Comment);
             }
         }
+    }
+
+    private static decimal ParseShippingFeeAmount(string? text)
+    {
+        if (string.IsNullOrWhiteSpace(text)
+            || text.Contains("包邮", StringComparison.Ordinal)
+            || text.Contains("free", StringComparison.OrdinalIgnoreCase))
+        {
+            return 0;
+        }
+
+        var numeric = new string(text
+            .Where(character => char.IsDigit(character) || character is '.' or ',')
+            .Select(character => character == ',' ? '.' : character)
+            .ToArray());
+        return decimal.TryParse(
+            numeric,
+            System.Globalization.NumberStyles.Number,
+            System.Globalization.CultureInfo.InvariantCulture,
+            out var amount)
+            ? Math.Max(0, amount)
+            : 0;
     }
 }

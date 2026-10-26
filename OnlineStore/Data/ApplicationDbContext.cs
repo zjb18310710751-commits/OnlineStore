@@ -35,11 +35,13 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
         builder.Entity<Product>().Property(p => p.Stock).IsConcurrencyToken();
         builder.Entity<Product>().Property(p => p.Price).IsConcurrencyToken();
         builder.Entity<Product>().Property(p => p.IsActive).IsConcurrencyToken();
+        builder.Entity<Product>().Property(p => p.ShippingFeeAmount).HasConversion<double>();
         builder.Entity<ProductSku>().Property(s => s.Stock).IsConcurrencyToken();
         builder.Entity<ProductSku>().Property(s => s.Price).IsConcurrencyToken();
         builder.Entity<ProductSku>().Property(s => s.IsActive).IsConcurrencyToken();
         builder.Entity<ProductSku>().Property(s => s.ProductId).IsConcurrencyToken();
         builder.Entity<Order>().Property(o => o.Status).IsConcurrencyToken();
+        builder.Entity<Order>().Property(o => o.InventoryRestoredAt).IsConcurrencyToken();
         builder.Entity<Coupon>().Property(c => c.UsedCount).IsConcurrencyToken();
         builder.Entity<Coupon>().Property(c => c.IsActive).IsConcurrencyToken();
         builder.Entity<Coupon>().Property(c => c.DiscountValue).IsConcurrencyToken();
@@ -108,6 +110,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
             entity.Property(p => p.Description).HasMaxLength(2000);
             entity.Property(p => p.Price).HasConversion<double>();
             entity.Property(p => p.OriginalPrice).HasConversion<double?>();
+            entity.Property(p => p.ShippingFeeAmount).HasConversion<double>();
             entity.Property(p => p.Sku).HasMaxLength(100);
             entity.Property(p => p.ImageUrl).HasMaxLength(500);
             entity.Property(p => p.DetailHtml).HasMaxLength(10000);
@@ -165,10 +168,14 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
         builder.Entity<Order>(entity =>
         {
             entity.HasIndex(o => o.UserId);
+            entity.HasIndex(o => o.OrderNo).IsUnique();
             entity.Property(o => o.Total).HasConversion<double>();
             entity.Property(o => o.DiscountAmount).HasConversion<double>();
+            entity.Property(o => o.ShippingAmount).HasConversion<double>();
             entity.Property(o => o.CouponCode).HasMaxLength(50);
             entity.Property(o => o.CouponName).HasMaxLength(100);
+            entity.Property(o => o.PaymentMethod).HasMaxLength(50).IsRequired();
+            entity.Property(o => o.OrderNotes).HasMaxLength(500);
             entity.Property(o => o.Carrier).HasMaxLength(50);
             entity.Property(o => o.TrackingNumber).HasMaxLength(50);
             entity.Property(o => o.ShippingOrigin).HasMaxLength(200);
@@ -185,19 +192,24 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
                   .WithOne(a => a.Order)
                   .HasForeignKey(a => a.OrderId)
                   .OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne<Order>()
+                  .WithMany()
+                  .HasForeignKey(o => o.ReplacementForOrderId)
+                  .OnDelete(DeleteBehavior.Restrict);
         });
 
         builder.Entity<AfterSalesRequest>(entity =>
         {
             entity.HasIndex(a => a.UserId);
             entity.HasIndex(a => a.Status);
-            entity.HasIndex(a => a.OrderId);
+            entity.HasIndex(a => a.OrderId)
+                  .IsUnique()
+                  .HasFilter("[Status] <> N'已拒绝'");
+            entity.Property(a => a.Status).IsConcurrencyToken();
             entity.Property(a => a.Type).HasMaxLength(20);
             entity.Property(a => a.Status).HasMaxLength(20);
             entity.Property(a => a.Reason).HasMaxLength(1000);
             entity.Property(a => a.AdminNote).HasMaxLength(500);
-            entity.Property(a => a.ReturnCarrier).HasMaxLength(50);
-            entity.Property(a => a.ReturnTrackingNumber).HasMaxLength(50);
         });
 
         builder.Entity<OrderItem>(entity =>

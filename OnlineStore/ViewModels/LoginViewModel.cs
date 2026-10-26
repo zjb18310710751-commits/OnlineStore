@@ -16,6 +16,6 @@ public class LoginViewModel
     [Display(Name = "记住我")]
     public bool RememberMe { get; set; }
 
-    [Display(Name = "记住账号密码")]
+    [Display(Name = "记住账号")]
     public bool RememberCredentials { get; set; }
 }

@@ -54,6 +54,17 @@
                                         @L10n.Text("预计发货", "Dispatch by") @o.ExpectedDispatchAt.Value.ToLocalTime().ToString("yyyy-MM-dd HH:mm")
                                     </div>
                                 }
+                                <div class="member-order-meta mt-1">
+                                    @Loc["Payment"]：@L10n.PaymentMethod(o.PaymentMethod)
+                                    @if (o.ShippingAmount > 0)
+                                    {
+                                        <span> · @Loc["ShippingFee"]：¥@o.ShippingAmount.ToString("F2")</span>
+                                    }
+                                </div>
+                                @if (!string.IsNullOrWhiteSpace(o.OrderNotes))
+                                {
+                                    <div class="member-order-meta mt-1">@L10n.Text("备注", "Notes")：@o.OrderNotes</div>
+                                }
                             </div>
                             <span class="badge member-order-status @StatusBadge(o.Status)">@L10n.Status(o.Status)</span>
                         </div>

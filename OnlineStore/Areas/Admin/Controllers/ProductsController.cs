@@ -85,6 +85,7 @@ public class ProductsController : Controller
             ShippingFromEn = vm.ShippingFromEn,
             ShippingFee = vm.ShippingFee,
             ShippingFeeEn = vm.ShippingFeeEn,
+            ShippingFeeAmount = vm.ShippingFeeAmount,
             DeliveryTime = vm.DeliveryTime,
             DeliveryTimeEn = vm.DeliveryTimeEn,
             DetailHtml = vm.DetailHtml
@@ -139,6 +140,7 @@ public class ProductsController : Controller
             ShippingFromEn = product.ShippingFromEn,
             ShippingFee = product.ShippingFee,
             ShippingFeeEn = product.ShippingFeeEn,
+            ShippingFeeAmount = product.ShippingFeeAmount,
             DeliveryTime = product.DeliveryTime,
             DeliveryTimeEn = product.DeliveryTimeEn,
             DetailHtml = product.DetailHtml
@@ -185,6 +187,7 @@ public class ProductsController : Controller
         product.ShippingFromEn = vm.ShippingFromEn;
         product.ShippingFee = vm.ShippingFee;
         product.ShippingFeeEn = vm.ShippingFeeEn;
+        product.ShippingFeeAmount = vm.ShippingFeeAmount;
         product.DeliveryTime = vm.DeliveryTime;
         product.DeliveryTimeEn = vm.DeliveryTimeEn;
         product.DetailHtml = vm.DetailHtml;
@@ -232,9 +235,9 @@ public class ProductsController : Controller
     private async Task PopulateFormAsync(ProductFormViewModel vm)
     {
         var shops = await _shopService.GetAllAsync();
-        vm.Shops = shops.Select(s => new SelectListItem(s.Name, s.Id.ToString()));
+        vm.Shops = shops.Select(s => new SelectListItem(L10n.Name(s), s.Id.ToString()));
 
         var categories = await _categoryService.GetAllAsync();
-        vm.Categories = categories.Select(c => new SelectListItem(c.Name, c.Id.ToString()));
+        vm.Categories = categories.Select(c => new SelectListItem(L10n.Name(c), c.Id.ToString()));
     }
 }

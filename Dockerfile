@@ -8,6 +8,7 @@ RUN dotnet publish "OnlineStore.csproj" -c Release -o /app/publish --no-restore
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
 WORKDIR /app
 COPY --from=build /app/publish .
-USER root
+RUN chown -R app:app /app
+USER app
 ENV ASPNETCORE_ENVIRONMENT=Production
 CMD ASPNETCORE_URLS=http://0.0.0.0:$PORT dotnet OnlineStore.dll

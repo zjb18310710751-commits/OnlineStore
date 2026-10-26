@@ -74,7 +74,7 @@
   <data name="Email" xml:space="preserve"><value>邮箱</value></data>
   <data name="Password" xml:space="preserve"><value>密码</value></data>
   <data name="RememberMe" xml:space="preserve"><value>记住我</value></data>
-  <data name="RememberCredentials" xml:space="preserve"><value>记住账号密码</value></data>
+  <data name="RememberCredentials" xml:space="preserve"><value>记住账号</value></data>
   <data name="EmailRegister" xml:space="preserve"><value>邮箱注册</value></data>
   <data name="PhoneRegister" xml:space="preserve"><value>手机号注册</value></data>
   <data name="EmailOrPhone" xml:space="preserve"><value>邮箱 / 手机号</value></data>
@@ -216,6 +216,7 @@
   <data name="CashOnDeliveryHint" xml:space="preserve"><value>收到商品时再付款。</value></data>
   <data name="CardPaymentDemo" xml:space="preserve"><value>银行卡支付（演示）</value></data>
   <data name="CardPaymentHint" xml:space="preserve"><value>演示用的模拟银行卡支付。</value></data>
+  <data name="InvalidPaymentMethod" xml:space="preserve"><value>请选择有效的支付方式</value></data>
   <data name="BankTransferDemo" xml:space="preserve"><value>银行转账（演示）</value></data>
   <data name="BankTransferHint" xml:space="preserve"><value>演示用的模拟银行转账。</value></data>
   <data name="OrderNotesOptional" xml:space="preserve"><value>订单备注（可选）</value></data>
@@ -393,6 +394,7 @@
   <data name="ProductNameRequired" xml:space="preserve"><value>请输入商品名称</value></data>
   <data name="PriceRequired" xml:space="preserve"><value>请输入价格</value></data>
   <data name="PriceInvalid" xml:space="preserve"><value>价格不能为负</value></data>
+  <data name="ShippingFeeAmountInvalid" xml:space="preserve"><value>邮费金额不能为负</value></data>
   <data name="OriginalPriceInvalid" xml:space="preserve"><value>原价不能为负</value></data>
   <data name="StockRequired" xml:space="preserve"><value>请输入库存</value></data>
   <data name="StockInvalid" xml:space="preserve"><value>库存不能为负</value></data>

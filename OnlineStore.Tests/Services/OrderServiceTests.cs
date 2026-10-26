@@ -69,8 +69,12 @@ public class OrderServiceTests
         var (context, order, _) = await SeedAsync();
         var service = new OrderService(context);
 
-        Assert.True(await service.ShipAsync(order.Id));
+        Assert.True(await service.ShipAsync(order.Id, "SF Express", "TEST00000001"));
         Assert.Equal(OrderStatus.Shipped, order.Status);
+        Assert.False(await service.CompleteAsync(order.Id));
+        order.ShippedAt = DateTime.UtcNow.AddSeconds(-10);
+        await context.SaveChangesAsync();
+        await service.GetTrackingAsync(order.Id);
         Assert.True(await service.CompleteAsync(order.Id));
         Assert.Equal(OrderStatus.Completed, order.Status);
     }
@@ -135,5 +139,48 @@ public class OrderServiceTests
 
         var product = await context.Products.FindAsync(1);
         Assert.Equal(8, product!.Stock);
+    }
+
+    [Fact]
+    public async Task ReturnAfterSales_RestoresStockOnlyOnce_AndRefundDoesNotDoubleIt()
+    {
+        var (context, order, product) = await SeedAsync();
+        order.Status = OrderStatus.Completed;
+        await context.SaveChangesAsync();
+        var service = new OrderService(context);
+
+        var request = await service.CreateAfterSalesAsync(
+            order.Id, order.UserId!, AfterSalesType.Return, "Item is damaged");
+        await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            service.CreateAfterSalesAsync(order.Id, order.UserId!, AfterSalesType.Exchange, "Second request"));
+        Assert.True(await service.ReviewAfterSalesAsync(request.Id, true, "Approved"));
+        Assert.True(await service.MarkAfterSalesReceivedAsync(request.Id));
+        Assert.True(await service.CompleteAfterSalesAsync(request.Id));
+        Assert.Equal(7, product.Stock);
+        Assert.NotNull(order.InventoryRestoredAt);
+
+        Assert.True(await service.RefundAsync(order.Id));
+        Assert.Equal(OrderStatus.Refunded, order.Status);
+        Assert.Equal(7, product.Stock);
+    }
+
+    [Fact]
+    public async Task ExchangeAfterSales_CreatesReplacementOrderWithoutChangingStock()
+    {
+        var (context, order, product) = await SeedAsync();
+        order.Status = OrderStatus.Completed;
+        await context.SaveChangesAsync();
+        var service = new OrderService(context);
+
+        var request = await service.CreateAfterSalesAsync(
+            order.Id, order.UserId!, AfterSalesType.Exchange, "Wrong color");
+        Assert.True(await service.ReviewAfterSalesAsync(request.Id, true, null));
+        Assert.True(await service.MarkAfterSalesReceivedAsync(request.Id));
+        Assert.True(await service.CompleteAfterSalesAsync(request.Id));
+
+        var replacement = await context.Orders.SingleAsync(item => item.ReplacementForOrderId == order.Id);
+        Assert.Equal(OrderStatus.PendingShipment, replacement.Status);
+        Assert.Equal(0, replacement.Total);
+        Assert.Equal(5, product.Stock);
     }
 }

@@ -51,7 +51,8 @@
     <label class="form-label">@Loc["ImageUrl"]</label>
     <div id="productImageBox" class="sku-image-box" tabindex="0"
          data-upload-url="@Url.Action("Upload", "Images", new { area = "Admin" })"
-         data-placeholder="@Loc["PasteImageHint"]">
+         data-placeholder="@Loc["PasteImageHint"]"
+         data-image-alt="@L10n.Text("商品主图", "Product image")">
         @if (!string.IsNullOrEmpty(Model.ImageUrl))
         {
             <img src="@Model.ImageUrl" alt="@Loc["Image"]" />
@@ -77,7 +78,7 @@
 
         function setPreview(url) {
             if (url) {
-                box.innerHTML = '<img src="' + url + '" alt="商品主图" />';
+                box.innerHTML = '<img src="' + url + '" alt="' + (box.dataset.imageAlt || '') + '" />';
             } else {
                 box.innerHTML = '<span class="text-muted">' + box.getAttribute('data-placeholder') + '</span>';
             }
@@ -115,17 +116,22 @@
     })();
 </script>
 <div class="row g-3">
-    <div class="col-md-4 mb-3">
+    <div class="col-md-3 mb-3">
         <label asp-for="ShippingFrom" class="form-label">@Loc["ShippingFrom"]</label>
         <input asp-for="ShippingFrom" class="form-control" placeholder="@Loc["ShippingFromPlaceholder"]" />
         <span asp-validation-for="ShippingFrom" class="text-danger small"></span>
     </div>
-    <div class="col-md-4 mb-3">
+    <div class="col-md-3 mb-3">
         <label asp-for="ShippingFee" class="form-label">@Loc["ShippingFee"]</label>
         <input asp-for="ShippingFee" class="form-control" placeholder="@Loc["ShippingFeePlaceholder"]" />
         <span asp-validation-for="ShippingFee" class="text-danger small"></span>
     </div>
-    <div class="col-md-4 mb-3">
+    <div class="col-md-3 mb-3">
+        <label asp-for="ShippingFeeAmount" class="form-label">@L10n.Text("邮费金额", "Shipping fee amount")</label>
+        <input asp-for="ShippingFeeAmount" class="form-control" min="0" step="0.01" />
+        <span asp-validation-for="ShippingFeeAmount" class="text-danger small"></span>
+    </div>
+    <div class="col-md-3 mb-3">
         <label asp-for="DeliveryTime" class="form-label">@Loc["DeliveryTime"]</label>
         <input asp-for="DeliveryTime" class="form-control" placeholder="@Loc["DeliveryTimePlaceholder"]" />
         <span asp-validation-for="DeliveryTime" class="text-danger small"></span>

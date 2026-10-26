@@ -26,5 +26,7 @@ public class CartItem
 
     public int Stock { get; set; }
 
+    public decimal ShippingFeeAmount { get; set; }
+
     public decimal LineTotal => Price * Quantity;
 }

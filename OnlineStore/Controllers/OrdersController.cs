@@ -60,6 +60,7 @@ public class OrdersController : Controller
         {
             Items = cart.Items,
             Total = cart.Total,
+            ShippingFee = cart.ShippingTotal,
             AddressId = defaultAddress?.Id,
             HasSavedAddresses = savedAddresses.Count > 0,
             UserName = defaultAddress?.RecipientName ?? $"{user?.LastName}{user?.FirstName}".Trim(),
@@ -96,6 +97,7 @@ public class OrdersController : Controller
                     vm.CouponCode = requested.Coupon.Code;
                     vm.DiscountAmount = requested.DiscountAmount;
                     vm.FreeShippingCoupon = requested.FreeShipping;
+                    vm.ShippingFee = requested.FreeShipping ? 0 : cart.ShippingTotal;
                     ApplyCouponChoices(vm, availableCoupons, requested.Coupon.Code);
                 }
                 else
@@ -103,6 +105,10 @@ public class OrdersController : Controller
                     ModelState.AddModelError(nameof(vm.CouponCode), requested.Error ?? _loc["CouponUnavailable"].Value);
                     ApplyCouponChoices(vm, availableCoupons, null);
                 }
+            }
+            if (string.IsNullOrWhiteSpace(couponCode) && vm.FreeShippingCoupon)
+            {
+                vm.ShippingFee = 0;
             }
         }
         return View(vm);
@@ -120,6 +126,7 @@ public class OrdersController : Controller
 
         vm.Items = cart.Items;
         vm.Total = cart.Total;
+        vm.ShippingFee = cart.ShippingTotal;
         vm.DiscountAmount = 0;
 
         var user = await _userManager.GetUserAsync(User);
@@ -155,6 +162,7 @@ public class OrdersController : Controller
             discount = result.DiscountAmount;
             vm.DiscountAmount = discount;
             vm.FreeShippingCoupon = result.FreeShipping;
+            vm.ShippingFee = result.FreeShipping ? 0 : cart.ShippingTotal;
             applied = result.Coupon;
             freeShipping = result.FreeShipping;
         }
@@ -182,14 +190,17 @@ public class OrdersController : Controller
 
         var order = new Order
         {
-            OrderNo = GenerateOrderNo(),
+            OrderNo = OrderNumberGenerator.Generate(),
             UserId = user.Id,
             UserName = vm.UserName!.Trim(),
             Phone = vm.Phone?.Trim(),
             Address = BuildFullAddress(vm),
-            Total = cart.Total - discount,
+            Total = Math.Max(0, cart.Total + vm.ShippingFee - discount),
             CouponCode = applied?.Code,
             DiscountAmount = discount,
+            ShippingAmount = vm.ShippingFee,
+            PaymentMethod = vm.PaymentMethod,
+            OrderNotes = string.IsNullOrWhiteSpace(vm.OrderNotes) ? null : vm.OrderNotes.Trim(),
             Status = OrderStatus.PendingShipment,
             Items = cart.Items.Select(i => new OrderItem
             {
@@ -215,6 +226,7 @@ public class OrdersController : Controller
             var refreshedCart = await _cartService.RefreshAsync();
             vm.Items = refreshedCart.Items;
             vm.Total = refreshedCart.Total;
+            vm.ShippingFee = refreshedCart.ShippingTotal;
             vm.DiscountAmount = 0;
             if (!string.IsNullOrWhiteSpace(vm.CouponCode) && refreshedCart.Items.Count > 0)
             {
@@ -227,6 +239,7 @@ public class OrdersController : Controller
                 {
                     vm.DiscountAmount = refreshedCoupon.DiscountAmount;
                     vm.FreeShippingCoupon = refreshedCoupon.FreeShipping;
+                    vm.ShippingFee = refreshedCoupon.FreeShipping ? 0 : refreshedCart.ShippingTotal;
                 }
             }
             await PopulateAvailableCouponsAsync(vm, user.Id);
@@ -263,9 +276,12 @@ public class OrdersController : Controller
                 ok = true,
                 discount = best?.DiscountAmount ?? 0m,
                 freeShipping = best?.FreeShipping ?? false,
+                shipping = best?.FreeShipping == true ? 0m : cart.ShippingTotal,
                 code = best?.Coupon?.Code,
                 total = cart.Total,
-                payable = cart.Total - (best?.DiscountAmount ?? 0m)
+                payable = cart.Total
+                    + (best?.FreeShipping == true ? 0m : cart.ShippingTotal)
+                    - (best?.DiscountAmount ?? 0m)
             });
         }
 
@@ -280,9 +296,12 @@ public class OrdersController : Controller
             ok = true,
             discount = result.DiscountAmount,
             freeShipping = result.FreeShipping,
+            shipping = result.FreeShipping ? 0m : cart.ShippingTotal,
             code = result.Coupon?.Code,
             total = cart.Total,
-            payable = cart.Total - result.DiscountAmount
+            payable = cart.Total
+                + (result.FreeShipping ? 0m : cart.ShippingTotal)
+                - result.DiscountAmount
         });
     }
 
@@ -422,9 +441,6 @@ public class OrdersController : Controller
         return RedirectToAction(nameof(MyOrders));
     }
 
-    private static string GenerateOrderNo() =>
-        $"OS{DateTime.UtcNow:yyyyMMddHHmmss}{Random.Shared.Next(100, 999)}";
-
     private void ValidateCheckoutDetails(CheckoutViewModel vm)
     {
         if (string.IsNullOrWhiteSpace(vm.UserName))
@@ -468,6 +484,11 @@ public class OrdersController : Controller
         if (string.IsNullOrWhiteSpace(vm.Country))
         {
             ModelState.AddModelError(nameof(vm.Country), _loc["CheckoutCountryRequired"]);
+        }
+
+        if (vm.PaymentMethod is not ("cash_on_delivery" or "card_demo" or "bank_transfer_demo"))
+        {
+            ModelState.AddModelError(nameof(vm.PaymentMethod), _loc["InvalidPaymentMethod"].Value);
         }
     }
 

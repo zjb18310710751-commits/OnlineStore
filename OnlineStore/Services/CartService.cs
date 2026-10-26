@@ -65,6 +65,7 @@ public class CartService : ICartService
             existing.Quantity = (int)Math.Min((long)Math.Max(0, existing.Quantity) + quantity, stock);
             existing.Price = price;
             existing.Stock = stock;
+            existing.ShippingFeeAmount = product.ShippingFeeAmount;
         }
         else
         {
@@ -81,7 +82,8 @@ public class CartService : ICartService
                 Price = price,
                 Quantity = Math.Min(quantity, stock),
                 ImageUrl = sku?.ImageUrl ?? product.ImageUrl,
-                Stock = stock
+                Stock = stock,
+                ShippingFeeAmount = product.ShippingFeeAmount
             });
         }
 
@@ -115,6 +117,7 @@ public class CartService : ICartService
             {
                 item.Stock = sku is null ? product.Stock : Math.Min(product.Stock, sku.Stock);
                 item.Price = sku?.Price ?? product.Price;
+                item.ShippingFeeAmount = product.ShippingFeeAmount;
                 item.Quantity = Math.Min(quantity, item.Stock);
             }
         }

@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using OnlineStore;
 using OnlineStore.Data;
@@ -9,7 +10,7 @@ using OnlineStore.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
-    ?? throw new InvalidOperationException("Î´ÅäÖÃÁ¬½Ó×Ö·û´® ConnectionStrings:DefaultConnection¡£");
+    ?? throw new InvalidOperationException("æœªé…ç½®è¿æ¥å­—ç¬¦ä¸² ConnectionStrings:DefaultConnectionã€‚");
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
@@ -35,6 +36,9 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.AccessDeniedPath = "/Account/AccessDenied";
     options.ExpireTimeSpan = TimeSpan.FromHours(2);
     options.SlidingExpiration = true;
+    options.Cookie.SecurePolicy = builder.Environment.IsDevelopment()
+        ? CookieSecurePolicy.SameAsRequest
+        : CookieSecurePolicy.Always;
 });
 
 builder.Services.AddScoped<IProductService, ProductService>();
@@ -71,6 +75,16 @@ builder.Services.AddSession(options =>
     options.IdleTimeout = TimeSpan.FromMinutes(30);
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
+    options.Cookie.SecurePolicy = builder.Environment.IsDevelopment()
+        ? CookieSecurePolicy.SameAsRequest
+        : CookieSecurePolicy.Always;
+});
+
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+    options.KnownNetworks.Clear();
+    options.KnownProxies.Clear();
 });
 
 builder.Services.AddHealthChecks()
@@ -91,6 +105,8 @@ if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
+    app.UseForwardedHeaders();
+    app.UseHttpsRedirection();
 }
 else
 {
@@ -98,11 +114,6 @@ else
 }
 
 app.UseStatusCodePagesWithReExecute("/Home/Error", "?code={0}");
-
-if (app.Environment.IsDevelopment())
-{
-    app.UseHttpsRedirection();
-}
 
 app.UseStaticFiles();
 
@@ -136,7 +147,7 @@ try
 catch (Exception ex)
 {
     var logger = app.Services.GetRequiredService<ILoggerFactory>().CreateLogger("DbInitializer");
-    logger.LogError(ex, "Êı¾İ¿â³õÊ¼»¯Ê§°Ü£ºÇë¼ì²é SQL Server (SQLEXPRESS) ·şÎñÊÇ·ñÒÑÆô¶¯£¬ÒÔ¼°Á¬½Ó´®/Æ¾¾İÊÇ·ñÕıÈ·¡£");
+    logger.LogError(ex, "æ•°æ®åº“åˆå§‹åŒ–å¤±è´¥ï¼šè¯·æ£€æŸ¥ SQL Server (SQLEXPRESS) æœåŠ¡æ˜¯å¦å·²å¯åŠ¨ï¼Œä»¥åŠè¿æ¥ä¸²/å‡­æ®æ˜¯å¦æ­£ç¡®ã€‚");
 }
 
 app.Run();

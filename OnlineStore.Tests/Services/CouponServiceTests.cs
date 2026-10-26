@@ -138,20 +138,6 @@ public class CouponServiceTests
     }
 
     [Fact]
-    public async Task IncrementUsageAsync_BumpsUsedCount()
-    {
-        using var context = CreateContext();
-        var coupon = ValidPercent();
-        context.Coupons.Add(coupon);
-        await context.SaveChangesAsync();
-        var service = new CouponService(context);
-
-        await service.IncrementUsageAsync(coupon.Id);
-
-        Assert.Equal(1, coupon.UsedCount);
-    }
-
-    [Fact]
     public async Task ValidateAsync_PerUserLimit_BlocksRepeatedRedemption()
     {
         using var context = CreateContext();

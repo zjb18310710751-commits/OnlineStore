@@ -3,7 +3,7 @@
     var product = (Product)ViewBag.Product;
     ViewData["Title"] = Loc["EditSpec"].Value;
 }
-<h1 class="h5 mb-4">@Loc["EditSpec"] <span class="text-muted">· @product.Name</span></h1>
+<h1 class="h5 mb-4">@Loc["EditSpec"] <span class="text-muted">· @L10n.Name(product)</span></h1>
 <form asp-action="Edit" asp-route-id="@Model.Id" method="post" class="card card-body shadow-sm">
     <partial name="_SpecForm" model="Model" />
     <div>
