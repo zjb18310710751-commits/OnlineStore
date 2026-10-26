@@ -153,6 +153,13 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
                   .WithMany(p => p.Reviews)
                   .HasForeignKey(r => r.ProductId)
                   .OnDelete(DeleteBehavior.Cascade);
+            entity.HasIndex(r => new { r.OrderId, r.ProductId, r.UserId })
+                  .IsUnique()
+                  .HasFilter("[OrderId] IS NOT NULL");
+            entity.HasOne(r => r.Order)
+                  .WithMany()
+                  .HasForeignKey(r => r.OrderId)
+                  .OnDelete(DeleteBehavior.SetNull);
         });
 
         builder.Entity<Order>(entity =>

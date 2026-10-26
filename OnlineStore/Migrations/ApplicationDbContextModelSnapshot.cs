@@ -1101,6 +1101,9 @@ namespace OnlineStore.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
+                    b.Property<int?>("OrderId")
+                        .HasColumnType("int");
+
                     b.Property<int>("ProductId")
                         .HasColumnType("int");
 
@@ -1108,7 +1111,7 @@ namespace OnlineStore.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("UserName")
                         .IsRequired()
@@ -1122,6 +1125,10 @@ namespace OnlineStore.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("ProductId");
+
+                    b.HasIndex("OrderId", "ProductId", "UserId")
+                        .IsUnique()
+                        .HasFilter("[OrderId] IS NOT NULL");
 
                     b.ToTable("Reviews");
                 });
@@ -1369,11 +1376,18 @@ namespace OnlineStore.Migrations
 
             modelBuilder.Entity("OnlineStore.Models.Review", b =>
                 {
+                    b.HasOne("OnlineStore.Models.Order", "Order")
+                        .WithMany()
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.HasOne("OnlineStore.Models.Product", "Product")
                         .WithMany("Reviews")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Order");
 
                     b.Navigation("Product");
                 });

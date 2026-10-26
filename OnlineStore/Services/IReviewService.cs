@@ -9,6 +9,8 @@ public interface IReviewService
 
     Task<IReadOnlyList<Review>> GetAllAsync();
 
+    Task<IReadOnlyList<Review>> GetByUserAsync(string userId);
+
     Task<Review> CreateAsync(Review review);
 
     Task DeleteAsync(int id);

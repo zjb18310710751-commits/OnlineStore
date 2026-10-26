@@ -1,6 +1,7 @@
 @model IReadOnlyList<Order>
 @{
     ViewData["Title"] = Loc["MyOrders"].Value;
+    var myReviews = ViewBag.MyReviews as IDictionary<string, Review> ?? new Dictionary<string, Review>();
 }
 @functions {
     string StatusBadge(string status) => "bg-white text-dark border";
@@ -60,16 +61,48 @@
                         <ul class="list-unstyled member-order-lines mb-2">
                             @foreach (var i in o.Items)
                             {
-                                <li class="d-flex justify-content-between member-order-line">
-                                    <span>
-                                        @L10n.Text(i.ProductName, i.ProductNameEn)
-                                        @if (!string.IsNullOrEmpty(i.Color) || !string.IsNullOrEmpty(i.Spec))
-                                        {
-                                            <small class="text-muted member-order-detail">@L10n.Text(i.Color ?? "", i.ColorEn) @L10n.Text(i.Spec ?? "", i.SpecEn)</small>
-                                        }
-                                        <small class="text-muted member-order-detail">× @i.Quantity</small>
-                                    </span>
-                                    <span>¥@i.LineTotal.ToString("F2")</span>
+                                <li class="member-order-line">
+                                    <div class="d-flex justify-content-between">
+                                        <span>
+                                            @L10n.Text(i.ProductName, i.ProductNameEn)
+                                            @if (!string.IsNullOrEmpty(i.Color) || !string.IsNullOrEmpty(i.Spec))
+                                            {
+                                                <small class="text-muted member-order-detail">@L10n.Text(i.Color ?? "", i.ColorEn) @L10n.Text(i.Spec ?? "", i.SpecEn)</small>
+                                            }
+                                            <small class="text-muted member-order-detail">× @i.Quantity</small>
+                                        </span>
+                                        <span>¥@i.LineTotal.ToString("F2")</span>
+                                    </div>
+                                    @if (myReviews.TryGetValue($"{o.Id}:{i.ProductId}", out var myReview) && myReview is not null)
+                                    {
+                                        <div class="member-order-my-review">
+                                            <div class="member-order-my-review-head">
+                                                <strong>@L10n.Text("我的评价", "My review")</strong>
+                                                <span class="member-order-review-stars" aria-label="@L10n.Text($"{myReview.Rating} 分", $"{myReview.Rating} out of 5")">
+                                                    @string.Concat(Enumerable.Repeat("★", myReview.Rating))@string.Concat(Enumerable.Repeat("☆", 5 - myReview.Rating))
+                                                </span>
+                                                <time datetime="@myReview.CreatedAt.ToString("o")">@myReview.CreatedAt.ToLocalTime().ToString("yyyy-MM-dd")</time>
+                                            </div>
+                                            @if (!string.IsNullOrWhiteSpace(myReview.Comment))
+                                            {
+                                                <p>@myReview.Comment</p>
+                                            }
+                                            else
+                                            {
+                                                <p class="text-muted">@L10n.Text("未填写文字评价。", "No written comment.")</p>
+                                            }
+                                            @if (!string.IsNullOrWhiteSpace(myReview.ImageUrl))
+                                            {
+                                                <a href="@myReview.ImageUrl" target="_blank" rel="noopener" class="member-order-review-image">@L10n.Text("查看评价图片", "View review photo")</a>
+                                            }
+                                        </div>
+                                    }
+                                    else if (o.Status == OrderStatus.Completed)
+                                    {
+                                        <a asp-controller="Products" asp-action="Details" asp-route-id="@i.ProductId" asp-route-orderId="@o.Id" asp-fragment="write-review" class="member-order-write-review">
+                                            <i class="bi bi-chat-square-text" aria-hidden="true"></i>@Loc["WriteReview"]
+                                        </a>
+                                    }
                                 </li>
                             }
                         </ul>

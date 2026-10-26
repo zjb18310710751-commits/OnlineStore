@@ -24,7 +24,7 @@ az group delete --name rg-onlinestore-demo --yes --no-wait
 
 ### 自动化部署
 
-- 推送到 `main` 后，GitHub Actions 会依次执行还原、构建、152 个后端测试、4 个前端回归测试，并发布到 Azure App Service。
+- 推送到 `main` 后，GitHub Actions 会依次执行还原、构建、155 个后端测试、4 个前端回归测试，并发布到 Azure App Service。
 - 仓库的 Actions Secrets 需要配置 `AZURE_WEBAPP_PUBLISH_PROFILE`，内容来自 Azure App Service 概览页的「获取发布配置文件 / Get publish profile」。
 - 本地仓库配置了 `post-commit` hook：在 `main` 分支提交后会自动执行 `git push origin main`；未提交的修改不会自动推送。
 
@@ -56,6 +56,8 @@ az group delete --name rg-onlinestore-demo --yes --no-wait
 | 多收货地址 | 个人中心地址簿的新增、编辑、删除；结算页选择默认地址并支持保存为默认地址 |
 | 首页轮播管理 | 后台 HeroSlides 管理轮播图、中英文标题/说明、跳转地址、排序与显示开关；首页自动轮播 |
 | 订单明细与结算校验 | 订单明细保存 SKU 颜色/规格快照；下单时复核价格、库存、商品状态和优惠券，取消/退款恢复库存 |
+| 订单物流与售后 | 买家可查看物流进度、确认收货、申请退货/换货并从列表隐藏已结束订单；后台支持填写承运商与运单号、审核售后、接收退货和完成退款流程 |
+| 订单评价 | 买家可在已完成订单中为对应商品写评价；同一订单商品再次提交会更新原评价，评分、评论、图片和日期直接显示在“我的订单”中 |
 | 多分类 | 一个商品可属于多个分类（多对多） |
 | 购物车 | 加入（支持所选颜色/规格）、查看、更新数量、移除、清空（基于 Session） |
 | 账号注册与登录 | 支持邮箱验证码注册，注册后自动登录；短信服务尚未接入，手机号注册明确提示暂不可用，已有手机号账号仍可登录；所有账号共用邮箱或手机号登录入口，登录后返回原站内页面，后台通过管理员角色授权限制访问；登出使用统一账号流程（ASP.NET Core Identity，密码策略+失败锁定） |
@@ -67,7 +69,7 @@ az group delete --name rg-onlinestore-demo --yes --no-wait
 | 优惠券 | 支持百分比、固定金额、免运费、最高优惠、最低消费、日期范围、全局/每用户次数、首单限制、排除促销商品、全店/分类/商品范围；后台支持优惠券名称、批量创建、CSV 导出与核销记录，系统内部唯一标识不在页面展示；个人中心“我的优惠券”展示可用/未开始/已用完/已过期状态，结算页可直接选择优惠券并默认选择最优方案 |
 | 取消订单与退款 | 用户取消自己的订单；后台订单管理（发货/完成/取消/退款）；取消/退款自动恢复库存 |
 | 完整中英双语 | 界面文案 + 商品/分类/店铺/评价/参数/SKU 颜色规格/快递/图文详情等数据库内容全部随语言切换 |
-| 单元测试 | xUnit 测试项目：商品筛选/分页/排序、购物车增删改清空、图片上传校验、优惠券计算/校验/核销、邮箱/手机号验证码、订单状态流转与库存扣减/恢复、记住账号密码（共 152 个 .NET 用例，另有 4 个前端规格选择与中文库存回归用例） |
+| 单元测试 | xUnit 测试项目：商品筛选/分页/排序、购物车增删改清空、图片上传校验、优惠券计算/校验/核销、订单评价关联、邮箱/手机号验证码、订单状态流转与库存扣减/恢复、记住账号密码（共 155 个 .NET 用例，另有 4 个前端规格选择与中文库存回归用例） |
 
 ## 目录结构
 
@@ -96,6 +98,8 @@ OnlineStore.Tests/  xUnit 单元测试项目（引用 OnlineStore，使用 EF Co
 - 新增语言：复制一份 `SharedResource.<culture>.resx` 翻译后，把 culture 加入 `Program.cs` 的 `supportedCultures` 即可。
 
 > 说明：界面文案与数据库内容（商品/分类/店铺名称与描述、评价、参数、SKU 颜色规格、快递信息）均已支持中英双语，切换语言时整页内容随之切换；英文内容已预置于种子数据中。
+
+> 后台商品、分类和店铺的名称输入只保留中文；已存在的英文名称数据继续用于前台英文页面，新名称缺失英文时自动回退显示中文。描述、参数和规格等其他翻译字段不受影响。
 
 ## 环境要求与前置步骤
 
@@ -170,6 +174,8 @@ dotnet run
 
 优惠券迁移 `20261026001008_AddCouponRules` 新增活动备注、最高优惠、每用户限用、首单限制、促销商品排除、分类/商品适用范围和核销记录；既有优惠券会回填为每人限用 1 次，结束日期会规范为当天 23:59:59。
 
+订单物流与评价迁移新增承运商、运单号、发货/送达/签收时间、物流信息快照、售后请求，以及评价与订单商品的关联索引。
+
 运行单元测试（在解决方案根目录）：
 
 ```bash
@@ -193,14 +199,14 @@ dotnet test
 | --- | --- | --- |
 | **可用性 Availability** | `Program.cs` 的 `/health` 健康检查（`AddHealthChecks().AddDbContextCheck`）；`DbInitializer` 用 try/catch 包裹，数据库异常仅记日志不阻塞启动；`UseExceptionHandler` + `UseStatusCodePagesWithReExecute` 友好错误页；全链路 `async/await` 避免阻塞线程 | 应用可被探活、故障可观测、异常有兜底页，单个依赖故障不致整体不可用 |
 | **可修改性 Modifiability** | `Services/*` 接口抽象（`IProductService`、`ICategoryService`、`ICartService`、`ICartStore`、`IImageStorageService`、`IRememberedLoginService`）经 DI 注入；`Program.cs` 的 `AddScoped` 注册；`SessionCartStore` 可替换为数据库/Redis、`ImageStorageService` 可替换为 OSS/S3 而不改业务；`Areas/Admin` 区域隔离；`ViewModels` 与 `Models` 分离 | 面向接口编程 + 依赖注入，新增/替换实现、扩展功能时不改动调用方 |
-| **可测试性 Testability** | `OnlineStore.Tests/` 测试项目：`ProductServiceTests`（分页/分类/关键词/价格筛选/排序/促销商品）、`CartServiceTests`（加入/累加/库存上限/更新/移除/清空）、`ImageStorageServiceTests`（上传校验）、`CouponCalculatorTests`/`CouponServiceTests`（优惠券计算、范围、首单、每用户限制、批量生成、核销与钱包状态）、`VerificationCodeServiceTests`（邮箱/手机号验证码生成/校验/过期/冷却）、`OrderServiceTests`（取消/退款/发货/完成与库存扣减/恢复）、`RememberedLoginCookieServiceTests`（记住账号密码的保存/读取/清除与密码不明文落盘），用 EF Core InMemory 与 `FakeCartStore` 假存储替代真实依赖 | 业务逻辑不依赖 HTTP/数据库细节，可独立实例化并快速验证；`dotnet test` 一键运行 152 个用例 |
+| **可测试性 Testability** | `OnlineStore.Tests/` 测试项目：`ProductServiceTests`（分页/分类/关键词/价格筛选/排序/促销商品）、`CartServiceTests`（加入/累加/库存上限/更新/移除/清空）、`ImageStorageServiceTests`（上传校验）、`CouponCalculatorTests`/`CouponServiceTests`（优惠券计算、范围、首单、每用户限制、批量生成、核销与钱包状态）、`ReviewOrderTests`（订单评价归属与更新）、`VerificationCodeServiceTests`（邮箱/手机号验证码生成/校验/过期/冷却）、`OrderServiceTests`（取消/退款/发货/完成与库存扣减/恢复）、`RememberedLoginCookieServiceTests`（记住账号密码的保存/读取/清除与密码不明文落盘），用 EF Core InMemory 与 `FakeCartStore` 假存储替代真实依赖 | 业务逻辑不依赖 HTTP/数据库细节，可独立实例化并快速验证；`dotnet test` 一键运行 155 个用例 |
 | **易用性 Usability** | Bootstrap 5.3 响应式主题（`Views/Shared/_Layout.cshtml`、`wwwroot/css/site.css`）；商品卡片 `_ProductCard.cshtml`、详情页数量步进器 `js/site.js` 的 `stepQty`；中英多语言（`Resources/*.resx`）；购物车徽标 `ViewComponents/CartSummaryViewComponent` | 界面一致美观、导航清晰、交互直观，减少用户操作成本 |
 | **安全性 Security** | Identity 密码哈希 + Cookie 认证（`Program.cs` 密码策略/锁定）；统一账号登录，后台控制器使用 `[Authorize(Roles="Admin")]` 校验管理员角色；Razor 默认 HTML 编码 + EF Core 参数化查询防 XSS/SQL 注入；表单 `[ValidateAntiForgeryToken]` 防 CSRF；`RedirectToLocal` 校验 `Url.IsLocalUrl` 防开放重定向；`ImageStorageService` 校验图片扩展名/大小/Content-Type 并 GUID 命名防路径注入；「记住账号密码」凭据经 Data Protection 加密后写入 HttpOnly Cookie，密码不以明文存储；登录失败统一提示不泄露账号是否存在 | 纵深防御：认证、授权、输入编码、防伪令牌、上传校验、开放重定向防护层层把关 |
 
 > **答辩提示（Question Handling）**：上述表格即"每个属性由哪些代码体现"的索引。被问及时，建议按「**属性 → 落在哪个文件哪一段 → 解决了什么问题 → 若去掉会怎样**」的思路回答，例如：
 > - 问"如何保证可修改性"→ 指 `Services/ICartStore.cs` + `SessionCartStore.cs`：换存储只需新增一个 `ICartStore` 实现并在 `Program.cs` 改一行注册，业务层零改动。
 > - 问"购物车怎么防越权/防篡改"→ 会话隔离 + 防伪令牌 + `AddAsync` 内校验商品是否上架、库存是否大于 0。
-> - 问"如何证明可测试"→ `dotnet test` 运行 152 个用例，均不依赖真实数据库与 HTTP 会话。
+> - 问"如何证明可测试"→ `dotnet test` 运行 155 个用例，均不依赖真实数据库与 HTTP 会话。
 
 ## 后续扩展
 

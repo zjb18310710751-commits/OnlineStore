@@ -638,6 +638,66 @@
     font-size: 13px;
 }
 
+.member-order-my-review {
+    margin-top: 9px;
+    padding: 10px 12px;
+    border-left: 2px solid #111;
+    background: #f7f7f7;
+    font-size: 11px;
+}
+
+.member-order-my-review-head {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    flex-wrap: wrap;
+}
+
+.member-order-my-review-head strong {
+    font-size: 11px;
+}
+
+.member-order-my-review-head time {
+    margin-left: auto;
+    color: var(--sf-muted);
+    font-size: 9px;
+}
+
+.member-order-review-stars {
+    color: #111;
+    letter-spacing: .08em;
+}
+
+.member-order-my-review p {
+    margin: 7px 0 0;
+    color: #333;
+    line-height: 1.6;
+    white-space: pre-wrap;
+}
+
+.member-order-review-image {
+    display: inline-block;
+    margin-top: 7px;
+    color: #555;
+    font-size: 10px;
+    text-underline-offset: 3px;
+}
+
+.member-order-write-review {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 9px;
+    color: #555;
+    font-size: 10px;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+.member-order-write-review:hover {
+    color: #111;
+}
+
 .checkout-coupon-clear:hover {
     border-bottom-color: currentColor;
     color: #111;

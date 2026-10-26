@@ -9,7 +9,7 @@
             <div class="product-detail-thumb d-flex align-items-center justify-content-center">
                 @if (!string.IsNullOrEmpty(Model.ImageUrl))
                 {
-                    <img src="@Model.ImageUrl" class="img-fluid" alt="@L10n.Name(Model)" />
+                    <img src="@Model.ImageUrl" class="img-fluid" alt="@Model.Name" />
                 }
                 else
                 {
@@ -19,9 +19,9 @@
         </div>
         <div class="col-md-8">
             <dl class="row mb-0">
-                <dt class="col-sm-3 text-muted">@Loc["Name"]</dt><dd class="col-sm-9">@L10n.Name(Model)</dd>
-                <dt class="col-sm-3 text-muted">@Loc["Shop"]</dt><dd class="col-sm-9">@L10n.Name(Model.Shop)</dd>
-                <dt class="col-sm-3 text-muted">@Loc["Category"]</dt><dd class="col-sm-9">@string.Join(" / ", Model.Categories.Select(c => L10n.Name(c)))</dd>
+                <dt class="col-sm-3 text-muted">@Loc["Name"]</dt><dd class="col-sm-9">@Model.Name</dd>
+                <dt class="col-sm-3 text-muted">@Loc["Shop"]</dt><dd class="col-sm-9">@Model.Shop?.Name</dd>
+                <dt class="col-sm-3 text-muted">@Loc["Category"]</dt><dd class="col-sm-9">@string.Join(" / ", Model.Categories.Select(c => c.Name))</dd>
                 <dt class="col-sm-3 text-muted">@Loc["Sku"]</dt><dd class="col-sm-9">@(Model.Sku ?? "—")</dd>
                 <dt class="col-sm-3 text-muted">@Loc["Price"]</dt><dd class="col-sm-9">¥@Model.Price.ToString("F2")</dd>
                 <dt class="col-sm-3 text-muted">@Loc["Stock"]</dt><dd class="col-sm-9">@Model.Stock</dd>

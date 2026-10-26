@@ -25,7 +25,7 @@
                 {
                     var comment = L10n.Text(r.Comment ?? "", r.CommentEn);
                     <tr>
-                        <td class="fw-semibold">@L10n.Name(r.Product)</td>
+                        <td class="fw-semibold">@r.Product?.Name</td>
                         <td>@L10n.Text(r.UserName, r.UserNameEn)</td>
                         <td><span class="text-warning">@(new string('★', r.Rating))</span></td>
                         <td class="text-muted">@(comment.Length > 30 ? comment[..30] + "…" : comment)</td>
