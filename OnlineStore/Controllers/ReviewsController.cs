@@ -13,6 +13,7 @@ public class ReviewsController : Controller
     private readonly IReviewService _reviewService;
     private readonly IProductService _productService;
     private readonly IImageStorageService _imageStorage;
+    private readonly IOrderService? _orderService;
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly IStringLocalizer<SharedResource> _loc;
 
@@ -21,18 +22,25 @@ public class ReviewsController : Controller
         IProductService productService,
         IImageStorageService imageStorage,
         UserManager<ApplicationUser> userManager,
-        IStringLocalizer<SharedResource> localizer)
+        IStringLocalizer<SharedResource> localizer,
+        IOrderService? orderService = null)
     {
         _reviewService = reviewService;
         _productService = productService;
         _imageStorage = imageStorage;
         _userManager = userManager;
         _loc = localizer;
+        _orderService = orderService;
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create(int productId, int rating, string? comment, IFormFile? image)
+    public async Task<IActionResult> Create(
+        int productId,
+        int rating,
+        string? comment,
+        IFormFile? image,
+        int? orderId = null)
     {
         var product = await _productService.GetByIdAsync(productId);
         if (product is null)
@@ -42,6 +50,19 @@ public class ReviewsController : Controller
 
         var user = await _userManager.GetUserAsync(User);
         if (user is null) return Challenge();
+
+        if (orderId.HasValue && _orderService is null)
+        {
+            orderId = null;
+        }
+        else if (orderId.HasValue && _orderService is not null)
+        {
+            var order = await _orderService.GetByIdAsync(orderId.Value);
+            if (order is null || order.UserId != user.Id || order.Items.All(item => item.ProductId != productId))
+            {
+                orderId = null;
+            }
+        }
 
         comment = string.IsNullOrWhiteSpace(comment) ? null : comment.Trim();
         if (comment?.Length > 1000 || rating is < 1 or > 5 || !ModelState.IsValid)
@@ -67,6 +88,7 @@ public class ReviewsController : Controller
         var review = new Review
         {
             ProductId = productId,
+            OrderId = orderId,
             UserId = user?.Id,
             UserName = ResolveUserName(user),
             Rating = Math.Clamp(rating, 1, 5),

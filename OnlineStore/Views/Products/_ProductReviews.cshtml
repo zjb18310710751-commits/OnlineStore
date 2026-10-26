@@ -107,6 +107,10 @@
                     {
                         <form asp-controller="Reviews" asp-action="Create" method="post" enctype="multipart/form-data" class="sf-review-form" data-review-form>
                             <input type="hidden" name="productId" value="@Model.Id" />
+                            @if (int.TryParse(Context.Request.Query["orderId"], out var reviewOrderId))
+                            {
+                                <input type="hidden" name="orderId" value="@reviewOrderId" />
+                            }
                             <fieldset class="sf-review-rating">
                                 <legend>@Loc["YourRating"]</legend>
                                 <div class="sf-review-rating-options">

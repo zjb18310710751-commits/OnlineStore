@@ -17,6 +17,7 @@ public class OrdersController : Controller
     private readonly IDeliveryAddressService _deliveryAddressService;
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly IStringLocalizer<SharedResource> _loc;
+    private readonly IReviewService? _reviewService;
 
     public OrdersController(
         IOrderService orderService,
@@ -24,7 +25,8 @@ public class OrdersController : Controller
         ICouponService couponService,
         IDeliveryAddressService deliveryAddressService,
         UserManager<ApplicationUser> userManager,
-        IStringLocalizer<SharedResource> localizer)
+        IStringLocalizer<SharedResource> localizer,
+        IReviewService? reviewService = null)
     {
         _orderService = orderService;
         _cartService = cartService;
@@ -32,6 +34,7 @@ public class OrdersController : Controller
         _deliveryAddressService = deliveryAddressService;
         _userManager = userManager;
         _loc = localizer;
+        _reviewService = reviewService;
     }
 
     [HttpGet]
@@ -306,6 +309,15 @@ public class OrdersController : Controller
         }
 
         var orders = await _orderService.GetByUserAsync(user.Id);
+        var reviews = _reviewService is null
+            ? Array.Empty<Review>()
+            : await _reviewService.GetByUserAsync(user.Id);
+        ViewBag.MyReviews = reviews
+            .Where(review => review.OrderId.HasValue)
+            .GroupBy(review => $"{review.OrderId}:{review.ProductId}")
+            .ToDictionary(
+                group => group.Key,
+                group => group.OrderByDescending(review => review.CreatedAt).First());
         return View(orders);
     }
 

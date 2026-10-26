@@ -30,7 +30,7 @@
                 @foreach (var s in Model)
                 {
                     <tr>
-                        <td class="fw-semibold">@L10n.Name(s)</td>
+                        <td class="fw-semibold">@s.Name</td>
                         <td><span class="text-warning">★</span> @s.Rating.ToString("0.0")</td>
                         <td>@s.SalesCount</td>
                         <td class="text-muted">@L10n.Description(s)</td>

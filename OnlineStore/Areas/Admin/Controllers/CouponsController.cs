@@ -202,11 +202,11 @@ public class CouponsController : Controller
             .ToListAsync();
 
         form.CategoryOptions = categories
-            .Select(category => new SelectListItem(L10n.Name(category), category.Id.ToString()))
+            .Select(category => new SelectListItem(category.Name, category.Id.ToString()))
             .ToList();
         form.ProductOptions = products
             .Select(product => new SelectListItem(
-                $"{L10n.Name(product)} · {product.Sku}".TrimEnd(' ', '·'),
+                $"{product.Name} · {product.Sku}".TrimEnd(' ', '·'),
                 product.Id.ToString()))
             .ToList();
     }

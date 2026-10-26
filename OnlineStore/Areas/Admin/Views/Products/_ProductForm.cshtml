@@ -5,11 +5,7 @@
     <input asp-for="Name" class="form-control" />
     <span asp-validation-for="Name" class="text-danger small"></span>
 </div>
-<div class="mb-3">
-    <label asp-for="NameEn" class="form-label">@Loc["ProductNameEn"]</label>
-    <input asp-for="NameEn" class="form-control" />
-    <span asp-validation-for="NameEn" class="text-danger small"></span>
-</div>
+@Html.HiddenFor(model => model.NameEn)
 <div class="row g-3">
     <div class="col-md-6 mb-3">
         <label asp-for="ShopId" class="form-label">@Loc["Shop"]</label>
