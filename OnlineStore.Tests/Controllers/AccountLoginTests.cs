@@ -66,7 +66,7 @@ public class AccountLoginTests
     {
         public RememberedLogin? Load() => null;
 
-        public void Save(string email, string password) =>
+        public void Save(string email) =>
             throw new InvalidOperationException("Displaying the login form must not save credentials.");
 
         public void Clear() =>

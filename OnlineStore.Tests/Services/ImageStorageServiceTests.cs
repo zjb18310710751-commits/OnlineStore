@@ -52,6 +52,16 @@ public class ImageStorageServiceTests
         return path;
     }
 
+    private static byte[] ValidJpeg() => new byte[]
+    {
+        0xFF, 0xD8, 0xFF, 0xE0, 0x00, 0x10, 0x4A, 0x46, 0x49, 0x46, 0x00, 0x01
+    };
+
+    private static byte[] ValidPng() => new byte[]
+    {
+        0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, 0x00, 0x00, 0x00, 0x0D
+    };
+
     [Fact]
     public async Task SaveAsync_SavesFile_AndReturnsRelativeUrl()
     {
@@ -60,7 +70,7 @@ public class ImageStorageServiceTests
         {
             var service = new ImageStorageService(new FakeWebHostEnvironment(webRoot));
 
-            var url = await service.SaveAsync(new FakeFormFile("photo.jpg", new byte[] { 1, 2, 3, 4 }));
+            var url = await service.SaveAsync(new FakeFormFile("photo.jpg", ValidJpeg()));
 
             Assert.StartsWith("/uploads/", url);
             Assert.EndsWith(".jpg", url);
@@ -124,13 +134,30 @@ public class ImageStorageServiceTests
     }
 
     [Fact]
+    public async Task SaveAsync_RejectsSpoofedImageContents()
+    {
+        var webRoot = CreateTempWebRoot();
+        try
+        {
+            var service = new ImageStorageService(new FakeWebHostEnvironment(webRoot));
+            var file = new FakeFormFile("fake.jpg", "<html>not an image</html>"u8.ToArray(), "image/jpeg");
+
+            await Assert.ThrowsAsync<InvalidOperationException>(() => service.SaveAsync(file));
+        }
+        finally
+        {
+            Directory.Delete(webRoot, recursive: true);
+        }
+    }
+
+    [Fact]
     public async Task Delete_RemovesSavedFile()
     {
         var webRoot = CreateTempWebRoot();
         try
         {
             var service = new ImageStorageService(new FakeWebHostEnvironment(webRoot));
-            var url = await service.SaveAsync(new FakeFormFile("photo.png", new byte[] { 9, 9, 9 }, "image/png"));
+            var url = await service.SaveAsync(new FakeFormFile("photo.png", ValidPng(), "image/png"));
 
             service.Delete(url);
 

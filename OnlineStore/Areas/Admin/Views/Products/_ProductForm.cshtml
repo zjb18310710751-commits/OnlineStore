@@ -1,11 +1,15 @@
 @model ProductFormViewModel
+@Html.HiddenFor(model => model.NameEn)
+@Html.HiddenFor(model => model.ShippingFromEn)
+@Html.HiddenFor(model => model.ShippingFeeEn)
+@Html.HiddenFor(model => model.DeliveryTimeEn)
+@Html.HiddenFor(model => model.DescriptionEn)
 <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 <div class="mb-3">
     <label asp-for="Name" class="form-label">@Loc["ProductName"]</label>
     <input asp-for="Name" class="form-control" />
     <span asp-validation-for="Name" class="text-danger small"></span>
 </div>
-@Html.HiddenFor(model => model.NameEn)
 <div class="row g-3">
     <div class="col-md-6 mb-3">
         <label asp-for="ShopId" class="form-label">@Loc["Shop"]</label>
@@ -47,7 +51,8 @@
     <label class="form-label">@Loc["ImageUrl"]</label>
     <div id="productImageBox" class="sku-image-box" tabindex="0"
          data-upload-url="@Url.Action("Upload", "Images", new { area = "Admin" })"
-         data-placeholder="@Loc["PasteImageHint"]">
+         data-placeholder="@Loc["PasteImageHint"]"
+         data-image-alt="@L10n.Text("商品主图", "Product image")">
         @if (!string.IsNullOrEmpty(Model.ImageUrl))
         {
             <img src="@Model.ImageUrl" alt="@Loc["Image"]" />
@@ -73,7 +78,7 @@
 
         function setPreview(url) {
             if (url) {
-                box.innerHTML = '<img src="' + url + '" alt="商品主图" />';
+                box.innerHTML = '<img src="' + url + '" alt="' + (box.dataset.imageAlt || '') + '" />';
             } else {
                 box.innerHTML = '<span class="text-muted">' + box.getAttribute('data-placeholder') + '</span>';
             }
@@ -111,48 +116,31 @@
     })();
 </script>
 <div class="row g-3">
-    <div class="col-md-4 mb-3">
+    <div class="col-md-3 mb-3">
         <label asp-for="ShippingFrom" class="form-label">@Loc["ShippingFrom"]</label>
         <input asp-for="ShippingFrom" class="form-control" placeholder="@Loc["ShippingFromPlaceholder"]" />
         <span asp-validation-for="ShippingFrom" class="text-danger small"></span>
     </div>
-    <div class="col-md-4 mb-3">
+    <div class="col-md-3 mb-3">
         <label asp-for="ShippingFee" class="form-label">@Loc["ShippingFee"]</label>
         <input asp-for="ShippingFee" class="form-control" placeholder="@Loc["ShippingFeePlaceholder"]" />
         <span asp-validation-for="ShippingFee" class="text-danger small"></span>
     </div>
-    <div class="col-md-4 mb-3">
+    <div class="col-md-3 mb-3">
+        <label asp-for="ShippingFeeAmount" class="form-label">@L10n.Text("邮费金额", "Shipping fee amount")</label>
+        <input asp-for="ShippingFeeAmount" class="form-control" min="0" step="0.01" />
+        <span asp-validation-for="ShippingFeeAmount" class="text-danger small"></span>
+    </div>
+    <div class="col-md-3 mb-3">
         <label asp-for="DeliveryTime" class="form-label">@Loc["DeliveryTime"]</label>
         <input asp-for="DeliveryTime" class="form-control" placeholder="@Loc["DeliveryTimePlaceholder"]" />
         <span asp-validation-for="DeliveryTime" class="text-danger small"></span>
     </div>
 </div>
-<div class="row g-3">
-    <div class="col-md-4 mb-3">
-        <label asp-for="ShippingFromEn" class="form-label">@Loc["ShippingFromEn"]</label>
-        <input asp-for="ShippingFromEn" class="form-control" />
-        <span asp-validation-for="ShippingFromEn" class="text-danger small"></span>
-    </div>
-    <div class="col-md-4 mb-3">
-        <label asp-for="ShippingFeeEn" class="form-label">@Loc["ShippingFeeEn"]</label>
-        <input asp-for="ShippingFeeEn" class="form-control" />
-        <span asp-validation-for="ShippingFeeEn" class="text-danger small"></span>
-    </div>
-    <div class="col-md-4 mb-3">
-        <label asp-for="DeliveryTimeEn" class="form-label">@Loc["DeliveryTimeEn"]</label>
-        <input asp-for="DeliveryTimeEn" class="form-control" />
-        <span asp-validation-for="DeliveryTimeEn" class="text-danger small"></span>
-    </div>
-</div>
-<div class="mb-3">
+<div class="mb-3 mt-3">
     <label asp-for="Description" class="form-label">@Loc["Description"]</label>
     <textarea asp-for="Description" class="form-control" rows="4"></textarea>
     <span asp-validation-for="Description" class="text-danger small"></span>
-</div>
-<div class="mb-3">
-    <label asp-for="DescriptionEn" class="form-label">@Loc["ProductDescriptionEn"]</label>
-    <textarea asp-for="DescriptionEn" class="form-control" rows="4"></textarea>
-    <span asp-validation-for="DescriptionEn" class="text-danger small"></span>
 </div>
 <div class="mb-3">
     <label asp-for="DetailHtml" class="form-label">@Loc["DetailIntro"]</label>

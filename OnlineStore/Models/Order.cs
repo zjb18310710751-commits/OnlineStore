@@ -35,6 +35,14 @@ public class Order
 
     public decimal DiscountAmount { get; set; }
 
+    public decimal ShippingAmount { get; set; }
+
+    [StringLength(50)]
+    public string PaymentMethod { get; set; } = "cash_on_delivery";
+
+    [StringLength(500)]
+    public string? OrderNotes { get; set; }
+
     [StringLength(20)]
     [Display(Name = "订单状态")]
     public string Status { get; set; } = "待发货";
@@ -74,6 +82,10 @@ public class Order
     public DateTime? SignedAt { get; set; }
 
     public DateTime? UserDeletedAt { get; set; }
+
+    public DateTime? InventoryRestoredAt { get; set; }
+
+    public int? ReplacementForOrderId { get; set; }
 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 

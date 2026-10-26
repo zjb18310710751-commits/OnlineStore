@@ -73,6 +73,9 @@ public class Product
     [Display(Name = "邮费（英文）")]
     public string? ShippingFeeEn { get; set; }
 
+    [Display(Name = "邮费金额")]
+    public decimal ShippingFeeAmount { get; set; }
+
     [StringLength(100)]
     [Display(Name = "发货时效")]
     public string? DeliveryTime { get; set; }

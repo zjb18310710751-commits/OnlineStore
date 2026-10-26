@@ -31,7 +31,7 @@ public class BrevoApiEmailService : IEmailService
 
         if (string.IsNullOrWhiteSpace(apiKey) || string.IsNullOrWhiteSpace(senderEmail))
         {
-            throw new InvalidOperationException("邮件服务未配置，请联系管理员。");
+            throw new InvalidOperationException("Email service is not configured.");
         }
 
         var senderName = section["SenderName"] ?? "Online Store";
@@ -58,8 +58,9 @@ public class BrevoApiEmailService : IEmailService
             var body = await response.Content.ReadAsStringAsync(cancellationToken);
             if (!response.IsSuccessStatusCode)
             {
-                _logger.LogError("Brevo 发送失败（{Status}）：{Body}", response.StatusCode, body);
-                throw new InvalidOperationException($"验证码发送失败（{response.StatusCode}）。");
+                _logger.LogError("Brevo email delivery failed with status {Status}: {Body}", response.StatusCode, body);
+                throw new InvalidOperationException(
+                    $"Verification email could not be sent. Brevo returned {response.StatusCode}.");
             }
         }
         catch (InvalidOperationException)
@@ -68,8 +69,8 @@ public class BrevoApiEmailService : IEmailService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "发送验证码邮件失败：{To}", to);
-            throw new InvalidOperationException($"验证码发送失败：{ex.Message}", ex);
+            _logger.LogError(ex, "Failed to send verification email to {To}.", to);
+            throw new InvalidOperationException("Verification email could not be sent.", ex);
         }
     }
 }

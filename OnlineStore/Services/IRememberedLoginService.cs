@@ -1,11 +1,11 @@
 namespace OnlineStore.Services;
 
-public sealed record RememberedLogin(string Email, string Password);
+public sealed record RememberedLogin(string Email);
 
 public interface IRememberedLoginService
 {
 
-    void Save(string email, string password);
+    void Save(string email);
 
     RememberedLogin? Load();
 

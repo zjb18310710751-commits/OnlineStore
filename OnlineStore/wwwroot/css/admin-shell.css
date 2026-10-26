@@ -55,7 +55,8 @@
 .admin-app .admin-store-link:hover { text-decoration: underline; text-underline-offset: 4px; }
 .admin-app .admin-language { min-width: 44px; min-height: 44px; border: 1px solid var(--admin-line); border-radius: 50%; background: #fff; color: var(--admin-ink); font-size: 12px; }
 .admin-app .admin-language:hover { background: var(--admin-surface); }
-.admin-app .admin-user-mark { display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 50%; background: var(--admin-surface); font-size: 19px; }
+.admin-app .admin-user-mark { display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; overflow: hidden; border-radius: 50%; background: var(--admin-surface); font-size: 19px; }
+.admin-app .admin-user-mark img { display: block; width: 100%; height: 100%; object-fit: cover; }
 .admin-app .admin-menu-toggle { display: inline-flex; align-items: center; justify-content: center; flex: 0 0 44px; width: 44px; height: 44px; padding: 0; border: 1px solid var(--admin-line); border-radius: var(--admin-radius); background: #fff; color: var(--admin-ink); font-size: 23px; }
 .admin-app .admin-content { width: 100%; max-width: 1680px; min-width: 0; margin-inline: auto; padding: var(--admin-gutter); }
 .admin-app .admin-content > h1, .admin-app .admin-content > div > h1 { color: var(--admin-ink); font-size: 28px; font-weight: 700; letter-spacing: -.035em; }
@@ -65,7 +66,6 @@
 .admin-app .btn { display: inline-flex; align-items: center; justify-content: center; gap: 4px; min-height: 44px; padding: 9px 16px; border-radius: 6px; font-size: 13px; font-weight: 600; }
 .admin-app .btn-primary { --bs-btn-bg: #151515; --bs-btn-border-color: #151515; --bs-btn-color: #fff; --bs-btn-hover-bg: #3d3d3d; --bs-btn-hover-border-color: #3d3d3d; --bs-btn-active-bg: #000; --bs-btn-active-border-color: #000; --bs-btn-disabled-bg: #777; --bs-btn-disabled-border-color: #777; }
 .admin-app :is(.btn-outline-primary, .btn-outline-secondary, .btn-outline-dark, .btn-outline-success, .btn-outline-danger, .btn-outline-warning, .btn-outline-info) { --bs-btn-color: #151515; --bs-btn-border-color: #111; --bs-btn-hover-bg: #f0f0f0; --bs-btn-hover-color: #151515; --bs-btn-hover-border-color: #111; --bs-btn-active-bg: #111; --bs-btn-active-color: #fff; --bs-btn-active-border-color: #111; }
-.admin-app :is(.btn-success, .btn-danger, .btn-warning, .btn-info) { --bs-btn-bg: #fff; --bs-btn-border-color: #111; --bs-btn-color: #111; --bs-btn-hover-bg: #111; --bs-btn-hover-border-color: #111; --bs-btn-hover-color: #fff; --bs-btn-active-bg: #111; --bs-btn-active-border-color: #111; --bs-btn-active-color: #fff; }
 .admin-store-heading { display: flex; align-items: flex-end; justify-content: space-between; gap: var(--admin-space); margin-bottom: 26px; padding: 2px 0 10px; }
 .admin-store-heading > div { min-width: 0; }
 .admin-store-eyebrow { margin: 0 0 8px; color: var(--admin-muted); font-size: 10px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; }

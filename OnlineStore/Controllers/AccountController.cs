@@ -87,7 +87,7 @@ public class AccountController : Controller
 
             if (model.RememberCredentials)
             {
-                _rememberedLogin.Save(model.Email, model.Password);
+                _rememberedLogin.Save(model.Email);
             }
             else
             {
@@ -824,7 +824,6 @@ public class AccountController : Controller
         return new LoginViewModel
         {
             Email = remembered.Email,
-            Password = remembered.Password,
             RememberCredentials = true
         };
     }

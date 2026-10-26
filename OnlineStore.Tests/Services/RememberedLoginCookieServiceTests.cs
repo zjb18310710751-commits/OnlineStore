@@ -16,13 +16,13 @@ public class RememberedLoginCookieServiceTests
     }
 
     [Fact]
-    public void SaveThenLoad_RoundTripsEmailAndPassword()
+    public void SaveThenLoad_RoundTripsEmailOnly()
     {
         var context = new DefaultHttpContext();
         var (accessor, protector) = CreateAccessor(context);
         var service = new RememberedLoginCookieService(accessor, protector);
 
-        service.Save("user@store.com", "Passw0rd@123");
+        service.Save("user@store.com");
 
         var setCookie = context.Response.Headers["Set-Cookie"].ToString();
         context.Request.Headers["Cookie"] = setCookie.Split(';')[0];
@@ -31,7 +31,6 @@ public class RememberedLoginCookieServiceTests
 
         Assert.NotNull(loaded);
         Assert.Equal("user@store.com", loaded!.Email);
-        Assert.Equal("Passw0rd@123", loaded.Password);
     }
 
     [Fact]
@@ -56,16 +55,15 @@ public class RememberedLoginCookieServiceTests
     }
 
     [Fact]
-    public void Save_DoesNotExposePasswordInPlaintext()
+    public void Save_DoesNotExposeEmailInPlaintext()
     {
         var context = new DefaultHttpContext();
         var (accessor, protector) = CreateAccessor(context);
         var service = new RememberedLoginCookieService(accessor, protector);
 
-        service.Save("user@store.com", "Passw0rd@123");
+        service.Save("user@store.com");
 
         var setCookie = context.Response.Headers["Set-Cookie"].ToString();
-        Assert.DoesNotContain("Passw0rd@123", setCookie);
         Assert.DoesNotContain("user@store.com", setCookie);
     }
 }

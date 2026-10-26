@@ -21,7 +21,7 @@ public class RememberedLoginCookieService : IRememberedLoginService
         _protector = dataProtectionProvider.CreateProtector(Purpose);
     }
 
-    public void Save(string email, string password)
+    public void Save(string email)
     {
         var httpContext = _httpContextAccessor.HttpContext;
         if (httpContext is null)
@@ -29,7 +29,7 @@ public class RememberedLoginCookieService : IRememberedLoginService
             return;
         }
 
-        var payload = JsonSerializer.Serialize(new RememberedLogin(email, password));
+        var payload = JsonSerializer.Serialize(new RememberedLogin(email));
         var protectedPayload = _protector.Protect(payload);
 
         httpContext.Response.Cookies.Append(CookieName, protectedPayload, new CookieOptions

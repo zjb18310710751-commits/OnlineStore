@@ -214,18 +214,11 @@ namespace OnlineStore.Migrations
                     b.Property<DateTime>("RequestedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("ReturnCarrier")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("ReturnTrackingNumber")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
                     b.Property<DateTime?>("ReviewedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Status")
+                        .IsConcurrencyToken()
                         .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
@@ -242,7 +235,9 @@ namespace OnlineStore.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("OrderId");
+                    b.HasIndex("OrderId")
+                        .IsUnique()
+                        .HasFilter("[Status] <> N'已拒绝'");
 
                     b.HasIndex("Status");
 
@@ -738,17 +733,36 @@ namespace OnlineStore.Migrations
                     b.Property<DateTime?>("ExpectedDispatchAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<DateTime?>("InventoryRestoredAt")
+                        .IsConcurrencyToken()
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("OrderNo")
                         .IsRequired()
                         .HasMaxLength(30)
                         .HasColumnType("nvarchar(30)");
 
+                    b.Property<string>("OrderNotes")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("PaymentMethod")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
                     b.Property<string>("Phone")
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
+                    b.Property<int?>("ReplacementForOrderId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime?>("ShippedAt")
                         .HasColumnType("datetime2");
+
+                    b.Property<double>("ShippingAmount")
+                        .HasColumnType("float");
 
                     b.Property<string>("ShippingFeeText")
                         .HasMaxLength(100)
@@ -794,6 +808,11 @@ namespace OnlineStore.Migrations
                         .HasColumnType("nvarchar(50)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("OrderNo")
+                        .IsUnique();
+
+                    b.HasIndex("ReplacementForOrderId");
 
                     b.HasIndex("UserId");
 
@@ -917,6 +936,9 @@ namespace OnlineStore.Migrations
                     b.Property<string>("ShippingFee")
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
+
+                    b.Property<double>("ShippingFeeAmount")
+                        .HasColumnType("float");
 
                     b.Property<string>("ShippingFeeEn")
                         .HasMaxLength(50)
@@ -1317,6 +1339,14 @@ namespace OnlineStore.Migrations
                         .IsRequired();
 
                     b.Navigation("Product");
+                });
+
+            modelBuilder.Entity("OnlineStore.Models.Order", b =>
+                {
+                    b.HasOne("OnlineStore.Models.Order", null)
+                        .WithMany()
+                        .HasForeignKey("ReplacementForOrderId")
+                        .OnDelete(DeleteBehavior.Restrict);
                 });
 
             modelBuilder.Entity("OnlineStore.Models.OrderItem", b =>

@@ -20,11 +20,13 @@ public class CheckoutViewModel
 
     public decimal DiscountAmount { get; set; }
 
+    public decimal ShippingFee { get; set; }
+
     public bool FreeShippingCoupon { get; set; }
 
     public List<CouponChoiceViewModel> AvailableCoupons { get; set; } = new();
 
-    public decimal PayableTotal => Total - DiscountAmount;
+    public decimal PayableTotal => Math.Max(0, Total + ShippingFee - DiscountAmount);
 
     [Display(Name = "收货人")]
     public string? UserName { get; set; }
@@ -47,9 +49,11 @@ public class CheckoutViewModel
     [Display(Name = "国家")]
     public string? Country { get; set; }
 
+    [Required]
     [Display(Name = "支付方式")]
     public string PaymentMethod { get; set; } = "cash_on_delivery";
 
+    [StringLength(500)]
     [Display(Name = "订单备注（可选）")]
     public string? OrderNotes { get; set; }
 }

@@ -73,8 +73,9 @@ public class SmtpEmailService : IEmailService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "发送验证码邮件失败：{To}", to);
-            throw new InvalidOperationException($"验证码发送失败（{host}:{port}）：{ex.Message}", ex);
+            _logger.LogError(ex, "Failed to send verification email to {To}.", to);
+            throw new InvalidOperationException(
+                $"Verification email could not be sent through {host}:{port}.", ex);
         }
         finally
         {

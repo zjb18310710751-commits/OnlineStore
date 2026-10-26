@@ -1,8 +1,10 @@
+@inject Microsoft.AspNetCore.Identity.UserManager<ApplicationUser> UserManager
 @functions {
     string Active(string controller) =>
         ViewContext.RouteData.Values["controller"]?.ToString() == controller ? "active" : "";
 }
 @{
+    var currentUser = User.Identity?.IsAuthenticated == true ? await UserManager.GetUserAsync(User) : null;
     var isZh = CultureInfo.CurrentUICulture.Name.StartsWith("zh", StringComparison.OrdinalIgnoreCase);
     var returnUrl = $"{Context.Request.Path}{Context.Request.QueryString}";
 }
@@ -64,7 +66,16 @@
                         <input type="hidden" name="returnUrl" value="@returnUrl" />
                         <button type="submit" class="admin-language" aria-label="@(isZh ? "Switch to English" : "切换到中文")">@(isZh ? "EN" : "中文")</button>
                     </form>
-                    <span class="admin-user-mark" aria-label="@L10n.Text("管理员", "Administrator")"><i class="bi bi-person" aria-hidden="true"></i></span>
+                    <span class="admin-user-mark" aria-label="@L10n.Text("管理员", "Administrator")">
+                        @if (!string.IsNullOrWhiteSpace(currentUser?.AvatarUrl))
+                        {
+                            <img src="@currentUser.AvatarUrl" alt="" />
+                        }
+                        else
+                        {
+                            <i class="bi bi-person" aria-hidden="true"></i>
+                        }
+                    </span>
                 </div>
             </header>
           <main class="admin-content" id="admin-content" tabindex="-1">

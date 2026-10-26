@@ -45,9 +45,17 @@
 .storefront .sf-language-form { margin: 0; }
 .storefront .sf-language { border: 0; padding: 0; background: transparent; color: inherit; min-width: 32px; min-height: 44px; font: inherit; font-size: 12px; }
 .storefront .sf-avatar { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; }
-.storefront .dropdown-menu { padding: 12px; border: 1px solid var(--sf-line); border-radius: 0; box-shadow: 0 10px 30px #0000000a; }
-.storefront .dropdown-item { min-height: 40px; padding: 8px 16px; color: #111; font-size: 14px; }
-.storefront .dropdown-item:active { background: #111; color: white; }
+.storefront .dropdown-menu { width: max-content; min-width: 0; max-width: min(260px, calc(100vw - 24px)); margin-top: 8px !important; padding: 6px; border: 1px solid #e3e3e3; border-radius: 10px; background: #fff; box-shadow: 0 14px 34px rgb(0 0 0 / 12%); transform-origin: top right; }
+.storefront .dropdown-item { min-height: 38px; padding: 8px 12px; border-radius: 6px; color: #111; font-size: 14px; transition: background-color 120ms ease, color 120ms ease; }
+.storefront .dropdown-item:hover, .storefront .dropdown-item:focus { background: #f2f2f2; color: #111; }
+.storefront .dropdown-item:active, .storefront .dropdown-item.active { background: #111; color: #fff; }
+.storefront .dropdown-menu form { margin: 0; }
+.storefront .dropdown-menu button.dropdown-item { width: 100%; border: 0; background: transparent; text-align: left; }
+.storefront .dropdown-menu button.dropdown-item:hover, .storefront .dropdown-menu button.dropdown-item:focus { background: #f2f2f2; color: #111; }
+.storefront .dropdown-menu button.dropdown-item:active { background: #111; color: #fff; }
+.storefront [data-bs-toggle="dropdown"][aria-expanded="true"] { background: var(--sf-surface); }
+.storefront .dropdown-item.sf-account-link { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.storefront .sf-count-badge { display: inline-flex; align-items: center; justify-content: center; min-width: 22px; height: 22px; padding-inline: 6px; border-radius: 999px; background: #111; color: #fff; font-size: 10px; font-weight: 700; line-height: 1; }
 .storefront .sf-home-hero { padding-top: 24px; }
 .storefront .sf-button { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 26px; border: 1px solid var(--sf-ink); background: var(--sf-ink); color: white; border-radius: var(--sf-radius); font-size: 15px; font-weight: 600; text-decoration: none; }
 .storefront .sf-button:hover { background: #444; border-color: #444; color: white; }
@@ -196,8 +204,7 @@
     line-height: 1.6;
 }
 
-.storefront .member-order-detail,
-.storefront .member-order-discount {
+.storefront .member-order-detail {
     font-size: 12px;
 }
 

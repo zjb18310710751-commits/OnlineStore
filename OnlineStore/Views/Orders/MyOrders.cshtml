@@ -54,6 +54,17 @@
                                         @L10n.Text("预计发货", "Dispatch by") @o.ExpectedDispatchAt.Value.ToLocalTime().ToString("yyyy-MM-dd HH:mm")
                                     </div>
                                 }
+                                <div class="member-order-meta mt-1">
+                                    @Loc["Payment"]：@L10n.PaymentMethod(o.PaymentMethod)
+                                    @if (o.ShippingAmount > 0)
+                                    {
+                                        <span> · @Loc["ShippingFee"]：¥@o.ShippingAmount.ToString("F2")</span>
+                                    }
+                                </div>
+                                @if (!string.IsNullOrWhiteSpace(o.OrderNotes))
+                                {
+                                    <div class="member-order-meta mt-1">@L10n.Text("备注", "Notes")：@o.OrderNotes</div>
+                                }
                             </div>
                             <span class="badge member-order-status @StatusBadge(o.Status)">@L10n.Status(o.Status)</span>
                         </div>
@@ -97,12 +108,6 @@
                                             }
                                         </div>
                                     }
-                                    else if (o.Status == OrderStatus.Completed)
-                                    {
-                                        <a asp-controller="Products" asp-action="Details" asp-route-id="@i.ProductId" asp-route-orderId="@o.Id" asp-fragment="write-review" class="member-order-write-review">
-                                            <i class="bi bi-chat-square-text" aria-hidden="true"></i>@Loc["WriteReview"]
-                                        </a>
-                                    }
                                 </li>
                             }
                         </ul>
@@ -125,7 +130,7 @@
                         }
 
                         <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mt-3">
-                            <div class="d-flex flex-wrap gap-2">
+                            <div class="member-order-actions d-flex flex-wrap gap-2 @(o.Status == OrderStatus.Completed ? "member-order-actions--stacked" : "")">
                                 @if (o.Status == OrderStatus.PendingShipment)
                                 {
                                     <form asp-controller="Orders" asp-action="Cancel" asp-route-id="@o.Id" method="post"
@@ -150,6 +155,15 @@
                                           onsubmit="return confirm(this.dataset.confirm);">
                                         <button type="submit" class="btn btn-sm btn-outline-dark">@L10n.Text("删除订单", "Delete order")</button>
                                     </form>
+                                }
+                                @if (o.Status == OrderStatus.Completed)
+                                {
+                                    foreach (var item in o.Items.Where(item => !myReviews.ContainsKey($"{o.Id}:{item.ProductId}")))
+                                    {
+                                        <a asp-controller="Products" asp-action="Details" asp-route-id="@item.ProductId" asp-route-orderId="@o.Id" asp-fragment="write-review" class="btn btn-sm btn-outline-dark member-order-review-link">
+                                            @Loc["WriteReview"]
+                                        </a>
+                                    }
                                 }
                             </div>
                             <span class="member-order-total">@Loc["Total"]：<span class="text-danger">¥@o.Total.ToString("F2")</span></span>

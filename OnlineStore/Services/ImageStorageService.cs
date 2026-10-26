@@ -46,6 +46,14 @@ public class ImageStorageService : IImageStorageService
             throw new InvalidOperationException(_loc["ImageInvalid"].Value);
         }
 
+        await using (var headerStream = file.OpenReadStream())
+        {
+            if (!await HasValidImageSignatureAsync(headerStream, ext, cancellationToken))
+            {
+                throw new InvalidOperationException(_loc["ImageInvalid"].Value);
+            }
+        }
+
         var uploadsDir = Path.Combine(_env.WebRootPath, "uploads");
         Directory.CreateDirectory(uploadsDir);
 
@@ -56,6 +64,32 @@ public class ImageStorageService : IImageStorageService
         await file.CopyToAsync(stream, cancellationToken);
 
         return $"/uploads/{fileName}";
+    }
+
+    private static async Task<bool> HasValidImageSignatureAsync(
+        Stream stream,
+        string extension,
+        CancellationToken cancellationToken)
+    {
+        var header = new byte[12];
+        var read = await stream.ReadAsync(header.AsMemory(), cancellationToken);
+        if (read < 6)
+        {
+            return false;
+        }
+
+        return extension.ToLowerInvariant() switch
+        {
+            ".jpg" or ".jpeg" => header[0] == 0xFF && header[1] == 0xD8 && header[2] == 0xFF,
+            ".png" => header.AsSpan(0, 8).SequenceEqual(
+                new byte[] { 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A }),
+            ".gif" => header.AsSpan(0, 6).SequenceEqual("GIF87a"u8)
+                || header.AsSpan(0, 6).SequenceEqual("GIF89a"u8),
+            ".webp" => read >= 12
+                && header.AsSpan(0, 4).SequenceEqual("RIFF"u8)
+                && header.AsSpan(8, 4).SequenceEqual("WEBP"u8),
+            _ => false
+        };
     }
 
     public void Delete(string? relativeUrl)

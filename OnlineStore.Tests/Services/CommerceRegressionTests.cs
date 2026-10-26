@@ -108,6 +108,47 @@ public class CommerceRegressionTests
     }
 
     [Fact]
+    public async Task CreateOrder_AddsShippingAndPersistsCheckoutDetails()
+    {
+        using var context = await CreateContextAsync();
+        (await context.Products.FindAsync(1))!.ShippingFeeAmount = 6m;
+        await context.SaveChangesAsync();
+        var order = NewOrder(2);
+        order.PaymentMethod = "card_demo";
+        order.OrderNotes = "Leave at reception";
+
+        await new OrderService(context).CreateAsync(order);
+
+        Assert.Equal(6m, order.ShippingAmount);
+        Assert.Equal(26m, order.Total);
+        Assert.Equal("card_demo", order.PaymentMethod);
+        Assert.Equal("Leave at reception", order.OrderNotes);
+    }
+
+    [Fact]
+    public async Task FreeShippingCoupon_RemovesCalculatedShipping()
+    {
+        using var context = await CreateContextAsync();
+        (await context.Products.FindAsync(1))!.ShippingFeeAmount = 6m;
+        context.Coupons.Add(new Coupon
+        {
+            Code = "FREESHIP",
+            DiscountType = CouponDiscountType.FreeShipping,
+            DiscountValue = 1,
+            StartDate = DateTime.UtcNow.AddDays(-1),
+            EndDate = DateTime.UtcNow.AddDays(1)
+        });
+        await context.SaveChangesAsync();
+        var order = NewOrder(2);
+        order.CouponCode = "FREESHIP";
+
+        await new OrderService(context).CreateAsync(order);
+
+        Assert.Equal(0m, order.ShippingAmount);
+        Assert.Equal(20m, order.Total);
+    }
+
+    [Fact]
     public async Task CreateOrder_PerUserLimit_BlocksReuseUntilOrderIsCancelled()
     {
         using var context = await CreateContextAsync();
@@ -150,7 +191,16 @@ public class CommerceRegressionTests
         using var context = await CreateContextAsync();
         var order = NewOrder();
         order.Total = 10;
+        order.Status = OrderStatus.Delivered;
         context.Orders.Add(order);
+        context.Orders.Add(new Order
+        {
+            OrderNo = Guid.NewGuid().ToString("N")[..30],
+            UserId = "user",
+            Total = 100,
+            Status = OrderStatus.Delivered,
+            ReplacementForOrderId = order.Id
+        });
         await context.SaveChangesAsync();
         await new ProductService(context).DeleteAsync(1);
         var result = await new AdminDashboardService(context, new ProductService(context)).GetAsync();
@@ -270,7 +320,7 @@ public class CommerceRegressionTests
         await new OrderService(context).CreateAsync(order);
         using var other = new ApplicationDbContext(new DbContextOptionsBuilder<ApplicationDbContext>()
             .UseInMemoryDatabase(databaseName).Options);
-        Assert.True(await new OrderService(other).ShipAsync(order.Id));
+        Assert.True(await new OrderService(other).ShipAsync(order.Id, "SF Express", "TEST00000001"));
         Assert.False(await new OrderService(context).CancelAsync(order.Id));
         Assert.Equal(4, (await context.Products.FindAsync(1))!.Stock);
     }

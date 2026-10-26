@@ -10,6 +10,7 @@ public class AdminDashboardService : IAdminDashboardService
     {
         OrderStatus.PendingShipment,
         OrderStatus.Shipped,
+        OrderStatus.Delivered,
         OrderStatus.Completed
     };
 
@@ -32,7 +33,7 @@ public class AdminDashboardService : IAdminDashboardService
             .ToListAsync();
 
         var revenueOrders = orders
-            .Where(o => ValidRevenueStatuses.Contains(o.Status))
+            .Where(o => o.ReplacementForOrderId is null && ValidRevenueStatuses.Contains(o.Status))
             .ToList();
         var today = DateTime.Now.Date;
 

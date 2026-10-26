@@ -51,6 +51,15 @@ public static class L10n
         };
     }
 
+    public static string PaymentMethod(string? method) =>
+        method switch
+        {
+            "cash_on_delivery" => Text("货到付款", "Cash on delivery"),
+            "card_demo" => Text("银行卡支付（演示）", "Card payment (demo)"),
+            "bank_transfer_demo" => Text("银行转账（演示）", "Bank transfer (demo)"),
+            _ => method ?? string.Empty
+        };
+
     public static string AfterSalesStatusLabel(string status)
     {
         if (!IsEnglish)

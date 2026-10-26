@@ -51,8 +51,6 @@ public interface ICouponService
 
     Task<IReadOnlyList<CouponWalletItem>> GetCustomerCouponsAsync(string userId);
 
-    Task IncrementUsageAsync(int id);
-
     Task<string> GenerateUniqueCodeAsync(string? campaignName);
 
     Task<int> GenerateBatchAsync(int couponId, int quantity, string? prefix);

@@ -48,10 +48,21 @@
                 @foreach (var o in Model.Orders)
                 {
                     <tr>
-                        <td class="fw-semibold">@o.OrderNo</td>
+                        <td class="fw-semibold">
+                            @o.OrderNo
+                            @if (o.ReplacementForOrderId.HasValue)
+                            {
+                                <span class="badge bg-white text-dark border ms-1">@L10n.Text("换货补发", "Exchange replacement")</span>
+                            }
+                        </td>
                         <td class="small">
                             @o.UserName<br />
-                            <span class="text-muted">@o.Phone</span>
+                            <span class="text-muted">@o.Phone</span><br />
+                            <span>@Loc["Payment"]：@L10n.PaymentMethod(o.PaymentMethod)</span>
+                            @if (!string.IsNullOrWhiteSpace(o.OrderNotes))
+                            {
+                                <div class="text-muted mt-1">@L10n.Text("备注", "Notes")：@o.OrderNotes</div>
+                            }
                         </td>
                         <td class="text-end">
                             @if (o.DiscountAmount > 0)
@@ -88,7 +99,11 @@
                                     <button type="submit" class="btn btn-sm btn-outline-dark">@Loc["CancelOrder"]</button>
                                 </form>
                             }
-                            else if (o.Status is OrderStatus.Shipped or OrderStatus.Delivered)
+                            else if (o.Status == OrderStatus.Shipped)
+                            {
+                                <button type="button" class="btn btn-sm btn-outline-dark" onclick="openAdminTrackingModal(@o.Id)">@L10n.Text("查看物流", "Track")</button>
+                            }
+                            else if (o.Status == OrderStatus.Delivered)
                             {
                                 <button type="button" class="btn btn-sm btn-outline-dark" onclick="openAdminTrackingModal(@o.Id)">@L10n.Text("查看物流", "Track")</button>
                                 <form asp-action="Complete" asp-route-id="@o.Id" method="post" class="d-inline">

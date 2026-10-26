@@ -16,8 +16,6 @@ public interface IOrderService
 
     Task<bool> RefundAsync(int id);
 
-    Task<bool> ShipAsync(int id);
-
     Task<bool> ShipAsync(int id, string? carrier, string? trackingNumber);
 
     Task<bool> CompleteAsync(int id);
@@ -26,11 +24,11 @@ public interface IOrderService
 
     Task<bool> ConfirmReceiptAsync(int id, string userId);
 
+    Task<int> GetDeliveredItemCountAsync(string userId);
+
     Task<bool> DeleteForUserAsync(int id, string userId);
 
     Task<AfterSalesRequest> CreateAfterSalesAsync(int orderId, string userId, string type, string reason);
-
-    Task<IReadOnlyList<AfterSalesRequest>> GetAfterSalesByUserAsync(string userId);
 
     Task<IReadOnlyList<AfterSalesRequest>> GetAfterSalesAllAsync();
 

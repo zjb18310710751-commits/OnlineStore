@@ -158,18 +158,6 @@ public class CouponService : ICouponService
             .ToList();
     }
 
-    public async Task IncrementUsageAsync(int id)
-    {
-        var coupon = await _context.Coupons.FirstOrDefaultAsync(c => c.Id == id);
-        if (coupon is null)
-        {
-            return;
-        }
-
-        coupon.UsedCount++;
-        await _context.SaveChangesAsync();
-    }
-
     public async Task<string> GenerateUniqueCodeAsync(string? campaignName)
     {
         var prefix = NormalizeCodePrefix(campaignName, "ZHY");

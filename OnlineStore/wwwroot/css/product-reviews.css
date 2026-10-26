@@ -10,13 +10,14 @@
     scroll-margin-top: calc(var(--sf-header-height) + var(--sf-space));
 }
 .storefront .sf-reviews [hidden] { display: none !important; }
-.storefront .sf-reviews-heading { display: flex; justify-content: space-between; align-items: end; gap: var(--sf-space); margin-bottom: var(--review-space-large); }
+.storefront .sf-reviews-heading { margin-bottom: var(--review-space-large); }
 .storefront .sf-reviews-eyebrow { margin: 0 0 var(--review-space-small); color: var(--sf-muted); font-size: 11px; font-weight: 600; letter-spacing: .13em; }
 .storefront .sf-reviews-heading h2 { margin: 0; font-size: clamp(28px, 3vw, 40px); font-weight: 600; letter-spacing: -.04em; line-height: 1.2; }
 .storefront .sf-reviews-total { margin-left: var(--review-space-small); color: var(--sf-muted); font-size: 18px; font-weight: 400; letter-spacing: 0; }
 .storefront .sf-reviews-heading > p { margin: 0; color: var(--sf-muted); font-size: 14px; }
 .storefront .sf-reviews-layout { display: grid; grid-template-columns: var(--pd-columns); gap: var(--review-column-gap); align-items: start; }
-.storefront .sf-reviews-overview { max-width: 300px; }
+.storefront .sf-reviews-rail { position: sticky; top: var(--pd-scroll-offset); max-width: 300px; min-width: 0; }
+.storefront .sf-reviews-overview { max-width: none; }
 .storefront .sf-review-score { display: flex; gap: var(--review-space-small); align-items: baseline; line-height: 1; margin-bottom: var(--review-space-small); }
 .storefront .sf-review-score-value { font-size: clamp(64px, 6vw, 88px); font-weight: 500; letter-spacing: -.065em; }
 .storefront .sf-review-score-scale { color: var(--sf-muted); font-size: 20px; }
@@ -77,9 +78,12 @@
 .storefront .sf-review-field textarea::placeholder { color: var(--sf-muted); }
 .storefront .sf-review-field textarea:focus-visible { outline: 2px solid var(--sf-ink); outline-offset: 2px; }
 .storefront .sf-review-character-count { display: block; padding-top: 6px; color: var(--sf-muted); text-align: right; font-size: 12px; }
-.storefront .sf-review-upload input[type="file"] { display: block; width: 100%; min-height: 44px; color: var(--sf-muted); font: inherit; font-size: 13px; }
-.storefront .sf-review-upload input[type="file"]::file-selector-button { min-height: 44px; margin-right: var(--review-space-small); padding: 8px 18px; border: 1px solid var(--sf-line); border-radius: var(--sf-radius); background: #fff; color: var(--sf-ink); font: inherit; cursor: pointer; }
-.storefront .sf-review-upload input[type="file"]::file-selector-button:hover { border-color: var(--sf-ink); }
+.storefront .sf-review-file-control { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; min-height: 44px; }
+.storefront .sf-review-file-input { position: absolute; width: 1px; height: 1px; overflow: hidden; opacity: 0; clip-path: inset(50%); }
+.storefront .sf-review-file-button { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 8px 18px; border: 1px solid var(--sf-line); border-radius: var(--sf-radius); background: #fff; color: var(--sf-ink); font-size: 13px; cursor: pointer; transition: border-color 120ms ease, background-color 120ms ease; }
+.storefront .sf-review-file-button:hover { border-color: var(--sf-ink); background: var(--sf-surface); }
+.storefront .sf-review-file-control:focus-within .sf-review-file-button { outline: 2px solid var(--sf-ink); outline-offset: 2px; }
+.storefront .sf-review-file-name { min-width: 0; color: var(--sf-muted); font-size: 13px; overflow-wrap: anywhere; }
 .storefront .sf-review-field-help { margin: 8px 0 0; color: var(--sf-muted); font-size: 12px; }
 .storefront .sf-review-field-error { margin: var(--review-space-small) 0 0; color: var(--review-error); font-size: 13px; }
 .storefront .sf-review-image-preview { display: flex; align-items: center; gap: var(--sf-space); margin-top: var(--sf-space); }
@@ -99,6 +103,7 @@
     .storefront .sf-reviews-heading { display: block; }
     .storefront .sf-reviews-heading > p { margin-top: var(--review-space-small); }
     .storefront .sf-reviews-layout { grid-template-columns: minmax(0, 1fr); gap: var(--review-space-large); }
+    .storefront .sf-reviews-rail { position: static; max-width: none; }
     .storefront .sf-reviews-overview { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: var(--sf-space); max-width: none; }
     .storefront .sf-review-score { grid-column: 1; grid-row: 1; }
     .storefront .sf-reviews-overview > .sf-review-stars { grid-column: 1; grid-row: 2; }

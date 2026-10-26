@@ -205,11 +205,11 @@
                             </div>
                             <div class="checkout-total-row">
                                 <span>@Loc["ShippingFee"]</span>
-                                <span>@Loc["FreeShipping"]</span>
+                                <span id="shippingAmountText">@(Model.ShippingFee > 0 ? $"¥{Model.ShippingFee:F2}" : Loc["FreeShipping"].Value)</span>
                             </div>
                             <div class="checkout-total-row checkout-grand-total">
                                 <span>@Loc["Total"]</span>
-                                <span id="payableTotalText" class="text-danger" data-base-total="@Model.Total.ToString("F2")">¥@Model.PayableTotal.ToString("F2")</span>
+                                <span id="payableTotalText" class="text-danger" data-base-total="@((Model.Total + Model.ShippingFee).ToString("F2"))">¥@Model.PayableTotal.ToString("F2")</span>
                             </div>
                         </div>
 
@@ -254,6 +254,7 @@
             var discountRow = document.getElementById('couponDiscountRow');
             var discountText = document.getElementById('couponDiscountText');
             var shippingRow = document.getElementById('couponShippingRow');
+            var shippingAmountText = document.getElementById('shippingAmountText');
             var payableText = document.getElementById('payableTotalText');
             var clearButton = document.getElementById('couponClear');
 
@@ -274,6 +275,9 @@
                 discountText.textContent = '-' + formatMoney(data.discount);
                 discountRow.classList.toggle('d-none', !(data.discount > 0));
                 shippingRow.classList.toggle('d-none', !data.freeShipping);
+                shippingAmountText.textContent = data.shipping > 0
+                    ? formatMoney(data.shipping)
+                    : '@Loc["FreeShipping"]';
                 statusEl.classList.remove('text-danger');
                 statusEl.textContent = '';
                 selectCouponButton(data.code || '');
@@ -286,6 +290,7 @@
                 discountRow.classList.add('d-none');
                 shippingRow.classList.add('d-none');
                 payableText.textContent = formatMoney(payableText.getAttribute('data-base-total'));
+                shippingAmountText.textContent = '@(Model.ShippingFee > 0 ? $"¥{Model.ShippingFee:F2}" : Loc["FreeShipping"].Value)';
                 selectCouponButton('');
             }
 
@@ -323,6 +328,7 @@
                 discountRow.classList.add('d-none');
                 shippingRow.classList.add('d-none');
                 payableText.textContent = formatMoney(payableText.getAttribute('data-base-total'));
+                shippingAmountText.textContent = '@(Model.ShippingFee > 0 ? $"¥{Model.ShippingFee:F2}" : Loc["FreeShipping"].Value)';
                 selectCouponButton('');
             });
 

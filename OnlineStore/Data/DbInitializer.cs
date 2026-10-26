@@ -373,6 +373,25 @@ public static class DbInitializer
 
         ApplyEnglishTranslations(products);
 
+        var ukOrigins = new[]
+        {
+            ("伦敦", "London"),
+            ("曼彻斯特", "Manchester"),
+            ("伯明翰", "Birmingham"),
+            ("利兹", "Leeds"),
+            ("格拉斯哥", "Glasgow"),
+            ("布里斯托尔", "Bristol"),
+            ("利物浦", "Liverpool"),
+            ("爱丁堡", "Edinburgh"),
+            ("谢菲尔德", "Sheffield"),
+            ("卡迪夫", "Cardiff")
+        };
+        for (var i = 0; i < products.Count; i++)
+        {
+            products[i].ShippingFrom = ukOrigins[i % ukOrigins.Length].Item1;
+            products[i].ShippingFromEn = ukOrigins[i % ukOrigins.Length].Item2;
+        }
+
         context.Shops.AddRange(shops);
         context.Categories.AddRange(categories);
         context.Products.AddRange(products);
@@ -855,6 +874,7 @@ public static class DbInitializer
         {
             p.ShippingFromEn ??= Tr(shipping, p.ShippingFrom);
             p.ShippingFeeEn ??= Tr(shipping, p.ShippingFee);
+            p.ShippingFeeAmount = ParseShippingFeeAmount(p.ShippingFee);
             p.DeliveryTimeEn ??= Tr(shipping, p.DeliveryTime);
 
             foreach (var spec in p.Specs)
@@ -875,5 +895,27 @@ public static class DbInitializer
                 r.CommentEn ??= Tr(comment, r.Comment);
             }
         }
+    }
+
+    private static decimal ParseShippingFeeAmount(string? text)
+    {
+        if (string.IsNullOrWhiteSpace(text)
+            || text.Contains("包邮", StringComparison.Ordinal)
+            || text.Contains("free", StringComparison.OrdinalIgnoreCase))
+        {
+            return 0;
+        }
+
+        var numeric = new string(text
+            .Where(character => char.IsDigit(character) || character is '.' or ',')
+            .Select(character => character == ',' ? '.' : character)
+            .ToArray());
+        return decimal.TryParse(
+            numeric,
+            System.Globalization.NumberStyles.Number,
+            System.Globalization.CultureInfo.InvariantCulture,
+            out var amount)
+            ? Math.Max(0, amount)
+            : 0;
     }
 }

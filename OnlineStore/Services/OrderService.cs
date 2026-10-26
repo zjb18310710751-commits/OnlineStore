@@ -142,7 +142,9 @@ public class OrderService : IOrderService
                 coupon.UsedCount++;
             }
 
-            order.Total = subtotal - discount;
+            var shippingAmount = CalculateShippingAmount(products, freeShipping);
+            order.ShippingAmount = shippingAmount;
+            order.Total = subtotal + shippingAmount - discount;
             order.DiscountAmount = discount;
             order.CouponCode = coupon?.Code;
             order.CouponName = coupon?.CampaignName;
@@ -187,8 +189,6 @@ public class OrderService : IOrderService
     public Task<bool> RefundAsync(int id) =>
         TransitionAsync(id, OrderStatus.Refunded, true, OrderStatus.Shipped, OrderStatus.Completed);
 
-    public Task<bool> ShipAsync(int id) => ShipAsync(id, "系统默认", $"TEST{id:D8}");
-
     public async Task<bool> ShipAsync(int id, string? carrier, string? trackingNumber)
     {
         var order = await GetByIdAsync(id);
@@ -197,7 +197,10 @@ public class OrderService : IOrderService
             return false;
         }
 
-        if (string.IsNullOrWhiteSpace(carrier) || string.IsNullOrWhiteSpace(trackingNumber))
+        if (string.IsNullOrWhiteSpace(carrier)
+            || string.IsNullOrWhiteSpace(trackingNumber)
+            || carrier.Trim().Length > 50
+            || trackingNumber.Trim().Length > 50)
         {
             return false;
         }
@@ -213,7 +216,7 @@ public class OrderService : IOrderService
     }
 
     public Task<bool> CompleteAsync(int id) =>
-        TransitionAsync(id, OrderStatus.Completed, false, OrderStatus.Shipped);
+        TransitionAsync(id, OrderStatus.Completed, false, OrderStatus.Delivered);
 
     public async Task<OrderTrackingView?> GetTrackingAsync(int id)
     {
@@ -230,32 +233,38 @@ public class OrderService : IOrderService
         var deliveredAt = shippedAt.Add(DeliveryThreshold);
         var signed = order.Status == OrderStatus.Completed || order.SignedAt.HasValue;
         var deliveredReached = order.DeliveredAt.HasValue || now >= deliveredAt;
+        var origin = !string.IsNullOrWhiteSpace(order.ShippingOrigin)
+            ? L10n.Text(order.ShippingOrigin, order.ShippingOriginEn)
+            : L10n.Text("广东深圳", "Shenzhen, China");
+        var destination = string.IsNullOrWhiteSpace(order.Address)
+            ? L10n.Text("顾客填写的收货地址", "the recipient's delivery address")
+            : order.Address;
 
         var nodes = new List<OrderTrackingNode>
         {
             Node(1,
                 L10n.Text("订单已包装", "Order packaged"),
-                L10n.Text("商家已完成包装与出库检查。", "The merchant has finished packaging and checks."),
+                $"{L10n.Text("商家已在", "Packaged at")} {origin} {L10n.Text("完成包装与出库检查。", "and passed dispatch checks.")}",
                 order.CreatedAt, true, false),
             Node(2,
                 L10n.Text("已交给承运商", "Handed to carrier"),
-                $"{L10n.Text("包裹已交给", "Parcel handed to")} {L10n.Carrier(order.Carrier)} ({order.TrackingNumber})",
+                $"{L10n.Text("包裹已从", "Parcel departed")} {origin} {L10n.Text("交给", "with")} {L10n.Carrier(order.Carrier)} ({order.TrackingNumber})",
                 shippedAt, true, false),
             Node(3,
                 L10n.Text("已离开分拨中心", "Departed regional hub"),
-                L10n.Text("包裹正在发往目的地。", "The parcel is on its way to the destination."),
+                $"{L10n.Text("包裹正在发往", "The parcel is travelling to")} {destination}",
                 shippedAt.Add(TrackingStep), now >= shippedAt.Add(TrackingStep), !deliveredReached && now >= shippedAt.Add(TrackingStep) && now < shippedAt.Add(TrackingStep * 2)),
             Node(4,
                 L10n.Text("已到达派送网点", "Arrived at local depot"),
-                L10n.Text("快递员正在派送。", "The courier is out for delivery."),
+                $"{L10n.Text("快递员正在派送至", "The courier is delivering to")} {destination}",
                 shippedAt.Add(TrackingStep * 2), now >= shippedAt.Add(TrackingStep * 2), !deliveredReached && now >= shippedAt.Add(TrackingStep * 2) && now < deliveredAt),
             Node(5,
                 signed
                     ? L10n.Text("已签收", "Delivered & signed")
                     : L10n.Text("已送达，等待签收", "Delivered, awaiting confirmation"),
                 signed
-                    ? L10n.Text("买家已确认收货，订单完成。", "The buyer confirmed receipt. Order completed.")
-                    : L10n.Text("包裹已送达，等待买家确认收货。", "Delivered. Waiting for the buyer to confirm receipt."),
+                    ? $"{L10n.Text("买家已在", "Delivered to")} {destination} {L10n.Text("确认收货，订单完成。", "and receipt was confirmed.")}"
+                    : $"{L10n.Text("包裹已送达", "Delivered to")} {destination}，{L10n.Text("等待买家确认收货。", "awaiting buyer confirmation.")}",
                 signed ? order.SignedAt : (deliveredReached ? deliveredAt : null),
                 signed || deliveredReached,
                 signed ? false : deliveredReached,
@@ -269,10 +278,8 @@ public class OrderService : IOrderService
             Carrier = L10n.Carrier(order.Carrier),
             TrackingNumber = order.TrackingNumber ?? string.Empty,
             OfficialTrackingUrl = $"https://t.17track.net/en#nums={Uri.EscapeDataString(order.TrackingNumber ?? string.Empty)}",
-            OriginLocation = !string.IsNullOrWhiteSpace(order.ShippingOrigin)
-                ? L10n.Text(order.ShippingOrigin, order.ShippingOriginEn)
-                : L10n.Text("广东深圳", "Shenzhen, China"),
-            DestinationCity = DestinationPart(order.Address),
+            OriginLocation = origin,
+            DestinationCity = destination,
             DestinationPostalCode = string.Empty,
             RecipientName = order.UserName,
             Status = order.Status,
@@ -290,12 +297,15 @@ public class OrderService : IOrderService
             return false;
         }
 
-        if (order.Status != OrderStatus.Shipped && order.Status != OrderStatus.Delivered)
+        if (order.Status == OrderStatus.Shipped)
+        {
+            await AdvanceDeliveryAsync(order);
+        }
+        if (order.Status != OrderStatus.Delivered)
         {
             return false;
         }
 
-        await AdvanceDeliveryAsync(order);
         order.Status = OrderStatus.Completed;
         order.SignedAt = DateTime.UtcNow;
         await _context.SaveChangesAsync();
@@ -330,36 +340,88 @@ public class OrderService : IOrderService
         return true;
     }
 
-    public async Task<AfterSalesRequest> CreateAfterSalesAsync(int orderId, string userId, string type, string reason)
+    public async Task<int> GetDeliveredItemCountAsync(string userId)
     {
-        var order = await GetByIdAsync(orderId);
-        if (order is null || !string.Equals(order.UserId, userId, StringComparison.Ordinal) || order.Status != OrderStatus.Completed)
+        var orders = await _context.Orders
+            .Include(o => o.Items)
+            .Where(o => o.UserId == userId
+                && o.UserDeletedAt == null
+                && (o.Status == OrderStatus.Shipped || o.Status == OrderStatus.Delivered))
+            .ToListAsync();
+
+        foreach (var order in orders.Where(o => o.Status == OrderStatus.Shipped))
         {
-            throw new InvalidOperationException(L10n.Text("当前订单不能申请售后。", "This order is not eligible for after-sales."));
+            await AdvanceDeliveryAsync(order);
         }
 
-        var normalizedType = type == AfterSalesType.Exchange ? AfterSalesType.Exchange : AfterSalesType.Return;
-        var request = new AfterSalesRequest
-        {
-            OrderId = order.Id,
-            UserId = userId,
-            Type = normalizedType,
-            Reason = reason.Trim(),
-            Status = AfterSalesStatus.Pending,
-            RequestedAt = DateTime.UtcNow
-        };
-        _context.AfterSalesRequests.Add(request);
-        await _context.SaveChangesAsync();
-        return request;
+        return orders
+            .Where(o => o.Status == OrderStatus.Delivered)
+            .Sum(o => o.Items.Sum(i => i.Quantity));
     }
 
-    public async Task<IReadOnlyList<AfterSalesRequest>> GetAfterSalesByUserAsync(string userId) =>
-        await _context.AfterSalesRequests
-            .AsNoTracking()
-            .Include(a => a.Order)
-            .Where(a => a.UserId == userId)
-            .OrderByDescending(a => a.RequestedAt)
-            .ToListAsync();
+    public async Task<AfterSalesRequest> CreateAfterSalesAsync(int orderId, string userId, string type, string reason)
+    {
+        if (type is not (AfterSalesType.Return or AfterSalesType.Exchange))
+        {
+            throw new InvalidOperationException(L10n.Text("售后类型无效。", "Invalid after-sales type."));
+        }
+
+        var normalizedReason = reason.Trim();
+        if (normalizedReason.Length is < 1 or > 1000)
+        {
+            throw new InvalidOperationException(L10n.Text(
+                "售后原因不能为空且不能超过 1000 个字符。",
+                "The after-sales reason must contain 1 to 1,000 characters."));
+        }
+
+        await using var transaction = _context.Database.IsRelational()
+            ? await _context.Database.BeginTransactionAsync(IsolationLevel.Serializable)
+            : null;
+        try
+        {
+            var order = await GetByIdAsync(orderId);
+            if (order is null || !string.Equals(order.UserId, userId, StringComparison.Ordinal)
+                || order.Status != OrderStatus.Completed)
+            {
+                throw new InvalidOperationException(L10n.Text(
+                    "当前订单不能申请售后。",
+                    "This order is not eligible for after-sales."));
+            }
+
+            var hasActiveRequest = await _context.AfterSalesRequests.AnyAsync(request =>
+                request.OrderId == orderId && request.Status != AfterSalesStatus.Rejected);
+            if (hasActiveRequest)
+            {
+                throw new InvalidOperationException(L10n.Text(
+                    "该订单已有有效售后申请。",
+                    "This order already has an active after-sales request."));
+            }
+
+            var request = new AfterSalesRequest
+            {
+                OrderId = order.Id,
+                UserId = userId,
+                Type = type,
+                Reason = normalizedReason,
+                Status = AfterSalesStatus.Pending,
+                RequestedAt = DateTime.UtcNow
+            };
+            _context.AfterSalesRequests.Add(request);
+            await _context.SaveChangesAsync();
+            if (transaction is not null)
+            {
+                await transaction.CommitAsync();
+            }
+            return request;
+        }
+        catch (DbUpdateException exception) when (IsUniqueConstraintFailure(exception))
+        {
+            _context.ChangeTracker.Clear();
+            throw new InvalidOperationException(L10n.Text(
+                "该订单已有有效售后申请。",
+                "This order already has an active after-sales request."), exception);
+        }
+    }
 
     public async Task<IReadOnlyList<AfterSalesRequest>> GetAfterSalesAllAsync() =>
         await _context.AfterSalesRequests
@@ -370,6 +432,11 @@ public class OrderService : IOrderService
 
     public async Task<bool> ReviewAfterSalesAsync(int id, bool approved, string? note)
     {
+        if (note?.Trim().Length > 500)
+        {
+            return false;
+        }
+
         var request = await _context.AfterSalesRequests.FirstOrDefaultAsync(a => a.Id == id);
         if (request is null || request.Status != AfterSalesStatus.Pending)
         {
@@ -399,24 +466,52 @@ public class OrderService : IOrderService
 
     public async Task<bool> CompleteAfterSalesAsync(int id)
     {
-        var request = await _context.AfterSalesRequests
-            .Include(a => a.Order)
-            .ThenInclude(o => o!.Items)
-            .FirstOrDefaultAsync(a => a.Id == id);
-        if (request is null || request.Status != AfterSalesStatus.Received)
+        await using var transaction = _context.Database.IsRelational()
+            ? await _context.Database.BeginTransactionAsync(IsolationLevel.Serializable)
+            : null;
+        try
         {
+            var request = await _context.AfterSalesRequests
+                .Include(a => a.Order)
+                .ThenInclude(o => o!.Items)
+                .FirstOrDefaultAsync(a => a.Id == id);
+            if (request is null || request.Status != AfterSalesStatus.Received || request.Order is null)
+            {
+                return false;
+            }
+
+            if (request.Type == AfterSalesType.Return)
+            {
+                await RestoreStockAsync(request.Order);
+            }
+            else if (request.Type == AfterSalesType.Exchange)
+            {
+                await RestoreStockAsync(request.Order);
+                var replacement = BuildReplacementOrder(request.Order);
+                if (!await ReserveStockAsync(replacement))
+                {
+                    _context.ChangeTracker.Clear();
+                    return false;
+                }
+                _context.Orders.Add(replacement);
+            }
+
+            request.Status = AfterSalesStatus.Completed;
+            request.CompletedAt = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
+            if (transaction is not null)
+            {
+                await transaction.CommitAsync();
+            }
+            return true;
+        }
+        catch (Exception exception) when (IsConcurrencyFailure(exception)
+            || IsUniqueConstraintFailure(exception)
+            || exception is OverflowException)
+        {
+            _context.ChangeTracker.Clear();
             return false;
         }
-
-        if (request.Order is not null && request.Type == AfterSalesType.Return)
-        {
-            await RestoreStockAsync(request.Order);
-        }
-
-        request.Status = AfterSalesStatus.Completed;
-        request.CompletedAt = DateTime.UtcNow;
-        await _context.SaveChangesAsync();
-        return true;
     }
 
     public Task<int> CountAsync() => _context.Orders.CountAsync();
@@ -457,16 +552,6 @@ public class OrderService : IOrderService
             IsFutureEstimated = isFutureEstimated
         };
 
-    private static string DestinationPart(string? address)
-    {
-        if (string.IsNullOrWhiteSpace(address))
-        {
-            return string.Empty;
-        }
-
-        return address.Split(',').Select(part => part.Trim()).FirstOrDefault(part => part.Length > 0) ?? string.Empty;
-    }
-
     private static void ApplyShippingSnapshot(Order order, IReadOnlyList<Product> products)
     {
         if (products.Count == 0)
@@ -487,6 +572,51 @@ public class OrderService : IOrderService
             .Max();
         order.ExpectedDispatchAt = DateTime.UtcNow.AddHours(dispatchHours);
     }
+
+    private static decimal CalculateShippingAmount(IReadOnlyList<Product> products, bool freeShipping) =>
+        freeShipping
+            ? 0
+            : products
+                .Select(product => product.ShippingFeeAmount)
+                .Where(amount => amount > 0)
+                .Sum();
+
+    private static Order BuildReplacementOrder(Order source) => new()
+    {
+        OrderNo = OrderNumberGenerator.Generate(),
+        UserId = source.UserId,
+        UserName = source.UserName,
+        Phone = source.Phone,
+        Address = source.Address,
+        Total = 0,
+        DiscountAmount = 0,
+        ShippingAmount = 0,
+        PaymentMethod = source.PaymentMethod,
+        OrderNotes = source.OrderNotes,
+        Status = OrderStatus.PendingShipment,
+        ShippingOrigin = source.ShippingOrigin,
+        ShippingOriginEn = source.ShippingOriginEn,
+        ShippingFeeText = source.ShippingFeeText,
+        ShippingFeeTextEn = source.ShippingFeeTextEn,
+        DispatchTimeText = source.DispatchTimeText,
+        DispatchTimeTextEn = source.DispatchTimeTextEn,
+        ExpectedDispatchAt = DateTime.UtcNow.AddHours(48),
+        ReplacementForOrderId = source.Id,
+        CreatedAt = DateTime.UtcNow,
+        Items = source.Items.Select(item => new OrderItem
+        {
+            ProductId = item.ProductId,
+            SkuId = item.SkuId,
+            ProductName = item.ProductName,
+            ProductNameEn = item.ProductNameEn,
+            Color = item.Color,
+            ColorEn = item.ColorEn,
+            Spec = item.Spec,
+            SpecEn = item.SpecEn,
+            Price = item.Price,
+            Quantity = item.Quantity
+        }).ToList()
+    };
 
     private static string? JoinDistinct(IEnumerable<string?> values) =>
         string.Join("、", values.Where(v => !string.IsNullOrWhiteSpace(v))
@@ -567,6 +697,12 @@ public class OrderService : IOrderService
 
     private async Task RestoreStockAsync(Order order)
     {
+        if (order.InventoryRestoredAt.HasValue)
+        {
+            return;
+        }
+
+        order.InventoryRestoredAt = DateTime.UtcNow;
         var productIds = order.Items.Select(i => i.ProductId).Distinct().ToList();
         if (productIds.Count == 0)
         {
@@ -597,6 +733,43 @@ public class OrderService : IOrderService
         }
     }
 
+    private async Task<bool> ReserveStockAsync(Order order)
+    {
+        var productQuantities = order.Items
+            .GroupBy(item => item.ProductId)
+            .ToDictionary(group => group.Key, group => group.Sum(item => (long)item.Quantity));
+        var skuQuantities = order.Items
+            .Where(item => item.SkuId.HasValue)
+            .GroupBy(item => item.SkuId!.Value)
+            .ToDictionary(group => group.Key, group => group.Sum(item => (long)item.Quantity));
+
+        var productIds = productQuantities.Keys.ToList();
+        var products = await _context.Products.Where(product => productIds.Contains(product.Id)).ToListAsync();
+        if (products.Count != productIds.Count || products.Any(product =>
+                !product.IsActive || productQuantities[product.Id] > product.Stock))
+        {
+            return false;
+        }
+
+        var skuIds = skuQuantities.Keys.ToList();
+        var skus = await _context.ProductSkus.Where(sku => skuIds.Contains(sku.Id)).ToListAsync();
+        if (skus.Count != skuIds.Count || skus.Any(sku =>
+                !sku.IsActive || skuQuantities[sku.Id] > sku.Stock))
+        {
+            return false;
+        }
+
+        foreach (var product in products)
+        {
+            product.Stock = checked(product.Stock - (int)productQuantities[product.Id]);
+        }
+        foreach (var sku in skus)
+        {
+            sku.Stock = checked(sku.Stock - (int)skuQuantities[sku.Id]);
+        }
+        return true;
+    }
+
     private async Task ReleaseCouponAsync(Order order)
     {
         var redemption = await _context.CouponRedemptions
@@ -624,6 +797,18 @@ public class OrderService : IOrderService
         for (Exception? current = exception; current is not null; current = current.InnerException)
         {
             if (current is DbUpdateConcurrencyException || current is SqlException { Number: 1205 })
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static bool IsUniqueConstraintFailure(Exception exception)
+    {
+        for (Exception? current = exception; current is not null; current = current.InnerException)
+        {
+            if (current is DbUpdateException { InnerException: SqlException { Number: 2601 or 2627 } })
             {
                 return true;
             }

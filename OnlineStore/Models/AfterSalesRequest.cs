@@ -25,12 +25,6 @@ public class AfterSalesRequest
     [StringLength(500)]
     public string? AdminNote { get; set; }
 
-    [StringLength(50)]
-    public string? ReturnCarrier { get; set; }
-
-    [StringLength(50)]
-    public string? ReturnTrackingNumber { get; set; }
-
     public DateTime RequestedAt { get; set; } = DateTime.UtcNow;
 
     public DateTime? ReviewedAt { get; set; }

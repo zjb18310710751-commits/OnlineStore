@@ -51,16 +51,26 @@ public class ReviewsController : Controller
         var user = await _userManager.GetUserAsync(User);
         if (user is null) return Challenge();
 
-        if (orderId.HasValue && _orderService is null)
+        if (orderId.HasValue)
         {
-            orderId = null;
-        }
-        else if (orderId.HasValue && _orderService is not null)
-        {
-            var order = await _orderService.GetByIdAsync(orderId.Value);
-            if (order is null || order.UserId != user.Id || order.Items.All(item => item.ProductId != productId))
+            if (_orderService is null)
             {
-                orderId = null;
+                TempData["Error"] = L10n.Text(
+                    "当前订单不能评价。",
+                    "This order cannot be reviewed.");
+                return RedirectToAction("Details", "Products", new { id = productId });
+            }
+
+            var order = await _orderService.GetByIdAsync(orderId.Value);
+            if (order is null
+                || order.UserId != user.Id
+                || order.Status != OrderStatus.Completed
+                || order.Items.All(item => item.ProductId != productId))
+            {
+                TempData["Error"] = L10n.Text(
+                    "只有已完成订单中的商品可以评价。",
+                    "Only products from completed orders can be reviewed.");
+                return RedirectToAction("Details", "Products", new { id = productId });
             }
         }
 
@@ -79,9 +89,10 @@ public class ReviewsController : Controller
             {
                 imageUrl = await _imageStorage.SaveAsync(image);
             }
-            catch (InvalidOperationException)
+            catch (InvalidOperationException ex)
             {
-                imageUrl = null;
+                TempData["Error"] = ex.Message;
+                return RedirectToAction("Details", "Products", new { id = productId });
             }
         }
 
@@ -105,13 +116,13 @@ public class ReviewsController : Controller
     {
         if (user is null)
         {
-            return "匿名用户";
+            return L10n.Text("匿名用户", "Anonymous");
         }
 
         var fullName = $"{user.LastName}{user.FirstName}".Trim();
         var name = !string.IsNullOrWhiteSpace(fullName)
             ? fullName
-            : user.Email?.Split('@')[0] ?? "用户";
+            : user.Email?.Split('@')[0] ?? L10n.Text("用户", "User");
         return name[..Math.Min(name.Length, 50)];
     }
 }

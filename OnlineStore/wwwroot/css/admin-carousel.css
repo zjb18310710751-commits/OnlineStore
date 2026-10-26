@@ -49,10 +49,6 @@
 .admin-carousel-manager .ac-upload-help { margin-bottom: 20px; }
 .admin-carousel-manager .ac-optional { margin-left: 6px; color: var(--admin-muted); font-size: 11px; font-weight: 400; }
 .admin-carousel-manager .ac-required { color: var(--admin-muted); }
-.admin-carousel-manager .ac-translations { border-top: 1px solid var(--admin-line); padding-top: 16px; }
-.admin-carousel-manager .ac-translations summary { cursor: pointer; min-height: 44px; font-weight: 600; }
-.admin-carousel-manager .ac-translations summary span { display: block; margin-top: 4px; padding-left: 16px; color: var(--admin-muted); font-size: 11px; font-weight: 400; }
-.admin-carousel-manager .ac-translations[open] summary { margin-bottom: 20px; }
 .admin-carousel-manager .ac-display-row { display: grid; grid-template-columns: 140px minmax(0, 1fr); gap: var(--admin-space); align-items: center; }
 .admin-carousel-manager .ac-display-row .ac-field { margin-bottom: 0; }
 .admin-carousel-manager .ac-visibility { min-width: 0; }

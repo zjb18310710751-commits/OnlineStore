@@ -7,7 +7,6 @@
 }
 
 .sf-catalog-intro { margin-bottom: 32px; }
-.sf-catalog-eyebrow { margin: 0 0 12px; color: var(--sf-muted); font-size: 13px; }
 .sf-catalog-toolbar { display: flex; justify-content: space-between; align-items: center; gap: 24px; }
 .sf-catalog-toolbar h1 { margin: 0; color: var(--sf-ink); font-size: clamp(24px, 2.2vw, 32px); font-weight: 600; letter-spacing: -.035em; }
 .sf-catalog-toolbar h1 span { font-weight: 400; }
