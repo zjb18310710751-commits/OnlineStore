@@ -150,4 +150,210 @@ public class CouponServiceTests
 
         Assert.Equal(1, coupon.UsedCount);
     }
+
+    [Fact]
+    public async Task ValidateAsync_PerUserLimit_BlocksRepeatedRedemption()
+    {
+        using var context = CreateContext();
+        var coupon = ValidPercent();
+        coupon.PerUserLimit = 1;
+        context.Coupons.Add(coupon);
+        await context.SaveChangesAsync();
+        context.CouponRedemptions.Add(new CouponRedemption
+        {
+            CouponId = coupon.Id,
+            UserId = "user-1",
+            OrderId = 10,
+            Code = coupon.Code
+        });
+        await context.SaveChangesAsync();
+
+        var result = await new CouponService(context).ValidateAsync(coupon.Code, 100m, "user-1");
+
+        Assert.False(result.Success);
+        Assert.Equal("CouponPerUserLimit", result.Error);
+    }
+
+    [Fact]
+    public async Task ValidateAsync_FirstOrderOnly_BlocksExistingCustomer()
+    {
+        using var context = CreateContext();
+        var coupon = ValidPercent();
+        coupon.FirstOrderOnly = true;
+        context.Coupons.Add(coupon);
+        context.Orders.Add(new Order { OrderNo = "OLD", UserId = "user-1", Total = 10m });
+        await context.SaveChangesAsync();
+
+        var result = await new CouponService(context).ValidateAsync(coupon.Code, 100m, "user-1");
+
+        Assert.False(result.Success);
+        Assert.Equal("CouponFirstOrderOnly", result.Error);
+    }
+
+    [Fact]
+    public async Task ValidateAsync_CategoryScope_UsesOnlyEligibleItems()
+    {
+        using var context = CreateContext();
+        var category = new Category { Id = 7, Name = "Eligible", Slug = "eligible" };
+        var product = new Product
+        {
+            Id = 7,
+            Name = "Eligible product",
+            Slug = "eligible-product",
+            Price = 80m,
+            ShopId = 1,
+            Categories = new List<Category> { category }
+        };
+        var coupon = ValidPercent();
+        coupon.DiscountValue = 50;
+        coupon.Scope = CouponScope.Categories;
+        coupon.Categories.Add(category);
+        context.Products.Add(product);
+        context.Coupons.Add(coupon);
+        await context.SaveChangesAsync();
+
+        var result = await new CouponService(context).ValidateAsync(
+            coupon.Code,
+            80m,
+            "user-1",
+            new[] { new CouponEvaluationItem(7, 80m, 1) });
+
+        Assert.True(result.Success);
+        Assert.Equal(40m, result.DiscountAmount);
+    }
+
+    [Fact]
+    public async Task ValidateAsync_ExcludeDiscountedItems_RejectsWhenAllItemsAreOnSale()
+    {
+        using var context = CreateContext();
+        var coupon = ValidPercent();
+        coupon.ExcludeDiscountedItems = true;
+        context.Products.Add(new Product
+        {
+            Id = 8,
+            Name = "Sale product",
+            Slug = "sale-product",
+            Price = 80m,
+            OriginalPrice = 100m,
+            ShopId = 1
+        });
+        context.Coupons.Add(coupon);
+        await context.SaveChangesAsync();
+
+        var result = await new CouponService(context).ValidateAsync(
+            coupon.Code,
+            80m,
+            "user-1",
+            new[] { new CouponEvaluationItem(8, 80m, 1) });
+
+        Assert.False(result.Success);
+        Assert.Equal("CouponItemsNotEligible", result.Error);
+    }
+
+    [Fact]
+    public async Task ValidateAsync_MaximumDiscount_CapsPercentageCoupon()
+    {
+        using var context = CreateContext();
+        var coupon = ValidPercent();
+        coupon.DiscountValue = 50;
+        coupon.MaxDiscountAmount = 15m;
+        context.Coupons.Add(coupon);
+        await context.SaveChangesAsync();
+
+        var result = await new CouponService(context).ValidateAsync(coupon.Code, 100m);
+
+        Assert.True(result.Success);
+        Assert.Equal(15m, result.DiscountAmount);
+    }
+
+    [Fact]
+    public async Task ValidateAsync_FreeShipping_ReturnsShippingBenefit()
+    {
+        using var context = CreateContext();
+        var coupon = ValidPercent();
+        coupon.DiscountType = CouponDiscountType.FreeShipping;
+        coupon.DiscountValue = 0;
+        context.Coupons.Add(coupon);
+        await context.SaveChangesAsync();
+
+        var result = await new CouponService(context).ValidateAsync(coupon.Code, 100m);
+
+        Assert.True(result.Success);
+        Assert.True(result.FreeShipping);
+        Assert.Equal(0m, result.DiscountAmount);
+    }
+
+    [Fact]
+    public async Task GetAvailableAsync_OrdersBestCouponFirst()
+    {
+        using var context = CreateContext();
+        var smaller = ValidPercent();
+        smaller.Code = "SMALL";
+        smaller.DiscountType = CouponDiscountType.Fixed;
+        smaller.DiscountValue = 5;
+        var larger = ValidPercent();
+        larger.Code = "LARGE";
+        larger.DiscountType = CouponDiscountType.Fixed;
+        larger.DiscountValue = 15;
+        context.Coupons.AddRange(smaller, larger);
+        await context.SaveChangesAsync();
+
+        var results = await new CouponService(context).GetAvailableAsync("user-1", 100m, Array.Empty<CouponEvaluationItem>());
+
+        Assert.Equal("LARGE", results[0].Coupon!.Code);
+        Assert.Equal(15m, results[0].DiscountAmount);
+    }
+
+    [Fact]
+    public async Task GenerateBatchAsync_CreatesUniqueCodesWithSameRules()
+    {
+        using var context = CreateContext();
+        var source = ValidPercent();
+        source.MaxDiscountAmount = 12m;
+        source.PerUserLimit = 2;
+        source.CampaignName = "Autumn";
+        context.Coupons.Add(source);
+        await context.SaveChangesAsync();
+
+        var count = await new CouponService(context).GenerateBatchAsync(source.Id, 3, "AUTUMN");
+        var generated = await context.Coupons
+            .Where(coupon => coupon.Code.StartsWith("AUTUMN-"))
+            .ToListAsync();
+
+        Assert.Equal(3, count);
+        Assert.Equal(3, generated.Count);
+        Assert.Equal(3, generated.Select(coupon => coupon.Code).Distinct().Count());
+        Assert.All(generated, coupon =>
+        {
+            Assert.Equal(12m, coupon.MaxDiscountAmount);
+            Assert.Equal(2, coupon.PerUserLimit);
+            Assert.Equal("Autumn", coupon.CampaignName);
+        });
+    }
+
+    [Fact]
+    public async Task DeleteAsync_UsedCoupon_IsSoftDeletedForAuditHistory()
+    {
+        using var context = CreateContext();
+        var coupon = ValidPercent();
+        context.Coupons.Add(coupon);
+        await context.SaveChangesAsync();
+        context.CouponRedemptions.Add(new CouponRedemption
+        {
+            CouponId = coupon.Id,
+            UserId = "user-1",
+            OrderId = 99,
+            Code = coupon.Code
+        });
+        await context.SaveChangesAsync();
+
+        Assert.True(await new CouponService(context).DeleteAsync(coupon.Id));
+        context.ChangeTracker.Clear();
+
+        var stored = await context.Coupons.FindAsync(coupon.Id);
+        Assert.NotNull(stored);
+        Assert.True(stored.IsDeleted);
+        Assert.False(stored.IsActive);
+        Assert.Single(await context.CouponRedemptions.ToListAsync());
+    }
 }

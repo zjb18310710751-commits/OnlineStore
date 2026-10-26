@@ -100,6 +100,47 @@ public class CommerceRegressionTests
         Assert.Equal(18m, order.Total);
         Assert.Equal(2m, order.DiscountAmount);
         Assert.Equal(1, coupon.UsedCount);
+        var redemption = Assert.Single(await context.CouponRedemptions.ToListAsync());
+        Assert.Equal(order.Id, redemption.OrderId);
+        Assert.Equal("user", redemption.UserId);
+        Assert.Equal(2m, redemption.DiscountAmount);
+    }
+
+    [Fact]
+    public async Task CreateOrder_PerUserLimit_BlocksReuseUntilOrderIsCancelled()
+    {
+        using var context = await CreateContextAsync();
+        var coupon = new Coupon
+        {
+            Code = "ONCE",
+            DiscountType = CouponDiscountType.Fixed,
+            DiscountValue = 2,
+            PerUserLimit = 1,
+            StartDate = DateTime.UtcNow.AddDays(-1),
+            EndDate = DateTime.UtcNow.AddDays(1)
+        };
+        context.Coupons.Add(coupon);
+        await context.SaveChangesAsync();
+
+        var first = NewOrder();
+        first.CouponCode = "ONCE";
+        var service = new OrderService(context);
+        await service.CreateAsync(first);
+
+        var second = NewOrder();
+        second.CouponCode = "ONCE";
+        await Assert.ThrowsAsync<OrderValidationException>(() => new OrderService(context).CreateAsync(second));
+        Assert.Equal(4, (await context.Products.FindAsync(1))!.Stock);
+
+        Assert.True(await service.CancelAsync(first.Id));
+        var redemption = Assert.Single(await context.CouponRedemptions.ToListAsync());
+        Assert.NotNull(redemption.ReleasedAt);
+        Assert.Equal(0, (await context.Coupons.FindAsync(coupon.Id))!.UsedCount);
+
+        var third = NewOrder();
+        third.CouponCode = "ONCE";
+        await new OrderService(context).CreateAsync(third);
+        Assert.Equal(1, (await context.Coupons.FindAsync(coupon.Id))!.UsedCount);
     }
 
     [Fact]

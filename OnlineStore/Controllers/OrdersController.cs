@@ -67,6 +67,14 @@ public class OrdersController : Controller
             PostalCode = defaultAddress?.PostalCode ?? string.Empty,
             Country = defaultAddress?.Country ?? string.Empty
         };
+        if (user is not null)
+        {
+            var availableCoupons = await _couponService.GetAvailableAsync(
+                user.Id,
+                cart.Total,
+                ToCouponEvaluationItems(cart.Items));
+            ApplyBestCoupon(vm, availableCoupons);
+        }
         return View(vm);
     }
 
@@ -100,17 +108,25 @@ public class OrdersController : Controller
 
         decimal discount = 0;
         Coupon? applied = null;
+        var freeShipping = false;
         if (!string.IsNullOrWhiteSpace(vm.CouponCode))
         {
-            var result = await _couponService.ValidateAsync(vm.CouponCode, cart.Total);
+            var result = await _couponService.ValidateAsync(
+                vm.CouponCode,
+                cart.Total,
+                user.Id,
+                ToCouponEvaluationItems(cart.Items));
             if (!result.Success)
             {
                 ModelState.AddModelError(nameof(vm.CouponCode), result.Error!);
+                await PopulateAvailableCouponsAsync(vm, user.Id);
                 return View(vm);
             }
             discount = result.DiscountAmount;
             vm.DiscountAmount = discount;
+            vm.FreeShippingCoupon = result.FreeShipping;
             applied = result.Coupon;
+            freeShipping = result.FreeShipping;
         }
 
         if (vm.SaveAsDefaultAddress)
@@ -172,12 +188,18 @@ public class OrdersController : Controller
             vm.DiscountAmount = 0;
             if (!string.IsNullOrWhiteSpace(vm.CouponCode) && refreshedCart.Items.Count > 0)
             {
-                var refreshedCoupon = await _couponService.ValidateAsync(vm.CouponCode, refreshedCart.Total);
+                var refreshedCoupon = await _couponService.ValidateAsync(
+                    vm.CouponCode,
+                    refreshedCart.Total,
+                    user.Id,
+                    ToCouponEvaluationItems(refreshedCart.Items));
                 if (refreshedCoupon.Success)
                 {
                     vm.DiscountAmount = refreshedCoupon.DiscountAmount;
+                    vm.FreeShippingCoupon = refreshedCoupon.FreeShipping;
                 }
             }
+            await PopulateAvailableCouponsAsync(vm, user.Id);
             ModelState.AddModelError(string.Empty, _loc[exception.ResourceKey].Value);
             return View(vm);
         }
@@ -195,12 +217,29 @@ public class OrdersController : Controller
             return Json(new { ok = false, error = _loc["EmptyCart"].Value });
         }
 
-        if (string.IsNullOrWhiteSpace(couponCode))
+        var user = await _userManager.GetUserAsync(User);
+        if (user is null)
         {
-            return Json(new { ok = true, discount = 0m, total = cart.Total, payable = cart.Total });
+            return Challenge();
         }
 
-        var result = await _couponService.ValidateAsync(couponCode, cart.Total);
+        var items = ToCouponEvaluationItems(cart.Items);
+        if (string.IsNullOrWhiteSpace(couponCode))
+        {
+            var available = await _couponService.GetAvailableAsync(user.Id, cart.Total, items);
+            var best = available.FirstOrDefault();
+            return Json(new
+            {
+                ok = true,
+                discount = best?.DiscountAmount ?? 0m,
+                freeShipping = best?.FreeShipping ?? false,
+                code = best?.Coupon?.Code,
+                total = cart.Total,
+                payable = cart.Total - (best?.DiscountAmount ?? 0m)
+            });
+        }
+
+        var result = await _couponService.ValidateAsync(couponCode, cart.Total, user.Id, items);
         if (!result.Success)
         {
             return Json(new { ok = false, error = result.Error });
@@ -210,6 +249,8 @@ public class OrdersController : Controller
         {
             ok = true,
             discount = result.DiscountAmount,
+            freeShipping = result.FreeShipping,
+            code = result.Coupon?.Code,
             total = cart.Total,
             payable = cart.Total - result.DiscountAmount
         });
@@ -313,4 +354,60 @@ public class OrdersController : Controller
             vm.City,
             vm.PostalCode,
             vm.Country);
+
+    private static IReadOnlyList<CouponEvaluationItem> ToCouponEvaluationItems(IEnumerable<CartItem> items) =>
+        items
+            .Select(item => new CouponEvaluationItem(item.ProductId, item.Price, item.Quantity))
+            .ToList();
+
+    private async Task PopulateAvailableCouponsAsync(CheckoutViewModel vm, string userId)
+    {
+        var available = await _couponService.GetAvailableAsync(
+            userId,
+            vm.Total,
+            ToCouponEvaluationItems(vm.Items));
+        ApplyCouponChoices(vm, available, vm.CouponCode);
+    }
+
+    private void ApplyBestCoupon(CheckoutViewModel vm, IReadOnlyList<CouponApplyResult> available)
+    {
+        var best = available.FirstOrDefault();
+        if (best?.Coupon is null)
+        {
+            ApplyCouponChoices(vm, available, null);
+            return;
+        }
+
+        vm.CouponCode = best.Coupon.Code;
+        vm.DiscountAmount = best.DiscountAmount;
+        vm.FreeShippingCoupon = best.FreeShipping;
+        ApplyCouponChoices(vm, available, best.Coupon.Code);
+    }
+
+    private void ApplyCouponChoices(
+        CheckoutViewModel vm,
+        IReadOnlyList<CouponApplyResult> available,
+        string? selectedCode)
+    {
+        var normalized = selectedCode?.Trim().ToUpperInvariant();
+        vm.AvailableCoupons = available
+            .Where(result => result.Coupon is not null)
+            .Select((result, index) =>
+            {
+                var coupon = result.Coupon!;
+                return new CouponChoiceViewModel
+                {
+                    Code = coupon.Code,
+                    CampaignName = coupon.CampaignName,
+                    DiscountType = coupon.DiscountType,
+                    DiscountValue = coupon.DiscountValue,
+                    CalculatedDiscount = result.DiscountAmount,
+                    FreeShipping = result.FreeShipping,
+                    EndDate = coupon.EndDate,
+                    IsBest = index == 0,
+                    IsSelected = coupon.Code == normalized
+                };
+            })
+            .ToList();
+    }
 }
