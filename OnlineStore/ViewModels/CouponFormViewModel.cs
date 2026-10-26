@@ -8,7 +8,6 @@ public class CouponFormViewModel
 {
     public int Id { get; set; }
 
-    [Required(ErrorMessage = "CouponCodeRequired")]
     [StringLength(50)]
     public string Code { get; set; } = string.Empty;
 

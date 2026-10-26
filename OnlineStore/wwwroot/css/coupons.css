@@ -235,6 +235,36 @@
     text-align: right;
 }
 
+.coupon-generated-code {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 2px 12px;
+    align-items: baseline;
+    padding: 12px 14px;
+    border: 1px solid var(--admin-line);
+    border-radius: 6px;
+    background: #fafafa;
+}
+
+.coupon-generated-code > span {
+    color: var(--admin-muted);
+    font-size: 10px;
+}
+
+.coupon-generated-code > strong {
+    overflow-wrap: anywhere;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: .03em;
+}
+
+.coupon-generated-code > small {
+    grid-column: 1 / -1;
+    color: var(--admin-muted);
+    font-size: 10px;
+    line-height: 1.5;
+}
+
 .coupon-check-card {
     display: flex;
     align-items: flex-start;
