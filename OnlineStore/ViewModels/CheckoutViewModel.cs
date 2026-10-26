@@ -20,6 +20,10 @@ public class CheckoutViewModel
 
     public decimal DiscountAmount { get; set; }
 
+    public bool FreeShippingCoupon { get; set; }
+
+    public List<CouponChoiceViewModel> AvailableCoupons { get; set; } = new();
+
     public decimal PayableTotal => Total - DiscountAmount;
 
     [Display(Name = "收货人")]

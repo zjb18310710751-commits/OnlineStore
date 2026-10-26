@@ -127,13 +127,65 @@
                             }
                         </ul>
 
-                        <div class="border-top pt-3">
+                        <div class="border-top pt-3 checkout-coupon-panel">
                             <label asp-for="CouponCode" class="form-label small fw-semibold">@Loc["CouponCode"]</label>
+                            @if (Model.AvailableCoupons.Count > 0)
+                            {
+                                <div class="checkout-coupon-heading">
+                                    <span>@Loc["AvailableCoupons"]</span>
+                                    <span>@Loc["BestCouponHint"]</span>
+                                </div>
+                                <div class="checkout-coupon-list" aria-label="@Loc["AvailableCoupons"]">
+                                    @foreach (var coupon in Model.AvailableCoupons)
+                                    {
+                                        <button type="button"
+                                                class="checkout-coupon-option @(coupon.IsSelected ? "is-selected" : "")"
+                                                data-apply-coupon="@coupon.Code">
+                                            <span class="checkout-coupon-option-top">
+                                                <strong>@coupon.Code</strong>
+                                                @if (coupon.IsBest)
+                                                {
+                                                    <span class="checkout-coupon-best">@Loc["BestCoupon"]</span>
+                                                }
+                                            </span>
+                                            <span class="checkout-coupon-option-rule">
+                                                @if (coupon.FreeShipping)
+                                                {
+                                                    @Loc["FreeShippingDiscount"]
+                                                }
+                                                else if (coupon.DiscountType == CouponDiscountType.Percent)
+                                                {
+                                                    @Loc["PercentCouponBenefit", coupon.DiscountValue.ToString("0.##")]
+                                                }
+                                                else
+                                                {
+                                                    @Loc["FixedCouponBenefit", coupon.DiscountValue.ToString("F2")]
+                                                }
+                                            </span>
+                                            <span class="checkout-coupon-option-meta">
+                                                @if (coupon.CalculatedDiscount > 0)
+                                                {
+                                                    <span>@Loc["CouponSavings", coupon.CalculatedDiscount.ToString("F2")]</span>
+                                                }
+                                                <span>@Loc["CouponEnds", coupon.EndDate.ToString("yyyy-MM-dd")]</span>
+                                            </span>
+                                        </button>
+                                    }
+                                </div>
+                            }
                             <div class="input-group mb-2">
                                 <input asp-for="CouponCode" id="couponCode" class="form-control" placeholder="@Loc["EnterCoupon"]" />
                                 <button type="button" id="couponApply" class="btn btn-outline-primary">@Loc["ApplyCoupon"]</button>
                             </div>
-                            <div id="couponStatus" class="text-danger small"></div>
+                            <div class="d-flex justify-content-between align-items-start gap-2">
+                                <div id="couponStatus" class="checkout-coupon-status small @(!string.IsNullOrWhiteSpace(Model.CouponCode) ? "text-success" : "")" role="status">
+                                    @if (!string.IsNullOrWhiteSpace(Model.CouponCode))
+                                    {
+                                        @Loc["CouponApplied"]
+                                    }
+                                </div>
+                                <button type="button" id="couponClear" class="checkout-coupon-clear">@Loc["RemoveCoupon"]</button>
+                            </div>
                             <span asp-validation-for="CouponCode" class="text-danger small"></span>
                         </div>
 
@@ -142,9 +194,13 @@
                                 <span>@Loc["Subtotal"]</span>
                                 <span id="subtotalText">¥@Model.Total.ToString("F2")</span>
                             </div>
-                            <div id="couponDiscountRow" class="checkout-total-row text-success d-none">
+                            <div id="couponDiscountRow" class="checkout-total-row text-success @(Model.DiscountAmount > 0 ? string.Empty : "d-none")">
                                 <span>@Loc["Discount"]</span>
-                                <span id="couponDiscountText">-¥0.00</span>
+                                <span id="couponDiscountText">-¥@Model.DiscountAmount.ToString("F2")</span>
+                            </div>
+                            <div id="couponShippingRow" class="checkout-total-row text-success @(Model.FreeShippingCoupon ? string.Empty : "d-none")">
+                                <span>@Loc["CouponBenefit"]</span>
+                                <span>@Loc["FreeShippingDiscount"]</span>
                             </div>
                             <div class="checkout-total-row">
                                 <span>@Loc["ShippingFee"]</span>
@@ -197,14 +253,43 @@
             var statusEl = document.getElementById('couponStatus');
             var discountRow = document.getElementById('couponDiscountRow');
             var discountText = document.getElementById('couponDiscountText');
+            var shippingRow = document.getElementById('couponShippingRow');
             var payableText = document.getElementById('payableTotalText');
+            var clearButton = document.getElementById('couponClear');
 
             function formatMoney(value) {
                 return '¥' + Number(value).toFixed(2);
             }
 
-            applyButton.addEventListener('click', function () {
-                var code = couponInput.value.trim();
+            function selectCouponButton(code) {
+                document.querySelectorAll('[data-apply-coupon]').forEach(function (button) {
+                    button.classList.toggle('is-selected', button.getAttribute('data-apply-coupon') === code);
+                });
+            }
+
+            function showCoupon(data) {
+                payableText.textContent = formatMoney(data.payable);
+                discountText.textContent = '-' + formatMoney(data.discount);
+                discountRow.classList.toggle('d-none', !(data.discount > 0));
+                shippingRow.classList.toggle('d-none', !data.freeShipping);
+                statusEl.classList.remove('text-danger');
+                statusEl.classList.add('text-success');
+                statusEl.textContent = data.code ? '@Loc["CouponApplied"]' : '';
+                selectCouponButton(data.code || '');
+            }
+
+            function showCouponError(message) {
+                statusEl.textContent = message || '';
+                statusEl.classList.add('text-danger');
+                statusEl.classList.remove('text-success');
+                discountRow.classList.add('d-none');
+                shippingRow.classList.add('d-none');
+                payableText.textContent = formatMoney(payableText.getAttribute('data-base-total'));
+                selectCouponButton('');
+            }
+
+            function applyCoupon(code) {
+                couponInput.value = code || '';
                 statusEl.textContent = '';
 
                 fetch('@Url.Action("PreviewCoupon", "Orders")?couponCode=' + encodeURIComponent(code), {
@@ -213,22 +298,35 @@
                 .then(function (response) { return response.json(); })
                 .then(function (data) {
                     if (data.ok) {
-                        payableText.textContent = formatMoney(data.payable);
-                        discountText.textContent = '-' + formatMoney(data.discount);
-                        if (data.discount > 0) {
-                            discountRow.classList.remove('d-none');
-                        } else {
-                            discountRow.classList.add('d-none');
-                        }
+                        couponInput.value = data.code || code || '';
+                        showCoupon(data);
                     } else {
-                        statusEl.textContent = data.error || '';
-                        discountRow.classList.add('d-none');
-                        payableText.textContent = formatMoney(payableText.getAttribute('data-base-total'));
+                        showCouponError(data.error);
                     }
                 })
                 .catch(function () {
-                    statusEl.textContent = '@Loc["CouponPreviewFailed"]';
+                    showCouponError('@Loc["CouponPreviewFailed"]');
                 });
+            }
+
+            applyButton.addEventListener('click', function () {
+                applyCoupon(couponInput.value.trim());
+            });
+
+            document.querySelectorAll('[data-apply-coupon]').forEach(function (button) {
+                button.addEventListener('click', function () {
+                    applyCoupon(button.getAttribute('data-apply-coupon'));
+                });
+            });
+
+            clearButton.addEventListener('click', function () {
+                couponInput.value = '';
+                statusEl.textContent = '';
+                statusEl.classList.remove('text-danger', 'text-success');
+                discountRow.classList.add('d-none');
+                shippingRow.classList.add('d-none');
+                payableText.textContent = formatMoney(payableText.getAttribute('data-base-total'));
+                selectCouponButton('');
             });
 
             var switchAddressModal = document.getElementById('switchAddressModal');

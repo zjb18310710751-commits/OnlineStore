@@ -497,4 +497,50 @@
   <data name="CheckoutRetry" xml:space="preserve"><value>商品库存或订单状态刚刚发生变化，请刷新后重试。</value></data>
   <data name="CheckoutQuantityInvalid" xml:space="preserve"><value>购买数量不正确，请返回购物车调整。</value></data>
   <data name="CartUnavailable" xml:space="preserve"><value>商品或规格不可用、库存不足或数量不正确，请重新选择。</value></data>
+  <data name="MaxDiscountAmount" xml:space="preserve"><value>最高优惠金额</value></data>
+  <data name="MaxDiscountAmountHint" xml:space="preserve"><value>留空表示不限制，百分比券尤其建议设置。</value></data>
+  <data name="MaxDiscountAmountInvalid" xml:space="preserve"><value>最高优惠金额不能为负。</value></data>
+  <data name="PerUserLimit" xml:space="preserve"><value>每用户限用次数</value></data>
+  <data name="PerUserLimitInvalid" xml:space="preserve"><value>每用户限用次数至少为 1。</value></data>
+  <data name="FirstOrderOnly" xml:space="preserve"><value>仅限首单</value></data>
+  <data name="ExcludeDiscountedItems" xml:space="preserve"><value>排除促销商品</value></data>
+  <data name="CouponScope" xml:space="preserve"><value>适用范围</value></data>
+  <data name="ScopeAllProducts" xml:space="preserve"><value>全店商品</value></data>
+  <data name="ScopeCategories" xml:space="preserve"><value>指定分类</value></data>
+  <data name="ScopeProducts" xml:space="preserve"><value>指定商品</value></data>
+  <data name="CouponCampaign" xml:space="preserve"><value>活动名称/备注</value></data>
+  <data name="CouponCampaignPlaceholder" xml:space="preserve"><value>如：秋季会员专享</value></data>
+  <data name="FreeShippingDiscount" xml:space="preserve"><value>免运费</value></data>
+  <data name="CouponScheduled" xml:space="preserve"><value>未开始</value></data>
+  <data name="CouponExhausted" xml:space="preserve"><value>已用完</value></data>
+  <data name="CouponPerUserLimit" xml:space="preserve"><value>你已达到该优惠券的个人使用上限。</value></data>
+  <data name="CouponFirstOrderOnly" xml:space="preserve"><value>该优惠券仅限首笔订单使用。</value></data>
+  <data name="CouponItemsNotEligible" xml:space="preserve"><value>购物车中没有符合该券适用范围的商品。</value></data>
+  <data name="CouponPercentRange" xml:space="preserve"><value>百分比优惠必须介于 0 到 100 之间。</value></data>
+  <data name="CouponDatesInvalid" xml:space="preserve"><value>结束日期不能早于开始日期。</value></data>
+  <data name="CouponCategoryRequired" xml:space="preserve"><value>请至少选择一个适用分类。</value></data>
+  <data name="CouponProductRequired" xml:space="preserve"><value>请至少选择一个适用商品。</value></data>
+  <data name="CouponBatchQuantityInvalid" xml:space="preserve"><value>每次可生成 1 到 50 个优惠码。</value></data>
+  <data name="CouponBatchFailed" xml:space="preserve"><value>批量生成失败，请检查输入后重试。</value></data>
+  <data name="CouponBatchCreated" xml:space="preserve"><value>已生成 {0} 个优惠码。</value></data>
+  <data name="ExportCoupons" xml:space="preserve"><value>导出 CSV</value></data>
+  <data name="BatchGenerate" xml:space="preserve"><value>批量生成</value></data>
+  <data name="BatchGenerateHint" xml:space="preserve"><value>复制当前优惠券的全部规则，一次生成最多 50 个唯一优惠码。</value></data>
+  <data name="BatchQuantity" xml:space="preserve"><value>生成数量</value></data>
+  <data name="BatchCodePrefix" xml:space="preserve"><value>优惠码前缀</value></data>
+  <data name="BatchGenerateAction" xml:space="preserve"><value>生成优惠码</value></data>
+  <data name="CopyCouponCode" xml:space="preserve"><value>复制优惠码</value></data>
+  <data name="CouponMinOrderShort" xml:space="preserve"><value>满 ¥{0}</value></data>
+  <data name="CouponMaxDiscountShort" xml:space="preserve"><value>最高减 ¥{0}</value></data>
+  <data name="PerUserUsageShort" xml:space="preserve"><value>每人限用 {0} 次</value></data>
+  <data name="AvailableCoupons" xml:space="preserve"><value>本单可用优惠券</value></data>
+  <data name="BestCouponHint" xml:space="preserve"><value>已默认选择最优惠方案</value></data>
+  <data name="BestCoupon" xml:space="preserve"><value>最优惠</value></data>
+  <data name="PercentCouponBenefit" xml:space="preserve"><value>立减 {0}%</value></data>
+  <data name="FixedCouponBenefit" xml:space="preserve"><value>立减 ¥{0}</value></data>
+  <data name="CouponSavings" xml:space="preserve"><value>本单省 ¥{0}</value></data>
+  <data name="CouponEnds" xml:space="preserve"><value>{0} 前有效</value></data>
+  <data name="RemoveCoupon" xml:space="preserve"><value>不使用优惠券</value></data>
+  <data name="CouponApplied" xml:space="preserve"><value>优惠券已应用</value></data>
+  <data name="CouponBenefit" xml:space="preserve"><value>优惠券权益</value></data>
 </root>

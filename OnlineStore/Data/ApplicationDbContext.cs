@@ -22,6 +22,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<ProductImage> ProductImages => Set<ProductImage>();
     public DbSet<Favorite> Favorites => Set<Favorite>();
     public DbSet<Coupon> Coupons => Set<Coupon>();
+    public DbSet<CouponRedemption> CouponRedemptions => Set<CouponRedemption>();
     public DbSet<EmailVerificationCode> EmailVerificationCodes => Set<EmailVerificationCode>();
     public DbSet<DeliveryAddress> DeliveryAddresses => Set<DeliveryAddress>();
     public DbSet<HeroSlide> HeroSlides => Set<HeroSlide>();
@@ -45,7 +46,12 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
         builder.Entity<Coupon>().Property(c => c.StartDate).IsConcurrencyToken();
         builder.Entity<Coupon>().Property(c => c.EndDate).IsConcurrencyToken();
         builder.Entity<Coupon>().Property(c => c.UsageLimit).IsConcurrencyToken();
+        builder.Entity<Coupon>().Property(c => c.PerUserLimit).IsConcurrencyToken();
+        builder.Entity<Coupon>().Property(c => c.MaxDiscountAmount).IsConcurrencyToken();
         builder.Entity<Coupon>().Property(c => c.MinOrderAmount).IsConcurrencyToken();
+        builder.Entity<Coupon>().Property(c => c.Scope).IsConcurrencyToken();
+        builder.Entity<Coupon>().Property(c => c.FirstOrderOnly).IsConcurrencyToken();
+        builder.Entity<Coupon>().Property(c => c.ExcludeDiscountedItems).IsConcurrencyToken();
 
         builder.Entity<HeroSlide>(entity =>
         {
@@ -190,7 +196,38 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
             entity.HasIndex(c => c.Code).IsUnique();
             entity.Property(c => c.Code).HasMaxLength(50).IsRequired();
             entity.Property(c => c.DiscountValue).HasConversion<double>();
+            entity.Property(c => c.MaxDiscountAmount).HasConversion<double?>();
             entity.Property(c => c.MinOrderAmount).HasConversion<double?>();
+            entity.Property(c => c.CampaignName).HasMaxLength(100);
+            entity.HasMany(c => c.Categories)
+                  .WithMany()
+                  .UsingEntity<Dictionary<string, object>>(
+                      "CouponCategory",
+                      j => j.HasOne<Category>().WithMany().HasForeignKey("CategoryId").OnDelete(DeleteBehavior.Cascade),
+                      j => j.HasOne<Coupon>().WithMany().HasForeignKey("CouponId").OnDelete(DeleteBehavior.Cascade));
+            entity.HasMany(c => c.Products)
+                  .WithMany()
+                  .UsingEntity<Dictionary<string, object>>(
+                      "CouponProduct",
+                      j => j.HasOne<Product>().WithMany().HasForeignKey("ProductId").OnDelete(DeleteBehavior.Cascade),
+                      j => j.HasOne<Coupon>().WithMany().HasForeignKey("CouponId").OnDelete(DeleteBehavior.Cascade));
+        });
+
+        builder.Entity<CouponRedemption>(entity =>
+        {
+            entity.HasIndex(r => new { r.CouponId, r.UserId, r.ReleasedAt });
+            entity.HasIndex(r => r.OrderId).IsUnique();
+            entity.HasIndex(r => r.UserId);
+            entity.Property(r => r.Code).HasMaxLength(50).IsRequired();
+            entity.Property(r => r.DiscountAmount).HasConversion<double>();
+            entity.HasOne(r => r.Coupon)
+                  .WithMany(c => c.Redemptions)
+                  .HasForeignKey(r => r.CouponId)
+                  .OnDelete(DeleteBehavior.Restrict);
+            entity.HasOne(r => r.Order)
+                  .WithMany()
+                  .HasForeignKey(r => r.OrderId)
+                  .OnDelete(DeleteBehavior.Cascade);
         });
 
         builder.Entity<EmailVerificationCode>(entity =>

@@ -9,10 +9,12 @@ namespace OnlineStore.Services;
 public class OrderService : IOrderService
 {
     private readonly ApplicationDbContext _context;
+    private readonly ICouponService _couponService;
 
-    public OrderService(ApplicationDbContext context)
+    public OrderService(ApplicationDbContext context, ICouponService? couponService = null)
     {
         _context = context;
+        _couponService = couponService ?? new CouponService(context);
     }
 
     public Task<Order?> GetByIdAsync(int id) =>
@@ -98,11 +100,23 @@ public class OrderService : IOrderService
             }
 
             var subtotal = order.Items.Sum(i => i.Price * i.Quantity);
-            var coupon = await GetValidCouponAsync(order.CouponCode, subtotal);
+            var coupon = await GetTrackedCouponAsync(order);
             var discount = 0m;
+            var freeShipping = false;
             if (coupon is not null)
             {
-                CouponCalculator.TryCompute(coupon, subtotal, out discount);
+                var result = await _couponService.ValidateAsync(
+                    coupon.Code,
+                    subtotal,
+                    order.UserId,
+                    ToEvaluationItems(order));
+                if (!result.Success || result.Coupon is null)
+                {
+                    throw new OrderValidationException("CouponUnavailable");
+                }
+
+                discount = result.DiscountAmount;
+                freeShipping = result.FreeShipping;
                 if (discount < order.DiscountAmount)
                 {
                     throw new OrderValidationException("CouponUnavailable");
@@ -128,6 +142,19 @@ public class OrderService : IOrderService
             order.Status = OrderStatus.PendingShipment;
             order.CreatedAt = DateTime.UtcNow;
             _context.Orders.Add(order);
+            if (coupon is not null)
+            {
+                _context.CouponRedemptions.Add(new CouponRedemption
+                {
+                    Coupon = coupon,
+                    UserId = order.UserId ?? string.Empty,
+                    Order = order,
+                    Code = coupon.Code,
+                    DiscountAmount = discount,
+                    ShippingWaived = freeShipping,
+                    CreatedAt = DateTime.UtcNow
+                });
+            }
             await _context.SaveChangesAsync();
             if (transaction is not null)
             {
@@ -161,28 +188,28 @@ public class OrderService : IOrderService
 
     public Task<int> CountAsync() => _context.Orders.CountAsync();
 
-    private async Task<Coupon?> GetValidCouponAsync(string? code, decimal subtotal)
+    private async Task<Coupon?> GetTrackedCouponAsync(Order order)
     {
-        if (string.IsNullOrWhiteSpace(code))
+        if (string.IsNullOrWhiteSpace(order.CouponCode))
         {
             return null;
         }
-        var normalized = code.Trim().ToUpperInvariant();
-        var coupon = await _context.Coupons.SingleOrDefaultAsync(c => c.Code == normalized);
+
+        var normalized = order.CouponCode.Trim().ToUpperInvariant();
+        var coupon = await _context.Coupons
+            .Include(c => c.Categories)
+            .Include(c => c.Products)
+            .SingleOrDefaultAsync(c => c.Code == normalized && !c.IsDeleted);
         if (coupon is not null)
         {
             await _context.Entry(coupon).ReloadAsync();
         }
-        var now = DateTime.UtcNow;
-        if (coupon is null || _context.Entry(coupon).State == EntityState.Detached || coupon.Code != normalized
-            || !coupon.IsActive || now < coupon.StartDate || now > coupon.EndDate
-            || coupon.UsedCount == int.MaxValue
-            || (coupon.UsageLimit.HasValue && coupon.UsedCount >= coupon.UsageLimit.Value)
-            || (coupon.MinOrderAmount.HasValue && subtotal < coupon.MinOrderAmount.Value)
-            || !CouponCalculator.TryCompute(coupon, subtotal, out _))
+
+        if (coupon is null || _context.Entry(coupon).State == EntityState.Detached)
         {
             throw new OrderValidationException("CouponUnavailable");
         }
+
         return coupon;
     }
 
@@ -206,6 +233,7 @@ public class OrderService : IOrderService
             if (restoreStock)
             {
                 await RestoreStockAsync(order);
+                await ReleaseCouponAsync(order);
             }
             order.Status = nextStatus;
             await _context.SaveChangesAsync();
@@ -253,6 +281,28 @@ public class OrderService : IOrderService
             }
         }
     }
+
+    private async Task ReleaseCouponAsync(Order order)
+    {
+        var redemption = await _context.CouponRedemptions
+            .Include(r => r.Coupon)
+            .FirstOrDefaultAsync(r => r.OrderId == order.Id && r.ReleasedAt == null);
+        if (redemption is null)
+        {
+            return;
+        }
+
+        redemption.ReleasedAt = DateTime.UtcNow;
+        if (redemption.Coupon is not null && redemption.Coupon.UsedCount > 0)
+        {
+            redemption.Coupon.UsedCount--;
+        }
+    }
+
+    private static IReadOnlyList<CouponEvaluationItem> ToEvaluationItems(Order order) =>
+        order.Items
+            .Select(item => new CouponEvaluationItem(item.ProductId, item.Price, item.Quantity))
+            .ToList();
 
     private static bool IsConcurrencyFailure(Exception exception)
     {

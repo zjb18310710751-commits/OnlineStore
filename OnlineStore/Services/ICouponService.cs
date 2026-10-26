@@ -2,7 +2,14 @@ using OnlineStore.Models;
 
 namespace OnlineStore.Services;
 
-public record CouponApplyResult(bool Success, string? Error, decimal DiscountAmount, Coupon? Coupon);
+public record CouponApplyResult(
+    bool Success,
+    string? Error,
+    decimal DiscountAmount,
+    Coupon? Coupon,
+    bool FreeShipping = false);
+
+public record CouponEvaluationItem(int ProductId, decimal Price, int Quantity);
 
 public interface ICouponService
 {
@@ -10,13 +17,24 @@ public interface ICouponService
 
     Task<Coupon?> GetByIdAsync(int id);
 
-    Task<Coupon> CreateAsync(Coupon coupon);
+    Task<Coupon> CreateAsync(Coupon coupon, IEnumerable<int>? categoryIds = null, IEnumerable<int>? productIds = null);
 
-    Task UpdateAsync(Coupon coupon);
+    Task UpdateAsync(Coupon coupon, IEnumerable<int>? categoryIds = null, IEnumerable<int>? productIds = null);
 
     Task<bool> DeleteAsync(int id);
 
-    Task<CouponApplyResult> ValidateAsync(string code, decimal orderTotal);
+    Task<CouponApplyResult> ValidateAsync(
+        string code,
+        decimal orderTotal,
+        string? userId = null,
+        IReadOnlyList<CouponEvaluationItem>? items = null);
+
+    Task<IReadOnlyList<CouponApplyResult>> GetAvailableAsync(
+        string userId,
+        decimal orderTotal,
+        IReadOnlyList<CouponEvaluationItem> items);
 
     Task IncrementUsageAsync(int id);
+
+    Task<int> GenerateBatchAsync(int couponId, int quantity, string? prefix);
 }

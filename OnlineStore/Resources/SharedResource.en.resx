@@ -497,4 +497,50 @@
   <data name="CheckoutRetry" xml:space="preserve"><value>Stock or order status has just changed. Please refresh and try again.</value></data>
   <data name="CheckoutQuantityInvalid" xml:space="preserve"><value>A purchase quantity is invalid. Please update your cart.</value></data>
   <data name="CartUnavailable" xml:space="preserve"><value>The product or variant is unavailable, stock is insufficient, or the quantity is invalid. Please check your selection.</value></data>
+  <data name="MaxDiscountAmount" xml:space="preserve"><value>Maximum discount</value></data>
+  <data name="MaxDiscountAmountHint" xml:space="preserve"><value>Leave blank for no cap. Recommended for percentage coupons.</value></data>
+  <data name="MaxDiscountAmountInvalid" xml:space="preserve"><value>Maximum discount cannot be negative.</value></data>
+  <data name="PerUserLimit" xml:space="preserve"><value>Uses per customer</value></data>
+  <data name="PerUserLimitInvalid" xml:space="preserve"><value>Uses per customer must be at least 1.</value></data>
+  <data name="FirstOrderOnly" xml:space="preserve"><value>First order only</value></data>
+  <data name="ExcludeDiscountedItems" xml:space="preserve"><value>Exclude discounted items</value></data>
+  <data name="CouponScope" xml:space="preserve"><value>Eligibility</value></data>
+  <data name="ScopeAllProducts" xml:space="preserve"><value>All products</value></data>
+  <data name="ScopeCategories" xml:space="preserve"><value>Selected categories</value></data>
+  <data name="ScopeProducts" xml:space="preserve"><value>Selected products</value></data>
+  <data name="CouponCampaign" xml:space="preserve"><value>Campaign / note</value></data>
+  <data name="CouponCampaignPlaceholder" xml:space="preserve"><value>e.g. Autumn members offer</value></data>
+  <data name="FreeShippingDiscount" xml:space="preserve"><value>Free shipping</value></data>
+  <data name="CouponScheduled" xml:space="preserve"><value>Scheduled</value></data>
+  <data name="CouponExhausted" xml:space="preserve"><value>Exhausted</value></data>
+  <data name="CouponPerUserLimit" xml:space="preserve"><value>You have reached the per-customer limit for this coupon.</value></data>
+  <data name="CouponFirstOrderOnly" xml:space="preserve"><value>This coupon is only available on a first order.</value></data>
+  <data name="CouponItemsNotEligible" xml:space="preserve"><value>Your cart does not contain any eligible items for this coupon.</value></data>
+  <data name="CouponPercentRange" xml:space="preserve"><value>Percentage discounts must be between 0 and 100.</value></data>
+  <data name="CouponDatesInvalid" xml:space="preserve"><value>The end date cannot be earlier than the start date.</value></data>
+  <data name="CouponCategoryRequired" xml:space="preserve"><value>Select at least one eligible category.</value></data>
+  <data name="CouponProductRequired" xml:space="preserve"><value>Select at least one eligible product.</value></data>
+  <data name="CouponBatchQuantityInvalid" xml:space="preserve"><value>Generate between 1 and 50 coupon codes at a time.</value></data>
+  <data name="CouponBatchFailed" xml:space="preserve"><value>Batch generation failed. Check your input and try again.</value></data>
+  <data name="CouponBatchCreated" xml:space="preserve"><value>{0} coupon codes generated.</value></data>
+  <data name="ExportCoupons" xml:space="preserve"><value>Export CSV</value></data>
+  <data name="BatchGenerate" xml:space="preserve"><value>Generate batch</value></data>
+  <data name="BatchGenerateHint" xml:space="preserve"><value>Copy every rule from this coupon and generate up to 50 unique codes.</value></data>
+  <data name="BatchQuantity" xml:space="preserve"><value>Number of codes</value></data>
+  <data name="BatchCodePrefix" xml:space="preserve"><value>Code prefix</value></data>
+  <data name="BatchGenerateAction" xml:space="preserve"><value>Generate codes</value></data>
+  <data name="CopyCouponCode" xml:space="preserve"><value>Copy coupon code</value></data>
+  <data name="CouponMinOrderShort" xml:space="preserve"><value>Min. ¥{0}</value></data>
+  <data name="CouponMaxDiscountShort" xml:space="preserve"><value>Max. ¥{0} off</value></data>
+  <data name="PerUserUsageShort" xml:space="preserve"><value>{0} use(s) per customer</value></data>
+  <data name="AvailableCoupons" xml:space="preserve"><value>Available for this order</value></data>
+  <data name="BestCouponHint" xml:space="preserve"><value>The best available option is pre-selected</value></data>
+  <data name="BestCoupon" xml:space="preserve"><value>Best value</value></data>
+  <data name="PercentCouponBenefit" xml:space="preserve"><value>{0}% off</value></data>
+  <data name="FixedCouponBenefit" xml:space="preserve"><value>¥{0} off</value></data>
+  <data name="CouponSavings" xml:space="preserve"><value>Save ¥{0} on this order</value></data>
+  <data name="CouponEnds" xml:space="preserve"><value>Valid through {0}</value></data>
+  <data name="RemoveCoupon" xml:space="preserve"><value>Don't use a coupon</value></data>
+  <data name="CouponApplied" xml:space="preserve"><value>Coupon applied</value></data>
+  <data name="CouponBenefit" xml:space="preserve"><value>Coupon benefit</value></data>
 </root>
