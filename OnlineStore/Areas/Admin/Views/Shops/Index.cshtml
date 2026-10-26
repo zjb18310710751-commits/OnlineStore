@@ -30,7 +30,21 @@
                 @foreach (var s in Model)
                 {
                     <tr>
-                        <td class="fw-semibold">@L10n.Name(s)</td>
+                        <td>
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="admin-shop-logo">
+                                    @if (!string.IsNullOrWhiteSpace(s.LogoUrl))
+                                    {
+                                        <img src="@s.LogoUrl" alt="" />
+                                    }
+                                    else
+                                    {
+                                        <i class="bi bi-shop"></i>
+                                    }
+                                </span>
+                                <span class="fw-semibold">@L10n.Name(s)</span>
+                            </div>
+                        </td>
                         <td><span class="text-warning">★</span> @s.Rating.ToString("0.0")</td>
                         <td>@s.SalesCount</td>
                         <td class="text-muted">@L10n.Description(s)</td>

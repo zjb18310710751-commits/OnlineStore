@@ -1070,6 +1070,21 @@ body {
     flex-shrink: 0;
 }
 
+.shop-avatar--logo {
+    width: 64px;
+    height: 64px;
+    overflow: hidden;
+    border-radius: 10px;
+    background: #f5f5f5;
+    color: #111;
+}
+
+.shop-avatar--logo img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
 .spec-row {
     display: flex;
     padding: .4rem 0;

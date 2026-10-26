@@ -5,7 +5,7 @@ namespace OnlineStore.ViewModels;
 public class LoginViewModel
 {
     [Required(ErrorMessage = "AccountRequired")]
-    [Display(Name = "邮箱 / 手机号")]
+    [Display(Name = "邮箱")]
     public string Email { get; set; } = string.Empty;
 
     [Required(ErrorMessage = "PasswordRequired")]

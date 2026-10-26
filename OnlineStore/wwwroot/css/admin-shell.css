@@ -76,6 +76,34 @@
 .admin-app .form-control, .admin-app .form-select { min-height: 44px; border-color: #d8d8d8; border-radius: 6px; font-size: 14px; }
 .admin-app .form-control:focus, .admin-app .form-select:focus { border-color: var(--admin-ink); box-shadow: 0 0 0 2px #15151512; }
 .admin-app .form-check-input:checked { background-color: var(--admin-ink); border-color: var(--admin-ink); }
+.admin-app .shop-logo-uploader {
+    display: grid;
+    place-items: center;
+    width: 152px;
+    height: 152px;
+    padding: 12px;
+    overflow: hidden;
+    border: 1px dashed #c8c8c8;
+    border-radius: var(--admin-radius);
+    background: #fafafa;
+    color: var(--admin-muted);
+    cursor: pointer;
+    text-align: center;
+    font-size: 11px;
+    line-height: 1.5;
+}
+
+.admin-app .shop-logo-uploader:hover,
+.admin-app .shop-logo-uploader:focus-visible {
+    border-color: var(--admin-ink);
+    background: #f4f4f4;
+}
+
+.admin-app .shop-logo-uploader img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
 .admin-app .table { --bs-table-color: var(--admin-ink); --bs-table-border-color: var(--admin-line); --bs-table-hover-bg: #fafafa; font-size: 13px; font-variant-numeric: tabular-nums; }
 .admin-app .table > :not(caption) > * > * { padding: 16px; vertical-align: middle; }
 .admin-app .table thead { --bs-table-bg: #fafafa; color: var(--admin-muted); }
@@ -86,6 +114,18 @@
 .admin-app .page-link { display: grid; min-width: 44px; min-height: 44px; place-items: center; border-color: var(--admin-line); color: var(--admin-ink); font-size: 13px; }
 .admin-app .active > .page-link { background: var(--admin-ink); border-color: var(--admin-ink); color: #fff; }
 .admin-app .admin-product-img { width: 44px; height: 44px; border-radius: 4px; }
+.admin-app .admin-shop-logo {
+    display: inline-grid;
+    width: 38px;
+    height: 38px;
+    flex: 0 0 38px;
+    place-items: center;
+    overflow: hidden;
+    border-radius: 6px;
+    background: var(--admin-surface);
+    color: var(--admin-muted);
+}
+.admin-app .admin-shop-logo img { width: 100%; height: 100%; object-fit: contain; }
 @media (min-width: 992px) {
     .admin-app .admin-sidebar { position: sticky; top: 0; height: 100vh; align-self: start; }
 }

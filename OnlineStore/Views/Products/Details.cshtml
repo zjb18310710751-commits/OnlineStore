@@ -31,7 +31,16 @@
             <div class="card shadow-sm mb-3">
                 <div class="card-body">
                     <div class="d-flex align-items-center gap-3">
-                        <div class="shop-avatar"><i class="bi bi-shop"></i></div>
+                        <div class="shop-avatar shop-avatar--logo">
+                            @if (!string.IsNullOrWhiteSpace(Model.Shop?.LogoUrl))
+                            {
+                                <img src="@Model.Shop.LogoUrl" alt="@L10n.Name(Model.Shop)" />
+                            }
+                            else
+                            {
+                                <i class="bi bi-shop"></i>
+                            }
+                        </div>
                         <div>
                             <div class="fw-semibold">@(Model.Shop is null ? "—" : L10n.Name(Model.Shop))</div>
                             <div class="text-warning small">

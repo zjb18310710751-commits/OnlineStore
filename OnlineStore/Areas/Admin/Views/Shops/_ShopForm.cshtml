@@ -7,6 +7,30 @@
     <input asp-for="Name" class="form-control" />
     <span asp-validation-for="Name" class="text-danger small"></span>
 </div>
+<div class="mb-3">
+    <label class="form-label">@Loc["ShopLogo"]</label>
+    <div id="shopLogoBox" class="shop-logo-uploader" tabindex="0"
+         data-upload-url="@Url.Action("Upload", "Images", new { area = "Admin" })"
+         data-placeholder="@Loc["ShopLogoPasteHint"]"
+         data-image-alt="@Loc["ShopLogo"]">
+        @if (!string.IsNullOrEmpty(Model.LogoUrl))
+        {
+            <img src="@Model.LogoUrl" alt="@Loc["ShopLogo"]" />
+        }
+        else
+        {
+            <span>@Loc["ShopLogoPasteHint"]</span>
+        }
+    </div>
+    <input type="hidden" asp-for="LogoUrl" id="shopLogoUrl" />
+    <input type="file" id="shopLogoFile" class="visually-hidden" accept=".jpg,.jpeg,.png,.webp,.gif" />
+    <div class="d-flex align-items-center gap-2 mt-2">
+        <button type="button" class="btn btn-sm btn-outline-secondary" id="shopLogoChoose">@Loc["ChooseImage"]</button>
+        <button type="button" class="btn btn-sm btn-outline-danger" id="shopLogoClear">@Loc["ClearImage"]</button>
+        <span class="form-text mb-0">@Loc["ShopLogoHint"]</span>
+    </div>
+    <span asp-validation-for="LogoUrl" class="text-danger small"></span>
+</div>
 <div class="row g-3">
     <div class="col-md-6 mb-3">
         <label asp-for="Rating" class="form-label">@Loc["ShopRating"]</label>
@@ -19,6 +43,58 @@
         <span asp-validation-for="SalesCount" class="text-danger small"></span>
     </div>
 </div>
+
+<script>
+    (function () {
+        var box = document.getElementById('shopLogoBox');
+        var fileInput = document.getElementById('shopLogoFile');
+        var hidden = document.getElementById('shopLogoUrl');
+        var choose = document.getElementById('shopLogoChoose');
+        var clear = document.getElementById('shopLogoClear');
+        if (!box || !fileInput || !hidden) return;
+
+        function setPreview(url) {
+            hidden.value = url || '';
+            box.innerHTML = url
+                ? '<img src="' + url + '" alt="' + box.getAttribute('data-image-alt') + '" />'
+                : '<span>' + box.getAttribute('data-placeholder') + '</span>';
+        }
+
+        async function upload(file) {
+            if (!file) return;
+            var formData = new FormData();
+            formData.append('file', file);
+            var token = document.querySelector('input[name="__RequestVerificationToken"]');
+            try {
+                var response = await fetch(box.getAttribute('data-upload-url'), {
+                    method: 'POST',
+                    body: formData,
+                    headers: { 'RequestVerificationToken': token ? token.value : '' }
+                });
+                var data = await response.json();
+                if (response.ok && data.url) setPreview(data.url);
+            } catch {
+                box.focus();
+            }
+        }
+
+        box.addEventListener('click', function () { fileInput.click(); });
+        box.addEventListener('paste', function (event) {
+            var items = event.clipboardData && event.clipboardData.items;
+            if (!items) return;
+            for (var i = 0; i < items.length; i++) {
+                if (items[i].type.indexOf('image') === 0) {
+                    event.preventDefault();
+                    upload(items[i].getAsFile());
+                    return;
+                }
+            }
+        });
+        fileInput.addEventListener('change', function () { upload(fileInput.files[0]); });
+        choose.addEventListener('click', function () { fileInput.click(); });
+        clear.addEventListener('click', function () { setPreview(''); });
+    })();
+</script>
 <div class="mb-3">
     <label asp-for="Description" class="form-label">@Loc["ShopDescription"]</label>
     <textarea asp-for="Description" class="form-control" rows="3"></textarea>

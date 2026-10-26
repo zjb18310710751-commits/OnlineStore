@@ -387,7 +387,7 @@
   <data name="EmailNotRegistered" xml:space="preserve"><value>该邮箱未注册</value></data>
   <data name="PasswordResetSuccess" xml:space="preserve"><value>密码已重置，请用新密码登录</value></data>
   <data name="DemoCode" xml:space="preserve"><value>验证码：{0}</value></data>
-  <data name="AccountRequired" xml:space="preserve"><value>请输入邮箱或手机号</value></data>
+  <data name="AccountRequired" xml:space="preserve"><value>请输入邮箱</value></data>
   <data name="PasswordRequired" xml:space="preserve"><value>请输入密码</value></data>
   <data name="AddressRequired" xml:space="preserve"><value>请输入地址</value></data>
   <data name="PasswordTooLong" xml:space="preserve"><value>密码最长 100 位</value></data>
@@ -555,4 +555,8 @@
   <data name="AvailableCouponCount" xml:space="preserve"><value>{0} 张可选</value></data>
   <data name="NoAvailableCoupons" xml:space="preserve"><value>当前订单暂时没有可用优惠券。</value></data>
   <data name="Coupon" xml:space="preserve"><value>优惠券</value></data>
+  <data name="ShopLogo" xml:space="preserve"><value>店铺 Logo</value></data>
+  <data name="ShopLogoPasteHint" xml:space="preserve"><value>点击选择图片，或按 Ctrl+V 粘贴 Logo</value></data>
+  <data name="ShopLogoHint" xml:space="preserve"><value>建议使用正方形图片，支持 JPG、PNG、WebP、GIF，最大 5 MB。</value></data>
+  <data name="ChooseImage" xml:space="preserve"><value>选择图片</value></data>
 </root>

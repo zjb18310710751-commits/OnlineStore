@@ -1,12 +1,10 @@
 @inject ICategoryService CategoryService
-@inject IFavoriteService FavoriteService
 @inject IOrderService OrderService
 @inject ICouponService CouponService
 @inject Microsoft.AspNetCore.Identity.UserManager<ApplicationUser> UserManager
 @{
     var categories = (await CategoryService.GetAllAsync()).ToList();
     var currentUser = User.Identity?.IsAuthenticated == true ? await UserManager.GetUserAsync(User) : null;
-    var favoriteCount = currentUser is null ? 0 : await FavoriteService.CountAsync(currentUser.Id);
     var deliveredItemCount = currentUser is null ? 0 : await OrderService.GetDeliveredItemCountAsync(currentUser.Id);
     var availableCouponCount = currentUser is null
         ? 0
@@ -64,18 +62,6 @@
                             <button type="submit" aria-label="@Loc["Search"]"><i class="bi bi-search" aria-hidden="true"></i></button>
                             <input type="search" name="searchTerm" placeholder="@Loc["Search"]" aria-label="@Loc["SearchPlaceholder"]" value="@Context.Request.Query["searchTerm"]" />
                         </form>
-                        <a class="sf-icon-link sf-favorite-link sf-nav-favorites position-relative"
-                           asp-controller="Favorites" asp-action="Index"
-                           title="@Loc["MyFavorites"]"
-                           aria-label="@Loc["MyFavorites"] (@favoriteCount)">
-                            <i class="bi bi-heart" aria-hidden="true"></i>
-                            @if (favoriteCount > 0)
-                            {
-                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                                    @(favoriteCount > 99 ? "99+" : favoriteCount.ToString())
-                                </span>
-                            }
-                        </a>
                         @await Component.InvokeAsync("CartSummary")
                         <div class="dropdown">
                             <button class="sf-icon-link" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="@Loc["Profile"]">
@@ -107,15 +93,6 @@
                                     <li><a class="dropdown-item" asp-controller="Account" asp-action="Login">@Loc["Login"]</a></li>
                                     <li><a class="dropdown-item" asp-controller="Account" asp-action="Register">@Loc["Register"]</a></li>
                                 }
-                                <li>
-                                    <a class="dropdown-item sf-account-link" asp-controller="Favorites" asp-action="Index">
-                                        <span>@Loc["MyFavorites"]</span>
-                                        @if (favoriteCount > 0)
-                                        {
-                                            <span class="sf-count-badge" aria-label="@L10n.Text($"{favoriteCount} 件收藏", $"{favoriteCount} favourites")">@favoriteCount</span>
-                                        }
-                                    </a>
-                                </li>
                                 @if (User.Identity?.IsAuthenticated == true)
                                 {
                                     <li>
@@ -162,8 +139,18 @@
     {
         <footer class="sf-footer">
             <div class="sf-container">
+                <div class="sf-footer-lead">
+                    <a class="sf-wordmark" asp-controller="Home" asp-action="Index" aria-label="ZHY · @Loc["Home"]">ZHY.</a>
+                    <div class="sf-footer-lead-copy">
+                        <h2>@L10n.Text("为日常，选更好的。", "A little better. Every day.")</h2>
+                        <p>@L10n.Text("从数码、服饰到家居与户外，把值得长期使用的好物带到生活里。", "Useful pieces for digital life, style, home and the outdoors — chosen to last.")</p>
+                    </div>
+                    <a class="sf-footer-shop-link" asp-controller="Products" asp-action="Index">
+                        @L10n.Text("浏览全部商品", "Browse all products") <i class="bi bi-arrow-right" aria-hidden="true"></i>
+                    </a>
+                </div>
+
                 <div class="sf-footer-grid">
-                    <div class="sf-footer-brand"><a class="sf-wordmark" asp-controller="Home" asp-action="Index">ZHY.</a><p>@L10n.Text("为日常，选更好的。", "A little better. Every day.")</p></div>
                     <div>
                         <h2>@Loc["ShopByCategory"]</h2>
                         <ul>
@@ -173,9 +160,38 @@
                             }
                         </ul>
                     </div>
-                    <div><h2>@L10n.Text("你的商店", "Your store")</h2><ul><li><a asp-controller="Account" asp-action="Profile">@Loc["Profile"]</a></li><li><a asp-controller="Orders" asp-action="MyOrders">@Loc["MyOrders"]</a></li><li><a asp-controller="Favorites" asp-action="Index">@Loc["MyFavorites"]</a></li><li><a asp-controller="Coupons" asp-action="Index">@Loc["MyCoupons"]</a></li><li><a asp-controller="Cart" asp-action="Index">@Loc["Cart"]</a></li></ul></div>
+                    <div>
+                        <h2>@L10n.Text("你的账户", "Your account")</h2>
+                        <ul>
+                            <li><a asp-controller="Account" asp-action="Profile">@Loc["Profile"]</a></li>
+                            <li><a asp-controller="Orders" asp-action="MyOrders">@Loc["MyOrders"]</a></li>
+                            @if (User.Identity?.IsAuthenticated == true)
+                            {
+                                <li><a asp-controller="Coupons" asp-action="Index">@Loc["MyCoupons"]</a></li>
+                            }
+                            <li><a asp-controller="Cart" asp-action="Index">@Loc["Cart"]</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h2>@L10n.Text("订单与服务", "Orders and service")</h2>
+                        <ul>
+                            <li><a asp-controller="Orders" asp-action="MyOrders">@L10n.Text("订单追踪", "Track an order")</a></li>
+                            <li><a asp-controller="Orders" asp-action="MyOrders">@L10n.Text("退换与售后", "Returns and after-sales")</a></li>
+                            <li><a asp-controller="Coupons" asp-action="Index">@L10n.Text("会员优惠", "Member offers")</a></li>
+                            <li><a asp-controller="Products" asp-action="Index">@L10n.Text("继续选购", "Keep shopping")</a></li>
+                        </ul>
+                    </div>
                 </div>
-                <div class="sf-footer-bottom"><span>&copy; @DateTime.Now.Year ZHY · @Loc["Brand"]</span><span>@L10n.Text("发现喜欢，留住日常。", "Find your everyday favourites.")</span></div>
+
+                <div class="sf-footer-service" aria-label="@L10n.Text("购物服务", "Shopping services")">
+                    <div><strong>@L10n.Text("精选商品", "Curated products")</strong><span>@L10n.Text("关注品质与长期使用价值", "Chosen for quality and everyday use")</span></div>
+                    <div><strong>@L10n.Text("物流可追踪", "Trackable delivery")</strong><span>@L10n.Text("订单发货后可查看实时进度", "Follow delivery progress after dispatch")</span></div>
+                    <div><strong>@L10n.Text("售后有记录", "Recorded after-sales")</strong><span>@L10n.Text("退货与换货申请清晰可查", "Returns and exchanges stay easy to follow")</span></div>
+                </div>
+                <div class="sf-footer-bottom">
+                    <span>&copy; @DateTime.Now.Year ZHY · @Loc["Brand"]</span>
+                    <span>@L10n.Text("发现喜欢，留住日常。", "Find what you love. Keep it close.")</span>
+                </div>
             </div>
         </footer>
     }
