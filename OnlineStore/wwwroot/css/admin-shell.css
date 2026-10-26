@@ -55,7 +55,8 @@
 .admin-app .admin-store-link:hover { text-decoration: underline; text-underline-offset: 4px; }
 .admin-app .admin-language { min-width: 44px; min-height: 44px; border: 1px solid var(--admin-line); border-radius: 50%; background: #fff; color: var(--admin-ink); font-size: 12px; }
 .admin-app .admin-language:hover { background: var(--admin-surface); }
-.admin-app .admin-user-mark { display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 50%; background: var(--admin-surface); font-size: 19px; }
+.admin-app .admin-user-mark { display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; overflow: hidden; border-radius: 50%; background: var(--admin-surface); font-size: 19px; }
+.admin-app .admin-user-mark img { display: block; width: 100%; height: 100%; object-fit: cover; }
 .admin-app .admin-menu-toggle { display: inline-flex; align-items: center; justify-content: center; flex: 0 0 44px; width: 44px; height: 44px; padding: 0; border: 1px solid var(--admin-line); border-radius: var(--admin-radius); background: #fff; color: var(--admin-ink); font-size: 23px; }
 .admin-app .admin-content { width: 100%; max-width: 1680px; min-width: 0; margin-inline: auto; padding: var(--admin-gutter); }
 .admin-app .admin-content > h1, .admin-app .admin-content > div > h1 { color: var(--admin-ink); font-size: 28px; font-weight: 700; letter-spacing: -.035em; }

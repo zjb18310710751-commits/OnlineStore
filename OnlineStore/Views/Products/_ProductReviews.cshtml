@@ -8,36 +8,38 @@
     var ratingLabel = L10n.Text("{0} 分，满分 5 分", "{0} out of 5 stars");
 }
 <section class="sf-reviews" id="product-reviews" aria-labelledby="product-reviews-title">
-    <header class="sf-reviews-heading">
-        <div>
-            <p class="sf-reviews-eyebrow">@L10n.Text("来自日常的真实感受", "THE EVERYDAY PERSPECTIVE")</p>
-            <h2 id="product-reviews-title">@Loc["Reviews"]<span class="sf-reviews-total">(@reviews.Count)</span></h2>
-        </div>
-        <p>@L10n.Text("看看大家怎么说，分享你的使用体验。", "Read their experience. Share your own.")</p>
-    </header>
     <div class="sf-reviews-layout">
-        <aside class="sf-reviews-overview" aria-label="@L10n.Text("评分概览", "Rating overview")">
-            <div class="sf-review-score">
-                <span class="sf-review-score-value">@(reviews.Count > 0 ? average.ToString("0.0") : "—")</span>
-                <span class="sf-review-score-scale">/ 5</span>
-            </div>
-            <div class="sf-review-stars" role="img" aria-label="@(reviews.Count > 0 ? string.Format(ratingLabel, average.ToString("0.0")) : L10n.Text("暂无评分", "No ratings yet"))">
-                <span class="sf-review-average-stars" style="--review-rating-fill: @(averageFill)%;" aria-hidden="true"><span class="sf-review-stars-empty">★★★★★</span><span class="sf-review-average-stars-fill">★★★★★</span></span>
-            </div>
-            <p class="sf-review-count">@L10n.Text($"基于 {reviews.Count} 条评价", $"Based on {reviews.Count} {(reviews.Count == 1 ? "review" : "reviews")}")</p>
-            <div class="sf-review-distribution">
-                @for (var star = 5; star >= 1; star--)
-                {
-                    var count = reviews.Count(r => r.Rating == star);
-                    <div class="sf-review-distribution-row">
-                        <span aria-hidden="true">@star <span class="sf-review-distribution-star">★</span></span>
-                        <progress value="@count" max="@Math.Max(reviews.Count, 1)" aria-label="@L10n.Text($"{star} 星：{count} 条评价", $"{star} stars: {count} reviews")">@count</progress>
-                        <span class="sf-review-distribution-count" aria-hidden="true">@count</span>
-                    </div>
-                }
-            </div>
-            <a class="sf-button sf-review-write-link" href="#write-review">@L10n.Text("写下评价", "Write a review")</a>
-        </aside>
+        <div class="sf-reviews-rail">
+            <header class="sf-reviews-heading">
+                <div>
+                    <p class="sf-reviews-eyebrow">@L10n.Text("来自日常的真实感受", "THE EVERYDAY PERSPECTIVE")</p>
+                    <h2 id="product-reviews-title">@Loc["Reviews"]<span class="sf-reviews-total">(@reviews.Count)</span></h2>
+                </div>
+                <p>@L10n.Text("看看大家怎么说，分享你的使用体验。", "Read their experience. Share your own.")</p>
+            </header>
+            <aside class="sf-reviews-overview" aria-label="@L10n.Text("评分概览", "Rating overview")">
+                <div class="sf-review-score">
+                    <span class="sf-review-score-value">@(reviews.Count > 0 ? average.ToString("0.0") : "—")</span>
+                    <span class="sf-review-score-scale">/ 5</span>
+                </div>
+                <div class="sf-review-stars" role="img" aria-label="@(reviews.Count > 0 ? string.Format(ratingLabel, average.ToString("0.0")) : L10n.Text("暂无评分", "No ratings yet"))">
+                    <span class="sf-review-average-stars" style="--review-rating-fill: @(averageFill)%;" aria-hidden="true"><span class="sf-review-stars-empty">★★★★★</span><span class="sf-review-average-stars-fill">★★★★★</span></span>
+                </div>
+                <p class="sf-review-count">@L10n.Text($"基于 {reviews.Count} 条评价", $"Based on {reviews.Count} {(reviews.Count == 1 ? "review" : "reviews")}")</p>
+                <div class="sf-review-distribution">
+                    @for (var star = 5; star >= 1; star--)
+                    {
+                        var count = reviews.Count(r => r.Rating == star);
+                        <div class="sf-review-distribution-row">
+                            <span aria-hidden="true">@star <span class="sf-review-distribution-star">★</span></span>
+                            <progress value="@count" max="@Math.Max(reviews.Count, 1)" aria-label="@L10n.Text($"{star} 星：{count} 条评价", $"{star} stars: {count} reviews")">@count</progress>
+                            <span class="sf-review-distribution-count" aria-hidden="true">@count</span>
+                        </div>
+                    }
+                </div>
+                <a class="sf-button sf-review-write-link" href="#write-review">@L10n.Text("写下评价", "Write a review")</a>
+            </aside>
+        </div>
         <div class="sf-reviews-content">
             @if (reviews.Count > 0)
             {
@@ -130,7 +132,11 @@
                             </div>
                             <div class="sf-review-upload">
                                 <label for="review-image">@Loc["ReviewImage"]</label>
-                                <input type="file" id="review-image" name="image" accept=".jpg,.jpeg,.png,.webp,.gif" aria-describedby="review-image-help review-image-error" data-review-image data-size-error="@L10n.Text("请选择不超过 5 MB 的图片。", "Choose an image under 5 MB.")" data-type-error="@L10n.Text("请选择 JPG、PNG、WebP 或 GIF 格式的图片。", "Choose a JPG, PNG, WebP, or GIF image.")" />
+                                <div class="sf-review-file-control">
+                                    <input class="sf-review-file-input" type="file" id="review-image" name="image" accept=".jpg,.jpeg,.png,.webp,.gif" aria-describedby="review-image-help review-image-error" data-review-image data-no-file="@L10n.Text("未选择文件", "No file chosen")" data-size-error="@L10n.Text("请选择不超过 5 MB 的图片。", "Choose an image under 5 MB.")" data-type-error="@L10n.Text("请选择 JPG、PNG、WebP 或 GIF 格式的图片。", "Choose a JPG, PNG, WebP, or GIF image.")" />
+                                    <label class="sf-review-file-button" for="review-image">@L10n.Text("选择文件", "Choose file")</label>
+                                    <span class="sf-review-file-name" data-review-file-name>@L10n.Text("未选择文件", "No file chosen")</span>
+                                </div>
                                 <p class="sf-review-field-help" id="review-image-help">JPG, PNG, WebP, GIF · @L10n.Text("最大 5 MB", "Up to 5 MB")</p>
                                 <p class="sf-review-field-error" id="review-image-error" data-review-image-error role="alert" hidden></p>
                                 <div class="sf-review-image-preview" data-review-image-preview hidden>

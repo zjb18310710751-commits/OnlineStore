@@ -2759,3 +2759,219 @@ body {
 .navbar-nav .nav-item .nav-pill-btn:active {
     transform: translateY(0);
 }
+
+.sf-select {
+    position: relative;
+    display: inline-flex;
+    max-width: 100%;
+    vertical-align: middle;
+}
+
+.sf-select--block {
+    display: flex;
+    width: 100%;
+}
+
+.sf-select--sort {
+    flex: 0 1 180px;
+    width: 180px;
+}
+
+.sf-select__native {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    border: 0 !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+
+.sf-select__trigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    width: 100%;
+    min-height: 44px;
+    padding: 10px 14px;
+    border: 1px solid #d8d8d8;
+    border-radius: 8px;
+    background: #fff;
+    color: #111;
+    font: inherit;
+    font-size: 14px;
+    line-height: 1.5;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color 140ms ease, border-color 140ms ease, box-shadow 140ms ease;
+}
+
+.sf-select__trigger:hover {
+    border-color: #111;
+}
+
+.sf-select__trigger:active {
+    border-color: #111;
+    background: #111;
+    color: #fff;
+}
+
+.sf-select__trigger:focus-visible,
+.sf-select.is-open .sf-select__trigger {
+    outline: none;
+    border-color: #111;
+    background: #f5f5f5;
+    box-shadow: 0 0 0 3px rgb(17 17 17 / 9%);
+}
+
+.sf-select__trigger:disabled {
+    border-color: #e7e7e7;
+    background: #fafafa;
+    color: #9a9a9a;
+    cursor: not-allowed;
+}
+
+.sf-select__value {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.sf-select__chevron {
+    flex: 0 0 8px;
+    width: 8px;
+    height: 8px;
+    margin-top: -4px;
+    border-right: 1.5px solid currentColor;
+    border-bottom: 1.5px solid currentColor;
+    transform: rotate(45deg);
+    transition: margin-top 140ms ease, transform 140ms ease;
+}
+
+.sf-select.is-open .sf-select__chevron {
+    margin-top: 4px;
+    transform: rotate(225deg);
+}
+
+.sf-select__menu {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    z-index: 2000;
+    width: max-content;
+    min-width: 100%;
+    max-width: min(360px, calc(100vw - 24px));
+    max-height: min(320px, 60vh);
+    padding: 6px;
+    overflow-y: auto;
+    border: 1px solid #e3e3e3;
+    border-radius: 10px;
+    background: #fff;
+    box-shadow: 0 14px 34px rgb(0 0 0 / 12%);
+    animation: sf-select-menu-in 120ms ease-out;
+}
+
+.sf-select__menu[hidden] {
+    display: none;
+}
+
+.sf-select__menu--above {
+    top: auto;
+    bottom: calc(100% + 6px);
+}
+
+.sf-select--sort .sf-select__menu {
+    right: 0;
+    left: auto;
+}
+
+.sf-select--sort .sf-select__menu,
+.sf-select--filter .sf-select__menu {
+    width: 100%;
+    min-width: 100%;
+    max-width: 100%;
+}
+
+.sf-select--filter .sf-select__option {
+    white-space: normal;
+}
+
+.sf-select__option {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    min-height: 38px;
+    padding: 8px 12px;
+    border: 0;
+    border-radius: 6px;
+    background: transparent;
+    color: #111;
+    font: inherit;
+    font-size: 14px;
+    line-height: 1.5;
+    text-align: left;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background-color 110ms ease, color 110ms ease;
+}
+
+.sf-select__option:hover,
+.sf-select__option.is-highlighted {
+    background: #f2f2f2;
+    color: #111;
+}
+
+.sf-select__option:active {
+    background: #111;
+    color: #fff;
+}
+
+.sf-select__option.is-selected {
+    background: #111;
+    color: #fff;
+}
+
+.sf-select__option.is-selected:hover,
+.sf-select__option.is-selected.is-highlighted {
+    background: #111;
+    color: #fff;
+}
+
+.sf-select__option:disabled {
+    background: transparent;
+    color: #a0a0a0;
+    cursor: not-allowed;
+}
+
+@keyframes sf-select-menu-in {
+    from {
+        opacity: 0;
+        transform: translateY(-4px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .sf-select__trigger,
+    .sf-select__chevron,
+    .sf-select__option {
+        transition: none;
+    }
+
+    .sf-select__menu {
+        animation: none;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .sf-select--sort {
+        flex-basis: 158px;
+        width: 158px;
+    }
+}

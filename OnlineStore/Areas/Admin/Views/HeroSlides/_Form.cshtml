@@ -2,11 +2,14 @@
 @{
     var defaultHeading = L10n.Text("让好物，成为主角。", "YOUR NEXT FAVOURITE.");
     var defaultDescription = L10n.Text("在左侧填写文字，预览这张轮播图。", "Your image and message will appear here.");
-    var isEnglish = !CultureInfo.CurrentUICulture.Name.StartsWith("zh", StringComparison.OrdinalIgnoreCase);
     var previewHeading = L10n.Text(Model.Heading, Model.HeadingEn);
     var previewDescription = L10n.Text(Model.Description ?? "", Model.DescriptionEn);
 }
 <input asp-for="Id" type="hidden" />
+<input asp-for="TitleEn" type="hidden" />
+<input asp-for="HeadingEn" type="hidden" />
+<input asp-for="DescriptionEn" type="hidden" />
+<input asp-for="ImageAltEn" type="hidden" />
 <div asp-validation-summary="All" class="text-danger ac-validation" role="alert"></div>
 <div class="ac-editor-grid">
     <div class="ac-editor-fields">
@@ -39,13 +42,6 @@
                 <textarea asp-for="Description" maxlength="240" class="form-control" rows="3" data-copy-description></textarea>
                 <span asp-validation-for="Description" class="text-danger small"></span>
             </div>
-            <details class="ac-translations" open="@((!string.IsNullOrWhiteSpace(Model.HeadingEn) || !string.IsNullOrWhiteSpace(Model.TitleEn)) ? "open" : null)">
-                <summary>@L10n.Text("英文内容", "English content") <span>@L10n.Text("选填 · 未填写时使用上方内容", "Optional · falls back to the main content")</span></summary>
-                <div class="ac-field"><label asp-for="TitleEn" class="form-label">@L10n.Text("轮播名称（英文）", "Slide name in English")</label><input asp-for="TitleEn" maxlength="100" class="form-control" /><span asp-validation-for="TitleEn" class="text-danger small"></span></div>
-                <div class="ac-field"><label asp-for="HeadingEn" class="form-label">@L10n.Text("宣传标题（英文）", "Headline in English")</label><input asp-for="HeadingEn" maxlength="120" class="form-control" data-copy-heading-en /><span asp-validation-for="HeadingEn" class="text-danger small"></span></div>
-                <div class="ac-field"><label asp-for="DescriptionEn" class="form-label">@L10n.Text("宣传说明（英文）", "Description in English")</label><textarea asp-for="DescriptionEn" maxlength="240" class="form-control" rows="3" data-copy-description-en></textarea><span asp-validation-for="DescriptionEn" class="text-danger small"></span></div>
-                <div class="ac-field"><label asp-for="ImageAltEn" class="form-label">@L10n.Text("图片描述（英文）", "Image description in English")</label><input asp-for="ImageAltEn" maxlength="200" class="form-control" /><span asp-validation-for="ImageAltEn" class="text-danger small"></span></div>
-            </details>
         </section>
         <section class="card card-body ac-form-section" aria-labelledby="ac-display-title">
             <h2 id="ac-display-title">@L10n.Text("展示设置", "Display settings")</h2>
@@ -63,7 +59,7 @@
         <div class="ac-form-actions"><button type="submit" class="btn btn-primary">@L10n.Text("保存轮播图", "Save slide")</button><a asp-action="Index" class="btn btn-outline-secondary">@Loc["Cancel"]</a><span>@L10n.Text("保存后生效", "Changes take effect when saved")</span></div>
     </div>
     <aside class="ac-preview-panel" aria-labelledby="ac-preview-title">
-        <div class="ac-preview-top"><h2 id="ac-preview-title">@L10n.Text("效果预览", "Live preview")</h2><label class="visually-hidden" for="ac-preview-language">@L10n.Text("预览语言", "Preview language")</label><select id="ac-preview-language" class="form-select" data-preview-language><option value="main" selected="@(!isEnglish ? "selected" : null)">@L10n.Text("主要内容", "Main content")</option><option value="en" selected="@(isEnglish ? "selected" : null)">English</option></select></div>
+        <div class="ac-preview-top"><h2 id="ac-preview-title">@L10n.Text("效果预览", "Live preview")</h2></div>
         <div class="ac-preview-stage" data-preview-stage>
             @if (!string.IsNullOrWhiteSpace(Model.ImageUrl))
             {

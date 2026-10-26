@@ -65,7 +65,13 @@
     const fileInput = section.querySelector('[data-review-image]');
     const preview = section.querySelector('[data-review-image-preview]');
     const fileError = section.querySelector('[data-review-image-error]');
+    const fileName = section.querySelector('[data-review-file-name]');
     let previewUrl = null;
+    const renderFileName = () => {
+        if (!fileInput || !fileName) return;
+        const file = fileInput.files[0];
+        fileName.textContent = file ? file.name : fileInput.dataset.noFile;
+    };
     const clearPreview = () => {
         if (previewUrl) URL.revokeObjectURL(previewUrl);
         previewUrl = null;
@@ -82,6 +88,7 @@
         fileError.hidden = true;
         fileError.textContent = '';
         const file = fileInput.files[0];
+        renderFileName();
         if (!file) return;
         const validExtension = /\.(jpe?g|png|webp|gif)$/i.test(file.name);
         const validType = !file.type || ['image/jpeg', 'image/png', 'image/webp', 'image/gif'].includes(file.type);
@@ -108,6 +115,7 @@
         fileError.hidden = true;
         fileError.textContent = '';
         clearPreview();
+        renderFileName();
         fileInput.focus();
     });
     window.addEventListener('pagehide', clearPreview);

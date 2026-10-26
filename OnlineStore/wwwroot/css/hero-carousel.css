@@ -119,7 +119,7 @@
     transform: translateX(-50%);
     pointer-events: auto;
 }
-.storefront .sf-carousel-navigation { max-width: min(calc(100% - 360px), 440px); overflow-x: auto; scrollbar-width: thin; }
+.storefront .sf-carousel-navigation { max-width: calc(100% - 32px); overflow-x: auto; scrollbar-width: thin; }
 .storefront .sf-carousel-dot { flex-shrink: 0; }
 .storefront .sf-carousel-dot {
     display: inline-flex;
@@ -144,35 +144,6 @@
     background: #fff;
     transform: scale(1.25);
 }
-.storefront .sf-carousel-playback {
-    position: absolute;
-    right: var(--campaign-control-inset);
-    bottom: var(--campaign-control-inset);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    pointer-events: auto;
-}
-.storefront .sf-carousel-icon,
-.storefront .sf-carousel-pause {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 44px;
-    height: 44px;
-    padding: 0;
-    border: 1px solid rgb(255 255 255 / 30%);
-    border-radius: 50%;
-    background: rgb(0 0 0 / 25%);
-    color: #fff;
-    font-size: 18px;
-    line-height: 1;
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-}
-.storefront .sf-carousel-icon:hover,
-.storefront .sf-carousel-pause:hover { background: rgb(0 0 0 / 50%); }
-.storefront .sf-carousel-pause i { font-size: 20px; }
 .storefront .sf-carousel :is(button, a):focus-visible {
     outline: 2px solid #fff;
     outline-offset: 4px;
@@ -191,11 +162,9 @@
         font-size: 14px;
         line-height: 1.6;
     }
-    .storefront .sf-carousel-playback { gap: 4px; }
 }
 @media (max-width: 575px) {
     .storefront .sf-carousel { --campaign-copy-bottom: 136px; }
-    .storefront .sf-carousel-playback { bottom: 64px; }
     .storefront .sf-carousel-navigation { max-width: calc(100% - 32px); }
 }
 @media (prefers-reduced-motion: reduce) {

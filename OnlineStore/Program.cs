@@ -9,7 +9,7 @@ using OnlineStore.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
-    ?? throw new InvalidOperationException("æœªé…ç½®è¿æ¥å­—ç¬¦ä¸² ConnectionStrings:DefaultConnectionã€‚");
+    ?? throw new InvalidOperationException("Î´ÅäÖÃÁ¬½Ó×Ö·û´® ConnectionStrings:DefaultConnection¡£");
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
@@ -136,7 +136,7 @@ try
 catch (Exception ex)
 {
     var logger = app.Services.GetRequiredService<ILoggerFactory>().CreateLogger("DbInitializer");
-    logger.LogError(ex, "æ•°æ®åº“åˆå§‹åŒ–å¤±è´¥ï¼šè¯·æ£€æŸ¥ SQL Server (SQLEXPRESS) æœåŠ¡æ˜¯å¦å·²å¯åŠ¨ï¼Œä»¥åŠè¿æ¥ä¸²/å‡­æ®æ˜¯å¦æ­£ç¡®ã€‚");
+    logger.LogError(ex, "Êı¾İ¿â³õÊ¼»¯Ê§°Ü£ºÇë¼ì²é SQL Server (SQLEXPRESS) ·şÎñÊÇ·ñÒÑÆô¶¯£¬ÒÔ¼°Á¬½Ó´®/Æ¾¾İÊÇ·ñÕıÈ·¡£");
 }
 
 app.Run();

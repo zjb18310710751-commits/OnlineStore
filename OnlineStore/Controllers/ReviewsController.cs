@@ -105,13 +105,13 @@ public class ReviewsController : Controller
     {
         if (user is null)
         {
-            return "匿名用户";
+            return L10n.Text("匿名用户", "Anonymous");
         }
 
         var fullName = $"{user.LastName}{user.FirstName}".Trim();
         var name = !string.IsNullOrWhiteSpace(fullName)
             ? fullName
-            : user.Email?.Split('@')[0] ?? "用户";
+            : user.Email?.Split('@')[0] ?? L10n.Text("用户", "User");
         return name[..Math.Min(name.Length, 50)];
     }
 }

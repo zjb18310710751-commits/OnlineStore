@@ -26,6 +26,8 @@ public interface IOrderService
 
     Task<bool> ConfirmReceiptAsync(int id, string userId);
 
+    Task<int> GetDeliveredItemCountAsync(string userId);
+
     Task<bool> DeleteForUserAsync(int id, string userId);
 
     Task<AfterSalesRequest> CreateAfterSalesAsync(int orderId, string userId, string type, string reason);

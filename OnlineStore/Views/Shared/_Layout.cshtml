@@ -1,10 +1,17 @@
 @inject ICategoryService CategoryService
 @inject IFavoriteService FavoriteService
+@inject IOrderService OrderService
+@inject ICouponService CouponService
 @inject Microsoft.AspNetCore.Identity.UserManager<ApplicationUser> UserManager
 @{
     var categories = (await CategoryService.GetAllAsync()).ToList();
     var currentUser = User.Identity?.IsAuthenticated == true ? await UserManager.GetUserAsync(User) : null;
     var favoriteCount = currentUser is null ? 0 : await FavoriteService.CountAsync(currentUser.Id);
+    var deliveredItemCount = currentUser is null ? 0 : await OrderService.GetDeliveredItemCountAsync(currentUser.Id);
+    var availableCouponCount = currentUser is null
+        ? 0
+        : (await CouponService.GetCustomerCouponsAsync(currentUser.Id))
+            .Count(item => item.Status == CouponWalletStatus.Available);
     var isAdmin = User.IsInRole("Admin");
     var isZh = CultureInfo.CurrentUICulture.Name.StartsWith("zh", StringComparison.OrdinalIgnoreCase);
     var returnUrl = $"{Context.Request.Path}{Context.Request.QueryString}";
@@ -85,17 +92,41 @@
                                 @if (User.Identity?.IsAuthenticated == true)
                                 {
                                     <li><a class="dropdown-item" asp-controller="Account" asp-action="Profile">@Loc["Profile"]</a></li>
-                                    <li><a class="dropdown-item" asp-controller="Orders" asp-action="MyOrders">@Loc["MyOrders"]</a></li>
+                                    <li>
+                                        <a class="dropdown-item sf-account-link" asp-controller="Orders" asp-action="MyOrders">
+                                            <span>@Loc["MyOrders"]</span>
+                                            @if (deliveredItemCount > 0)
+                                            {
+                                                <span class="sf-count-badge" aria-label="@L10n.Text($"{deliveredItemCount} 件商品已送达", $"{deliveredItemCount} delivered items")">@deliveredItemCount</span>
+                                            }
+                                        </a>
+                                    </li>
                                 }
                                 else
                                 {
                                     <li><a class="dropdown-item" asp-controller="Account" asp-action="Login">@Loc["Login"]</a></li>
                                     <li><a class="dropdown-item" asp-controller="Account" asp-action="Register">@Loc["Register"]</a></li>
                                 }
-                                <li><a class="dropdown-item" asp-controller="Favorites" asp-action="Index">@Loc["MyFavorites"]</a></li>
+                                <li>
+                                    <a class="dropdown-item sf-account-link" asp-controller="Favorites" asp-action="Index">
+                                        <span>@Loc["MyFavorites"]</span>
+                                        @if (favoriteCount > 0)
+                                        {
+                                            <span class="sf-count-badge" aria-label="@L10n.Text($"{favoriteCount} 件收藏", $"{favoriteCount} favourites")">@favoriteCount</span>
+                                        }
+                                    </a>
+                                </li>
                                 @if (User.Identity?.IsAuthenticated == true)
                                 {
-                                    <li><a class="dropdown-item" asp-controller="Coupons" asp-action="Index">@Loc["MyCoupons"]</a></li>
+                                    <li>
+                                        <a class="dropdown-item sf-account-link" asp-controller="Coupons" asp-action="Index">
+                                            <span>@Loc["MyCoupons"]</span>
+                                            @if (availableCouponCount > 0)
+                                            {
+                                                <span class="sf-count-badge" aria-label="@L10n.Text($"{availableCouponCount} 张可用优惠券", $"{availableCouponCount} available coupons")">@availableCouponCount</span>
+                                            }
+                                        </a>
+                                    </li>
                                 }
                                 @if (!isCatalogPage)
                                 {

@@ -41,7 +41,218 @@ function switchImage(btn, url) {
 document.addEventListener('DOMContentLoaded', function () {
     document.querySelectorAll('[data-send-code-url]').forEach(initSendCodeButton);
     initPasswordToggles();
+    initCustomSelects();
 });
+
+function initCustomSelects() {
+    var selectId = 0;
+
+    document.querySelectorAll('select:not([multiple]):not([size])').forEach(function (select) {
+        if (select.dataset.customSelectReady) return;
+        select.dataset.customSelectReady = 'true';
+
+        selectId += 1;
+        var listboxId = 'sf-select-' + selectId;
+        var wrapper = document.createElement('div');
+        wrapper.className = 'sf-select';
+        if (select.classList.contains('form-select')) {
+            wrapper.classList.add('sf-select--block');
+        }
+        if (select.classList.contains('sf-filter-input')) {
+            wrapper.classList.add('sf-select--block', 'sf-select--filter');
+        }
+        if (select.closest('.sf-sort-form') || select.closest('.sf-review-sort')) {
+            wrapper.classList.add('sf-select--sort');
+        }
+
+        select.parentNode.insertBefore(wrapper, select);
+        wrapper.appendChild(select);
+        select.classList.add('sf-select__native');
+        select.tabIndex = -1;
+        select.setAttribute('aria-hidden', 'true');
+
+        var trigger = document.createElement('button');
+        trigger.type = 'button';
+        trigger.className = 'sf-select__trigger';
+        trigger.setAttribute('role', 'combobox');
+        trigger.setAttribute('aria-haspopup', 'listbox');
+        trigger.setAttribute('aria-controls', listboxId);
+        trigger.setAttribute('aria-expanded', 'false');
+        trigger.disabled = select.disabled;
+
+        var value = document.createElement('span');
+        value.className = 'sf-select__value';
+        var chevron = document.createElement('span');
+        chevron.className = 'sf-select__chevron';
+        chevron.setAttribute('aria-hidden', 'true');
+        trigger.append(value, chevron);
+
+        var menu = document.createElement('div');
+        menu.className = 'sf-select__menu';
+        menu.id = listboxId;
+        menu.setAttribute('role', 'listbox');
+        menu.hidden = true;
+
+        var options = Array.prototype.slice.call(select.options);
+        var optionButtons = options.map(function (option, index) {
+            var item = document.createElement('button');
+            item.type = 'button';
+            item.className = 'sf-select__option';
+            item.id = listboxId + '-option-' + index;
+            item.setAttribute('role', 'option');
+            item.setAttribute('aria-selected', 'false');
+            item.tabIndex = -1;
+            item.textContent = option.text;
+            item.disabled = option.disabled;
+            item.dataset.optionIndex = String(index);
+            item.addEventListener('mouseenter', function () {
+                highlight(index);
+            });
+            item.addEventListener('mousedown', function (event) {
+                event.preventDefault();
+            });
+            item.addEventListener('click', function () {
+                choose(index);
+            });
+            menu.appendChild(item);
+            return item;
+        });
+
+        wrapper.append(trigger, menu);
+
+        function syncSelection() {
+            var index = select.selectedIndex;
+            var selected = index >= 0 ? options[index] : null;
+            value.textContent = selected ? selected.text : '';
+            trigger.setAttribute('aria-label', selected ? selected.text : '');
+            optionButtons.forEach(function (item, optionIndex) {
+                item.setAttribute('aria-selected', String(optionIndex === index));
+                item.classList.toggle('is-selected', optionIndex === index);
+            });
+        }
+
+        function highlight(index) {
+            optionButtons.forEach(function (item, optionIndex) {
+                item.classList.toggle('is-highlighted', optionIndex === index);
+            });
+            if (index >= 0) {
+                trigger.setAttribute('aria-activedescendant', optionButtons[index].id);
+                optionButtons[index].scrollIntoView({ block: 'nearest' });
+            } else {
+                trigger.removeAttribute('aria-activedescendant');
+            }
+        }
+
+        function openMenu() {
+            if (select.disabled || optionButtons.length === 0) return;
+            menu.hidden = false;
+            wrapper.classList.add('is-open');
+            trigger.setAttribute('aria-expanded', 'true');
+            highlight(Math.max(0, select.selectedIndex));
+            requestAnimationFrame(function () {
+                var bounds = menu.getBoundingClientRect();
+                menu.classList.toggle('sf-select__menu--above', bounds.bottom > window.innerHeight - 12);
+            });
+        }
+
+        function closeMenu(returnFocus) {
+            menu.hidden = true;
+            wrapper.classList.remove('is-open');
+            trigger.setAttribute('aria-expanded', 'false');
+            trigger.removeAttribute('aria-activedescendant');
+            optionButtons.forEach(function (item) {
+                item.classList.remove('is-highlighted');
+            });
+            if (returnFocus) trigger.focus();
+        }
+
+        function highlightedIndex() {
+            return optionButtons.findIndex(function (item) {
+                return item.classList.contains('is-highlighted');
+            });
+        }
+
+        function choose(index) {
+            if (index < 0 || index >= options.length || options[index].disabled) return;
+            var changed = select.selectedIndex !== index;
+            select.selectedIndex = index;
+            syncSelection();
+            closeMenu(true);
+            if (changed) select.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+
+        trigger.addEventListener('click', function () {
+            if (menu.hidden) {
+                openMenu();
+            } else {
+                closeMenu(false);
+            }
+        });
+
+        trigger.addEventListener('keydown', function (event) {
+            var index = highlightedIndex();
+            if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+                event.preventDefault();
+                if (menu.hidden) {
+                    openMenu();
+                    return;
+                }
+                var direction = event.key === 'ArrowDown' ? 1 : -1;
+                var next = index < 0 ? Math.max(0, select.selectedIndex) : index;
+                for (var step = 0; step < optionButtons.length; step += 1) {
+                    next = (next + direction + optionButtons.length) % optionButtons.length;
+                    if (!optionButtons[next].disabled) break;
+                }
+                highlight(next);
+                return;
+            }
+
+            if (event.key === 'Home' || event.key === 'End') {
+                event.preventDefault();
+                if (menu.hidden) openMenu();
+                var target = event.key === 'Home' ? 0 : optionButtons.length - 1;
+                highlight(target);
+                return;
+            }
+
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                if (menu.hidden) {
+                    openMenu();
+                } else {
+                    choose(index);
+                }
+                return;
+            }
+
+            if (event.key === 'Escape' && !menu.hidden) {
+                event.preventDefault();
+                closeMenu(true);
+            }
+        });
+
+        trigger.addEventListener('keydown', function (event) {
+            if (event.key === 'Tab' && !menu.hidden) closeMenu(false);
+        });
+
+        document.addEventListener('pointerdown', function (event) {
+            if (!wrapper.contains(event.target)) closeMenu(false);
+        });
+        document.addEventListener('focusin', function (event) {
+            if (!wrapper.contains(event.target)) closeMenu(false);
+        });
+        window.addEventListener('resize', function () {
+            if (!menu.hidden) closeMenu(false);
+        });
+
+        select.addEventListener('change', syncSelection);
+        select.form?.addEventListener('reset', function () {
+            window.setTimeout(syncSelection, 0);
+        });
+
+        syncSelection();
+    });
+}
 
 function initPasswordToggles() {
     document.querySelectorAll('.password-toggle').forEach(function (btn) {

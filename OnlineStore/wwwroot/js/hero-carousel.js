@@ -8,23 +8,17 @@
         var controls = root.querySelector('[data-hero-controls]');
         if (slides.length < 2 || !controls) return;
 
-        var previous = root.querySelector('[data-hero-prev]');
-        var next = root.querySelector('[data-hero-next]');
         var dots = Array.prototype.slice.call(root.querySelectorAll('[data-hero-dot]'));
-        var pauseButton = root.querySelector('[data-hero-pause]');
-        var pauseIcon = root.querySelector('[data-hero-pause-icon]');
-        var pauseText = root.querySelector('[data-hero-pause-text]');
-        var counter = root.querySelector('[data-hero-current]');
         var status = root.querySelector('[data-hero-status]');
         var motionPreference = window.matchMedia('(prefers-reduced-motion: reduce)');
         var hoverCapability = window.matchMedia('(hover: hover) and (pointer: fine)');
         var configuredInterval = Number(root.dataset.interval);
-        var interval = Number.isFinite(configuredInterval) && configuredInterval > 0 ? configuredInterval : 5000;
+        var interval = Number.isFinite(configuredInterval) && configuredInterval > 0 ? configuredInterval : 3000;
         var activeIndex = Math.max(0, slides.findIndex(function (slide) { return slide.classList.contains('is-active'); }));
-        var persistentlyPaused = motionPreference.matches;
+        var motionPaused = motionPreference.matches;
         var hovered = hoverCapability.matches && root.matches(':hover');
+        var focused = false;
         var timer = null;
-        var pointerPauseAction = null;
 
         if (status) {
             status.setAttribute('aria-live', 'polite');
@@ -40,29 +34,11 @@
 
         function schedule() {
             cancelTimer();
-            if (persistentlyPaused || hovered || document.hidden) return;
+            if (motionPaused || hovered || focused || document.hidden) return;
             timer = window.setTimeout(function () {
                 timer = null;
                 showSlide(activeIndex + 1, false);
             }, interval);
-        }
-
-        function updatePauseControl() {
-            var label = persistentlyPaused ? root.dataset.playLabel : root.dataset.pauseLabel;
-            if (pauseButton) {
-                if (label) pauseButton.setAttribute('aria-label', label);
-            }
-            if (pauseText && label) pauseText.textContent = label;
-            if (pauseIcon) {
-                pauseIcon.classList.toggle('bi-pause-fill', !persistentlyPaused);
-                pauseIcon.classList.toggle('bi-play-fill', persistentlyPaused);
-            }
-        }
-
-        function setPaused(paused) {
-            persistentlyPaused = paused;
-            updatePauseControl();
-            schedule();
         }
 
         function showSlide(index, manuallyRequested) {
@@ -82,30 +58,16 @@
                     dot.removeAttribute('aria-current');
                 }
             });
-            if (counter) counter.textContent = String(activeIndex + 1).padStart(2, '0');
             if (manuallyRequested && status) status.textContent = slides[activeIndex].dataset.slideLabel || '';
             schedule();
         }
 
-        if (previous) previous.addEventListener('click', function () { showSlide(activeIndex - 1, true); });
-        if (next) next.addEventListener('click', function () { showSlide(activeIndex + 1, true); });
         dots.forEach(function (dot) {
             dot.addEventListener('click', function () {
                 var index = Number(dot.dataset.slideIndex);
                 if (Number.isInteger(index) && index >= 0 && index < slides.length) showSlide(index, true);
             });
         });
-        if (pauseButton) {
-            pauseButton.addEventListener('pointerdown', function (event) {
-                if (event.button === 0) pointerPauseAction = !persistentlyPaused;
-            });
-            pauseButton.addEventListener('pointercancel', function () { pointerPauseAction = null; });
-            pauseButton.addEventListener('click', function (event) {
-                var paused = event.detail > 0 && pointerPauseAction !== null ? pointerPauseAction : !persistentlyPaused;
-                pointerPauseAction = null;
-                setPaused(paused);
-            });
-        }
 
         root.addEventListener('mouseenter', function () {
             if (!hoverCapability.matches) return;
@@ -116,14 +78,21 @@
             hovered = false;
             schedule();
         });
-        root.addEventListener('focusin', function (event) {
-            var focusIsInSlide = slides.some(function (slide) { return slide.contains(event.target); });
-            if (!event.relatedTarget || !root.contains(event.relatedTarget) || focusIsInSlide) setPaused(true);
+        root.addEventListener('focusin', function () {
+            focused = true;
+            cancelTimer();
+        });
+        root.addEventListener('focusout', function (event) {
+            if (!root.contains(event.relatedTarget)) {
+                focused = false;
+                schedule();
+            }
         });
         document.addEventListener('visibilitychange', schedule);
 
         function handleMotionChange(event) {
-            if (event.matches) setPaused(true);
+            motionPaused = event.matches;
+            schedule();
         }
         if (typeof motionPreference.addEventListener === 'function') {
             motionPreference.addEventListener('change', handleMotionChange);
@@ -132,7 +101,6 @@
         }
 
         root.dataset.carouselReady = 'true';
-        updatePauseControl();
         showSlide(activeIndex, false);
         controls.hidden = false;
     }

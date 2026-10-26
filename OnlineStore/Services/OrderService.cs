@@ -230,32 +230,38 @@ public class OrderService : IOrderService
         var deliveredAt = shippedAt.Add(DeliveryThreshold);
         var signed = order.Status == OrderStatus.Completed || order.SignedAt.HasValue;
         var deliveredReached = order.DeliveredAt.HasValue || now >= deliveredAt;
+        var origin = !string.IsNullOrWhiteSpace(order.ShippingOrigin)
+            ? L10n.Text(order.ShippingOrigin, order.ShippingOriginEn)
+            : L10n.Text("广东深圳", "Shenzhen, China");
+        var destination = string.IsNullOrWhiteSpace(order.Address)
+            ? L10n.Text("顾客填写的收货地址", "the recipient's delivery address")
+            : order.Address;
 
         var nodes = new List<OrderTrackingNode>
         {
             Node(1,
                 L10n.Text("订单已包装", "Order packaged"),
-                L10n.Text("商家已完成包装与出库检查。", "The merchant has finished packaging and checks."),
+                $"{L10n.Text("商家已在", "Packaged at")} {origin} {L10n.Text("完成包装与出库检查。", "and passed dispatch checks.")}",
                 order.CreatedAt, true, false),
             Node(2,
                 L10n.Text("已交给承运商", "Handed to carrier"),
-                $"{L10n.Text("包裹已交给", "Parcel handed to")} {L10n.Carrier(order.Carrier)} ({order.TrackingNumber})",
+                $"{L10n.Text("包裹已从", "Parcel departed")} {origin} {L10n.Text("交给", "with")} {L10n.Carrier(order.Carrier)} ({order.TrackingNumber})",
                 shippedAt, true, false),
             Node(3,
                 L10n.Text("已离开分拨中心", "Departed regional hub"),
-                L10n.Text("包裹正在发往目的地。", "The parcel is on its way to the destination."),
+                $"{L10n.Text("包裹正在发往", "The parcel is travelling to")} {destination}",
                 shippedAt.Add(TrackingStep), now >= shippedAt.Add(TrackingStep), !deliveredReached && now >= shippedAt.Add(TrackingStep) && now < shippedAt.Add(TrackingStep * 2)),
             Node(4,
                 L10n.Text("已到达派送网点", "Arrived at local depot"),
-                L10n.Text("快递员正在派送。", "The courier is out for delivery."),
+                $"{L10n.Text("快递员正在派送至", "The courier is delivering to")} {destination}",
                 shippedAt.Add(TrackingStep * 2), now >= shippedAt.Add(TrackingStep * 2), !deliveredReached && now >= shippedAt.Add(TrackingStep * 2) && now < deliveredAt),
             Node(5,
                 signed
                     ? L10n.Text("已签收", "Delivered & signed")
                     : L10n.Text("已送达，等待签收", "Delivered, awaiting confirmation"),
                 signed
-                    ? L10n.Text("买家已确认收货，订单完成。", "The buyer confirmed receipt. Order completed.")
-                    : L10n.Text("包裹已送达，等待买家确认收货。", "Delivered. Waiting for the buyer to confirm receipt."),
+                    ? $"{L10n.Text("买家已在", "Delivered to")} {destination} {L10n.Text("确认收货，订单完成。", "and receipt was confirmed.")}"
+                    : $"{L10n.Text("包裹已送达", "Delivered to")} {destination}，{L10n.Text("等待买家确认收货。", "awaiting buyer confirmation.")}",
                 signed ? order.SignedAt : (deliveredReached ? deliveredAt : null),
                 signed || deliveredReached,
                 signed ? false : deliveredReached,
@@ -269,10 +275,8 @@ public class OrderService : IOrderService
             Carrier = L10n.Carrier(order.Carrier),
             TrackingNumber = order.TrackingNumber ?? string.Empty,
             OfficialTrackingUrl = $"https://t.17track.net/en#nums={Uri.EscapeDataString(order.TrackingNumber ?? string.Empty)}",
-            OriginLocation = !string.IsNullOrWhiteSpace(order.ShippingOrigin)
-                ? L10n.Text(order.ShippingOrigin, order.ShippingOriginEn)
-                : L10n.Text("广东深圳", "Shenzhen, China"),
-            DestinationCity = DestinationPart(order.Address),
+            OriginLocation = origin,
+            DestinationCity = destination,
             DestinationPostalCode = string.Empty,
             RecipientName = order.UserName,
             Status = order.Status,
@@ -328,6 +332,25 @@ public class OrderService : IOrderService
         order.UserDeletedAt = DateTime.UtcNow;
         await _context.SaveChangesAsync();
         return true;
+    }
+
+    public async Task<int> GetDeliveredItemCountAsync(string userId)
+    {
+        var orders = await _context.Orders
+            .Include(o => o.Items)
+            .Where(o => o.UserId == userId
+                && o.UserDeletedAt == null
+                && (o.Status == OrderStatus.Shipped || o.Status == OrderStatus.Delivered))
+            .ToListAsync();
+
+        foreach (var order in orders.Where(o => o.Status == OrderStatus.Shipped))
+        {
+            await AdvanceDeliveryAsync(order);
+        }
+
+        return orders
+            .Where(o => o.Status == OrderStatus.Delivered)
+            .Sum(o => o.Items.Sum(i => i.Quantity));
     }
 
     public async Task<AfterSalesRequest> CreateAfterSalesAsync(int orderId, string userId, string type, string reason)
