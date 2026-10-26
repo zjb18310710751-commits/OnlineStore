@@ -543,4 +543,15 @@
   <data name="RemoveCoupon" xml:space="preserve"><value>不使用优惠券</value></data>
   <data name="CouponApplied" xml:space="preserve"><value>优惠券已应用</value></data>
   <data name="CouponBenefit" xml:space="preserve"><value>优惠券权益</value></data>
+  <data name="MyCoupons" xml:space="preserve"><value>我的优惠券</value></data>
+  <data name="MyCouponsHint" xml:space="preserve"><value>查看当前可用的店铺优惠券、使用条件与有效期，结算时可直接选择。</value></data>
+  <data name="NoMyCoupons" xml:space="preserve"><value>暂时没有优惠券</value></data>
+  <data name="NoMyCouponsHint" xml:space="preserve"><value>新的会员优惠和限时活动会显示在这里。</value></data>
+  <data name="CouponStatusAvailable" xml:space="preserve"><value>可使用</value></data>
+  <data name="CouponStatusUsed" xml:space="preserve"><value>已用完</value></data>
+  <data name="CouponRemainingUses" xml:space="preserve"><value>还可使用 {0} 次</value></data>
+  <data name="UseCoupon" xml:space="preserve"><value>去使用</value></data>
+  <data name="ViewMyCoupons" xml:space="preserve"><value>我的优惠券</value></data>
+  <data name="AvailableCouponCount" xml:space="preserve"><value>{0} 张可选</value></data>
+  <data name="NoAvailableCoupons" xml:space="preserve"><value>当前订单暂时没有可用优惠券。</value></data>
 </root>

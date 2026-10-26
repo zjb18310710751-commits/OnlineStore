@@ -356,4 +356,43 @@ public class CouponServiceTests
         Assert.False(stored.IsActive);
         Assert.Single(await context.CouponRedemptions.ToListAsync());
     }
+
+    [Fact]
+    public async Task GetCustomerCouponsAsync_ReportsAvailableScheduledUsedAndExpiredStates()
+    {
+        using var context = CreateContext();
+        var now = DateTime.UtcNow;
+        var available = ValidPercent();
+        available.Code = "AVAILABLE";
+        var scheduled = ValidPercent();
+        scheduled.Code = "SCHEDULED";
+        scheduled.StartDate = now.AddDays(1);
+        scheduled.EndDate = now.AddDays(10);
+        var used = ValidPercent();
+        used.Code = "USED";
+        used.PerUserLimit = 1;
+        var expired = ValidPercent();
+        expired.Code = "EXPIRED";
+        expired.StartDate = now.AddDays(-10);
+        expired.EndDate = now.AddDays(-2);
+        context.Coupons.AddRange(available, scheduled, used, expired);
+        context.Orders.Add(new Order { OrderNo = "OLD", UserId = "user-1", Total = 10m });
+        await context.SaveChangesAsync();
+        context.CouponRedemptions.Add(new CouponRedemption
+        {
+            CouponId = used.Id,
+            UserId = "user-1",
+            OrderId = 50,
+            Code = used.Code
+        });
+        await context.SaveChangesAsync();
+
+        var wallet = await new CouponService(context).GetCustomerCouponsAsync("user-1");
+        var statuses = wallet.ToDictionary(item => item.Coupon.Code, item => item.Status);
+
+        Assert.Equal(CouponWalletStatus.Available, statuses["AVAILABLE"]);
+        Assert.Equal(CouponWalletStatus.Scheduled, statuses["SCHEDULED"]);
+        Assert.Equal(CouponWalletStatus.Used, statuses["USED"]);
+        Assert.Equal(CouponWalletStatus.Expired, statuses["EXPIRED"]);
+    }
 }

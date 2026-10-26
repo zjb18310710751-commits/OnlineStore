@@ -543,4 +543,15 @@
   <data name="RemoveCoupon" xml:space="preserve"><value>Don't use a coupon</value></data>
   <data name="CouponApplied" xml:space="preserve"><value>Coupon applied</value></data>
   <data name="CouponBenefit" xml:space="preserve"><value>Coupon benefit</value></data>
+  <data name="MyCoupons" xml:space="preserve"><value>My Coupons</value></data>
+  <data name="MyCouponsHint" xml:space="preserve"><value>Review available store coupons, eligibility and expiry, then choose one directly at checkout.</value></data>
+  <data name="NoMyCoupons" xml:space="preserve"><value>No coupons yet</value></data>
+  <data name="NoMyCouponsHint" xml:space="preserve"><value>New member offers and limited-time promotions will appear here.</value></data>
+  <data name="CouponStatusAvailable" xml:space="preserve"><value>Available</value></data>
+  <data name="CouponStatusUsed" xml:space="preserve"><value>Used up</value></data>
+  <data name="CouponRemainingUses" xml:space="preserve"><value>{0} use(s) remaining</value></data>
+  <data name="UseCoupon" xml:space="preserve"><value>Use coupon</value></data>
+  <data name="ViewMyCoupons" xml:space="preserve"><value>My Coupons</value></data>
+  <data name="AvailableCouponCount" xml:space="preserve"><value>{0} available</value></data>
+  <data name="NoAvailableCoupons" xml:space="preserve"><value>No coupons are available for this order.</value></data>
 </root>

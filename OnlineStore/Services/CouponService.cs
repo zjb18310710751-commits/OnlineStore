@@ -115,6 +115,49 @@ public class CouponService : ICouponService
             .ToList();
     }
 
+    public async Task<IReadOnlyList<CouponWalletItem>> GetCustomerCouponsAsync(string userId)
+    {
+        var coupons = await CouponQuery()
+            .AsNoTracking()
+            .Where(c => !c.IsDeleted && c.IsActive)
+            .OrderByDescending(c => c.CreatedAt)
+            .ToListAsync();
+        var usage = await _context.CouponRedemptions
+            .AsNoTracking()
+            .Where(redemption => redemption.UserId == userId && redemption.ReleasedAt == null)
+            .GroupBy(redemption => redemption.CouponId)
+            .Select(group => new { CouponId = group.Key, Count = group.Count() })
+            .ToDictionaryAsync(row => row.CouponId, row => row.Count);
+        var hasPreviousOrder = await _context.Orders
+            .AsNoTracking()
+            .AnyAsync(order => order.UserId == userId);
+        var now = DateTime.UtcNow;
+
+        return coupons
+            .Select(coupon =>
+            {
+                var userUsage = usage.GetValueOrDefault(coupon.Id);
+                var remaining = coupon.PerUserLimit.HasValue
+                    ? Math.Max(0, coupon.PerUserLimit.Value - userUsage)
+                    : null as int?;
+                var status = coupon.UsageLimit.HasValue && coupon.UsedCount >= coupon.UsageLimit.Value
+                    || coupon.PerUserLimit.HasValue && userUsage >= coupon.PerUserLimit.Value
+                    ? CouponWalletStatus.Used
+                    : now < coupon.StartDate
+                        ? CouponWalletStatus.Scheduled
+                        : now > coupon.EndDate
+                            ? CouponWalletStatus.Expired
+                            : coupon.FirstOrderOnly && hasPreviousOrder
+                                ? CouponWalletStatus.Ineligible
+                                : CouponWalletStatus.Available;
+
+                return new CouponWalletItem(coupon, status, userUsage, remaining);
+            })
+            .OrderBy(item => item.Status)
+            .ThenBy(item => item.Coupon.EndDate)
+            .ToList();
+    }
+
     public async Task IncrementUsageAsync(int id)
     {
         var coupon = await _context.Coupons.FirstOrDefaultAsync(c => c.Id == id);

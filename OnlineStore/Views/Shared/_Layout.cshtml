@@ -80,6 +80,10 @@
                                     <li><a class="dropdown-item" asp-controller="Account" asp-action="Register">@Loc["Register"]</a></li>
                                 }
                                 <li><a class="dropdown-item" asp-controller="Favorites" asp-action="Index">@Loc["MyFavorites"]</a></li>
+                                @if (User.Identity?.IsAuthenticated == true)
+                                {
+                                    <li><a class="dropdown-item" asp-controller="Coupons" asp-action="Index">@Loc["MyCoupons"]</a></li>
+                                }
                                 @if (!isCatalogPage)
                                 {
                                     <li><a class="dropdown-item" asp-controller="Products" asp-action="Index">@Loc["AllProducts"]</a></li>
@@ -125,7 +129,7 @@
                             }
                         </ul>
                     </div>
-                    <div><h2>@L10n.Text("你的商店", "Your store")</h2><ul><li><a asp-controller="Account" asp-action="Profile">@Loc["Profile"]</a></li><li><a asp-controller="Orders" asp-action="MyOrders">@Loc["MyOrders"]</a></li><li><a asp-controller="Favorites" asp-action="Index">@Loc["MyFavorites"]</a></li><li><a asp-controller="Cart" asp-action="Index">@Loc["Cart"]</a></li></ul></div>
+                    <div><h2>@L10n.Text("你的商店", "Your store")</h2><ul><li><a asp-controller="Account" asp-action="Profile">@Loc["Profile"]</a></li><li><a asp-controller="Orders" asp-action="MyOrders">@Loc["MyOrders"]</a></li><li><a asp-controller="Favorites" asp-action="Index">@Loc["MyFavorites"]</a></li><li><a asp-controller="Coupons" asp-action="Index">@Loc["MyCoupons"]</a></li><li><a asp-controller="Cart" asp-action="Index">@Loc["Cart"]</a></li></ul></div>
                 </div>
                 <div class="sf-footer-bottom"><span>&copy; @DateTime.Now.Year ZHY · @Loc["Brand"]</span><span>@L10n.Text("发现喜欢，留住日常。", "Find your everyday favourites.")</span></div>
             </div>
