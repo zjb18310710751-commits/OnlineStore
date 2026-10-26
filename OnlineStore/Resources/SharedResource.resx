@@ -539,7 +539,6 @@
   <data name="CouponSavings" xml:space="preserve"><value>本单省 ¥{0}</value></data>
   <data name="CouponEnds" xml:space="preserve"><value>{0} 前有效</value></data>
   <data name="RemoveCoupon" xml:space="preserve"><value>不使用优惠券</value></data>
-  <data name="CouponApplied" xml:space="preserve"><value>优惠券已应用</value></data>
   <data name="CouponBenefit" xml:space="preserve"><value>优惠券权益</value></data>
   <data name="MyCoupons" xml:space="preserve"><value>我的优惠券</value></data>
   <data name="MyCouponsHint" xml:space="preserve"><value>查看当前可用的店铺优惠券、使用条件与有效期，结算时可直接选择。</value></data>

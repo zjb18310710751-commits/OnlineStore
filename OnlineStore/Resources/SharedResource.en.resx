@@ -539,7 +539,6 @@
   <data name="CouponSavings" xml:space="preserve"><value>Save ¥{0} on this order</value></data>
   <data name="CouponEnds" xml:space="preserve"><value>Valid through {0}</value></data>
   <data name="RemoveCoupon" xml:space="preserve"><value>Don't use a coupon</value></data>
-  <data name="CouponApplied" xml:space="preserve"><value>Coupon applied</value></data>
   <data name="CouponBenefit" xml:space="preserve"><value>Coupon benefit</value></data>
   <data name="MyCoupons" xml:space="preserve"><value>My Coupons</value></data>
   <data name="MyCouponsHint" xml:space="preserve"><value>Review available store coupons, eligibility and expiry, then choose one directly at checkout.</value></data>

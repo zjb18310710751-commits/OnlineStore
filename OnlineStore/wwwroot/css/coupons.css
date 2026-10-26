@@ -387,6 +387,10 @@
     line-height: 1.4;
 }
 
+.checkout-coupon-status:empty {
+    display: none;
+}
+
 .checkout-coupon-empty {
     margin: 0 0 9px;
     padding: 10px 11px;

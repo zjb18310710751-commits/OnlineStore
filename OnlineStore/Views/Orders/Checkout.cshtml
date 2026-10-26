@@ -183,13 +183,8 @@
                                 <p class="checkout-coupon-empty">@Loc["NoAvailableCoupons"]</p>
                             }
                             <input asp-for="CouponCode" id="couponCode" type="hidden" />
-                            <div class="d-flex justify-content-between align-items-start gap-2">
-                                <div id="couponStatus" class="checkout-coupon-status small @(!string.IsNullOrWhiteSpace(Model.CouponCode) ? "text-success" : "")" role="status">
-                                    @if (!string.IsNullOrWhiteSpace(Model.CouponCode))
-                                    {
-                                        @Loc["CouponApplied"]
-                                    }
-                                </div>
+                            <div class="d-flex justify-content-end align-items-start gap-2">
+                                <div id="couponStatus" class="checkout-coupon-status small" role="status"></div>
                                 <button type="button" id="couponClear" class="checkout-coupon-clear">@Loc["RemoveCoupon"]</button>
                             </div>
                             <span asp-validation-for="CouponCode" class="text-danger small"></span>
@@ -280,15 +275,13 @@
                 discountRow.classList.toggle('d-none', !(data.discount > 0));
                 shippingRow.classList.toggle('d-none', !data.freeShipping);
                 statusEl.classList.remove('text-danger');
-                statusEl.classList.add('text-success');
-                statusEl.textContent = data.code ? '@Loc["CouponApplied"]' : '';
+                statusEl.textContent = '';
                 selectCouponButton(data.code || '');
             }
 
             function showCouponError(message) {
                 statusEl.textContent = message || '';
                 statusEl.classList.add('text-danger');
-                statusEl.classList.remove('text-success');
                 discountRow.classList.add('d-none');
                 shippingRow.classList.add('d-none');
                 payableText.textContent = formatMoney(payableText.getAttribute('data-base-total'));
@@ -325,7 +318,7 @@
             clearButton.addEventListener('click', function () {
                 couponInput.value = '';
                 statusEl.textContent = '';
-                statusEl.classList.remove('text-danger', 'text-success');
+                statusEl.classList.remove('text-danger');
                 discountRow.classList.add('d-none');
                 shippingRow.classList.add('d-none');
                 payableText.textContent = formatMoney(payableText.getAttribute('data-base-total'));
