@@ -1,0 +1,112 @@
+@model IReadOnlyList<CouponWalletItem>
+@{
+    ViewData["Title"] = Loc["MyCoupons"].Value;
+    var availableCount = Model.Count(item => item.Status == CouponWalletStatus.Available);
+}
+
+<div class="container py-4 coupon-wallet-page">
+    <header class="coupon-wallet-header">
+        <div>
+            <p class="coupon-wallet-eyebrow">@L10n.Text("会员权益", "Member benefits")</p>
+            <h1>@Loc["MyCoupons"]</h1>
+            <p>@Loc["MyCouponsHint"]</p>
+        </div>
+        <div class="coupon-wallet-count">
+            <strong>@availableCount</strong>
+            <span>@L10n.Text("张可用", "available")</span>
+        </div>
+    </header>
+
+    @if (Model.Count == 0)
+    {
+        <section class="coupon-wallet-empty">
+            <i class="bi bi-ticket-perforated"></i>
+            <h2>@Loc["NoMyCoupons"]</h2>
+            <p>@Loc["NoMyCouponsHint"]</p>
+            <a asp-controller="Products" asp-action="Index" class="sf-button">@Loc["ContinueShopping"]</a>
+        </section>
+    }
+    else
+    {
+        <section class="coupon-wallet-grid" aria-label="@Loc["MyCoupons"]">
+            @foreach (var item in Model)
+            {
+                var coupon = item.Coupon;
+                var statusText = item.Status switch
+                {
+                    CouponWalletStatus.Available => Loc["CouponStatusAvailable"].Value,
+                    CouponWalletStatus.Scheduled => Loc["CouponScheduled"].Value,
+                    CouponWalletStatus.Used => Loc["CouponStatusUsed"].Value,
+                    CouponWalletStatus.Ineligible => Loc["CouponFirstOrderOnly"].Value,
+                    _ => Loc["CouponExpired"].Value
+                };
+                var statusClass = item.Status == CouponWalletStatus.Available
+                    ? "is-available"
+                    : item.Status == CouponWalletStatus.Scheduled
+                        ? "is-scheduled"
+                        : "is-muted";
+                <article class="coupon-wallet-card @statusClass">
+                    <div class="coupon-wallet-value">
+                        @if (coupon.DiscountType == CouponDiscountType.FreeShipping)
+                        {
+                            <strong><i class="bi bi-truck"></i></strong>
+                            <span>@Loc["FreeShippingDiscount"]</span>
+                        }
+                        else if (coupon.DiscountType == CouponDiscountType.Percent)
+                        {
+                            <strong>@coupon.DiscountValue.ToString("0.##")<small>%</small></strong>
+                            <span>@L10n.Text("折扣", "off")</span>
+                        }
+                        else
+                        {
+                            <strong><small>¥</small>@coupon.DiscountValue.ToString("0.##")</strong>
+                            <span>@L10n.Text("立减", "off")</span>
+                        }
+                    </div>
+                    <div class="coupon-wallet-content">
+                        <div class="coupon-wallet-topline">
+                            <span class="coupon-wallet-status">@statusText</span>
+                            @if (item.RemainingUses.HasValue)
+                            {
+                                <span>@Loc["CouponRemainingUses", item.RemainingUses.Value]</span>
+                            }
+                        </div>
+                        <h2>@(string.IsNullOrWhiteSpace(coupon.CampaignName) ? coupon.Code : coupon.CampaignName)</h2>
+                        <p class="coupon-wallet-code">@coupon.Code</p>
+                        <div class="coupon-wallet-rules">
+                            @if (coupon.MinOrderAmount.HasValue)
+                            {
+                                <span>@Loc["CouponMinOrderShort", coupon.MinOrderAmount.Value.ToString("F2")]</span>
+                            }
+                            @if (coupon.MaxDiscountAmount.HasValue)
+                            {
+                                <span>@Loc["CouponMaxDiscountShort", coupon.MaxDiscountAmount.Value.ToString("F2")]</span>
+                            }
+                            <span>@Loc["CouponEnds", coupon.EndDate.ToString("yyyy-MM-dd")]</span>
+                        </div>
+                        <div class="coupon-wallet-footer">
+                            <span>@CouponScopeLabel(coupon.Scope)</span>
+                            @if (item.Status == CouponWalletStatus.Available)
+                            {
+                                <a asp-controller="Orders" asp-action="Checkout" asp-route-couponCode="@coupon.Code">@Loc["UseCoupon"]</a>
+                            }
+                            else
+                            {
+                                <span>@Loc["CouponUnavailable"]</span>
+                            }
+                        </div>
+                    </div>
+                </article>
+            }
+        </section>
+    }
+</div>
+
+@functions {
+    private string CouponScopeLabel(CouponScope scope) => scope switch
+    {
+        CouponScope.Categories => Loc["ScopeCategories"].Value,
+        CouponScope.Products => Loc["ScopeProducts"].Value,
+        _ => Loc["ScopeAllProducts"].Value
+    };
+}

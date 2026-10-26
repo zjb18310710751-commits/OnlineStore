@@ -35,7 +35,7 @@ public class OrdersController : Controller
     }
 
     [HttpGet]
-    public async Task<IActionResult> Checkout()
+    public async Task<IActionResult> Checkout(string? couponCode = null)
     {
         var cart = await _cartService.GetCartAsync();
         if (cart.Items.Count == 0)
@@ -73,7 +73,30 @@ public class OrdersController : Controller
                 user.Id,
                 cart.Total,
                 ToCouponEvaluationItems(cart.Items));
-            ApplyBestCoupon(vm, availableCoupons);
+            if (string.IsNullOrWhiteSpace(couponCode))
+            {
+                ApplyBestCoupon(vm, availableCoupons);
+            }
+            else
+            {
+                var requested = await _couponService.ValidateAsync(
+                    couponCode,
+                    cart.Total,
+                    user.Id,
+                    ToCouponEvaluationItems(cart.Items));
+                if (requested.Success && requested.Coupon is not null)
+                {
+                    vm.CouponCode = requested.Coupon.Code;
+                    vm.DiscountAmount = requested.DiscountAmount;
+                    vm.FreeShippingCoupon = requested.FreeShipping;
+                    ApplyCouponChoices(vm, availableCoupons, requested.Coupon.Code);
+                }
+                else
+                {
+                    ModelState.AddModelError(nameof(vm.CouponCode), requested.Error ?? _loc["CouponUnavailable"].Value);
+                    ApplyCouponChoices(vm, availableCoupons, null);
+                }
+            }
         }
         return View(vm);
     }

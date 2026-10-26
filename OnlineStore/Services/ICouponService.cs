@@ -11,6 +11,21 @@ public record CouponApplyResult(
 
 public record CouponEvaluationItem(int ProductId, decimal Price, int Quantity);
 
+public enum CouponWalletStatus
+{
+    Available = 0,
+    Scheduled = 1,
+    Used = 2,
+    Ineligible = 3,
+    Expired = 4
+}
+
+public record CouponWalletItem(
+    Coupon Coupon,
+    CouponWalletStatus Status,
+    int UserUsage,
+    int? RemainingUses);
+
 public interface ICouponService
 {
     Task<IReadOnlyList<Coupon>> GetAllAsync();
@@ -33,6 +48,8 @@ public interface ICouponService
         string userId,
         decimal orderTotal,
         IReadOnlyList<CouponEvaluationItem> items);
+
+    Task<IReadOnlyList<CouponWalletItem>> GetCustomerCouponsAsync(string userId);
 
     Task IncrementUsageAsync(int id);
 
