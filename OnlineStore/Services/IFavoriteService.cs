@@ -8,5 +8,7 @@ public interface IFavoriteService
 
     Task<bool> ToggleAsync(string userId, int productId);
 
+    Task<int> CountAsync(string userId);
+
     Task<IReadOnlyList<Product>> GetFavoritesAsync(string userId);
 }

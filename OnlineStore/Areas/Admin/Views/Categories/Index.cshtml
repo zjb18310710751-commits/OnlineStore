@@ -2,9 +2,13 @@
 @{
     ViewData["Title"] = Loc["CategoryManagement"].Value;
 }
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h1 class="h4 mb-0">@Loc["CategoryManagement"]</h1>
-    <a asp-area="Admin" asp-controller="Categories" asp-action="Create" class="btn btn-primary btn-sm"><i class="bi bi-plus-lg me-1"></i>@Loc["AddCategory"]</a>
+<div class="admin-store-heading">
+    <div>
+        <p class="admin-store-eyebrow">@L10n.Text("商店结构", "Storefront structure")</p>
+        <h1>@Loc["CategoryManagement"]</h1>
+        <p class="admin-store-intro">@L10n.Text("组织商品分类、展示顺序和分类说明。", "Organize product categories, display order and descriptions.")</p>
+    </div>
+    <a asp-area="Admin" asp-controller="Categories" asp-action="Create" class="btn btn-primary"><i class="bi bi-plus-lg"></i>@Loc["AddCategory"]</a>
 </div>
 
 <div class="card shadow-sm">

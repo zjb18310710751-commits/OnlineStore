@@ -2,19 +2,30 @@
 @{
     ViewData["Title"] = Loc["MyFavorites"].Value;
 }
-<div class="container py-4">
-    <h1 class="h4 mb-4">@Loc["MyFavorites"]</h1>
+<div class="container coupon-wallet-page member-favorites-page">
+    <header class="coupon-wallet-header">
+        <div>
+            <p class="coupon-wallet-eyebrow">@L10n.Text("账户中心", "Member account")</p>
+            <h1>@Loc["MyFavorites"]</h1>
+            <p>@L10n.Text("保存喜欢的好物，随时回来查看。", "Keep the pieces you love in one place.")</p>
+        </div>
+        <div class="coupon-wallet-count">
+            <strong>@Model.Count</strong>
+            <span>@L10n.Text("件收藏", "favourites")</span>
+        </div>
+    </header>
     @if (Model.Count == 0)
     {
-        <div class="alert alert-light border text-center py-5">
-            <i class="bi bi-heart display-5 d-block mb-3 text-muted"></i>
-            <p class="mb-3">@Loc["NoFavorites"]</p>
-            <a asp-controller="Products" asp-action="Index" class="btn btn-primary">@Loc["ContinueShopping"]</a>
-        </div>
+        <section class="coupon-wallet-empty">
+            <i class="bi bi-heart"></i>
+            <h2>@Loc["NoFavorites"]</h2>
+            <p>@L10n.Text("还没有收藏商品，遇到喜欢的好物就把它留住。", "You have no favourites yet. Save the pieces you like as you browse.")</p>
+            <a asp-controller="Products" asp-action="Index" class="sf-button">@Loc["ContinueShopping"]</a>
+        </section>
     }
     else
     {
-        <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3">
+        <div class="coupon-wallet-grid member-favorite-grid">
             @foreach (var p in Model)
             {
                 <partial name="_FavoriteCard" model="@p" />

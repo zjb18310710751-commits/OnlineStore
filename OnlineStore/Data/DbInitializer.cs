@@ -52,6 +52,7 @@ public static class DbInitializer
 
         if (await context.Categories.AnyAsync())
         {
+            await SeedDemoOrdersAsync(context, userManager);
             return;
         }
 
@@ -375,6 +376,188 @@ public static class DbInitializer
         context.Shops.AddRange(shops);
         context.Categories.AddRange(categories);
         context.Products.AddRange(products);
+        await context.SaveChangesAsync();
+
+        await SeedDemoOrdersAsync(context, userManager);
+    }
+
+    private static async Task SeedDemoOrdersAsync(
+        ApplicationDbContext context,
+        UserManager<ApplicationUser> userManager)
+    {
+        const string demoBuyerEmail = "3293906920@qq.com";
+        const string demoBuyerPassword = "Admin@123456";
+
+        var buyer = await userManager.FindByEmailAsync(demoBuyerEmail);
+        if (buyer is null)
+        {
+            buyer = new ApplicationUser
+            {
+                UserName = demoBuyerEmail,
+                Email = demoBuyerEmail,
+                EmailConfirmed = true,
+                FirstName = "Demo",
+                LastName = "Buyer",
+                PhoneNumber = "13800138000"
+            };
+            var createResult = await userManager.CreateAsync(buyer, demoBuyerPassword);
+            if (!createResult.Succeeded)
+            {
+                return;
+            }
+        }
+        else if (!await userManager.CheckPasswordAsync(buyer, demoBuyerPassword))
+        {
+            var resetToken = await userManager.GeneratePasswordResetTokenAsync(buyer);
+            var resetResult = await userManager.ResetPasswordAsync(buyer, resetToken, demoBuyerPassword);
+            if (!resetResult.Succeeded)
+            {
+                return;
+            }
+        }
+
+        await BackfillDemoShippingSnapshotsAsync(context);
+
+        if (await context.Orders.AnyAsync(o => o.OrderNo.StartsWith("DEMO-")))
+        {
+            return;
+        }
+
+        var products = await context.Products
+            .Where(p => p.IsActive)
+            .OrderBy(p => p.Id)
+            .Take(5)
+            .ToListAsync();
+        if (products.Count == 0)
+        {
+            return;
+        }
+
+        var now = DateTime.UtcNow;
+        var orders = new List<Order>
+        {
+            DemoOrder("DEMO-1001", OrderStatus.PendingShipment, now.AddHours(-1), products[0], 1, buyer.Id),
+            DemoOrder("DEMO-1002", OrderStatus.Shipped, now.AddHours(-8), products[1 % products.Count], 2, buyer.Id),
+            DemoOrder("DEMO-1003", OrderStatus.Delivered, now.AddHours(-30), products[2 % products.Count], 1, buyer.Id),
+            DemoOrder("DEMO-1004", OrderStatus.Completed, now.AddDays(-3), products[3 % products.Count], 1, buyer.Id),
+            DemoOrder("DEMO-1005", OrderStatus.Completed, now.AddDays(-7), products[4 % products.Count], 2, buyer.Id)
+        };
+
+        var shipped = orders[1];
+        shipped.Carrier = "顺丰速运";
+        shipped.TrackingNumber = "SF1234567890123";
+        shipped.ShippedAt = now.AddSeconds(-10);
+
+        var delivered = orders[2];
+        delivered.Carrier = "中通快递";
+        delivered.TrackingNumber = "ZT9876543210987";
+        delivered.ShippedAt = now.AddHours(-20);
+        delivered.DeliveredAt = now.AddHours(-2);
+
+        orders[3].Carrier = "邮政 EMS";
+        orders[3].TrackingNumber = "EMS202610260001";
+        orders[3].ShippedAt = now.AddDays(-4);
+        orders[3].DeliveredAt = now.AddDays(-2);
+        orders[3].SignedAt = now.AddDays(-2).AddHours(-1);
+
+        orders[4].Carrier = "圆通速递";
+        orders[4].TrackingNumber = "YT202610100002";
+        orders[4].ShippedAt = now.AddDays(-8);
+        orders[4].DeliveredAt = now.AddDays(-6);
+        orders[4].SignedAt = now.AddDays(-6).AddHours(-2);
+        orders[4].AfterSalesRequests.Add(new AfterSalesRequest
+        {
+            UserId = buyer.Id,
+            Type = AfterSalesType.Exchange,
+            Reason = "商品外包装破损，申请换货。",
+            Status = AfterSalesStatus.Approved,
+            RequestedAt = now.AddDays(-1),
+            ReviewedAt = now.AddHours(-6)
+        });
+
+        orders[3].AfterSalesRequests.Add(new AfterSalesRequest
+        {
+            UserId = buyer.Id,
+            Type = AfterSalesType.Return,
+            Reason = "收到的商品与预期不符，申请退货。",
+            Status = AfterSalesStatus.Pending,
+            RequestedAt = now.AddHours(-12)
+        });
+
+        context.Orders.AddRange(orders);
+        await context.SaveChangesAsync();
+    }
+
+    private static Order DemoOrder(
+        string orderNo,
+        string status,
+        DateTime createdAt,
+        Product product,
+        int quantity,
+        string userId)
+    {
+        var total = product.Price * quantity;
+        return new Order
+        {
+            OrderNo = orderNo,
+            UserId = userId,
+            UserName = "Demo Buyer",
+            Phone = "13800138000",
+            Address = "广东省深圳市南山区科技园, 518000, 中国",
+            Total = total,
+            Status = status,
+            CreatedAt = createdAt,
+            Items = new List<OrderItem>
+            {
+                new()
+                {
+                    ProductId = product.Id,
+                    ProductName = product.Name,
+                    ProductNameEn = product.NameEn,
+                    Price = product.Price,
+                    Quantity = quantity
+                }
+            }
+        };
+    }
+
+    private static async Task BackfillDemoShippingSnapshotsAsync(ApplicationDbContext context)
+    {
+        var orders = await context.Orders
+            .Include(o => o.Items)
+            .Where(o => o.OrderNo.StartsWith("DEMO-") && o.ShippingOrigin == null)
+            .ToListAsync();
+        if (orders.Count == 0)
+        {
+            return;
+        }
+
+        var productIds = orders.SelectMany(o => o.Items).Select(i => i.ProductId).Distinct().ToList();
+        var products = await context.Products
+            .Where(p => productIds.Contains(p.Id))
+            .ToDictionaryAsync(p => p.Id);
+
+        foreach (var order in orders)
+        {
+            var productId = order.Items.Select(i => i.ProductId).FirstOrDefault();
+            if (!products.TryGetValue(productId, out var product))
+            {
+                continue;
+            }
+
+            order.ShippingOrigin = product.ShippingFrom;
+            order.ShippingOriginEn = product.ShippingFromEn;
+            order.ShippingFeeText = product.ShippingFee;
+            order.ShippingFeeTextEn = product.ShippingFeeEn;
+            order.DispatchTimeText = product.DeliveryTime;
+            order.DispatchTimeTextEn = product.DeliveryTimeEn;
+
+            var hours = product.DeliveryTime?.Contains("24") == true ? 24
+                : product.DeliveryTime?.Contains("48") == true ? 48
+                : 72;
+            order.ExpectedDispatchAt = order.CreatedAt.AddHours(hours);
+        }
+
         await context.SaveChangesAsync();
     }
 

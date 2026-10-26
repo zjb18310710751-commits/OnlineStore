@@ -282,6 +282,7 @@
             function showCouponError(message) {
                 statusEl.textContent = message || '';
                 statusEl.classList.add('text-danger');
+                statusEl.classList.remove('text-success');
                 discountRow.classList.add('d-none');
                 shippingRow.classList.add('d-none');
                 payableText.textContent = formatMoney(payableText.getAttribute('data-base-total'));

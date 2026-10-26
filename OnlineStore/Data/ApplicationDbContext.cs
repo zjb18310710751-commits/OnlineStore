@@ -19,6 +19,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<Review> Reviews => Set<Review>();
     public DbSet<Order> Orders => Set<Order>();
     public DbSet<OrderItem> OrderItems => Set<OrderItem>();
+    public DbSet<AfterSalesRequest> AfterSalesRequests => Set<AfterSalesRequest>();
     public DbSet<ProductImage> ProductImages => Set<ProductImage>();
     public DbSet<Favorite> Favorites => Set<Favorite>();
     public DbSet<Coupon> Coupons => Set<Coupon>();
@@ -161,10 +162,35 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
             entity.Property(o => o.DiscountAmount).HasConversion<double>();
             entity.Property(o => o.CouponCode).HasMaxLength(50);
             entity.Property(o => o.CouponName).HasMaxLength(100);
+            entity.Property(o => o.Carrier).HasMaxLength(50);
+            entity.Property(o => o.TrackingNumber).HasMaxLength(50);
+            entity.Property(o => o.ShippingOrigin).HasMaxLength(200);
+            entity.Property(o => o.ShippingOriginEn).HasMaxLength(200);
+            entity.Property(o => o.ShippingFeeText).HasMaxLength(100);
+            entity.Property(o => o.ShippingFeeTextEn).HasMaxLength(100);
+            entity.Property(o => o.DispatchTimeText).HasMaxLength(100);
+            entity.Property(o => o.DispatchTimeTextEn).HasMaxLength(100);
             entity.HasMany(o => o.Items)
                   .WithOne(i => i.Order)
                   .HasForeignKey(i => i.OrderId)
                   .OnDelete(DeleteBehavior.Cascade);
+            entity.HasMany(o => o.AfterSalesRequests)
+                  .WithOne(a => a.Order)
+                  .HasForeignKey(a => a.OrderId)
+                  .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        builder.Entity<AfterSalesRequest>(entity =>
+        {
+            entity.HasIndex(a => a.UserId);
+            entity.HasIndex(a => a.Status);
+            entity.HasIndex(a => a.OrderId);
+            entity.Property(a => a.Type).HasMaxLength(20);
+            entity.Property(a => a.Status).HasMaxLength(20);
+            entity.Property(a => a.Reason).HasMaxLength(1000);
+            entity.Property(a => a.AdminNote).HasMaxLength(500);
+            entity.Property(a => a.ReturnCarrier).HasMaxLength(50);
+            entity.Property(a => a.ReturnTrackingNumber).HasMaxLength(50);
         });
 
         builder.Entity<OrderItem>(entity =>

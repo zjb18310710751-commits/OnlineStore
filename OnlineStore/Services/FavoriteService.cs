@@ -38,6 +38,9 @@ public class FavoriteService : IFavoriteService
         return true;
     }
 
+    public Task<int> CountAsync(string userId) =>
+        _context.Favorites.CountAsync(f => f.UserId == userId);
+
     public async Task<IReadOnlyList<Product>> GetFavoritesAsync(string userId)
     {
         var ids = await _context.Favorites

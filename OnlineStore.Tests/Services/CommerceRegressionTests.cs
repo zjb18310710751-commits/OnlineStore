@@ -167,6 +167,22 @@ public class CommerceRegressionTests
     }
 
     [Fact]
+    public async Task FavoriteCount_RemainsAfterAddingTheProductToCart()
+    {
+        using var context = await CreateContextAsync();
+        var favorites = new FavoriteService(context);
+        Assert.True(await favorites.ToggleAsync("user", 1));
+        Assert.Equal(1, await favorites.CountAsync("user"));
+
+        var cart = new CartService(new MemoryCartStore(), new ProductService(context), new ProductSkuService(context));
+        await cart.AddAsync(1, 1);
+
+        Assert.Equal(1, await favorites.CountAsync("user"));
+        Assert.False(await favorites.ToggleAsync("user", 1));
+        Assert.Equal(0, await favorites.CountAsync("user"));
+    }
+
+    [Fact]
     public async Task CreateOrder_SelectedSku_CancelRestoresBothStocksExactlyOnce()
     {
         using var context = await CreateContextAsync();

@@ -39,7 +39,45 @@ public class Order
     [Display(Name = "订单状态")]
     public string Status { get; set; } = "待发货";
 
+    [StringLength(50)]
+    [Display(Name = "承运商")]
+    public string? Carrier { get; set; }
+
+    [StringLength(50)]
+    [Display(Name = "运单号")]
+    public string? TrackingNumber { get; set; }
+
+    [StringLength(200)]
+    public string? ShippingOrigin { get; set; }
+
+    [StringLength(200)]
+    public string? ShippingOriginEn { get; set; }
+
+    [StringLength(100)]
+    public string? ShippingFeeText { get; set; }
+
+    [StringLength(100)]
+    public string? ShippingFeeTextEn { get; set; }
+
+    [StringLength(100)]
+    public string? DispatchTimeText { get; set; }
+
+    [StringLength(100)]
+    public string? DispatchTimeTextEn { get; set; }
+
+    public DateTime? ExpectedDispatchAt { get; set; }
+
+    public DateTime? ShippedAt { get; set; }
+
+    public DateTime? DeliveredAt { get; set; }
+
+    public DateTime? SignedAt { get; set; }
+
+    public DateTime? UserDeletedAt { get; set; }
+
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     public ICollection<OrderItem> Items { get; set; } = new List<OrderItem>();
+
+    public ICollection<AfterSalesRequest> AfterSalesRequests { get; set; } = new List<AfterSalesRequest>();
 }

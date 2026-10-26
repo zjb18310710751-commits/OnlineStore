@@ -474,7 +474,7 @@ public class AccountController : Controller
 
         try
         {
-            await _emailService.SendAsync(target, _loc["VerificationEmailSubject"].Value,
+            await _emailService.SendAsync(target, EmailTemplateBuilder.VerificationCodeSubject,
                 EmailTemplateBuilder.BuildVerificationCode(code));
         }
         catch (Exception)

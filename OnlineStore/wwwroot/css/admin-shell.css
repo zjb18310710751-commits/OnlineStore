@@ -37,6 +37,12 @@
 .admin-app .admin-nav-link i { flex: 0 0 20px; font-size: 17px; text-align: center; }
 .admin-app .admin-nav-link:hover { background: var(--admin-surface); color: var(--admin-ink); }
 .admin-app .admin-nav-link.active { background: var(--admin-ink); color: #fff; font-weight: 600; }
+.admin-order-section-nav { display: flex; align-items: center; gap: 8px; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid var(--admin-line); }
+.admin-order-section-nav a { display: inline-flex; align-items: center; gap: 8px; min-height: 40px; padding: 8px 15px; border: 1px solid #d7d7d7; border-radius: 999px; background: #fff; color: var(--admin-ink); font-size: 13px; font-weight: 600; text-decoration: none; }
+.admin-order-section-nav a:hover { border-color: var(--admin-ink); color: var(--admin-ink); }
+.admin-order-section-nav a.is-active { border-color: var(--admin-ink); background: var(--admin-ink); color: #fff; }
+.admin-order-section-nav a span { display: inline-flex; align-items: center; justify-content: center; min-width: 20px; height: 20px; padding-inline: 5px; border-radius: 999px; background: var(--admin-surface); color: var(--admin-ink); font-size: 10px; }
+.admin-order-section-nav a.is-active span { background: #fff; color: var(--admin-ink); }
 .admin-app .admin-sidebar-footer { margin-top: auto; padding: 16px; border-top: 1px solid var(--admin-line); }
 .admin-app .admin-main { min-width: 0; padding: 0; }
 .admin-app .admin-topbar { position: sticky; top: 0; z-index: 1000; display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: var(--admin-header-height); padding: 12px var(--admin-gutter); border-bottom: 1px solid var(--admin-line); background: #fff; }
@@ -58,7 +64,15 @@
 .admin-app .card-body { padding: var(--admin-space); }
 .admin-app .btn { display: inline-flex; align-items: center; justify-content: center; gap: 4px; min-height: 44px; padding: 9px 16px; border-radius: 6px; font-size: 13px; font-weight: 600; }
 .admin-app .btn-primary { --bs-btn-bg: #151515; --bs-btn-border-color: #151515; --bs-btn-color: #fff; --bs-btn-hover-bg: #3d3d3d; --bs-btn-hover-border-color: #3d3d3d; --bs-btn-active-bg: #000; --bs-btn-active-border-color: #000; --bs-btn-disabled-bg: #777; --bs-btn-disabled-border-color: #777; }
-.admin-app :is(.btn-outline-primary, .btn-outline-secondary) { --bs-btn-color: #242424; --bs-btn-border-color: #d8d8d8; --bs-btn-hover-bg: #f0f0f0; --bs-btn-hover-color: #151515; --bs-btn-hover-border-color: #aaa; --bs-btn-active-bg: #e7e7e7; --bs-btn-active-color: #151515; --bs-btn-active-border-color: #999; }
+.admin-app :is(.btn-outline-primary, .btn-outline-secondary, .btn-outline-dark, .btn-outline-success, .btn-outline-danger, .btn-outline-warning, .btn-outline-info) { --bs-btn-color: #151515; --bs-btn-border-color: #111; --bs-btn-hover-bg: #f0f0f0; --bs-btn-hover-color: #151515; --bs-btn-hover-border-color: #111; --bs-btn-active-bg: #111; --bs-btn-active-color: #fff; --bs-btn-active-border-color: #111; }
+.admin-app :is(.btn-success, .btn-danger, .btn-warning, .btn-info) { --bs-btn-bg: #fff; --bs-btn-border-color: #111; --bs-btn-color: #111; --bs-btn-hover-bg: #111; --bs-btn-hover-border-color: #111; --bs-btn-hover-color: #fff; --bs-btn-active-bg: #111; --bs-btn-active-border-color: #111; --bs-btn-active-color: #fff; }
+.admin-store-heading { display: flex; align-items: flex-end; justify-content: space-between; gap: var(--admin-space); margin-bottom: 26px; padding: 2px 0 10px; }
+.admin-store-heading > div { min-width: 0; }
+.admin-store-eyebrow { margin: 0 0 8px; color: var(--admin-muted); font-size: 10px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; }
+.admin-store-heading h1 { margin: 0; color: var(--admin-ink); font-size: 32px; font-weight: 700; letter-spacing: -.045em; line-height: 1.1; }
+.admin-store-heading h1 small { margin-left: 8px; color: var(--admin-muted); font-size: 13px; font-weight: 500; letter-spacing: 0; }
+.admin-store-intro { margin: 9px 0 0; color: var(--admin-muted); font-size: 13px; }
+.admin-store-heading > .btn { flex-shrink: 0; }
 .admin-app .form-control, .admin-app .form-select { min-height: 44px; border-color: #d8d8d8; border-radius: 6px; font-size: 14px; }
 .admin-app .form-control:focus, .admin-app .form-select:focus { border-color: var(--admin-ink); box-shadow: 0 0 0 2px #15151512; }
 .admin-app .form-check-input:checked { background-color: var(--admin-ink); border-color: var(--admin-ink); }
@@ -85,6 +99,10 @@
     .admin-app .admin-topbar-heading { gap: 12px; }
     .admin-app .admin-breadcrumb > span, .admin-app .admin-breadcrumb > i { display: none; }
     .admin-app .admin-breadcrumb strong { font-size: 14px; }
+}
+@media (max-width: 767px) {
+    .admin-store-heading { align-items: flex-start; flex-direction: column; }
+    .admin-store-heading h1 { font-size: 27px; }
 }
 @media (max-width: 575px) {
     .admin-app { --admin-gutter: 16px; --admin-space: 20px; }

@@ -118,8 +118,26 @@
                                 }
                             </div>
 
-                            <div class="shipping-box small text-muted mb-3">
-                                <i class="bi bi-truck me-1"></i>@Loc["Delivery"]：@L10n.Text(Model.ShippingFrom ?? "—", Model.ShippingFromEn) · @L10n.Text(Model.ShippingFee ?? "—", Model.ShippingFeeEn) · @L10n.Text(Model.DeliveryTime ?? "—", Model.DeliveryTimeEn)
+                            <div class="pd-shipping-panel mb-3">
+                                <div class="pd-shipping-title">
+                                    <i class="bi bi-truck" aria-hidden="true"></i>
+                                    @L10n.Text("配送与发货", "Shipping information")
+                                </div>
+                                <div class="pd-shipping-grid">
+                                    <div>
+                                        <span>@L10n.Text("发货地", "Ships from")</span>
+                                        <strong>@L10n.Text(Model.ShippingFrom ?? "—", Model.ShippingFromEn)</strong>
+                                    </div>
+                                    <div>
+                                        <span>@L10n.Text("运费", "Shipping fee")</span>
+                                        <strong>@L10n.Text(Model.ShippingFee ?? "—", Model.ShippingFeeEn)</strong>
+                                    </div>
+                                    <div>
+                                        <span>@L10n.Text("发货时效", "Dispatch time")</span>
+                                        <strong>@L10n.Text(Model.DeliveryTime ?? "—", Model.DeliveryTimeEn)</strong>
+                                    </div>
+                                </div>
+                                <p>@L10n.Text("发货后可在“我的订单”中查看物流进度。", "Track delivery progress from My Orders after dispatch.")</p>
                             </div>
 
                             @if (hasSku)
@@ -150,11 +168,11 @@
                                 <input type="hidden" name="returnUrl" value="@($"{Context.Request.Path}{Context.Request.QueryString}")" />
                                 <div class="mb-3">
                                     <div class="sku-label">@Loc["Quantity"]</div>
-                                    <div class="input-group" style="max-width:150px;">
-                                        <button type="button" class="btn btn-outline-secondary" onclick="stepQty(this,-1)"><i class="bi bi-dash"></i></button>
-                                        <input id="qty" name="quantity" type="number" class="form-control text-center" value="1"
+                                    <div class="input-group pd-quantity-stepper">
+                                        <button type="button" class="pd-qty-btn" onclick="stepQty(this,-1)" aria-label="@L10n.Text("减少数量", "Decrease quantity")"><i class="bi bi-dash"></i></button>
+                                        <input id="qty" name="quantity" type="number" class="form-control text-center pd-qty-input" value="1"
                                                min="1" max="@Model.Stock" inputmode="numeric" required aria-label="@Loc["Quantity"].Value" />
-                                        <button type="button" class="btn btn-outline-secondary" onclick="stepQty(this,1)"><i class="bi bi-plus"></i></button>
+                                        <button type="button" class="pd-qty-btn" onclick="stepQty(this,1)" aria-label="@L10n.Text("增加数量", "Increase quantity")"><i class="bi bi-plus"></i></button>
                                     </div>
                                 </div>
                                 <div class="d-flex gap-2">

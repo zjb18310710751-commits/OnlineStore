@@ -2,24 +2,33 @@
 @{
     ViewData["Title"] = Loc["ShoppingCart"].Value;
 }
-<div class="container py-4">
-    <div class="mb-4">
-        <h1 class="h3 mb-0"><i class="bi bi-cart3 me-2"></i>@Loc["ShoppingCart"]</h1>
-    </div>
+<div class="container coupon-wallet-page member-cart-page">
+    <header class="coupon-wallet-header">
+        <div>
+            <p class="coupon-wallet-eyebrow">@L10n.Text("账户中心", "Member account")</p>
+            <h1>@Loc["ShoppingCart"]</h1>
+            <p>@L10n.Text("确认商品与数量，然后继续结算。", "Review your items and quantities before checkout.")</p>
+        </div>
+        <div class="coupon-wallet-count">
+            <strong>@Model.TotalItems</strong>
+            <span>@L10n.Text("件商品", "items")</span>
+        </div>
+    </header>
 
     @if (Model.Items.Count == 0)
     {
-        <div class="alert alert-light border text-center py-5">
-            <i class="bi bi-cart-x display-5 d-block mb-3 text-muted"></i>
-            <p class="mb-3">@Loc["EmptyCart"]</p>
-            <a asp-controller="Products" asp-action="Index" class="btn btn-primary">@Loc["ContinueShopping"]</a>
-        </div>
+        <section class="coupon-wallet-empty">
+            <i class="bi bi-cart-x"></i>
+            <h2>@Loc["EmptyCart"]</h2>
+            <p>@L10n.Text("购物车还是空的，去看看今天的精选商品。", "Your cart is empty. Explore today's picks.")</p>
+            <a asp-controller="Products" asp-action="Index" class="sf-button">@Loc["ContinueShopping"]</a>
+        </section>
     }
     else
     {
         <div class="row g-4">
             <div class="col-lg-8">
-                <div class="card cart-products-card shadow-sm">
+                <div class="card cart-products-card member-cart-products-card">
                     <div class="cart-product-grid cart-product-header" aria-hidden="true">
                         <div>@Loc["Products"]</div>
                         <div>@Loc["Price"]</div>
@@ -97,7 +106,7 @@
             </div>
 
             <div class="col-lg-4">
-                <div class="card cart-summary-card shadow-sm">
+                <div class="card cart-summary-card member-cart-summary-card">
                     <div class="card-header fw-semibold">@Loc["OrderSummary"]</div>
                     <div class="card-body">
                         <div class="cart-summary-line">
