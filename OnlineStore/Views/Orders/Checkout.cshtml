@@ -89,10 +89,17 @@
                             </span>
                         </label>
                         <label class="checkout-payment-option">
-                            <input asp-for="PaymentMethod" id="paymentTransfer" type="radio" value="bank_transfer_demo" class="form-check-input" />
+                            <input asp-for="PaymentMethod" id="paymentAlipay" type="radio" value="alipay_demo" class="form-check-input" />
                             <span>
-                                <span class="checkout-payment-title"><i class="bi bi-bank me-2"></i>@Loc["BankTransferDemo"]</span>
-                                <span class="checkout-payment-hint">@Loc["BankTransferHint"]</span>
+                                <span class="checkout-payment-title"><i class="bi bi-phone me-2"></i>@Loc["AlipayPaymentDemo"]</span>
+                                <span class="checkout-payment-hint">@Loc["AlipayPaymentHint"]</span>
+                            </span>
+                        </label>
+                        <label class="checkout-payment-option">
+                            <input asp-for="PaymentMethod" id="paymentWeChat" type="radio" value="wechat_pay_demo" class="form-check-input" />
+                            <span>
+                                <span class="checkout-payment-title"><i class="bi bi-chat-dots me-2"></i>@Loc["WeChatPaymentDemo"]</span>
+                                <span class="checkout-payment-hint">@Loc["WeChatPaymentHint"]</span>
                             </span>
                         </label>
 

@@ -486,7 +486,7 @@ public class OrdersController : Controller
             ModelState.AddModelError(nameof(vm.Country), _loc["CheckoutCountryRequired"]);
         }
 
-        if (vm.PaymentMethod is not ("cash_on_delivery" or "card_demo" or "bank_transfer_demo"))
+        if (vm.PaymentMethod is not ("cash_on_delivery" or "card_demo" or "alipay_demo" or "wechat_pay_demo"))
         {
             ModelState.AddModelError(nameof(vm.PaymentMethod), _loc["InvalidPaymentMethod"].Value);
         }

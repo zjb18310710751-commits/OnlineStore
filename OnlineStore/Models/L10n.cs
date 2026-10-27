@@ -56,6 +56,8 @@ public static class L10n
         {
             "cash_on_delivery" => Text("货到付款", "Cash on delivery"),
             "card_demo" => Text("银行卡支付", "Card payment"),
+            "alipay_demo" => Text("支付宝支付（Alipay+）", "Alipay+"),
+            "wechat_pay_demo" => Text("微信支付", "WeChat Pay"),
             "bank_transfer_demo" => Text("银行转账", "Bank transfer"),
             _ => method ?? string.Empty
         };
