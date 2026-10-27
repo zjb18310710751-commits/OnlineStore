@@ -68,10 +68,12 @@
                            asp-controller="Favorites" asp-action="Index"
                            title="@Loc["MyFavorites"]"
                            aria-label="@Loc["MyFavorites"] (@favoriteCount)">
-                            <i class="bi bi-heart" aria-hidden="true"></i>
+                            <svg class="sf-nav-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 0 0 0-7.78Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                            </svg>
                             @if (favoriteCount > 0)
                             {
-                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                <span class="sf-nav-count" aria-hidden="true">
                                     @(favoriteCount > 99 ? "99+" : favoriteCount.ToString())
                                 </span>
                             }
@@ -85,7 +87,10 @@
                                 }
                                 else
                                 {
-                                    <i class="bi bi-person" aria-hidden="true"></i>
+                                    <svg class="sf-nav-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                        <circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="1.5"></circle>
+                                        <path d="M4 21v-2a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                                    </svg>
                                 }
                             </button>
                             <ul class="dropdown-menu dropdown-menu-end">
