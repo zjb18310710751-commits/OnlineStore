@@ -1,10 +1,12 @@
 @inject ICategoryService CategoryService
+@inject IFavoriteService FavoriteService
 @inject IOrderService OrderService
 @inject ICouponService CouponService
 @inject Microsoft.AspNetCore.Identity.UserManager<ApplicationUser> UserManager
 @{
     var categories = (await CategoryService.GetAllAsync()).ToList();
     var currentUser = User.Identity?.IsAuthenticated == true ? await UserManager.GetUserAsync(User) : null;
+    var favoriteCount = currentUser is null ? 0 : await FavoriteService.CountAsync(currentUser.Id);
     var deliveredItemCount = currentUser is null ? 0 : await OrderService.GetDeliveredItemCountAsync(currentUser.Id);
     var availableCouponCount = currentUser is null
         ? 0
@@ -62,6 +64,18 @@
                             <button type="submit" aria-label="@Loc["Search"]"><i class="bi bi-search" aria-hidden="true"></i></button>
                             <input type="search" name="searchTerm" placeholder="@Loc["Search"]" aria-label="@Loc["SearchPlaceholder"]" value="@Context.Request.Query["searchTerm"]" />
                         </form>
+                        <a class="sf-icon-link sf-favorite-link position-relative"
+                           asp-controller="Favorites" asp-action="Index"
+                           title="@Loc["MyFavorites"]"
+                           aria-label="@Loc["MyFavorites"] (@favoriteCount)">
+                            <i class="bi bi-heart" aria-hidden="true"></i>
+                            @if (favoriteCount > 0)
+                            {
+                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                    @(favoriteCount > 99 ? "99+" : favoriteCount.ToString())
+                                </span>
+                            }
+                        </a>
                         @await Component.InvokeAsync("CartSummary")
                         <div class="dropdown">
                             <button class="sf-icon-link" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="@Loc["Profile"]">
