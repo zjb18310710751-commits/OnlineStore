@@ -55,8 +55,8 @@ public static class L10n
         method switch
         {
             "cash_on_delivery" => Text("货到付款", "Cash on delivery"),
-            "card_demo" => Text("银行卡支付（演示）", "Card payment (demo)"),
-            "bank_transfer_demo" => Text("银行转账（演示）", "Bank transfer (demo)"),
+            "card_demo" => Text("银行卡支付", "Card payment"),
+            "bank_transfer_demo" => Text("银行转账", "Bank transfer"),
             _ => method ?? string.Empty
         };
 

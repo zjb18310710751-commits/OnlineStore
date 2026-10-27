@@ -214,10 +214,10 @@
   <data name="Payment" xml:space="preserve"><value>支付</value></data>
   <data name="CashOnDelivery" xml:space="preserve"><value>货到付款</value></data>
   <data name="CashOnDeliveryHint" xml:space="preserve"><value>收到商品时再付款。</value></data>
-  <data name="CardPaymentDemo" xml:space="preserve"><value>银行卡支付（演示）</value></data>
+  <data name="CardPaymentDemo" xml:space="preserve"><value>银行卡支付</value></data>
   <data name="CardPaymentHint" xml:space="preserve"><value>演示用的模拟银行卡支付。</value></data>
   <data name="InvalidPaymentMethod" xml:space="preserve"><value>请选择有效的支付方式</value></data>
-  <data name="BankTransferDemo" xml:space="preserve"><value>银行转账（演示）</value></data>
+  <data name="BankTransferDemo" xml:space="preserve"><value>银行转账</value></data>
   <data name="BankTransferHint" xml:space="preserve"><value>演示用的模拟银行转账。</value></data>
   <data name="OrderNotesOptional" xml:space="preserve"><value>订单备注（可选）</value></data>
   <data name="OrderNotesPlaceholder" xml:space="preserve"><value>输入订单备注…</value></data>
