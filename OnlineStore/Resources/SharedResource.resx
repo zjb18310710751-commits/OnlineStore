@@ -213,7 +213,7 @@
   <data name="YourOrder" xml:space="preserve"><value>你的订单</value></data>
   <data name="Payment" xml:space="preserve"><value>支付</value></data>
   <data name="CashOnDelivery" xml:space="preserve"><value>货到付款</value></data>
-  <data name="CashOnDeliveryHint" xml:space="preserve"><value>收到商品时再付款。</value></data>
+  <data name="CashOnDeliveryHint" xml:space="preserve"><value>演示用收到商品时再付款</value></data>
   <data name="CardPaymentDemo" xml:space="preserve"><value>银行卡支付</value></data>
   <data name="CardPaymentHint" xml:space="preserve"><value>演示用的模拟银行卡支付。</value></data>
   <data name="AlipayPaymentDemo" xml:space="preserve"><value>支付宝支付（Alipay+）</value></data>
