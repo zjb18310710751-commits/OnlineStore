@@ -154,9 +154,10 @@
                                 }
                                 @if (o.Status == OrderStatus.Completed)
                                 {
-                                    foreach (var item in o.Items.Where(item => !myReviews.ContainsKey($"{o.Id}:{item.ProductId}")))
+                                    var reviewItem = o.Items.FirstOrDefault(item => !myReviews.ContainsKey($"{o.Id}:{item.ProductId}"));
+                                    if (reviewItem is not null)
                                     {
-                                        <a asp-controller="Products" asp-action="Details" asp-route-id="@item.ProductId" asp-route-orderId="@o.Id" asp-fragment="write-review" class="btn btn-sm btn-outline-dark member-order-review-link">
+                                        <a asp-controller="Products" asp-action="Details" asp-route-id="@reviewItem.ProductId" asp-route-orderId="@o.Id" asp-fragment="write-review" class="btn btn-sm btn-outline-dark member-order-review-link">
                                             @Loc["WriteReview"]
                                         </a>
                                     }
