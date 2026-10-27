@@ -214,10 +214,10 @@
   <data name="Payment" xml:space="preserve"><value>Payment</value></data>
   <data name="CashOnDelivery" xml:space="preserve"><value>Cash on delivery</value></data>
   <data name="CashOnDeliveryHint" xml:space="preserve"><value>Pay when your order arrives.</value></data>
-  <data name="CardPaymentDemo" xml:space="preserve"><value>Card payment (demo)</value></data>
+  <data name="CardPaymentDemo" xml:space="preserve"><value>Card payment</value></data>
   <data name="CardPaymentHint" xml:space="preserve"><value>Simulated card payment for demonstration.</value></data>
   <data name="InvalidPaymentMethod" xml:space="preserve"><value>Choose a valid payment method</value></data>
-  <data name="BankTransferDemo" xml:space="preserve"><value>Bank transfer (demo)</value></data>
+  <data name="BankTransferDemo" xml:space="preserve"><value>Bank transfer</value></data>
   <data name="BankTransferHint" xml:space="preserve"><value>Simulated bank transfer for demonstration.</value></data>
   <data name="OrderNotesOptional" xml:space="preserve"><value>Order notes (optional)</value></data>
   <data name="OrderNotesPlaceholder" xml:space="preserve"><value>Enter order notes…</value></data>
