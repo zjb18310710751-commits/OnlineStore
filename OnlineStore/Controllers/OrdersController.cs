@@ -328,6 +328,7 @@ public class OrdersController : Controller
         }
 
         var orders = await _orderService.GetByUserAsync(user.Id);
+        ViewData["OrderItemPreviews"] = await _orderService.GetOrderItemPreviewsAsync(orders.SelectMany(order => order.Items));
         var reviews = _reviewService is null
             ? Array.Empty<Review>()
             : await _reviewService.GetByUserAsync(user.Id);

@@ -45,7 +45,8 @@
 {
 <div class="card shadow-sm mb-4">
     <div class="table-responsive">
-        <table class="table table-hover align-middle mb-0">
+        <table class="table table-hover align-middle mb-0" data-admin-order-updates
+               data-order-updates-url="@(Url.Action("OrderUpdates") + "?" + string.Join("&", Model.Orders.Select(order => $"ids={order.Id}")))">
             <thead class="table-light">
                 <tr>
                     <th>@Loc["OrderNo"]</th>
@@ -63,7 +64,8 @@
                 }
                 @foreach (var o in Model.Orders)
                 {
-                    <tr>
+                    var state = AdminOrderUpdateViewModel.FromOrder(o);
+                    <tr data-order-id="@o.Id" data-order-status="@o.Status">
                         <td class="fw-semibold">
                             @o.OrderNo
                             @if (o.ReplacementForOrderId.HasValue)
@@ -87,7 +89,7 @@
                             }
                             <span class="text-danger fw-semibold ms-1">¥@o.Total.ToString("F2")</span>
                         </td>
-                        <td><span class="badge @StatusBadge(o.Status)">@L10n.Status(o.Status)</span></td>
+                        <td><span class="badge @StatusBadge(o.Status)" data-order-status-label aria-live="polite">@state.StatusLabel</span></td>
                         <td class="small text-muted">
                             @if (!string.IsNullOrWhiteSpace(o.Carrier))
                             {
@@ -106,49 +108,36 @@
                             {
                                 <span>—</span>
                             }
-                            @if (o.Status == OrderStatus.ReceiptException && !string.IsNullOrWhiteSpace(o.ReceiptExceptionReason))
-                            {
-                                <div class="mt-2 text-danger">@L10n.Text("签收异常", "Receipt exception")：@o.ReceiptExceptionReason</div>
-                                <div>@o.ReceiptExceptionReportedBy · @o.ReceiptExceptionReportedAt?.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</div>
-                            }
-                            else if (o.Status == OrderStatus.Completed && o.ReceiptConfirmedAutomatically)
-                            {
-                                <div class="mt-2">@L10n.Text("确认期届满，系统自动确认收货", "Auto-confirmed after the 7-day window")</div>
-                            }
+                            <div class="mt-2 @(state.IsReceiptException ? "text-danger" : null)" data-order-note
+                                 hidden="@(state.ReceiptNote is null)">@state.ReceiptNote</div>
                         </td>
                         <td class="text-end text-nowrap">
-                            @if (o.Status == OrderStatus.PendingShipment)
-                            {
+                            <span data-order-actions-status="@OrderStatus.PendingShipment" hidden="@(o.Status != OrderStatus.PendingShipment)">
                                 <button type="button" class="btn btn-sm btn-outline-dark" onclick="openDispatchModal(@o.Id, '@o.OrderNo')">@Loc["Ship"]</button>
                                 <form asp-action="Cancel" asp-route-id="@o.Id" method="post" class="d-inline" data-confirm="@Loc["ConfirmCancelOrder"]" onsubmit="return confirm(this.dataset.confirm);">
                                     <button type="submit" class="btn btn-sm btn-outline-dark">@Loc["CancelOrder"]</button>
                                 </form>
-                            }
-                            else if (o.Status == OrderStatus.Shipped)
-                            {
+                            </span>
+                            <span data-order-actions-status="@(OrderStatus.Shipped + "," + OrderStatus.Delivered + "," + OrderStatus.ReceiptException)"
+                                  hidden="@(o.Status != OrderStatus.Shipped && o.Status != OrderStatus.Delivered && o.Status != OrderStatus.ReceiptException)">
                                 <button type="button" class="btn btn-sm btn-outline-dark" onclick="openAdminTrackingModal(@o.Id)">@L10n.Text("查看物流", "Track")</button>
-                            }
-                            else if (o.Status == OrderStatus.Delivered)
-                            {
-                                <button type="button" class="btn btn-sm btn-outline-dark" onclick="openAdminTrackingModal(@o.Id)">@L10n.Text("查看物流", "Track")</button>
+                            </span>
+                            <span data-order-actions-status="@OrderStatus.Delivered" hidden="@(o.Status != OrderStatus.Delivered)">
                                 <button type="button" class="btn btn-sm btn-outline-dark"
                                         onclick="openReceiptExceptionModal(@o.Id, '@o.OrderNo')">
                                     @L10n.Text("签收异常", "Receipt exception")
                                 </button>
-                            }
-                            else if (o.Status == OrderStatus.ReceiptException)
-                            {
-                                <button type="button" class="btn btn-sm btn-outline-dark" onclick="openAdminTrackingModal(@o.Id)">@L10n.Text("查看物流", "Track")</button>
+                            </span>
+                            <span data-order-actions-status="@OrderStatus.ReceiptException" hidden="@(o.Status != OrderStatus.ReceiptException)">
                                 <form asp-action="Refund" asp-route-id="@o.Id" method="post" class="d-inline" data-confirm="@L10n.Text("确定为该异常签收订单退款并恢复库存吗？", "Refund this receipt-exception order and restore stock?")" onsubmit="return confirm(this.dataset.confirm);">
                                     <button type="submit" class="btn btn-sm btn-outline-dark">@Loc["Refund"]</button>
                                 </form>
-                            }
-                            else if (o.Status == OrderStatus.Completed)
-                            {
+                            </span>
+                            <span data-order-actions-status="@OrderStatus.Completed" hidden="@(o.Status != OrderStatus.Completed)">
                                 <form asp-action="Refund" asp-route-id="@o.Id" method="post" class="d-inline" data-confirm="@Loc["ConfirmRefundOrder"]" onsubmit="return confirm(this.dataset.confirm);">
                                     <button type="submit" class="btn btn-sm btn-outline-dark">@Loc["Refund"]</button>
                                 </form>
-                            }
+                            </span>
                         </td>
                     </tr>
                 }
@@ -299,6 +288,7 @@ else
 </div>
 
 @section Scripts {
+    <script src="~/js/admin-order-updates.js" asp-append-version="true"></script>
     <script>
         let adminTrackingPollTimer = null;
 

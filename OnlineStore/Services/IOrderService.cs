@@ -8,9 +8,11 @@ public interface IOrderService
     Task<Order?> GetByIdAsync(int id);
 
     Task<IReadOnlyList<Order>> GetByUserAsync(string userId);
+    Task<IReadOnlyDictionary<int, OrderItemPreviewViewModel>> GetOrderItemPreviewsAsync(IEnumerable<OrderItem> items);
 
     Task<IReadOnlyList<Order>> GetAllAsync();
     Task<PagedResult<Order>> GetAdminOrdersPagedAsync(int page, int pageSize);
+    Task<IReadOnlyList<Order>> GetAdminOrderUpdatesAsync(IReadOnlyCollection<int> orderIds);
 
     Task<Order> CreateAsync(Order order);
 

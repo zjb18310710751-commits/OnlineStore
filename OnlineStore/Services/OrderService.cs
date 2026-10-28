@@ -46,6 +46,49 @@ public class OrderService : IOrderService
             .OrderByDescending(o => o.CreatedAt)
             .ToListAsync();
 
+    public async Task<IReadOnlyDictionary<int, OrderItemPreviewViewModel>> GetOrderItemPreviewsAsync(IEnumerable<OrderItem> items)
+    {
+        var orderItems = items.ToArray();
+        if (orderItems.Length == 0) return new Dictionary<int, OrderItemPreviewViewModel>();
+
+        var productIds = orderItems.Select(item => item.ProductId).Distinct().ToArray();
+        var products = await _context.Products.AsNoTracking()
+            .Where(product => productIds.Contains(product.Id))
+            .Select(product => new
+            {
+                product.Id,
+                product.ImageUrl,
+                product.IsActive,
+                GalleryImage = product.Images.Where(image => !string.IsNullOrWhiteSpace(image.ImageUrl))
+                    .OrderBy(image => image.SortOrder).ThenBy(image => image.Id)
+                    .Select(image => image.ImageUrl).FirstOrDefault()
+            }).ToDictionaryAsync(product => product.Id);
+        var skuIds = orderItems.Where(item => item.SkuId.HasValue).Select(item => item.SkuId!.Value).Distinct().ToArray();
+        var skus = await _context.ProductSkus.AsNoTracking()
+            .Where(sku => skuIds.Contains(sku.Id) && productIds.Contains(sku.ProductId))
+            .Select(sku => new { sku.Id, sku.ProductId, sku.ImageUrl })
+            .ToDictionaryAsync(sku => sku.Id);
+
+        var previews = new Dictionary<int, OrderItemPreviewViewModel>();
+        foreach (var item in orderItems)
+        {
+            if (!products.TryGetValue(item.ProductId, out var product))
+            {
+                previews[item.Id] = new(null, false);
+                continue;
+            }
+
+            var image = !string.IsNullOrWhiteSpace(product.ImageUrl) ? product.ImageUrl : product.GalleryImage;
+            if (item.SkuId.HasValue && skus.TryGetValue(item.SkuId.Value, out var sku)
+                && sku.ProductId == item.ProductId && !string.IsNullOrWhiteSpace(sku.ImageUrl))
+            {
+                image = sku.ImageUrl;
+            }
+            previews[item.Id] = new(image, product.IsActive);
+        }
+        return previews;
+    }
+
     public async Task<PagedResult<Order>> GetAdminOrdersPagedAsync(int page, int pageSize)
     {
         await ProcessPendingOrderStatesAsync();
@@ -59,6 +102,15 @@ public class OrderService : IOrderService
         page = Math.Clamp(page, 1, totalPages);
         var items = await query.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
         return new PagedResult<Order>(items, page, pageSize, total);
+    }
+
+    public async Task<IReadOnlyList<Order>> GetAdminOrderUpdatesAsync(IReadOnlyCollection<int> orderIds)
+    {
+        await ProcessPendingOrderStatesAsync();
+        return await _context.Orders.AsNoTracking()
+            .Where(order => orderIds.Contains(order.Id))
+            .OrderByDescending(order => order.CreatedAt)
+            .ToListAsync();
     }
 
     public async Task<Order> CreateAsync(Order order)

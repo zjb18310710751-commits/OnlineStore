@@ -49,6 +49,17 @@ public class OrdersController : Controller
     }
 
     [HttpGet]
+    [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
+    public async Task<IActionResult> OrderUpdates([FromQuery] int[] ids)
+    {
+        if (!ModelState.IsValid || ids.Length > 10 || ids.Any(id => id <= 0)) return BadRequest();
+        var orders = ids.Length == 0
+            ? Array.Empty<Order>()
+            : await _orderService.GetAdminOrderUpdatesAsync(ids.Distinct().ToArray());
+        return Json(new { success = true, orders = orders.Select(AdminOrderUpdateViewModel.FromOrder) });
+    }
+
+    [HttpGet]
     public async Task<IActionResult> OrderTracking(int id)
     {
         var tracking = await _orderService.GetTrackingAsync(id);

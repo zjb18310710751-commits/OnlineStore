@@ -2,6 +2,11 @@
 @{
     ViewData["Title"] = Loc["MyOrders"].Value;
     var myReviews = ViewBag.MyReviews as IDictionary<string, Review> ?? new Dictionary<string, Review>();
+    var itemPreviews = ViewData["OrderItemPreviews"] as IReadOnlyDictionary<int, OrderItemPreviewViewModel>
+        ?? new Dictionary<int, OrderItemPreviewViewModel>();
+}
+@section Styles {
+    <link rel="stylesheet" href="~/css/member-orders.css" asp-append-version="true" />
 }
 @functions {
     string StatusBadge(string status) => "bg-white text-dark border";
@@ -36,8 +41,8 @@
             <div class="list-group list-group-flush">
                 @foreach (var o in Model)
                 {
-                    <div class="list-group-item member-order-item">
-                        <div class="d-flex justify-content-between align-items-start gap-3 mb-2">
+                    <div class="list-group-item member-order-item" data-order-id="@o.Id">
+                        <div class="member-order-heading">
                             <div>
                                 <span class="text-muted member-order-meta me-2">@Loc["OrderNo"]：@o.OrderNo</span>
                                 <span class="text-muted member-order-meta">@o.CreatedAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</span>
@@ -72,17 +77,51 @@
                         <ul class="list-unstyled member-order-lines mb-2">
                             @foreach (var i in o.Items)
                             {
+                                var productName = L10n.Text(i.ProductName, i.ProductNameEn);
+                                var preview = itemPreviews.GetValueOrDefault(i.Id) ?? new OrderItemPreviewViewModel(null, false);
                                 <li class="member-order-line">
-                                    <div class="d-flex justify-content-between">
-                                        <span>
-                                            @L10n.Text(i.ProductName, i.ProductNameEn)
+                                    <div class="member-order-product">
+                                        <div class="member-order-product-image">
+                                            @if (!string.IsNullOrWhiteSpace(preview.ImageUrl))
+                                            {
+                                                <img src="@preview.ImageUrl" alt="@productName" width="112" height="112" loading="lazy"
+                                                     onerror="this.hidden=true; this.nextElementSibling.hidden=false;" />
+                                            }
+                                            <span class="member-order-image-empty" hidden="@(!string.IsNullOrWhiteSpace(preview.ImageUrl))">
+                                                <i class="bi bi-image" aria-hidden="true"></i>
+                                                <span>@L10n.Text("暂无图片", "No photo")</span>
+                                            </span>
+                                        </div>
+                                        <div class="member-order-product-info">
+                                            <h2 class="member-order-product-name">
+                                                @if (preview.CanViewProduct)
+                                                {
+                                                    <a asp-controller="Products" asp-action="Details" asp-route-id="@i.ProductId">@productName</a>
+                                                }
+                                                else
+                                                {
+                                                    @productName
+                                                }
+                                            </h2>
                                             @if (!string.IsNullOrEmpty(i.Color) || !string.IsNullOrEmpty(i.Spec))
                                             {
-                                                <small class="text-muted member-order-detail">@L10n.Text(i.Color ?? "", i.ColorEn) @L10n.Text(i.Spec ?? "", i.SpecEn)</small>
+                                                <p class="member-order-product-options">
+                                                    @if (!string.IsNullOrEmpty(i.Color))
+                                                    {
+                                                        <span>@L10n.Text("颜色", "Colour")：@L10n.Text(i.Color, i.ColorEn)</span>
+                                                    }
+                                                    @if (!string.IsNullOrEmpty(i.Spec))
+                                                    {
+                                                        <span>@L10n.Text("规格", "Size / spec")：@L10n.Text(i.Spec, i.SpecEn)</span>
+                                                    }
+                                                </p>
                                             }
-                                            <small class="text-muted member-order-detail">× @i.Quantity</small>
-                                        </span>
-                                        <span>¥@i.LineTotal.ToString("F2")</span>
+                                            <p class="member-order-product-quantity">@L10n.Text("数量", "Quantity") <strong>× @i.Quantity</strong></p>
+                                        </div>
+                                        <div class="member-order-product-amount">
+                                            <span>@L10n.Text("商品小计", "Item subtotal")</span>
+                                            <strong>¥@i.LineTotal.ToString("F2")</strong>
+                                        </div>
                                     </div>
                                     @if (myReviews.TryGetValue($"{o.Id}:{i.ProductId}", out var myReview) && myReview is not null)
                                     {
@@ -125,7 +164,7 @@
                             </div>
                         }
 
-                        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mt-3">
+                        <div class="member-order-footer">
                             <div class="member-order-actions d-flex flex-wrap gap-2 @(o.Status == OrderStatus.Completed ? "member-order-actions--stacked" : "")">
                                 @if (o.Status == OrderStatus.PendingShipment)
                                 {
