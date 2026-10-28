@@ -3,7 +3,6 @@ using OnlineStore.Services;
 
 namespace OnlineStore.ViewComponents;
 
-/// <summary>导航栏购物车徽标：显示当前购物车内的商品行数。</summary>
 public class CartSummaryViewComponent : ViewComponent
 {
     private readonly ICartService _cartService;

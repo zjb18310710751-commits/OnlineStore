@@ -1,0 +1,12 @@
+<dialog id="ui-confirm-dialog" class="ui-confirm-dialog" aria-labelledby="ui-confirm-title" aria-describedby="ui-confirm-message">
+    <button type="button" class="ui-dialog-close" data-confirm-close aria-label="@L10n.Text("关闭确认提示", "Close confirmation")"><i class="bi bi-x-lg" aria-hidden="true"></i></button>
+    <div class="ui-dialog-icon" aria-hidden="true"><i class="bi bi-exclamation-triangle"></i></div>
+    <div class="ui-dialog-header">
+        <h2 id="ui-confirm-title" class="ui-dialog-title">@L10n.Text("确认操作", "Confirm action")</h2>
+        <p id="ui-confirm-message" class="ui-dialog-message" data-confirm-message></p>
+    </div>
+    <div class="ui-dialog-actions">
+        <button type="button" class="ui-button ui-button-secondary" data-confirm-cancel autofocus>@L10n.Text("取消", "Cancel")</button>
+        <button type="button" class="ui-button ui-button-primary" data-confirm-accept>@L10n.Text("确认", "Confirm")</button>
+    </div>
+</dialog>

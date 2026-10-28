@@ -6,7 +6,6 @@ using MimeKit;
 
 namespace OnlineStore.Services;
 
-/// <summary>基于 SMTP 的邮件发送实现（MailKit），配置从 Email 段读取。</summary>
 public class SmtpEmailService : IEmailService
 {
     private readonly IConfiguration _configuration;
@@ -26,7 +25,7 @@ public class SmtpEmailService : IEmailService
 
         if (string.IsNullOrWhiteSpace(host) || string.IsNullOrWhiteSpace(senderEmail))
         {
-            throw new InvalidOperationException("邮件服务未配置，请联系管理员。");
+            throw new InvalidOperationException("Email service is not configured.");
         }
 
         var port = section.GetValue("Port", 587);
@@ -44,7 +43,7 @@ public class SmtpEmailService : IEmailService
         using var client = new SmtpClient();
         try
         {
-            // 465 端口是隐式 SSL（SMTPS）；其余端口按配置走 STARTTLS
+
             var secureOptions = port == 465
                 ? SecureSocketOptions.SslOnConnect
                 : (enableSsl ? SecureSocketOptions.StartTls : SecureSocketOptions.None);
@@ -60,8 +59,9 @@ public class SmtpEmailService : IEmailService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "发送验证码邮件失败：{To}", to);
-            throw new InvalidOperationException($"验证码发送失败（{host}:{port}）：{ex.Message}", ex);
+            _logger.LogError(ex, "Failed to send verification email to {To}.", to);
+            throw new InvalidOperationException(
+                $"Verification email could not be sent through {host}:{port}.", ex);
         }
         finally
         {

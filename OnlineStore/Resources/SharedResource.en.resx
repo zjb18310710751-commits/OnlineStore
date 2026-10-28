@@ -71,17 +71,15 @@
   <data name="StockLimit" xml:space="preserve"><value>Max {0} in stock</value></data>
   <data name="OrderSummary" xml:space="preserve"><value>Order Summary</value></data>
   <data name="CartItemCount" xml:space="preserve"><value>Items</value></data>
-  <data name="AdminLogin" xml:space="preserve"><value>Admin Login</value></data>
   <data name="Email" xml:space="preserve"><value>Email</value></data>
   <data name="Password" xml:space="preserve"><value>Password</value></data>
   <data name="RememberMe" xml:space="preserve"><value>Remember me</value></data>
-  <data name="RememberCredentials" xml:space="preserve"><value>Remember email &amp; password</value></data>
+  <data name="RememberCredentials" xml:space="preserve"><value>Remember account</value></data>
   <data name="EmailRegister" xml:space="preserve"><value>Register with email</value></data>
   <data name="PhoneRegister" xml:space="preserve"><value>Register with phone</value></data>
   <data name="EmailOrPhone" xml:space="preserve"><value>Email or phone</value></data>
   <data name="PhoneAlreadyRegistered" xml:space="preserve"><value>This phone number is already registered</value></data>
   <data name="InvalidPhone" xml:space="preserve"><value>Enter a valid phone number</value></data>
-  <data name="LoginHint" xml:space="preserve"><value>Default account: see README.md (change password after first login)</value></data>
   <data name="Register" xml:space="preserve"><value>Register</value></data>
   <data name="RegisterTitle" xml:space="preserve"><value>Create Account</value></data>
   <data name="ConfirmPassword" xml:space="preserve"><value>Confirm password</value></data>
@@ -215,10 +213,15 @@
   <data name="YourOrder" xml:space="preserve"><value>Your order</value></data>
   <data name="Payment" xml:space="preserve"><value>Payment</value></data>
   <data name="CashOnDelivery" xml:space="preserve"><value>Cash on delivery</value></data>
-  <data name="CashOnDeliveryHint" xml:space="preserve"><value>Pay when your order arrives.</value></data>
-  <data name="CardPaymentDemo" xml:space="preserve"><value>Card payment (demo)</value></data>
+  <data name="CashOnDeliveryHint" xml:space="preserve"><value>Simulated cash on delivery payment.</value></data>
+  <data name="CardPaymentDemo" xml:space="preserve"><value>Card payment</value></data>
   <data name="CardPaymentHint" xml:space="preserve"><value>Simulated card payment for demonstration.</value></data>
-  <data name="BankTransferDemo" xml:space="preserve"><value>Bank transfer (demo)</value></data>
+  <data name="AlipayPaymentDemo" xml:space="preserve"><value>Alipay+</value></data>
+  <data name="AlipayPaymentHint" xml:space="preserve"><value>Simulated Alipay+ payment for demonstration.</value></data>
+  <data name="WeChatPaymentDemo" xml:space="preserve"><value>WeChat Pay</value></data>
+  <data name="WeChatPaymentHint" xml:space="preserve"><value>Simulated WeChat Pay payment for demonstration.</value></data>
+  <data name="InvalidPaymentMethod" xml:space="preserve"><value>Choose a valid payment method</value></data>
+  <data name="BankTransferDemo" xml:space="preserve"><value>Bank transfer</value></data>
   <data name="BankTransferHint" xml:space="preserve"><value>Simulated bank transfer for demonstration.</value></data>
   <data name="OrderNotesOptional" xml:space="preserve"><value>Order notes (optional)</value></data>
   <data name="OrderNotesPlaceholder" xml:space="preserve"><value>Enter order notes…</value></data>
@@ -349,6 +352,7 @@
   <data name="EditCoupon" xml:space="preserve"><value>Edit Coupon</value></data>
   <data name="NoCoupons" xml:space="preserve"><value>No coupons yet</value></data>
   <data name="CouponCode" xml:space="preserve"><value>Coupon Code</value></data>
+  <data name="CouponName" xml:space="preserve"><value>Coupon name</value></data>
   <data name="CouponType" xml:space="preserve"><value>Type</value></data>
   <data name="CouponValue" xml:space="preserve"><value>Value</value></data>
   <data name="MinOrderAmount" xml:space="preserve"><value>Min. Order</value></data>
@@ -387,13 +391,14 @@
   <data name="EmailNotRegistered" xml:space="preserve"><value>This email is not registered</value></data>
   <data name="PasswordResetSuccess" xml:space="preserve"><value>Password reset. Please sign in with your new password.</value></data>
   <data name="DemoCode" xml:space="preserve"><value>Code: {0}</value></data>
-  <data name="AccountRequired" xml:space="preserve"><value>Please enter your email or phone number</value></data>
+  <data name="AccountRequired" xml:space="preserve"><value>Please enter your email</value></data>
   <data name="PasswordRequired" xml:space="preserve"><value>Please enter your password</value></data>
   <data name="AddressRequired" xml:space="preserve"><value>Please enter your address</value></data>
   <data name="PasswordTooLong" xml:space="preserve"><value>Password cannot exceed 100 characters</value></data>
   <data name="ProductNameRequired" xml:space="preserve"><value>Please enter a product name</value></data>
   <data name="PriceRequired" xml:space="preserve"><value>Please enter a price</value></data>
   <data name="PriceInvalid" xml:space="preserve"><value>Price cannot be negative</value></data>
+  <data name="ShippingFeeAmountInvalid" xml:space="preserve"><value>Shipping fee cannot be negative</value></data>
   <data name="OriginalPriceInvalid" xml:space="preserve"><value>Original price cannot be negative</value></data>
   <data name="StockRequired" xml:space="preserve"><value>Please enter the stock quantity</value></data>
   <data name="StockInvalid" xml:space="preserve"><value>Stock cannot be negative</value></data>
@@ -408,7 +413,7 @@
   <data name="ParamValueRequired" xml:space="preserve"><value>Please enter a parameter value</value></data>
   <data name="ColorRequired" xml:space="preserve"><value>Please enter a color</value></data>
   <data name="SpecRequired" xml:space="preserve"><value>Please enter a spec</value></data>
-  <data name="CouponCodeRequired" xml:space="preserve"><value>Please enter a coupon code</value></data>
+  <data name="CouponNameRequired" xml:space="preserve"><value>Please enter a coupon name</value></data>
   <data name="CouponValueInvalid" xml:space="preserve"><value>Coupon value must be greater than 0</value></data>
   <data name="MinOrderAmountInvalid" xml:space="preserve"><value>Minimum order amount cannot be negative</value></data>
   <data name="UsageLimitInvalid" xml:space="preserve"><value>Usage limit must be at least 1</value></data>
@@ -422,8 +427,6 @@
   <data name="PhoneRequired" xml:space="preserve"><value>Please enter a phone number</value></data>
   <data name="PhoneFormatInvalid" xml:space="preserve"><value>Invalid phone number format</value></data>
   <data name="RegisterSuccess" xml:space="preserve"><value>Registration successful. Welcome!</value></data>
-  <data name="EmailOrPasswordIncorrect" xml:space="preserve"><value>Incorrect email or password.</value></data>
-  <data name="NotAdmin" xml:space="preserve"><value>This account does not have admin privileges.</value></data>
   <data name="OrderCancelled" xml:space="preserve"><value>Order cancelled.</value></data>
   <data name="OrderCancelFailed" xml:space="preserve"><value>Cancellation failed: the order cannot be cancelled in its current state.</value></data>
   <data name="ShopCreated" xml:space="preserve"><value>Shop created.</value></data>
@@ -444,7 +447,7 @@
   <data name="CouponUpdated" xml:space="preserve"><value>Coupon updated.</value></data>
   <data name="CouponDeleted" xml:space="preserve"><value>Coupon deleted.</value></data>
   <data name="CouponDeleteFailed" xml:space="preserve"><value>Cannot delete: coupon not found.</value></data>
-  <data name="CouponCodeExists" xml:space="preserve"><value>Coupon code already exists.</value></data>
+  <data name="CouponCodeExists" xml:space="preserve"><value>Could not create the coupon. Please try again.</value></data>
   <data name="CategoryCreated" xml:space="preserve"><value>Category created.</value></data>
   <data name="CategoryUpdated" xml:space="preserve"><value>Category updated.</value></data>
   <data name="CategoryDeleted" xml:space="preserve"><value>Category deleted.</value></data>
@@ -457,13 +460,13 @@
   <data name="OrderCancelFailedAdmin" xml:space="preserve"><value>Operation failed: the order cannot be cancelled in its current state.</value></data>
   <data name="OrderRefunded" xml:space="preserve"><value>Order refunded and stock restored.</value></data>
   <data name="OrderRefundFailed" xml:space="preserve"><value>Operation failed: the order cannot be refunded in its current state.</value></data>
-  <data name="CouponNotFound" xml:space="preserve"><value>Coupon code does not exist.</value></data>
-  <data name="CouponDisabled" xml:space="preserve"><value>Coupon code is disabled.</value></data>
-  <data name="CouponNotStarted" xml:space="preserve"><value>Coupon code is not active yet.</value></data>
-  <data name="CouponExpired" xml:space="preserve"><value>Coupon code has expired.</value></data>
-  <data name="CouponUsageLimit" xml:space="preserve"><value>Coupon code has reached its usage limit.</value></data>
+  <data name="CouponNotFound" xml:space="preserve"><value>Coupon does not exist.</value></data>
+  <data name="CouponDisabled" xml:space="preserve"><value>Coupon is disabled.</value></data>
+  <data name="CouponNotStarted" xml:space="preserve"><value>Coupon is not active yet.</value></data>
+  <data name="CouponExpired" xml:space="preserve"><value>Coupon has expired.</value></data>
+  <data name="CouponUsageLimit" xml:space="preserve"><value>Coupon has reached its usage limit.</value></data>
   <data name="CouponMinOrder" xml:space="preserve"><value>Order total must be at least ¥{0} to use this coupon.</value></data>
-  <data name="CouponUnavailable" xml:space="preserve"><value>Coupon code is not available.</value></data>
+  <data name="CouponUnavailable" xml:space="preserve"><value>Coupon is not available.</value></data>
   <data name="VerificationCodeTooFrequent" xml:space="preserve"><value>Verification code sent too frequently. Try again later.</value></data>
   <data name="UnsupportedImageFormat" xml:space="preserve"><value>Unsupported image format: {0}. Only jpg / png / webp / gif are supported.</value></data>
   <data name="ImageEmpty" xml:space="preserve"><value>The image file is empty.</value></data>
@@ -479,7 +482,6 @@
   <data name="ShippingFromPlaceholder" xml:space="preserve"><value>e.g. Shenzhen, Guangdong</value></data>
   <data name="ShippingFeePlaceholder" xml:space="preserve"><value>e.g. Free shipping / ¥8</value></data>
   <data name="DeliveryTimePlaceholder" xml:space="preserve"><value>e.g. Ships within 48 hours</value></data>
-  <data name="CouponCodePlaceholder" xml:space="preserve"><value>e.g. SAVE20</value></data>
   <data name="SkuColorPlaceholder" xml:space="preserve"><value>e.g. Army green</value></data>
   <data name="SkuSpecPlaceholder" xml:space="preserve"><value>e.g. 3-4 persons</value></data>
   <data name="SpecNamePlaceholder" xml:space="preserve"><value>e.g. Material</value></data>
@@ -495,4 +497,70 @@
   <data name="ShippingFromEn" xml:space="preserve"><value>Ships from (English)</value></data>
   <data name="ShippingFeeEn" xml:space="preserve"><value>Shipping fee (English)</value></data>
   <data name="DeliveryTimeEn" xml:space="preserve"><value>Delivery time (English)</value></data>
+  <data name="CheckoutCartUnavailable" xml:space="preserve"><value>A product or variant in your cart is no longer available. Please update your cart.</value></data>
+  <data name="CheckoutPriceChanged" xml:space="preserve"><value>A product price has changed. Please review the latest price in your cart before ordering.</value></data>
+  <data name="CheckoutStockUnavailable" xml:space="preserve"><value>There is not enough stock for this order. Please update the quantities in your cart.</value></data>
+  <data name="CheckoutRetry" xml:space="preserve"><value>Stock or order status has just changed. Please refresh and try again.</value></data>
+  <data name="CheckoutQuantityInvalid" xml:space="preserve"><value>A purchase quantity is invalid. Please update your cart.</value></data>
+  <data name="CartUnavailable" xml:space="preserve"><value>The product or variant is unavailable, stock is insufficient, or the quantity is invalid. Please check your selection.</value></data>
+  <data name="MaxDiscountAmount" xml:space="preserve"><value>Maximum discount</value></data>
+  <data name="MaxDiscountAmountHint" xml:space="preserve"><value>Leave blank for no cap. Recommended for percentage coupons.</value></data>
+  <data name="MaxDiscountAmountInvalid" xml:space="preserve"><value>Maximum discount cannot be negative.</value></data>
+  <data name="PerUserLimit" xml:space="preserve"><value>Uses per customer</value></data>
+  <data name="PerUserLimitInvalid" xml:space="preserve"><value>Uses per customer must be at least 1.</value></data>
+  <data name="FirstOrderOnly" xml:space="preserve"><value>First order only</value></data>
+  <data name="ExcludeDiscountedItems" xml:space="preserve"><value>Exclude discounted items</value></data>
+  <data name="CouponScope" xml:space="preserve"><value>Eligibility</value></data>
+  <data name="ScopeAllProducts" xml:space="preserve"><value>All products</value></data>
+  <data name="ScopeCategories" xml:space="preserve"><value>Selected categories</value></data>
+  <data name="ScopeProducts" xml:space="preserve"><value>Selected products</value></data>
+  <data name="CouponCampaign" xml:space="preserve"><value>Campaign / note</value></data>
+  <data name="CouponCampaignPlaceholder" xml:space="preserve"><value>e.g. Autumn members offer</value></data>
+  <data name="FreeShippingDiscount" xml:space="preserve"><value>Free shipping</value></data>
+  <data name="CouponScheduled" xml:space="preserve"><value>Scheduled</value></data>
+  <data name="CouponExhausted" xml:space="preserve"><value>Exhausted</value></data>
+  <data name="CouponPerUserLimit" xml:space="preserve"><value>You have reached the per-customer limit for this coupon.</value></data>
+  <data name="CouponFirstOrderOnly" xml:space="preserve"><value>This coupon is only available on a first order.</value></data>
+  <data name="CouponItemsNotEligible" xml:space="preserve"><value>Your cart does not contain any eligible items for this coupon.</value></data>
+  <data name="CouponPercentRange" xml:space="preserve"><value>Percentage discounts must be between 0 and 100.</value></data>
+  <data name="CouponDatesInvalid" xml:space="preserve"><value>The end date cannot be earlier than the start date.</value></data>
+  <data name="CouponCategoryRequired" xml:space="preserve"><value>Select at least one eligible category.</value></data>
+  <data name="CouponProductRequired" xml:space="preserve"><value>Select at least one eligible product.</value></data>
+  <data name="CouponBatchQuantityInvalid" xml:space="preserve"><value>Create between 1 and 50 coupons at a time.</value></data>
+  <data name="CouponBatchFailed" xml:space="preserve"><value>Batch generation failed. Check your input and try again.</value></data>
+  <data name="CouponBatchCreated" xml:space="preserve"><value>{0} coupons created.</value></data>
+  <data name="ExportCoupons" xml:space="preserve"><value>Export CSV</value></data>
+  <data name="BatchGenerate" xml:space="preserve"><value>Generate batch</value></data>
+  <data name="BatchGenerateHint" xml:space="preserve"><value>Copy every rule from this coupon and create up to 50 coupons in the same campaign.</value></data>
+  <data name="BatchQuantity" xml:space="preserve"><value>Number of codes</value></data>
+  <data name="BatchGenerateAction" xml:space="preserve"><value>Create coupons</value></data>
+  <data name="CouponMinOrderShort" xml:space="preserve"><value>Min. ¥{0}</value></data>
+  <data name="CouponMaxDiscountShort" xml:space="preserve"><value>Max. ¥{0} off</value></data>
+  <data name="PerUserUsageShort" xml:space="preserve"><value>{0} use(s) per customer</value></data>
+  <data name="AvailableCoupons" xml:space="preserve"><value>Available for this order</value></data>
+  <data name="BestCouponHint" xml:space="preserve"><value>The best available option is pre-selected</value></data>
+  <data name="BestCoupon" xml:space="preserve"><value>Best value</value></data>
+  <data name="PercentCouponBenefit" xml:space="preserve"><value>{0}% off</value></data>
+  <data name="FixedCouponBenefit" xml:space="preserve"><value>¥{0} off</value></data>
+  <data name="CouponSavings" xml:space="preserve"><value>Save ¥{0} on this order</value></data>
+  <data name="CouponEnds" xml:space="preserve"><value>Valid through {0}</value></data>
+  <data name="RemoveCoupon" xml:space="preserve"><value>Don't use a coupon</value></data>
+  <data name="CouponApplied" xml:space="preserve"><value>Coupon applied</value></data>
+  <data name="CouponBenefit" xml:space="preserve"><value>Coupon benefit</value></data>
+  <data name="MyCoupons" xml:space="preserve"><value>My Coupons</value></data>
+  <data name="MyCouponsHint" xml:space="preserve"><value>Review available store coupons, eligibility and expiry, then choose one directly at checkout.</value></data>
+  <data name="NoMyCoupons" xml:space="preserve"><value>No coupons yet</value></data>
+  <data name="NoMyCouponsHint" xml:space="preserve"><value>New member offers and limited-time promotions will appear here.</value></data>
+  <data name="CouponStatusAvailable" xml:space="preserve"><value>Available</value></data>
+  <data name="CouponStatusUsed" xml:space="preserve"><value>Used up</value></data>
+  <data name="CouponRemainingUses" xml:space="preserve"><value>{0} use(s) remaining</value></data>
+  <data name="UseCoupon" xml:space="preserve"><value>Use coupon</value></data>
+  <data name="ViewMyCoupons" xml:space="preserve"><value>My Coupons</value></data>
+  <data name="AvailableCouponCount" xml:space="preserve"><value>{0} available</value></data>
+  <data name="NoAvailableCoupons" xml:space="preserve"><value>No coupons are available for this order.</value></data>
+  <data name="Coupon" xml:space="preserve"><value>Coupon</value></data>
+  <data name="ShopLogo" xml:space="preserve"><value>Shop logo</value></data>
+  <data name="ShopLogoPasteHint" xml:space="preserve"><value>Choose an image or press Ctrl+V to paste a logo</value></data>
+  <data name="ShopLogoHint" xml:space="preserve"><value>Square images work best. JPG, PNG, WebP or GIF, up to 5 MB.</value></data>
+  <data name="ChooseImage" xml:space="preserve"><value>Choose image</value></data>
 </root>

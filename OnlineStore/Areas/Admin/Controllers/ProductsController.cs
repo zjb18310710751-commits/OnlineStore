@@ -85,12 +85,12 @@ public class ProductsController : Controller
             ShippingFromEn = vm.ShippingFromEn,
             ShippingFee = vm.ShippingFee,
             ShippingFeeEn = vm.ShippingFeeEn,
+            ShippingFeeAmount = vm.ShippingFeeAmount,
             DeliveryTime = vm.DeliveryTime,
             DeliveryTimeEn = vm.DeliveryTimeEn,
             DetailHtml = vm.DetailHtml
         };
 
-        // 若上传了图片，则覆盖表单中的图片地址
         if (vm.ImageFile is { Length: > 0 })
         {
             try
@@ -140,6 +140,7 @@ public class ProductsController : Controller
             ShippingFromEn = product.ShippingFromEn,
             ShippingFee = product.ShippingFee,
             ShippingFeeEn = product.ShippingFeeEn,
+            ShippingFeeAmount = product.ShippingFeeAmount,
             DeliveryTime = product.DeliveryTime,
             DeliveryTimeEn = product.DeliveryTimeEn,
             DetailHtml = product.DetailHtml
@@ -186,18 +187,16 @@ public class ProductsController : Controller
         product.ShippingFromEn = vm.ShippingFromEn;
         product.ShippingFee = vm.ShippingFee;
         product.ShippingFeeEn = vm.ShippingFeeEn;
+        product.ShippingFeeAmount = vm.ShippingFeeAmount;
         product.DeliveryTime = vm.DeliveryTime;
         product.DeliveryTimeEn = vm.DeliveryTimeEn;
         product.DetailHtml = vm.DetailHtml;
 
-        // 若上传了新图片，保存成功后清理被替换的旧本地图片
         if (vm.ImageFile is { Length: > 0 })
         {
-            var previousImageUrl = product.ImageUrl;
             try
             {
                 product.ImageUrl = await _imageStorage.SaveAsync(vm.ImageFile);
-                _imageStorage.Delete(previousImageUrl);
             }
             catch (InvalidOperationException ex)
             {

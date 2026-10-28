@@ -1,30 +1,46 @@
 using OnlineStore.Models;
+using OnlineStore.ViewModels;
 
 namespace OnlineStore.Services;
 
-/// <summary>订单业务抽象。</summary>
 public interface IOrderService
 {
     Task<Order?> GetByIdAsync(int id);
 
     Task<IReadOnlyList<Order>> GetByUserAsync(string userId);
 
-    /// <summary>后台订单列表（含明细，按时间倒序）。</summary>
     Task<IReadOnlyList<Order>> GetAllAsync();
+    Task<PagedResult<Order>> GetAdminOrdersPagedAsync(int page, int pageSize);
 
     Task<Order> CreateAsync(Order order);
 
-    /// <summary>取消订单（待发货→已取消，恢复库存）。</summary>
     Task<bool> CancelAsync(int id);
 
-    /// <summary>退款（已发货/已完成→已退款，恢复库存）。</summary>
     Task<bool> RefundAsync(int id);
 
-    /// <summary>发货（待发货→已发货）。</summary>
-    Task<bool> ShipAsync(int id);
+    Task<bool> ShipAsync(int id, string? carrier, string? trackingNumber);
 
-    /// <summary>完成（已发货→已完成）。</summary>
     Task<bool> CompleteAsync(int id);
+
+    Task<OrderTrackingView?> GetTrackingAsync(int id);
+
+    Task<bool> ConfirmReceiptAsync(int id, string userId);
+
+    Task<int> GetDeliveredItemCountAsync(string userId);
+
+    Task<bool> DeleteForUserAsync(int id, string userId);
+
+    Task<AfterSalesRequest> CreateAfterSalesAsync(int orderId, string userId, string type, string reason);
+
+    Task<IReadOnlyList<AfterSalesRequest>> GetAfterSalesAllAsync();
+    Task<PagedResult<AfterSalesRequest>> GetAfterSalesPagedAsync(int page, int pageSize);
+    Task<int> CountPendingAfterSalesAsync();
+
+    Task<bool> ReviewAfterSalesAsync(int id, bool approved, string? note);
+
+    Task<bool> MarkAfterSalesReceivedAsync(int id);
+
+    Task<bool> CompleteAfterSalesAsync(int id);
 
     Task<int> CountAsync();
 }

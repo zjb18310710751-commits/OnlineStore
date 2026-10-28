@@ -2,7 +2,6 @@ using System.ComponentModel.DataAnnotations;
 
 namespace OnlineStore.Models;
 
-/// <summary>店铺：多个商品归属于同一店铺，展示店名、评分与销量。</summary>
 public class Shop
 {
     public int Id { get; set; }
@@ -30,6 +29,10 @@ public class Shop
     [StringLength(500)]
     [Display(Name = "店铺简介（英文）")]
     public string? DescriptionEn { get; set; }
+
+    [StringLength(500)]
+    [Display(Name = "店铺 Logo")]
+    public string? LogoUrl { get; set; }
 
     public ICollection<Product> Products { get; set; } = new List<Product>();
 }

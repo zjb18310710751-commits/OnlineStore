@@ -22,6 +22,36 @@ namespace OnlineStore.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("CouponCategory", b =>
+                {
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CouponId")
+                        .HasColumnType("int");
+
+                    b.HasKey("CategoryId", "CouponId");
+
+                    b.HasIndex("CouponId");
+
+                    b.ToTable("CouponCategory");
+                });
+
+            modelBuilder.Entity("CouponProduct", b =>
+                {
+                    b.Property<int>("CouponId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.HasKey("CouponId", "ProductId");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("CouponProduct");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
                     b.Property<string>("Id")
@@ -155,6 +185,67 @@ namespace OnlineStore.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("OnlineStore.Models.AfterSalesRequest", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AdminNote")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<DateTime?>("CompletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("OrderId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Reason")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<DateTime?>("ReceivedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("RequestedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("ReviewedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Status")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrderId")
+                        .IsUnique()
+                        .HasFilter("[Status] <> N'已拒绝'");
+
+                    b.HasIndex("Status");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AfterSalesRequests");
+                });
+
             modelBuilder.Entity("OnlineStore.Models.ApplicationUser", b =>
                 {
                     b.Property<string>("Id")
@@ -286,6 +377,10 @@ namespace OnlineStore.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("CampaignName")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
                     b.Property<string>("Code")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -295,27 +390,58 @@ namespace OnlineStore.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<int>("DiscountType")
+                        .IsConcurrencyToken()
                         .HasColumnType("int");
 
                     b.Property<double>("DiscountValue")
+                        .IsConcurrencyToken()
                         .HasColumnType("float");
 
                     b.Property<DateTime>("EndDate")
+                        .IsConcurrencyToken()
                         .HasColumnType("datetime2");
 
-                    b.Property<bool>("IsActive")
+                    b.Property<bool>("ExcludeDiscountedItems")
+                        .IsConcurrencyToken()
                         .HasColumnType("bit");
 
-                    b.Property<double?>("MinOrderAmount")
+                    b.Property<bool>("FirstOrderOnly")
+                        .IsConcurrencyToken()
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsActive")
+                        .IsConcurrencyToken()
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<double?>("MaxDiscountAmount")
+                        .IsConcurrencyToken()
                         .HasColumnType("float");
 
+                    b.Property<double?>("MinOrderAmount")
+                        .IsConcurrencyToken()
+                        .HasColumnType("float");
+
+                    b.Property<int?>("PerUserLimit")
+                        .IsConcurrencyToken()
+                        .HasColumnType("int");
+
+                    b.Property<int>("Scope")
+                        .IsConcurrencyToken()
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("StartDate")
+                        .IsConcurrencyToken()
                         .HasColumnType("datetime2");
 
                     b.Property<int?>("UsageLimit")
+                        .IsConcurrencyToken()
                         .HasColumnType("int");
 
                     b.Property<int>("UsedCount")
+                        .IsConcurrencyToken()
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -324,6 +450,54 @@ namespace OnlineStore.Migrations
                         .IsUnique();
 
                     b.ToTable("Coupons");
+                });
+
+            modelBuilder.Entity("OnlineStore.Models.CouponRedemption", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<int>("CouponId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<double>("DiscountAmount")
+                        .HasColumnType("float");
+
+                    b.Property<int>("OrderId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("ReleasedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("ShippingWaived")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrderId")
+                        .IsUnique();
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("CouponId", "UserId", "ReleasedAt");
+
+                    b.ToTable("CouponRedemptions");
                 });
 
             modelBuilder.Entity("OnlineStore.Models.DeliveryAddress", b =>
@@ -450,6 +624,71 @@ namespace OnlineStore.Migrations
                     b.ToTable("Favorites");
                 });
 
+            modelBuilder.Entity("OnlineStore.Models.HeroSlide", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(240)
+                        .HasColumnType("nvarchar(240)");
+
+                    b.Property<string>("DescriptionEn")
+                        .HasMaxLength(240)
+                        .HasColumnType("nvarchar(240)");
+
+                    b.Property<int>("DisplayOrder")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Heading")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("nvarchar(120)");
+
+                    b.Property<string>("HeadingEn")
+                        .HasMaxLength(120)
+                        .HasColumnType("nvarchar(120)");
+
+                    b.Property<string>("ImageAlt")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("ImageAltEn")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("ImageUrl")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("LinkUrl")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("TitleEn")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IsActive", "DisplayOrder");
+
+                    b.ToTable("HeroSlides");
+                });
+
             modelBuilder.Entity("OnlineStore.Models.Order", b =>
                 {
                     b.Property<int>("Id")
@@ -462,32 +701,103 @@ namespace OnlineStore.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
+                    b.Property<string>("Carrier")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
                     b.Property<string>("CouponCode")
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<string>("CouponName")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
                     b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DeliveredAt")
                         .HasColumnType("datetime2");
 
                     b.Property<double>("DiscountAmount")
                         .HasColumnType("float");
+
+                    b.Property<string>("DispatchTimeText")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("DispatchTimeTextEn")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime?>("ExpectedDispatchAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("InventoryRestoredAt")
+                        .IsConcurrencyToken()
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("OrderNo")
                         .IsRequired()
                         .HasMaxLength(30)
                         .HasColumnType("nvarchar(30)");
 
+                    b.Property<string>("OrderNotes")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("PaymentMethod")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
                     b.Property<string>("Phone")
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
+                    b.Property<int?>("ReplacementForOrderId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("ShippedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<double>("ShippingAmount")
+                        .HasColumnType("float");
+
+                    b.Property<string>("ShippingFeeText")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("ShippingFeeTextEn")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("ShippingOrigin")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("ShippingOriginEn")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<DateTime?>("SignedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Status")
+                        .IsConcurrencyToken()
                         .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
                     b.Property<double>("Total")
                         .HasColumnType("float");
+
+                    b.Property<string>("TrackingNumber")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime?>("UserDeletedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("UserId")
                         .HasColumnType("nvarchar(450)");
@@ -498,6 +808,11 @@ namespace OnlineStore.Migrations
                         .HasColumnType("nvarchar(50)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("OrderNo")
+                        .IsUnique();
+
+                    b.HasIndex("ReplacementForOrderId");
 
                     b.HasIndex("UserId");
 
@@ -539,6 +854,9 @@ namespace OnlineStore.Migrations
                         .HasColumnType("nvarchar(150)");
 
                     b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("SkuId")
                         .HasColumnType("int");
 
                     b.Property<string>("Spec")
@@ -596,6 +914,7 @@ namespace OnlineStore.Migrations
                         .HasColumnType("nvarchar(500)");
 
                     b.Property<bool>("IsActive")
+                        .IsConcurrencyToken()
                         .HasColumnType("bit");
 
                     b.Property<string>("Name")
@@ -611,11 +930,15 @@ namespace OnlineStore.Migrations
                         .HasColumnType("float");
 
                     b.Property<double>("Price")
+                        .IsConcurrencyToken()
                         .HasColumnType("float");
 
                     b.Property<string>("ShippingFee")
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
+
+                    b.Property<double>("ShippingFeeAmount")
+                        .HasColumnType("float");
 
                     b.Property<string>("ShippingFeeEn")
                         .HasMaxLength(50)
@@ -642,6 +965,7 @@ namespace OnlineStore.Migrations
                         .HasColumnType("nvarchar(150)");
 
                     b.Property<int>("Stock")
+                        .IsConcurrencyToken()
                         .HasColumnType("int");
 
                     b.Property<DateTime>("UpdatedAt")
@@ -706,12 +1030,15 @@ namespace OnlineStore.Migrations
                         .HasColumnType("nvarchar(500)");
 
                     b.Property<bool>("IsActive")
+                        .IsConcurrencyToken()
                         .HasColumnType("bit");
 
                     b.Property<double>("Price")
+                        .IsConcurrencyToken()
                         .HasColumnType("float");
 
                     b.Property<int>("ProductId")
+                        .IsConcurrencyToken()
                         .HasColumnType("int");
 
                     b.Property<string>("Spec")
@@ -724,6 +1051,7 @@ namespace OnlineStore.Migrations
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<int>("Stock")
+                        .IsConcurrencyToken()
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -795,6 +1123,9 @@ namespace OnlineStore.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
+                    b.Property<int?>("OrderId")
+                        .HasColumnType("int");
+
                     b.Property<int>("ProductId")
                         .HasColumnType("int");
 
@@ -802,7 +1133,7 @@ namespace OnlineStore.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("UserName")
                         .IsRequired()
@@ -816,6 +1147,10 @@ namespace OnlineStore.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("ProductId");
+
+                    b.HasIndex("OrderId", "ProductId", "UserId")
+                        .IsUnique()
+                        .HasFilter("[OrderId] IS NOT NULL");
 
                     b.ToTable("Reviews");
                 });
@@ -833,6 +1168,10 @@ namespace OnlineStore.Migrations
                         .HasColumnType("nvarchar(500)");
 
                     b.Property<string>("DescriptionEn")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("LogoUrl")
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
@@ -871,6 +1210,36 @@ namespace OnlineStore.Migrations
                     b.HasIndex("ProductId");
 
                     b.ToTable("ProductCategory");
+                });
+
+            modelBuilder.Entity("CouponCategory", b =>
+                {
+                    b.HasOne("OnlineStore.Models.Category", null)
+                        .WithMany()
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("OnlineStore.Models.Coupon", null)
+                        .WithMany()
+                        .HasForeignKey("CouponId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("CouponProduct", b =>
+                {
+                    b.HasOne("OnlineStore.Models.Coupon", null)
+                        .WithMany()
+                        .HasForeignKey("CouponId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("OnlineStore.Models.Product", null)
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -924,6 +1293,36 @@ namespace OnlineStore.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("OnlineStore.Models.AfterSalesRequest", b =>
+                {
+                    b.HasOne("OnlineStore.Models.Order", "Order")
+                        .WithMany("AfterSalesRequests")
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Order");
+                });
+
+            modelBuilder.Entity("OnlineStore.Models.CouponRedemption", b =>
+                {
+                    b.HasOne("OnlineStore.Models.Coupon", "Coupon")
+                        .WithMany("Redemptions")
+                        .HasForeignKey("CouponId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("OnlineStore.Models.Order", "Order")
+                        .WithMany()
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Coupon");
+
+                    b.Navigation("Order");
+                });
+
             modelBuilder.Entity("OnlineStore.Models.DeliveryAddress", b =>
                 {
                     b.HasOne("OnlineStore.Models.ApplicationUser", "User")
@@ -946,9 +1345,12 @@ namespace OnlineStore.Migrations
                     b.Navigation("Product");
                 });
 
-            modelBuilder.Entity("OnlineStore.Models.ApplicationUser", b =>
+            modelBuilder.Entity("OnlineStore.Models.Order", b =>
                 {
-                    b.Navigation("DeliveryAddresses");
+                    b.HasOne("OnlineStore.Models.Order", null)
+                        .WithMany()
+                        .HasForeignKey("ReplacementForOrderId")
+                        .OnDelete(DeleteBehavior.Restrict);
                 });
 
             modelBuilder.Entity("OnlineStore.Models.OrderItem", b =>
@@ -1008,11 +1410,18 @@ namespace OnlineStore.Migrations
 
             modelBuilder.Entity("OnlineStore.Models.Review", b =>
                 {
+                    b.HasOne("OnlineStore.Models.Order", "Order")
+                        .WithMany()
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.HasOne("OnlineStore.Models.Product", "Product")
                         .WithMany("Reviews")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Order");
 
                     b.Navigation("Product");
                 });
@@ -1032,8 +1441,20 @@ namespace OnlineStore.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("OnlineStore.Models.ApplicationUser", b =>
+                {
+                    b.Navigation("DeliveryAddresses");
+                });
+
+            modelBuilder.Entity("OnlineStore.Models.Coupon", b =>
+                {
+                    b.Navigation("Redemptions");
+                });
+
             modelBuilder.Entity("OnlineStore.Models.Order", b =>
                 {
+                    b.Navigation("AfterSalesRequests");
+
                     b.Navigation("Items");
                 });
 

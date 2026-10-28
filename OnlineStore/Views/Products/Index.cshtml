@@ -2,156 +2,171 @@
 @{
     ViewData["Title"] = Loc["AllProducts"].Value;
     var q = Model.Query;
+    var selectedCategory = Model.Categories.FirstOrDefault(c => c.Id == q.CategoryId);
+    var catalogTitle = selectedCategory is null ? Loc["AllProducts"].Value : L10n.Name(selectedCategory);
+    var routeValues = new Dictionary<string, string>
+    {
+        ["searchTerm"] = q.SearchTerm ?? "",
+        ["shopId"] = q.ShopId?.ToString() ?? "",
+        ["minPrice"] = q.MinPrice?.ToString(CultureInfo.InvariantCulture) ?? "",
+        ["maxPrice"] = q.MaxPrice?.ToString(CultureInfo.InvariantCulture) ?? "",
+        ["minRating"] = q.MinRating?.ToString(CultureInfo.InvariantCulture) ?? "",
+        ["inStockOnly"] = q.InStockOnly ? "true" : "",
+        ["sortBy"] = q.SortBy ?? "newest"
+    };
 }
-<div class="container py-4">
-    <div class="row">
-        <aside class="col-lg-3 mb-4">
-            <div class="card shadow-sm mb-3">
-                <div class="card-header fw-semibold">@Loc["Categories"]</div>
-                <div class="list-group list-group-flush">
-                    <a class="list-group-item list-group-item-action @(q.CategoryId is null ? "active" : "")"
-                       asp-controller="Products" asp-action="Index"
-                       asp-route-searchTerm="@q.SearchTerm"
-                       asp-route-shopId="@q.ShopId"
-                       asp-route-minPrice="@q.MinPrice"
-                       asp-route-maxPrice="@q.MaxPrice"
-                       asp-route-minRating="@q.MinRating"
-                       asp-route-inStockOnly="@(q.InStockOnly ? "true" : null)"
-                       asp-route-sortBy="@q.SortBy">@Loc["All"]</a>
-                    @foreach (var c in Model.Categories)
+<div class="sf-container sf-catalog" data-catalog>
+    <div class="sf-catalog-intro">
+        <div class="sf-catalog-toolbar">
+            <h1>@catalogTitle <span>(@Model.TotalItems)</span></h1>
+            <div class="sf-catalog-tools">
+                <button class="sf-filter-toggle" type="button" hidden data-filter-toggle
+                        aria-controls="catalogFilters" aria-expanded="true"
+                        data-show-label="@L10n.Text("显示筛选", "Show filters")"
+                        data-hide-label="@L10n.Text("隐藏筛选", "Hide filters")">
+                    <span data-filter-label>@L10n.Text("隐藏筛选", "Hide filters")</span>
+                    <i class="bi bi-sliders2" aria-hidden="true"></i>
+                </button>
+                <form class="sf-sort-form" method="get" asp-controller="Products" asp-action="Index" data-sort-form>
+                    <input type="hidden" name="categoryId" value="@q.CategoryId" />
+                    <input type="hidden" name="searchTerm" value="@q.SearchTerm" />
+                    <input type="hidden" name="shopId" value="@q.ShopId" />
+                    <input type="hidden" name="minPrice" value="@q.MinPrice?.ToString(CultureInfo.InvariantCulture)" />
+                    <input type="hidden" name="maxPrice" value="@q.MaxPrice?.ToString(CultureInfo.InvariantCulture)" />
+                    <input type="hidden" name="minRating" value="@q.MinRating?.ToString(CultureInfo.InvariantCulture)" />
+                    @if (q.InStockOnly)
                     {
-                        <a class="list-group-item list-group-item-action @(q.CategoryId == c.Id ? "active" : "")"
-                           asp-controller="Products" asp-action="Index"
-                           asp-route-categoryId="@c.Id"
-                           asp-route-searchTerm="@q.SearchTerm"
-                           asp-route-shopId="@q.ShopId"
-                           asp-route-minPrice="@q.MinPrice"
-                           asp-route-maxPrice="@q.MaxPrice"
-                           asp-route-minRating="@q.MinRating"
-                           asp-route-inStockOnly="@(q.InStockOnly ? "true" : null)"
-                           asp-route-sortBy="@q.SortBy">@L10n.Name(c)</a>
+                        <input type="hidden" name="inStockOnly" value="true" />
                     }
-                </div>
+                    <label for="catalogSort">@Loc["SortBy"]</label>
+                    <select id="catalogSort" name="sortBy" data-sort-select>
+                        <option value="newest" selected="@(q.SortBy == "newest" || string.IsNullOrWhiteSpace(q.SortBy))">@Loc["SortNewest"]</option>
+                        <option value="price_asc" selected="@(q.SortBy == "price_asc")">@Loc["SortPriceAsc"]</option>
+                        <option value="price_desc" selected="@(q.SortBy == "price_desc")">@Loc["SortPriceDesc"]</option>
+                        <option value="name" selected="@(q.SortBy == "name")">@Loc["SortName"]</option>
+                    </select>
+                    <button class="sf-sort-apply" type="submit" data-sort-apply>@Loc["ApplyFilters"]</button>
+                </form>
             </div>
+        </div>
+        @if (!string.IsNullOrWhiteSpace(q.SearchTerm))
+        {
+            <p class="sf-search-summary">@L10n.Text("搜索结果：", "Results for:") <strong>@q.SearchTerm</strong></p>
+        }
+    </div>
 
-            <div class="card catalog-filter-card">
-                <div class="card-body">
-                    <form method="get" asp-controller="Products" asp-action="Index">
-                        <input type="hidden" name="categoryId" value="@q.CategoryId" />
-                        <input type="hidden" name="searchTerm" value="@q.SearchTerm" />
+    <div class="sf-catalog-layout" data-catalog-layout>
+        <aside id="catalogFilters" class="sf-catalog-sidebar" aria-label="@Loc["Filter"]">
+            <nav class="sf-catalog-categories" aria-label="@Loc["Categories"]">
+                <h2>@Loc["Categories"]</h2>
+                <a class="@(q.CategoryId is null ? "is-active" : "")"
+                   aria-current="@(q.CategoryId is null ? "page" : null)"
+                   asp-controller="Products" asp-action="Index" asp-all-route-data="routeValues">@Loc["All"]</a>
+                @foreach (var category in Model.Categories)
+                {
+                    <a class="@(q.CategoryId == category.Id ? "is-active" : "")"
+                       aria-current="@(q.CategoryId == category.Id ? "page" : null)"
+                       asp-controller="Products" asp-action="Index" asp-all-route-data="routeValues"
+                       asp-route-categoryId="@category.Id">@L10n.Name(category)</a>
+                }
+            </nav>
+            <form class="sf-filter-form" method="get" asp-controller="Products" asp-action="Index">
+                <input type="hidden" name="categoryId" value="@q.CategoryId" />
+                <input type="hidden" name="searchTerm" value="@q.SearchTerm" />
+                <input type="hidden" name="sortBy" value="@(q.SortBy ?? "newest")" />
 
-                        <div class="catalog-filter-heading">
-                            <h2 class="catalog-filter-title">@Loc["Filter"]</h2>
-                            @if (q.HasActiveFilters)
-                            {
-                                <a asp-controller="Products" asp-action="Index" class="catalog-filter-clear">@Loc["ClearFilters"]</a>
-                            }
-                        </div>
-
-                        <div class="catalog-filter-group">
-                            <label class="catalog-filter-label" for="filterShop">@Loc["BrandFilter"]</label>
-                            <select id="filterShop" name="shopId" class="form-select catalog-filter-control">
-                                <option value="" selected="@(!q.ShopId.HasValue)">@Loc["AllBrands"]</option>
-                                @foreach (var brand in Model.Brands)
-                                {
-                                    <option value="@brand.Id" selected="@(q.ShopId == brand.Id)">@L10n.Name(brand)</option>
-                                }
-                            </select>
-                        </div>
-
-                        <div class="catalog-filter-group">
-                            <span class="catalog-filter-label">@Loc["PriceRange"]</span>
-                            <div class="catalog-price-row">
-                                <label class="visually-hidden" for="filterMinPrice">@Loc["MinPrice"]</label>
-                                <input id="filterMinPrice" type="number" name="minPrice" inputmode="decimal"
-                                       class="form-control catalog-filter-control" min="0" step="0.01"
-                                       placeholder="@Loc["MinPrice"]" value="@q.MinPrice" />
-                                <span class="catalog-price-separator" aria-hidden="true">—</span>
-                                <label class="visually-hidden" for="filterMaxPrice">@Loc["MaxPrice"]</label>
-                                <input id="filterMaxPrice" type="number" name="maxPrice" inputmode="decimal"
-                                       class="form-control catalog-filter-control" min="0" step="0.01"
-                                       placeholder="@Loc["MaxPrice"]" value="@q.MaxPrice" />
-                            </div>
-                        </div>
-
-                        <div class="catalog-filter-group">
-                            <label class="catalog-filter-label" for="filterRating">@Loc["MinRating"]</label>
-                            <select id="filterRating" name="minRating" class="form-select catalog-filter-control">
-                                <option value="" selected="@(!q.MinRating.HasValue)">@Loc["NoRatingLimit"]</option>
-                                <option value="3" selected="@(q.MinRating == 3)">@Loc["RatingStars", 3]</option>
-                                <option value="4" selected="@(q.MinRating == 4)">@Loc["RatingStars", 4]</option>
-                                <option value="4.5" selected="@(q.MinRating == 4.5)">@Loc["RatingStars", "4.5"]</option>
-                            </select>
-                        </div>
-
-                        <div class="catalog-filter-group">
-                            <div class="form-check catalog-stock-check">
-                                <input id="filterInStock" name="inStockOnly" value="true" type="checkbox"
-                                       class="form-check-input" checked="@q.InStockOnly" />
-                                <label class="form-check-label" for="filterInStock">@Loc["OnlyInStock"]</label>
-                            </div>
-                        </div>
-
-                        <div class="catalog-filter-group">
-                            <label class="catalog-filter-label" for="filterSortBy">@Loc["SortBy"]</label>
-                            <select id="filterSortBy" name="sortBy" class="form-select catalog-filter-control">
-                                <option value="newest" selected="@(q.SortBy == "newest" || string.IsNullOrWhiteSpace(q.SortBy))">@Loc["SortNewest"]</option>
-                                <option value="price_asc" selected="@(q.SortBy == "price_asc")">@Loc["SortPriceAsc"]</option>
-                                <option value="price_desc" selected="@(q.SortBy == "price_desc")">@Loc["SortPriceDesc"]</option>
-                                <option value="name" selected="@(q.SortBy == "name")">@Loc["SortName"]</option>
-                            </select>
-                        </div>
-
-                        <button class="btn catalog-filter-apply w-100" type="submit">@Loc["ApplyFilters"]</button>
-                    </form>
+                <div class="sf-filter-section">
+                    <label class="sf-filter-title" for="filterShop">@Loc["BrandFilter"]</label>
+                    <select id="filterShop" name="shopId" class="sf-filter-input">
+                        <option value="" selected="@(!q.ShopId.HasValue)">@Loc["AllBrands"]</option>
+                        @foreach (var brand in Model.Brands)
+                        {
+                            <option value="@brand.Id" selected="@(q.ShopId == brand.Id)">@L10n.Name(brand)</option>
+                        }
+                    </select>
                 </div>
-            </div>
+
+                <fieldset class="sf-filter-section">
+                    <legend class="sf-filter-title">@Loc["PriceRange"]</legend>
+                    <div class="sf-price-fields">
+                        <div>
+                            <label for="filterMinPrice">@Loc["MinPrice"]</label>
+                            <input id="filterMinPrice" name="minPrice" type="number" inputmode="decimal"
+                                   class="sf-filter-input" min="0" step="0.01" placeholder="¥ 0"
+                                   value="@q.MinPrice?.ToString(CultureInfo.InvariantCulture)" />
+                        </div>
+                        <span aria-hidden="true">—</span>
+                        <div>
+                            <label for="filterMaxPrice">@Loc["MaxPrice"]</label>
+                            <input id="filterMaxPrice" name="maxPrice" type="number" inputmode="decimal"
+                                   class="sf-filter-input" min="0" step="0.01" placeholder="¥"
+                                   value="@q.MaxPrice?.ToString(CultureInfo.InvariantCulture)" />
+                        </div>
+                    </div>
+                </fieldset>
+
+                <div class="sf-filter-section">
+                    <label class="sf-filter-title" for="filterRating">@Loc["MinRating"]</label>
+                    <select id="filterRating" name="minRating" class="sf-filter-input">
+                        <option value="" selected="@(!q.MinRating.HasValue)">@Loc["NoRatingLimit"]</option>
+                        <option value="3" selected="@(q.MinRating == 3)">@Loc["RatingStars", 3]</option>
+                        <option value="4" selected="@(q.MinRating == 4)">@Loc["RatingStars", 4]</option>
+                        <option value="4.5" selected="@(q.MinRating == 4.5)">@Loc["RatingStars", "4.5"]</option>
+                    </select>
+                </div>
+
+                <div class="sf-filter-section">
+                    <label class="sf-stock-option" for="filterInStock">
+                        <input id="filterInStock" name="inStockOnly" value="true" type="checkbox" checked="@q.InStockOnly" />
+                        <span>@Loc["OnlyInStock"]</span>
+                    </label>
+                </div>
+                <button class="sf-filter-submit" type="submit">@Loc["ApplyFilters"]</button>
+                @if (q.HasActiveFilters)
+                {
+                    <a class="sf-filter-reset" asp-controller="Products" asp-action="Index">@Loc["ClearFilters"]</a>
+                }
+            </form>
         </aside>
 
-        <div class="col-lg-9">
-            <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-                <h1 class="h4 mb-0">@Loc["ItemsCount", Model.TotalItems]</h1>
-            </div>
-
+        <section class="sf-catalog-results" aria-label="@Loc["AllProducts"]">
             @if (!q.HasActiveFilters)
             {
-                <div class="mb-3">
-                    <span class="text-muted small me-2"><i class="bi bi-fire"></i>@Loc["HotKeywords"]</span>
+                <div class="sf-popular-searches">
+                    <span>@Loc["HotKeywords"]</span>
                     @{
                         var hotKeywords = new[] { "耳机", "键盘", "帐篷", "T恤", "图书" };
-                        var hotKeywordLabels = new[]
-                        {
-                            Loc["HotKwHeadphones"].Value,
-                            Loc["HotKwKeyboard"].Value,
-                            Loc["HotKwTent"].Value,
-                            Loc["HotKwTshirt"].Value,
-                            Loc["HotKwBooks"].Value
-                        };
+                        var hotKeywordLabels = new[] { Loc["HotKwHeadphones"].Value, Loc["HotKwKeyboard"].Value, Loc["HotKwTent"].Value, Loc["HotKwTshirt"].Value, Loc["HotKwBooks"].Value };
                     }
                     @for (var i = 0; i < hotKeywords.Length; i++)
                     {
-                        <a asp-controller="Products" asp-action="Index" asp-route-searchTerm="@hotKeywords[i]" class="badge bg-light text-dark text-decoration-none me-1">@hotKeywordLabels[i]</a>
+                        <a asp-controller="Products" asp-action="Index" asp-route-searchTerm="@hotKeywords[i]">@hotKeywordLabels[i]</a>
                     }
                 </div>
             }
 
             @if (Model.Items.Count == 0)
             {
-                <div class="alert alert-light border text-center py-5">@Loc["NoResults"]</div>
+                <div class="sf-catalog-empty">
+                    <i class="bi bi-search" aria-hidden="true"></i>
+                    <h2>@Loc["NoResults"]</h2>
+                    <p>@L10n.Text("换个关键词，或减少一些筛选条件。", "Try another search or adjust your filters.")</p>
+                    <a asp-controller="Products" asp-action="Index">@Loc["ClearFilters"]</a>
+                </div>
                 @if (Model.Recommendations.Count > 0)
                 {
-                    <h2 class="h6 mt-4 mb-3">@Loc["GuessYouLike"]</h2>
-                    <div class="row row-cols-2 row-cols-md-3 row-cols-xl-4 g-3">
-                        @foreach (var p in Model.Recommendations)
+                    <h2 class="sf-recommendation-title">@Loc["GuessYouLike"]</h2>
+                    <div class="sf-catalog-grid">
+                        @foreach (var product in Model.Recommendations)
                         {
-                            <partial name="_ProductCard" model="@p" />
+                            <partial name="_ProductCard" model="@product" />
                         }
                     </div>
                 }
             }
             else
             {
-                <div class="row row-cols-2 row-cols-md-3 row-cols-xl-4 g-3">
+                <div class="sf-catalog-grid">
                     @foreach (var product in Model.Items)
                     {
                         <partial name="_ProductCard" model="@product" />
@@ -161,38 +176,26 @@
 
             @if (Model.TotalPages > 1)
             {
-                <nav class="mt-4">
-                    <ul class="pagination justify-content-center">
-                        <li class="page-item @(Model.HasPrevious ? "" : "disabled")">
-                            <a class="page-link" asp-controller="Products" asp-action="Index"
-                               asp-route-categoryId="@q.CategoryId" asp-route-searchTerm="@q.SearchTerm"
-                               asp-route-shopId="@q.ShopId"
-                               asp-route-minPrice="@q.MinPrice" asp-route-maxPrice="@q.MaxPrice"
-                               asp-route-minRating="@q.MinRating" asp-route-inStockOnly="@(q.InStockOnly ? "true" : null)"
-                               asp-route-sortBy="@q.SortBy" asp-route-page="@(Model.Page - 1)">@Loc["Previous"]</a>
-                        </li>
-                        @for (var i = 1; i <= Model.TotalPages; i++)
-                        {
-                            <li class="page-item @(i == Model.Page ? "active" : "")">
-                                <a class="page-link" asp-controller="Products" asp-action="Index"
-                                   asp-route-categoryId="@q.CategoryId" asp-route-searchTerm="@q.SearchTerm"
-                                   asp-route-shopId="@q.ShopId"
-                                   asp-route-minPrice="@q.MinPrice" asp-route-maxPrice="@q.MaxPrice"
-                                   asp-route-minRating="@q.MinRating" asp-route-inStockOnly="@(q.InStockOnly ? "true" : null)"
-                                   asp-route-sortBy="@q.SortBy" asp-route-page="@i">@i</a>
-                            </li>
-                        }
-                        <li class="page-item @(Model.HasNext ? "" : "disabled")">
-                            <a class="page-link" asp-controller="Products" asp-action="Index"
-                               asp-route-categoryId="@q.CategoryId" asp-route-searchTerm="@q.SearchTerm"
-                               asp-route-shopId="@q.ShopId"
-                               asp-route-minPrice="@q.MinPrice" asp-route-maxPrice="@q.MaxPrice"
-                               asp-route-minRating="@q.MinRating" asp-route-inStockOnly="@(q.InStockOnly ? "true" : null)"
-                               asp-route-sortBy="@q.SortBy" asp-route-page="@(Model.Page + 1)">@Loc["Next"]</a>
-                        </li>
-                    </ul>
+                <nav class="sf-catalog-pagination" aria-label="@L10n.Text("商品分页", "Product pages")">
+                    @if (Model.HasPrevious)
+                    {
+                        <a class="sf-page-direction" asp-controller="Products" asp-action="Index" asp-all-route-data="routeValues"
+                           asp-route-categoryId="@q.CategoryId" asp-route-page="@(Model.Page - 1)">@Loc["Previous"]</a>
+                    }
+                    @for (var i = 1; i <= Model.TotalPages; i++)
+                    {
+                        <a class="@(i == Model.Page ? "is-current" : "")" aria-current="@(i == Model.Page ? "page" : null)"
+                           aria-label="@L10n.Text($"第 {i} 页", $"Page {i}")"
+                           asp-controller="Products" asp-action="Index" asp-all-route-data="routeValues"
+                           asp-route-categoryId="@q.CategoryId" asp-route-page="@i">@i</a>
+                    }
+                    @if (Model.HasNext)
+                    {
+                        <a class="sf-page-direction" asp-controller="Products" asp-action="Index" asp-all-route-data="routeValues"
+                           asp-route-categoryId="@q.CategoryId" asp-route-page="@(Model.Page + 1)">@Loc["Next"]</a>
+                    }
                 </nav>
             }
-        </div>
+        </section>
     </div>
 </div>

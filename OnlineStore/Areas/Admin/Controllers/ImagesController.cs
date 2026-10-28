@@ -5,7 +5,6 @@ using OnlineStore.Services;
 
 namespace OnlineStore.Areas.Admin.Controllers;
 
-/// <summary>后台图片上传：供图文编辑器粘贴图片时调用，返回可访问的 URL。</summary>
 [Area("Admin")]
 [Authorize(Roles = "Admin")]
 public class ImagesController : Controller

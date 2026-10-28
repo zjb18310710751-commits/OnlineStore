@@ -1,11 +1,12 @@
 using OnlineStore.Models;
+using OnlineStore.ViewModels;
 
 namespace OnlineStore.Services;
 
-/// <summary>店铺业务抽象。</summary>
 public interface IShopService
 {
     Task<IReadOnlyList<Shop>> GetAllAsync();
+    Task<PagedResult<Shop>> GetPagedAsync(int page, int pageSize);
 
     Task<Shop?> GetByIdAsync(int id);
 
@@ -13,7 +14,6 @@ public interface IShopService
 
     Task UpdateAsync(Shop shop);
 
-    /// <summary>删除店铺；店铺下仍有商品时返回 false。</summary>
     Task<bool> DeleteAsync(int id);
 
     Task<int> CountAsync();

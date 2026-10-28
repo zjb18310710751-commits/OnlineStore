@@ -1,0 +1,142 @@
+.admin-app .overview { --overview-gap: 24px; --overview-panel-padding: 24px; width: 100%; max-width: none; color: var(--admin-ink); }
+.admin-app .overview-head { display: flex; align-items: center; justify-content: space-between; gap: 24px; margin-bottom: 28px; }
+.admin-app .overview-eyebrow { display: block; margin-bottom: 8px; color: var(--admin-muted); font-size: 11px; font-weight: 700; letter-spacing: .1em; }
+.admin-app .overview-head h1 { margin: 0; color: var(--admin-ink); font-size: clamp(28px, 2.7vw, 36px); font-weight: 750; letter-spacing: -.04em; line-height: 1.2; }
+.admin-app .overview-head p { margin: 10px 0 0; color: var(--admin-muted); font-size: 14px; }
+.admin-app .overview-metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; margin-bottom: 16px; }
+.admin-app .overview-metric { display: flex; flex-direction: column; justify-content: flex-start; gap: 18px; min-width: 0; min-height: 150px; padding: 22px; border: 1px solid var(--admin-line); border-radius: var(--admin-radius); background: #fff; }
+.admin-app .overview-metric-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.admin-app .overview-metric-top > i { color: #888; font-size: 17px; }
+.admin-app .overview-metric-label { margin: 0; color: var(--admin-muted); font-size: 13px; font-weight: 500; }
+.admin-app .overview-metric-value { display: block; color: var(--admin-ink); font-size: clamp(24px, 2.3vw, 34px); font-weight: 650; letter-spacing: -.045em; font-variant-numeric: tabular-nums; line-height: 1.1; overflow-wrap: anywhere; }
+.admin-app .overview-currency { margin-right: 3px; font-size: .76em; font-weight: 500; }
+.admin-app .overview-metric-note { margin-top: auto; color: var(--admin-muted); font-size: 11px; line-height: 1.5; }
+.admin-app .overview-tasks { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-bottom: var(--overview-gap); }
+.admin-app .overview-task { display: flex; align-items: center; gap: 14px; min-width: 0; min-height: 88px; padding: 18px 22px; border: 1px solid var(--admin-line); border-radius: var(--admin-radius); background: #fff; color: var(--admin-ink); text-decoration: none; }
+.admin-app .overview-task:hover { border-color: #bcbcbc; background: #fafafa; color: var(--admin-ink); }
+.admin-app .overview-task-icon { display: grid; place-items: center; width: 40px; height: 40px; flex-shrink: 0; border-radius: 6px; background: var(--admin-surface); font-size: 19px; }
+.admin-app .overview-task-copy { display: flex; min-width: 0; flex-direction: column; gap: 3px; }
+.admin-app .overview-task-copy > strong { display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 600; }
+.admin-app .overview-task-copy > span { color: var(--admin-muted); font-size: 12px; }
+.admin-app .overview-task-count { display: inline-flex; align-items: center; justify-content: center; min-width: 23px; min-height: 21px; padding: 1px 6px; border-radius: 4px; background: #ededed; font-variant-numeric: tabular-nums; font-size: 12px; }
+.admin-app .overview-task > .bi-arrow-right { margin-left: auto; flex-shrink: 0; }
+.admin-app .overview-grid { display: grid; grid-template-columns: minmax(0, 2fr) minmax(300px, 1fr); gap: var(--overview-gap); align-items: stretch; }
+.admin-app .overview-panel { display: flex; flex-direction: column; min-width: 0; border: 1px solid var(--admin-line); border-radius: var(--admin-radius); background: #fff; overflow: hidden; }
+.admin-app .overview-panel-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 83px; padding: 20px var(--overview-panel-padding); border-bottom: 1px solid var(--admin-line); }
+.admin-app .overview-panel-head h2 { margin: 0; color: var(--admin-ink); font-size: 15px; font-weight: 650; line-height: 1.4; }
+.admin-app .overview-panel-head p { margin: 5px 0 0; color: var(--admin-muted); font-size: 11px; line-height: 1.4; }
+.admin-app .overview-panel-head > a { display: inline-flex; align-items: center; gap: 5px; min-height: 40px; flex-shrink: 0; color: var(--admin-muted); font-size: 11px; font-weight: 500; text-decoration: none; }
+.admin-app .overview-panel-head > a:hover { color: var(--admin-ink); text-decoration: underline; text-underline-offset: 3px; }
+.admin-app .overview-panel-body { min-width: 0; flex: 1; padding: 8px var(--overview-panel-padding) 16px; }
+.admin-app .overview-revenue-body { padding-top: 20px; }
+.admin-app .overview-revenue-summary { display: flex; align-items: baseline; flex-wrap: wrap; gap: 8px 12px; }
+.admin-app .overview-revenue-summary strong { font-size: 27px; font-weight: 650; letter-spacing: -.04em; font-variant-numeric: tabular-nums; line-height: 1.25; }
+.admin-app .overview-revenue-summary > span { color: var(--admin-muted); font-size: 11px; }
+.admin-app .overview-chart-note { margin: 7px 0 20px; color: var(--admin-muted); font-size: 11px; line-height: 1.55; }
+.admin-app .overview-periods { display: inline-flex; gap: 2px; padding: 3px; border: 1px solid var(--admin-line); border-radius: 6px; background: var(--admin-surface); }
+.admin-app .overview-periods button { min-width: 57px; min-height: 34px; padding: 5px 9px; border: 0; border-radius: 4px; color: var(--admin-muted); background: transparent; font: inherit; font-size: 11px; cursor: pointer; }
+.admin-app .overview-periods button[aria-pressed="true"] { background: var(--admin-ink); color: #fff; }
+.admin-app .overview-periods button:hover:not([aria-pressed="true"]) { color: var(--admin-ink); background: #e8e8e8; }
+.admin-app .overview-chart { position: relative; width: 100%; height: 220px; }
+.admin-app .overview-chart-empty { margin: 14px 0 4px; color: var(--admin-muted); font-size: 11px; line-height: 1.6; }
+.admin-app .overview-chart-data { margin-top: 12px; color: var(--admin-muted); font-size: 11px; }
+.admin-app .overview-chart-data summary { padding: 9px 0; cursor: pointer; }
+.admin-app .overview-chart-data summary:hover { color: var(--admin-ink); }
+.admin-app .overview-revenue-fallback { margin-top: 10px; }
+.admin-app .overview-revenue-fallback > p { color: var(--admin-muted); font-size: 12px; }
+.admin-app .overview-revenue-fallback dl, .admin-app .overview-chart-data dl { display: grid; grid-template-columns: repeat(auto-fit, minmax(96px, 1fr)); gap: 8px; margin: 0 0 10px; }
+.admin-app .overview-revenue-fallback dl > div, .admin-app .overview-chart-data dl > div { padding: 10px; background: var(--admin-surface); border-radius: 4px; }
+.admin-app .overview-revenue-fallback dt, .admin-app .overview-chart-data dt { color: var(--admin-muted); font-size: 11px; font-weight: 400; }
+.admin-app .overview-revenue-fallback dd, .admin-app .overview-chart-data dd { margin: 3px 0 0; color: var(--admin-ink); font-size: 12px; font-variant-numeric: tabular-nums; }
+.admin-app .overview [hidden] { display: none !important; }
+.admin-app .overview-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 11px; min-height: 280px; height: 100%; padding: 32px 12px; color: var(--admin-muted); text-align: center; }
+.admin-app .overview-empty > i { display: grid; place-items: center; width: 52px; height: 52px; margin-bottom: 4px; border: 1px solid var(--admin-line); border-radius: 50%; color: #777; background: #fafafa; font-size: 23px; }
+.admin-app .overview-empty > strong { color: var(--admin-ink); font-size: 14px; font-weight: 600; }
+.admin-app .overview-empty > p { max-width: 250px; margin: 0; color: var(--admin-muted); font-size: 12px; line-height: 1.7; }
+.admin-app .overview-empty > a { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 7px 12px; color: var(--admin-ink); font-size: 12px; font-weight: 600; text-decoration: none; }
+.admin-app .overview-empty > a:hover { text-decoration: underline; text-underline-offset: 4px; }
+.admin-app .overview-product-list, .admin-app .overview-review-list { margin: 0; padding: 0; list-style: none; }
+.admin-app .overview-product-list li { display: grid; grid-template-columns: 19px 40px minmax(0, 1fr) auto; gap: 10px; align-items: center; min-height: 76px; padding: 13px 0; border-bottom: 1px solid var(--admin-line); }
+.admin-app .overview-product-list li:last-child, .admin-app .overview-review-list li:last-child { border-bottom: 0; }
+.admin-app .overview-product-rank { width: auto; color: #969696; font-size: 10px; font-weight: 500; font-variant-numeric: tabular-nums; }
+.admin-app .overview-product-thumb { width: 40px; height: 46px; border: 0; border-radius: 4px; background: var(--admin-surface); color: #888; }
+.admin-app .overview-product-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.admin-app .overview-product-info { display: flex; min-width: 0; flex-direction: column; gap: 5px; }
+.admin-app .overview-product-name { color: var(--admin-ink); font-size: 12px; font-weight: 600; text-decoration: none; white-space: normal; overflow: visible; overflow-wrap: anywhere; }
+.admin-app .overview-product-name:hover { text-decoration: underline; text-underline-offset: 3px; }
+.admin-app .overview-product-meta { color: var(--admin-muted); font-size: 10px; }
+.admin-app .overview-product-revenue { margin-left: 0; color: var(--admin-ink); font-size: 11px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.admin-app .overview-orders-body { display: flex; flex-direction: column; padding: 0; }
+.admin-app .overview-orders-body > .overview-empty { flex: 1; }
+.admin-app .overview-table { min-width: 570px; font-size: 12px; }
+.admin-app .overview-table > :not(caption) > * > * { padding-inline: 16px; }
+.admin-app .overview-table thead th { padding-top: 15px; padding-bottom: 15px; color: var(--admin-muted); background: #fafafa; font-size: 10px; font-weight: 500; letter-spacing: 0; text-transform: none; border-color: var(--admin-line); white-space: nowrap; }
+.admin-app .overview-table tbody td { padding-top: 18px; padding-bottom: 18px; color: var(--admin-ink); border-bottom-color: var(--admin-line); }
+.admin-app .overview-table tbody tr:last-child td { border-bottom: 0; }
+.admin-app .overview-table .overview-order-date { color: var(--admin-muted); font-size: 10px; white-space: nowrap; }
+.admin-app .overview-mono { font-variant-numeric: tabular-nums; letter-spacing: 0; }
+.admin-app .overview-status { display: inline-flex; align-items: center; gap: 5px; padding: 4px 7px; border-radius: 4px; color: #626262; background: #f0f0f0; font-size: 10px; font-weight: 500; white-space: nowrap; }
+.admin-app .overview-status::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+.admin-app .overview-status.is-warning { color: #8b6020; background: #f8f2e7; }
+.admin-app .overview-status.is-info { color: #446575; background: #edf3f5; }
+.admin-app .overview-status.is-success { color: #42664e; background: #edf4ee; }
+.admin-app .overview-status.is-danger { color: #8e4a46; background: #f9eeee; }
+.admin-app .overview-review-list li { display: flex; align-items: flex-start; gap: 11px; padding: 18px 0; border-bottom: 1px solid var(--admin-line); }
+.admin-app .overview-avatar { width: 30px; height: 30px; flex-shrink: 0; border-radius: 50%; background: var(--admin-surface); color: #555; font-size: 11px; font-weight: 600; }
+.admin-app .overview-review-info { display: flex; min-width: 0; flex: 1; flex-direction: column; gap: 5px; }
+.admin-app .overview-review-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: nowrap; }
+.admin-app .overview-review-top strong { min-width: 0; flex: 1; color: var(--admin-ink); font-size: 12px; font-weight: 600; }
+.admin-app .overview-review-date { margin-left: auto; color: var(--admin-muted); font-size: 10px; font-variant-numeric: tabular-nums; }
+.admin-app .overview-stars { color: #323232; font-size: 10px; letter-spacing: .1em; line-height: 1.3; }
+.admin-app .overview-review-text { color: #555; font-size: 12px; line-height: 1.65; overflow-wrap: anywhere; }
+.admin-app .overview-review-product { display: block; align-self: flex-start; margin-top: 1px; padding: 0; border-radius: 0; background: transparent; color: var(--admin-muted); font-size: 10px; line-height: 1.5; overflow-wrap: anywhere; }
+.admin-app .overview-data-note { display: flex; align-items: baseline; gap: 7px; margin: 20px 0 0; color: var(--admin-muted); font-size: 11px; line-height: 1.7; }
+.admin-app .overview-data-note > i { flex-shrink: 0; }
+@media (max-width: 1199px) {
+    .admin-app .overview { --overview-gap: 20px; --overview-panel-padding: 20px; }
+    .admin-app .overview-grid { grid-template-columns: minmax(0, 1.5fr) minmax(290px, 1fr); }
+    .admin-app .overview-metric { padding: 18px; }
+    .admin-app .overview-metric-note { font-size: 10px; }
+    .admin-app .overview-product-list li { grid-template-columns: 16px 34px minmax(0, 1fr); }
+    .admin-app .overview-product-thumb { width: 34px; height: 40px; grid-row: span 2; }
+    .admin-app .overview-product-rank { grid-row: span 2; }
+    .admin-app .overview-product-revenue { grid-column: 3; }
+}
+@media (max-width: 767px) {
+    .admin-app .overview { --overview-gap: 16px; --overview-panel-padding: 18px; }
+    .admin-app .overview-head { align-items: flex-start; gap: 16px; margin-bottom: 22px; }
+    .admin-app .overview-head h1 { font-size: 28px; }
+    .admin-app .overview-head p { max-width: 250px; font-size: 12px; }
+    .admin-app .overview-eyebrow { font-size: 10px; }
+    .admin-app .overview-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .admin-app .overview-metric { gap: 15px; min-height: 142px; padding: 18px; }
+    .admin-app .overview-metric-value { font-size: 27px; }
+    .admin-app .overview-metric-label { font-size: 12px; }
+    .admin-app .overview-tasks { gap: 12px; }
+    .admin-app .overview-task { align-items: flex-start; gap: 10px; min-height: 105px; padding: 14px; }
+    .admin-app .overview-task-icon { display: none; }
+    .admin-app .overview-task-copy > strong { flex-wrap: wrap; gap: 5px; font-size: 12px; }
+    .admin-app .overview-task-copy > span { font-size: 11px; }
+    .admin-app .overview-task > .bi-arrow-right { margin-top: 2px; font-size: 12px; }
+    .admin-app .overview-grid { grid-template-columns: minmax(0, 1fr); }
+    .admin-app .overview-panel-head { min-height: 76px; padding-block: 12px; }
+    .admin-app .overview-product-list li { grid-template-columns: 19px 40px minmax(0, 1fr) auto; }
+    .admin-app .overview-product-rank, .admin-app .overview-product-thumb { grid-row: auto; }
+    .admin-app .overview-product-thumb { width: 40px; height: 46px; }
+    .admin-app .overview-product-revenue { grid-column: auto; }
+    .admin-app .overview-empty { min-height: 230px; }
+    .admin-app .overview-periods button { min-height: 44px; min-width: 50px; }
+}
+@media (max-width: 419px) {
+    .admin-app .overview-head { flex-wrap: wrap; }
+    .admin-app .overview-head p { max-width: none; }
+    .admin-app .overview-metric { padding: 14px; }
+    .admin-app .overview-metric-value { font-size: 25px; }
+    .admin-app .overview-metric-top > i { display: none; }
+    .admin-app .overview-panel-head h2 { font-size: 14px; }
+    .admin-app .overview-panel-head > a { font-size: 10px; }
+    .admin-app .overview-product-list li { grid-template-columns: 16px 34px minmax(0, 1fr); }
+    .admin-app .overview-product-rank, .admin-app .overview-product-thumb { grid-row: span 2; }
+    .admin-app .overview-product-thumb { width: 34px; height: 40px; }
+    .admin-app .overview-product-revenue { grid-column: 3; }
+}

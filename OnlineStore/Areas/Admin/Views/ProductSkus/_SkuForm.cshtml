@@ -1,6 +1,8 @@
 @model ProductSku
 <input type="hidden" asp-for="Id" />
 <input type="hidden" asp-for="ProductId" />
+<input type="hidden" asp-for="ColorEn" />
+<input type="hidden" asp-for="SpecEn" />
 <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 <div class="row g-3">
     <div class="col-md-4 mb-3">
@@ -21,18 +23,6 @@
 </div>
 <div class="row g-3">
     <div class="col-md-4 mb-3">
-        <label asp-for="ColorEn" class="form-label">@Loc["ColorEn"]</label>
-        <input asp-for="ColorEn" class="form-control" />
-        <span asp-validation-for="ColorEn" class="text-danger small"></span>
-    </div>
-    <div class="col-md-4 mb-3">
-        <label asp-for="SpecEn" class="form-label">@Loc["SpecEn"]</label>
-        <input asp-for="SpecEn" class="form-control" />
-        <span asp-validation-for="SpecEn" class="text-danger small"></span>
-    </div>
-</div>
-<div class="row g-3">
-    <div class="col-md-4 mb-3">
         <label asp-for="Stock" class="form-label">@Loc["Stock"]</label>
         <input asp-for="Stock" class="form-control" type="number" min="0" />
         <span asp-validation-for="Stock" class="text-danger small"></span>
@@ -41,7 +31,8 @@
         <label class="form-label">@Loc["ImageUrl"]</label>
         <div id="skuImageBox" class="sku-image-box" tabindex="0"
              data-upload-url="@Url.Action("Upload", "Images", new { area = "Admin" })"
-             data-placeholder="@Loc["PasteImageHint"]">
+         data-placeholder="@Loc["PasteImageHint"]"
+         data-image-alt="@L10n.Text("规格图", "SKU image")">
             @if (!string.IsNullOrEmpty(Model.ImageUrl))
             {
                 <img src="@Model.ImageUrl" alt="@Loc["Image"]" />
@@ -72,7 +63,7 @@
 
         function setPreview(url) {
             if (url) {
-                box.innerHTML = '<img src="' + url + '" alt="规格图" />';
+                box.innerHTML = '<img src="' + url + '" alt="' + (box.dataset.imageAlt || '') + '" />';
             } else {
                 box.innerHTML = '<span class="text-muted">' + box.getAttribute('data-placeholder') + '</span>';
             }

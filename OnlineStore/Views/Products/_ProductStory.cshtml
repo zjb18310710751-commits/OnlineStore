@@ -1,0 +1,27 @@
+@model Product
+@{
+    var detailHtml = L10n.DetailHtml(Model);
+    var description = L10n.Description(Model);
+}
+<section class="pd-story" id="product-story" aria-labelledby="product-story-title">
+    <header class="pd-story-intro">
+        <p class="pd-story-eyebrow">@L10n.Text("近看每一处细节", "A closer look")</p>
+        <h2 id="product-story-title">@Loc["DetailIntro"]</h2>
+        <p class="pd-story-product">@L10n.Name(Model)</p>
+        <a href="#product-specifications" class="pd-story-spec-link">@L10n.Text("查看商品参数", "View specifications") <i class="bi bi-arrow-up-right" aria-hidden="true"></i></a>
+    </header>
+    <div class="pd-story-content">
+        @if (!string.IsNullOrWhiteSpace(detailHtml))
+        {
+            @Html.Raw(detailHtml)
+        }
+        else if (!string.IsNullOrWhiteSpace(description))
+        {
+            <p class="pd-story-description">@description</p>
+        }
+        else
+        {
+            <p class="pd-story-empty">@L10n.Text("更多商品信息正在准备中，你可以先查看上方的商品参数。", "More details are on the way. You can find the product specifications above.")</p>
+        }
+    </div>
+</section>

@@ -1,5 +1,3 @@
-# Render Blueprint 部署配置
-# 在 Render 控制台选择 "New + Blueprint" 并连接此 GitHub 仓库，即可自动创建下面的服务
 services:
   - type: web
     name: online-store

@@ -4,7 +4,6 @@ using OnlineStore.Models;
 
 namespace OnlineStore.Services;
 
-/// <summary>基于 Session 的购物车存储：将购物车序列化为 JSON 存入会话。</summary>
 public class SessionCartStore : ICartStore
 {
     private const string SessionKey = "Cart";

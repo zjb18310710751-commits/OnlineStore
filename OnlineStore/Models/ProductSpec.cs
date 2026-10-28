@@ -2,7 +2,6 @@ using System.ComponentModel.DataAnnotations;
 
 namespace OnlineStore.Models;
 
-/// <summary>商品参数（键值对），如「材质：涤纶」「重量：2.5kg」。</summary>
 public class ProductSpec
 {
     public int Id { get; set; }

@@ -1,6 +1,5 @@
 namespace OnlineStore.Models;
 
-/// <summary>用户收藏（心愿单）：用户对商品的一对一收藏关系。</summary>
 public class Favorite
 {
     public int Id { get; set; }

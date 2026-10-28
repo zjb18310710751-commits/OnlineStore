@@ -4,7 +4,6 @@ using OnlineStore.Services;
 
 namespace OnlineStore.Tests.Services;
 
-/// <summary>记住账号密码服务单元测试：保存/读取/清除，以及密码不以明文落盘。</summary>
 public class RememberedLoginCookieServiceTests
 {
     private const string CookieName = "OnlineStore.RememberedLogin";
@@ -17,15 +16,14 @@ public class RememberedLoginCookieServiceTests
     }
 
     [Fact]
-    public void SaveThenLoad_RoundTripsEmailAndPassword()
+    public void SaveThenLoad_RoundTripsEmailOnly()
     {
         var context = new DefaultHttpContext();
         var (accessor, protector) = CreateAccessor(context);
         var service = new RememberedLoginCookieService(accessor, protector);
 
-        service.Save("user@store.com", "Passw0rd@123");
+        service.Save("user@store.com");
 
-        // 模拟浏览器把响应 Set-Cookie 回传给下一次请求
         var setCookie = context.Response.Headers["Set-Cookie"].ToString();
         context.Request.Headers["Cookie"] = setCookie.Split(';')[0];
 
@@ -33,7 +31,6 @@ public class RememberedLoginCookieServiceTests
 
         Assert.NotNull(loaded);
         Assert.Equal("user@store.com", loaded!.Email);
-        Assert.Equal("Passw0rd@123", loaded.Password);
     }
 
     [Fact]
@@ -58,16 +55,15 @@ public class RememberedLoginCookieServiceTests
     }
 
     [Fact]
-    public void Save_DoesNotExposePasswordInPlaintext()
+    public void Save_DoesNotExposeEmailInPlaintext()
     {
         var context = new DefaultHttpContext();
         var (accessor, protector) = CreateAccessor(context);
         var service = new RememberedLoginCookieService(accessor, protector);
 
-        service.Save("user@store.com", "Passw0rd@123");
+        service.Save("user@store.com");
 
         var setCookie = context.Response.Headers["Set-Cookie"].ToString();
-        Assert.DoesNotContain("Passw0rd@123", setCookie);
         Assert.DoesNotContain("user@store.com", setCookie);
     }
 }

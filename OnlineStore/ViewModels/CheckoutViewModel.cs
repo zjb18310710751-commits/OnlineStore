@@ -3,20 +3,16 @@ using OnlineStore.Models;
 
 namespace OnlineStore.ViewModels;
 
-/// <summary>结算页视图模型：购物车明细 + 收货信息。</summary>
 public class CheckoutViewModel
 {
     public List<CartItem> Items { get; set; } = new();
 
     public decimal Total { get; set; }
 
-    /// <summary>结算页当前选中的地址簿地址；为空表示用户尚未选择或使用旧地址。</summary>
     public int? AddressId { get; set; }
 
-    /// <summary>用户是否已经保存过结构化收货地址（用于决定是否显示“保存为默认地址”）。</summary>
     public bool HasSavedAddresses { get; set; }
 
-    /// <summary>新用户结算时是否把当前填写的地址保存为默认地址。</summary>
     public bool SaveAsDefaultAddress { get; set; }
 
     [StringLength(50)]
@@ -24,8 +20,13 @@ public class CheckoutViewModel
 
     public decimal DiscountAmount { get; set; }
 
-    /// <summary>实付金额 = 商品总额 - 优惠。</summary>
-    public decimal PayableTotal => Total - DiscountAmount;
+    public decimal ShippingFee { get; set; }
+
+    public bool FreeShippingCoupon { get; set; }
+
+    public List<CouponChoiceViewModel> AvailableCoupons { get; set; } = new();
+
+    public decimal PayableTotal => Math.Max(0, Total + ShippingFee - DiscountAmount);
 
     [Display(Name = "收货人")]
     public string? UserName { get; set; }
@@ -48,9 +49,11 @@ public class CheckoutViewModel
     [Display(Name = "国家")]
     public string? Country { get; set; }
 
+    [Required]
     [Display(Name = "支付方式")]
     public string PaymentMethod { get; set; } = "cash_on_delivery";
 
+    [StringLength(500)]
     [Display(Name = "订单备注（可选）")]
     public string? OrderNotes { get; set; }
 }

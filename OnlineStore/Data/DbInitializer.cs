@@ -4,9 +4,6 @@ using OnlineStore.Models;
 
 namespace OnlineStore.Data;
 
-/// <summary>
-/// 首次运行初始化：应用 EF Core Migrations 建库建表，并写入种子数据。
-/// </summary>
 public static class DbInitializer
 {
     public const string AdminEmail = "admin@store.com";
@@ -30,13 +27,12 @@ public static class DbInitializer
         UserManager<ApplicationUser> userManager,
         RoleManager<IdentityRole> roleManager)
     {
-        // 1) 角色
+
         if (!await roleManager.RoleExistsAsync(AdminRole))
         {
             await roleManager.CreateAsync(new IdentityRole(AdminRole));
         }
 
-        // 2) 管理员账号（幂等）
         if (await userManager.FindByEmailAsync(AdminEmail) is null)
         {
             var admin = new ApplicationUser
@@ -52,16 +48,14 @@ public static class DbInitializer
             }
         }
 
-        // 3) 为既有数据回填英文字段（幂等），保证老库切英文时各类内容都有英文
         await BackfillContentTranslationsAsync(context);
 
-        // 4) 分类与示例商品（幂等：仅在分类表为空时写入）
         if (await context.Categories.AnyAsync())
         {
+            await SeedDemoOrdersAsync(context, userManager);
             return;
         }
 
-        // 店铺
         var outdoor = new Shop { Name = "山野户外旗舰店", NameEn = "Mountain Outdoors Flagship Store", Rating = 4.9m, SalesCount = 12800, Description = "专注户外装备 12 年，只卖靠谱的。", DescriptionEn = "12 years of outdoor gear expertise — only dependable gear." };
         var digital = new Shop { Name = "极客数码自营店", NameEn = "Geek Digital Store", Rating = 4.8m, SalesCount = 8600, Description = "正品数码，官方直营。", DescriptionEn = "Genuine digital products, direct from official channels." };
         var bookstore = new Shop { Name = "悦读图书专营店", NameEn = "Joyful Reading Bookstore", Rating = 4.9m, SalesCount = 32000, Description = "好书，认真选每一本。", DescriptionEn = "Good books, carefully selected." };
@@ -70,7 +64,6 @@ public static class DbInitializer
 
         var shops = new List<Shop> { outdoor, digital, bookstore, homeStore, clothing };
 
-        // 分类
         var electronics = new Category { Name = "电子产品", NameEn = "Electronics", Slug = "电子产品", Description = "手机、电脑、数码配件", DescriptionEn = "Phones, computers and digital accessories", DisplayOrder = 1 };
         var fashion = new Category { Name = "服装服饰", NameEn = "Fashion", Slug = "服装服饰", Description = "男女装、鞋帽配饰", DescriptionEn = "Men's and women's clothing, shoes and accessories", DisplayOrder = 2 };
         var books = new Category { Name = "图书", NameEn = "Books", Slug = "图书", Description = "文学、科技、教育", DescriptionEn = "Literature, technology and education", DisplayOrder = 3 };
@@ -280,7 +273,6 @@ public static class DbInitializer
             }
         };
 
-        // 追加 88 件商品：覆盖各类目、价格从低到高，模拟真实商城
         var extraItems = new (string Name, string NameEn, Category Category, Shop Shop, decimal Price)[]
         {
             ("手机支架", "Phone Holder", electronics, digital, 19.90m), ("三合一数据线", "3-in-1 Data Cable", electronics, digital, 29.00m),
@@ -359,7 +351,6 @@ public static class DbInitializer
             });
         }
 
-        // 为种子商品配占位图（每件商品固定一张，可随后台图片上传替换为真实商品图）
         foreach (var p in products)
         {
             p.ImageUrl = $"https://picsum.photos/seed/{p.Sku}/600/400";
@@ -373,7 +364,6 @@ public static class DbInitializer
             p.DetailHtml = BuildDetailHtml(p.Name, p.Description ?? "", images[0].ImageUrl, images[1].ImageUrl);
             p.DetailHtmlEn = BuildDetailHtmlEn(p.NameEn ?? p.Name, p.DescriptionEn ?? p.Description ?? "", images[0].ImageUrl, images[1].ImageUrl);
 
-            // 每个 SKU 配一张不同图，选择颜色/规格时主图随之切换
             var skuIndex = 0;
             foreach (var sku in p.Skus)
             {
@@ -381,12 +371,212 @@ public static class DbInitializer
             }
         }
 
-        // 为种子数据补充英文（快递/参数/规格颜色/评价）
         ApplyEnglishTranslations(products);
+
+        var ukOrigins = new[]
+        {
+            ("伦敦", "London"),
+            ("曼彻斯特", "Manchester"),
+            ("伯明翰", "Birmingham"),
+            ("利兹", "Leeds"),
+            ("格拉斯哥", "Glasgow"),
+            ("布里斯托尔", "Bristol"),
+            ("利物浦", "Liverpool"),
+            ("爱丁堡", "Edinburgh"),
+            ("谢菲尔德", "Sheffield"),
+            ("卡迪夫", "Cardiff")
+        };
+        for (var i = 0; i < products.Count; i++)
+        {
+            products[i].ShippingFrom = ukOrigins[i % ukOrigins.Length].Item1;
+            products[i].ShippingFromEn = ukOrigins[i % ukOrigins.Length].Item2;
+        }
 
         context.Shops.AddRange(shops);
         context.Categories.AddRange(categories);
         context.Products.AddRange(products);
+        await context.SaveChangesAsync();
+
+        await SeedDemoOrdersAsync(context, userManager);
+    }
+
+    private static async Task SeedDemoOrdersAsync(
+        ApplicationDbContext context,
+        UserManager<ApplicationUser> userManager)
+    {
+        const string demoBuyerEmail = "3293906920@qq.com";
+        const string demoBuyerPassword = "Admin@123456";
+
+        var buyer = await userManager.FindByEmailAsync(demoBuyerEmail);
+        if (buyer is null)
+        {
+            buyer = new ApplicationUser
+            {
+                UserName = demoBuyerEmail,
+                Email = demoBuyerEmail,
+                EmailConfirmed = true,
+                FirstName = "Demo",
+                LastName = "Buyer",
+                PhoneNumber = "13800138000"
+            };
+            var createResult = await userManager.CreateAsync(buyer, demoBuyerPassword);
+            if (!createResult.Succeeded)
+            {
+                return;
+            }
+        }
+        else if (!await userManager.CheckPasswordAsync(buyer, demoBuyerPassword))
+        {
+            var resetToken = await userManager.GeneratePasswordResetTokenAsync(buyer);
+            var resetResult = await userManager.ResetPasswordAsync(buyer, resetToken, demoBuyerPassword);
+            if (!resetResult.Succeeded)
+            {
+                return;
+            }
+        }
+
+        await BackfillDemoShippingSnapshotsAsync(context);
+
+        if (await context.Orders.AnyAsync(o => o.OrderNo.StartsWith("DEMO-")))
+        {
+            return;
+        }
+
+        var products = await context.Products
+            .Where(p => p.IsActive)
+            .OrderBy(p => p.Id)
+            .Take(5)
+            .ToListAsync();
+        if (products.Count == 0)
+        {
+            return;
+        }
+
+        var now = DateTime.UtcNow;
+        var orders = new List<Order>
+        {
+            DemoOrder("DEMO-1001", OrderStatus.PendingShipment, now.AddHours(-1), products[0], 1, buyer.Id),
+            DemoOrder("DEMO-1002", OrderStatus.Shipped, now.AddHours(-8), products[1 % products.Count], 2, buyer.Id),
+            DemoOrder("DEMO-1003", OrderStatus.Delivered, now.AddHours(-30), products[2 % products.Count], 1, buyer.Id),
+            DemoOrder("DEMO-1004", OrderStatus.Completed, now.AddDays(-3), products[3 % products.Count], 1, buyer.Id),
+            DemoOrder("DEMO-1005", OrderStatus.Completed, now.AddDays(-7), products[4 % products.Count], 2, buyer.Id)
+        };
+
+        var shipped = orders[1];
+        shipped.Carrier = "顺丰速运";
+        shipped.TrackingNumber = "SF1234567890123";
+        shipped.ShippedAt = now.AddSeconds(-10);
+
+        var delivered = orders[2];
+        delivered.Carrier = "中通快递";
+        delivered.TrackingNumber = "ZT9876543210987";
+        delivered.ShippedAt = now.AddHours(-20);
+        delivered.DeliveredAt = now.AddHours(-2);
+
+        orders[3].Carrier = "邮政 EMS";
+        orders[3].TrackingNumber = "EMS202610260001";
+        orders[3].ShippedAt = now.AddDays(-4);
+        orders[3].DeliveredAt = now.AddDays(-2);
+        orders[3].SignedAt = now.AddDays(-2).AddHours(-1);
+
+        orders[4].Carrier = "圆通速递";
+        orders[4].TrackingNumber = "YT202610100002";
+        orders[4].ShippedAt = now.AddDays(-8);
+        orders[4].DeliveredAt = now.AddDays(-6);
+        orders[4].SignedAt = now.AddDays(-6).AddHours(-2);
+        orders[4].AfterSalesRequests.Add(new AfterSalesRequest
+        {
+            UserId = buyer.Id,
+            Type = AfterSalesType.Exchange,
+            Reason = "商品外包装破损，申请换货。",
+            Status = AfterSalesStatus.Approved,
+            RequestedAt = now.AddDays(-1),
+            ReviewedAt = now.AddHours(-6)
+        });
+
+        orders[3].AfterSalesRequests.Add(new AfterSalesRequest
+        {
+            UserId = buyer.Id,
+            Type = AfterSalesType.Return,
+            Reason = "收到的商品与预期不符，申请退货。",
+            Status = AfterSalesStatus.Pending,
+            RequestedAt = now.AddHours(-12)
+        });
+
+        context.Orders.AddRange(orders);
+        await context.SaveChangesAsync();
+    }
+
+    private static Order DemoOrder(
+        string orderNo,
+        string status,
+        DateTime createdAt,
+        Product product,
+        int quantity,
+        string userId)
+    {
+        var total = product.Price * quantity;
+        return new Order
+        {
+            OrderNo = orderNo,
+            UserId = userId,
+            UserName = "Demo Buyer",
+            Phone = "13800138000",
+            Address = "广东省深圳市南山区科技园, 518000, 中国",
+            Total = total,
+            Status = status,
+            CreatedAt = createdAt,
+            Items = new List<OrderItem>
+            {
+                new()
+                {
+                    ProductId = product.Id,
+                    ProductName = product.Name,
+                    ProductNameEn = product.NameEn,
+                    Price = product.Price,
+                    Quantity = quantity
+                }
+            }
+        };
+    }
+
+    private static async Task BackfillDemoShippingSnapshotsAsync(ApplicationDbContext context)
+    {
+        var orders = await context.Orders
+            .Include(o => o.Items)
+            .Where(o => o.OrderNo.StartsWith("DEMO-") && o.ShippingOrigin == null)
+            .ToListAsync();
+        if (orders.Count == 0)
+        {
+            return;
+        }
+
+        var productIds = orders.SelectMany(o => o.Items).Select(i => i.ProductId).Distinct().ToList();
+        var products = await context.Products
+            .Where(p => productIds.Contains(p.Id))
+            .ToDictionaryAsync(p => p.Id);
+
+        foreach (var order in orders)
+        {
+            var productId = order.Items.Select(i => i.ProductId).FirstOrDefault();
+            if (!products.TryGetValue(productId, out var product))
+            {
+                continue;
+            }
+
+            order.ShippingOrigin = product.ShippingFrom;
+            order.ShippingOriginEn = product.ShippingFromEn;
+            order.ShippingFeeText = product.ShippingFee;
+            order.ShippingFeeTextEn = product.ShippingFeeEn;
+            order.DispatchTimeText = product.DeliveryTime;
+            order.DispatchTimeTextEn = product.DeliveryTimeEn;
+
+            var hours = product.DeliveryTime?.Contains("24") == true ? 24
+                : product.DeliveryTime?.Contains("48") == true ? 48
+                : 72;
+            order.ExpectedDispatchAt = order.CreatedAt.AddHours(hours);
+        }
+
         await context.SaveChangesAsync();
     }
 
@@ -410,7 +600,7 @@ public static class DbInitializer
 
     private static async Task BackfillContentTranslationsAsync(ApplicationDbContext context)
     {
-        // 分类
+
         var categories = await context.Categories
             .Where(c => c.NameEn == null || c.DescriptionEn == null)
             .ToListAsync();
@@ -423,7 +613,6 @@ public static class DbInitializer
             }
         }
 
-        // 店铺
         var shops = await context.Shops.ToListAsync();
         foreach (var shop in shops)
         {
@@ -434,7 +623,6 @@ public static class DbInitializer
             }
         }
 
-        // 商品（含快递信息、参数、规格颜色、评价）
         var products = await context.Products
             .Include(p => p.Specs)
             .Include(p => p.Skus)
@@ -563,7 +751,6 @@ public static class DbInitializer
     private static Review Review(string userName, int rating, string comment, int daysAgo = 0, string? imageUrl = null)
         => new() { UserName = userName, Rating = rating, Comment = comment, ImageUrl = imageUrl, CreatedAt = DateTime.UtcNow.AddDays(-daysAgo) };
 
-    /// <summary>按中文值查字典，为种子数据的快递/参数/规格/评价填充英文字段。</summary>
     private static void ApplyEnglishTranslations(List<Product> products)
     {
         var specName = new Dictionary<string, string>
@@ -687,6 +874,7 @@ public static class DbInitializer
         {
             p.ShippingFromEn ??= Tr(shipping, p.ShippingFrom);
             p.ShippingFeeEn ??= Tr(shipping, p.ShippingFee);
+            p.ShippingFeeAmount = ParseShippingFeeAmount(p.ShippingFee);
             p.DeliveryTimeEn ??= Tr(shipping, p.DeliveryTime);
 
             foreach (var spec in p.Specs)
@@ -707,5 +895,27 @@ public static class DbInitializer
                 r.CommentEn ??= Tr(comment, r.Comment);
             }
         }
+    }
+
+    private static decimal ParseShippingFeeAmount(string? text)
+    {
+        if (string.IsNullOrWhiteSpace(text)
+            || text.Contains("包邮", StringComparison.Ordinal)
+            || text.Contains("free", StringComparison.OrdinalIgnoreCase))
+        {
+            return 0;
+        }
+
+        var numeric = new string(text
+            .Where(character => char.IsDigit(character) || character is '.' or ',')
+            .Select(character => character == ',' ? '.' : character)
+            .ToArray());
+        return decimal.TryParse(
+            numeric,
+            System.Globalization.NumberStyles.Number,
+            System.Globalization.CultureInfo.InvariantCulture,
+            out var amount)
+            ? Math.Max(0, amount)
+            : 0;
     }
 }

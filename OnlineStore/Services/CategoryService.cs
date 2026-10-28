@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using OnlineStore.Data;
 using OnlineStore.Models;
+using OnlineStore.ViewModels;
 
 namespace OnlineStore.Services;
 
@@ -19,6 +20,18 @@ public class CategoryService : ICategoryService
             .OrderBy(c => c.DisplayOrder)
             .ThenBy(c => c.Name)
             .ToListAsync();
+
+    public async Task<PagedResult<Category>> GetPagedAsync(int page, int pageSize)
+    {
+        var query = _context.Categories.AsNoTracking()
+            .OrderBy(category => category.DisplayOrder)
+            .ThenBy(category => category.Name);
+        var total = await query.CountAsync();
+        var totalPages = Math.Max(1, (int)Math.Ceiling(total / (double)pageSize));
+        page = Math.Clamp(page, 1, totalPages);
+        var items = await query.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
+        return new PagedResult<Category>(items, page, pageSize, total);
+    }
 
     public Task<Category?> GetByIdAsync(int id) =>
         _context.Categories.FirstOrDefaultAsync(c => c.Id == id);
@@ -49,7 +62,7 @@ public class CategoryService : ICategoryService
 
         if (category.Products.Any())
         {
-            return false; // 分类下仍有商品，不允许删除
+            return false;
         }
 
         _context.Categories.Remove(category);

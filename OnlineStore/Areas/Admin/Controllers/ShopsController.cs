@@ -19,11 +19,8 @@ public class ShopsController : Controller
         _loc = localizer;
     }
 
-    public async Task<IActionResult> Index()
-    {
-        var shops = await _shopService.GetAllAsync();
-        return View(shops);
-    }
+    public async Task<IActionResult> Index(int page = 1) =>
+        View(await _shopService.GetPagedAsync(page, 10));
 
     [HttpGet]
     public IActionResult Create() => View(new Shop());

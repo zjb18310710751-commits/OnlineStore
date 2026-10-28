@@ -2,7 +2,6 @@ using System.ComponentModel.DataAnnotations;
 
 namespace OnlineStore.ViewModels;
 
-/// <summary>分类创建/编辑表单视图模型。</summary>
 public class CategoryFormViewModel
 {
     public int Id { get; set; }

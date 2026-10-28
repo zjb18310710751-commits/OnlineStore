@@ -2,7 +2,6 @@ using System.ComponentModel.DataAnnotations;
 
 namespace OnlineStore.Models;
 
-/// <summary>商品/产品。归属一个店铺，可属于多个分类，含规格变体、参数与评价。</summary>
 public class Product
 {
     public int Id { get; set; }
@@ -33,10 +32,8 @@ public class Product
     [Display(Name = "原价")]
     public decimal? OriginalPrice { get; set; }
 
-    /// <summary>是否促销中（原价高于现价）。</summary>
     public bool IsOnSale => OriginalPrice.HasValue && OriginalPrice.Value > Price;
 
-    /// <summary>折扣百分比（促销时），如 30 表示 -30%。</summary>
     public int? DiscountPercent =>
         IsOnSale ? (int)Math.Round((1m - Price / OriginalPrice!.Value) * 100m) : null;
 
@@ -54,15 +51,12 @@ public class Product
     [Display(Name = "上架")]
     public bool IsActive { get; set; } = true;
 
-    // 店铺
     public int ShopId { get; set; }
 
     public Shop? Shop { get; set; }
 
-    // 多分类（多对多）
     public ICollection<Category> Categories { get; set; } = new List<Category>();
 
-    // 快递信息
     [StringLength(100)]
     [Display(Name = "发货地")]
     public string? ShippingFrom { get; set; }
@@ -78,6 +72,9 @@ public class Product
     [StringLength(50)]
     [Display(Name = "邮费（英文）")]
     public string? ShippingFeeEn { get; set; }
+
+    [Display(Name = "邮费金额")]
+    public decimal ShippingFeeAmount { get; set; }
 
     [StringLength(100)]
     [Display(Name = "发货时效")]
@@ -95,7 +92,6 @@ public class Product
     [Display(Name = "图文介绍（英文）")]
     public string? DetailHtmlEn { get; set; }
 
-    // 规格变体 / 参数 / 评价
     public ICollection<ProductSku> Skus { get; set; } = new List<ProductSku>();
 
     public ICollection<ProductSpec> Specs { get; set; } = new List<ProductSpec>();

@@ -21,7 +21,7 @@
             <dl class="row mb-0">
                 <dt class="col-sm-3 text-muted">@Loc["Name"]</dt><dd class="col-sm-9">@L10n.Name(Model)</dd>
                 <dt class="col-sm-3 text-muted">@Loc["Shop"]</dt><dd class="col-sm-9">@L10n.Name(Model.Shop)</dd>
-                <dt class="col-sm-3 text-muted">@Loc["Category"]</dt><dd class="col-sm-9">@string.Join(" / ", Model.Categories.Select(c => L10n.Name(c)))</dd>
+                <dt class="col-sm-3 text-muted">@Loc["Category"]</dt><dd class="col-sm-9">@string.Join(" / ", Model.Categories.Select(L10n.Name))</dd>
                 <dt class="col-sm-3 text-muted">@Loc["Sku"]</dt><dd class="col-sm-9">@(Model.Sku ?? "—")</dd>
                 <dt class="col-sm-3 text-muted">@Loc["Price"]</dt><dd class="col-sm-9">¥@Model.Price.ToString("F2")</dd>
                 <dt class="col-sm-3 text-muted">@Loc["Stock"]</dt><dd class="col-sm-9">@Model.Stock</dd>

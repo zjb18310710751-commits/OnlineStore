@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace OnlineStore.ViewModels;
 
-/// <summary>商品创建/编辑表单视图模型。</summary>
 public class ProductFormViewModel
 {
     public int Id { get; set; }
@@ -77,6 +76,10 @@ public class ProductFormViewModel
     [StringLength(50)]
     [Display(Name = "邮费（英文）")]
     public string? ShippingFeeEn { get; set; }
+
+    [Range(0, 9999999, ErrorMessage = "ShippingFeeAmountInvalid")]
+    [Display(Name = "邮费金额")]
+    public decimal ShippingFeeAmount { get; set; }
 
     [StringLength(100)]
     [Display(Name = "发货时效")]

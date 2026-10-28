@@ -54,6 +54,11 @@ public class ProductSpecsController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(ProductSpec spec)
     {
+        if (await _productService.GetByIdAsync(spec.ProductId) is null)
+        {
+            return NotFound();
+        }
+
         if (!ModelState.IsValid)
         {
             await LoadProductAsync(spec.ProductId);
@@ -87,13 +92,25 @@ public class ProductSpecsController : Controller
             return NotFound();
         }
 
+        var existing = await _specService.GetByIdAsync(id);
+        if (existing is null || existing.ProductId != spec.ProductId
+            || await _productService.GetByIdAsync(spec.ProductId) is null)
+        {
+            return NotFound();
+        }
+
         if (!ModelState.IsValid)
         {
             await LoadProductAsync(spec.ProductId);
             return View(spec);
         }
 
-        await _specService.UpdateAsync(spec);
+        existing.Name = spec.Name;
+        existing.NameEn = spec.NameEn;
+        existing.Value = spec.Value;
+        existing.ValueEn = spec.ValueEn;
+        existing.DisplayOrder = spec.DisplayOrder;
+        await _specService.UpdateAsync(existing);
         TempData["Success"] = _loc["SpecUpdated"].Value;
         return RedirectToAction(nameof(Index), new { productId = spec.ProductId });
     }

@@ -1,22 +1,30 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace OnlineStore.ViewModels;
 
-/// <summary>个人中心地址维护。</summary>
 public class AddressViewModel : ProfileSidebarViewModel
 {
     public int? Id { get; set; }
 
+    [StringLength(100)]
     public string? RecipientName { get; set; }
 
+    [StringLength(20)]
     public string? PhoneNumber { get; set; }
 
+    [StringLength(200)]
     public string? Address { get; set; }
 
+    [StringLength(200)]
     public string? AddressLine2 { get; set; }
 
+    [StringLength(100)]
     public string? City { get; set; }
 
+    [StringLength(100)]
     public string? PostalCode { get; set; }
 
+    [StringLength(100)]
     public string? Country { get; set; }
 
     public bool IsDefault { get; set; }

@@ -6,7 +6,16 @@
     <div class="card shadow-sm mb-4">
         <div class="card-body">
             <div class="d-flex align-items-center gap-3">
-                <div class="shop-avatar" style="width:64px;height:64px;font-size:1.8rem;"><i class="bi bi-shop"></i></div>
+                <div class="shop-avatar shop-avatar--logo">
+                    @if (!string.IsNullOrWhiteSpace(Model.Shop.LogoUrl))
+                    {
+                        <img src="@Model.Shop.LogoUrl" alt="@L10n.Name(Model.Shop)" />
+                    }
+                    else
+                    {
+                        <i class="bi bi-shop"></i>
+                    }
+                </div>
                 <div>
                     <h1 class="h5 mb-1">@L10n.Name(Model.Shop)</h1>
                     <div class="text-warning">

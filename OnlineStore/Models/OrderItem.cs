@@ -2,7 +2,6 @@ using System.ComponentModel.DataAnnotations;
 
 namespace OnlineStore.Models;
 
-/// <summary>订单明细：下单时的商品快照（名称/颜色/规格/单价/数量）。</summary>
 public class OrderItem
 {
     public int Id { get; set; }
@@ -12,6 +11,8 @@ public class OrderItem
     public Order? Order { get; set; }
 
     public int ProductId { get; set; }
+
+    public int? SkuId { get; set; }
 
     [StringLength(150)]
     public string ProductName { get; set; } = string.Empty;
@@ -35,6 +36,5 @@ public class OrderItem
 
     public int Quantity { get; set; }
 
-    /// <summary>小计 = 单价 × 数量。</summary>
     public decimal LineTotal => Price * Quantity;
 }

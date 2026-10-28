@@ -2,7 +2,6 @@ using System.ComponentModel.DataAnnotations;
 
 namespace OnlineStore.Models;
 
-/// <summary>订单：用户从购物车提交后生成，含收货信息与订单明细。</summary>
 public class Order
 {
     public int Id { get; set; }
@@ -11,7 +10,6 @@ public class Order
     [Display(Name = "订单号")]
     public string OrderNo { get; set; } = string.Empty;
 
-    /// <summary>下单用户 Id。</summary>
     public string? UserId { get; set; }
 
     [StringLength(50)]
@@ -29,18 +27,69 @@ public class Order
     [Display(Name = "订单金额")]
     public decimal Total { get; set; }
 
-    /// <summary>使用的优惠码（如有）。</summary>
     [StringLength(50)]
     public string? CouponCode { get; set; }
 
-    /// <summary>优惠金额（无优惠为 0）。</summary>
+    [StringLength(100)]
+    public string? CouponName { get; set; }
+
     public decimal DiscountAmount { get; set; }
+
+    public decimal ShippingAmount { get; set; }
+
+    [StringLength(50)]
+    public string PaymentMethod { get; set; } = "cash_on_delivery";
+
+    [StringLength(500)]
+    public string? OrderNotes { get; set; }
 
     [StringLength(20)]
     [Display(Name = "订单状态")]
     public string Status { get; set; } = "待发货";
 
+    [StringLength(50)]
+    [Display(Name = "承运商")]
+    public string? Carrier { get; set; }
+
+    [StringLength(50)]
+    [Display(Name = "运单号")]
+    public string? TrackingNumber { get; set; }
+
+    [StringLength(200)]
+    public string? ShippingOrigin { get; set; }
+
+    [StringLength(200)]
+    public string? ShippingOriginEn { get; set; }
+
+    [StringLength(100)]
+    public string? ShippingFeeText { get; set; }
+
+    [StringLength(100)]
+    public string? ShippingFeeTextEn { get; set; }
+
+    [StringLength(100)]
+    public string? DispatchTimeText { get; set; }
+
+    [StringLength(100)]
+    public string? DispatchTimeTextEn { get; set; }
+
+    public DateTime? ExpectedDispatchAt { get; set; }
+
+    public DateTime? ShippedAt { get; set; }
+
+    public DateTime? DeliveredAt { get; set; }
+
+    public DateTime? SignedAt { get; set; }
+
+    public DateTime? UserDeletedAt { get; set; }
+
+    public DateTime? InventoryRestoredAt { get; set; }
+
+    public int? ReplacementForOrderId { get; set; }
+
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     public ICollection<OrderItem> Items { get; set; } = new List<OrderItem>();
+
+    public ICollection<AfterSalesRequest> AfterSalesRequests { get; set; } = new List<AfterSalesRequest>();
 }

@@ -3,7 +3,6 @@ using OnlineStore.Services;
 
 namespace OnlineStore.Tests.Services;
 
-/// <summary>优惠券金额计算纯函数单元测试。</summary>
 public class CouponCalculatorTests
 {
     private static Coupon Percent(decimal value) => new()
@@ -44,6 +43,26 @@ public class CouponCalculatorTests
     {
         Assert.True(CouponCalculator.TryCompute(Fixed(200), 100m, out var discount));
         Assert.Equal(100m, discount);
+    }
+
+    [Fact]
+    public void TryCompute_Percent_RespectsMaximumDiscount()
+    {
+        var coupon = Percent(50);
+        coupon.MaxDiscountAmount = 12m;
+
+        Assert.True(CouponCalculator.TryCompute(coupon, 100m, out var discount));
+        Assert.Equal(12m, discount);
+    }
+
+    [Fact]
+    public void TryCompute_FreeShipping_ReturnsBenefitWithoutCashDiscount()
+    {
+        var coupon = new Coupon { DiscountType = CouponDiscountType.FreeShipping };
+
+        Assert.True(CouponCalculator.TryCompute(coupon, 100m, out var discount, out var freeShipping));
+        Assert.Equal(0m, discount);
+        Assert.True(freeShipping);
     }
 
     [Theory]

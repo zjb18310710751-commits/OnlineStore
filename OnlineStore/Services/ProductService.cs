@@ -65,7 +65,7 @@ public class ProductService : IProductService
             "price_asc" => q.OrderBy(p => p.Price),
             "price_desc" => q.OrderByDescending(p => p.Price),
             "name" => q.OrderBy(p => p.Name),
-            _ => q.OrderByDescending(p => p.CreatedAt) // 默认：最新上架
+            _ => q.OrderByDescending(p => p.CreatedAt)
         };
 
         var total = await q.CountAsync();
@@ -79,7 +79,6 @@ public class ProductService : IProductService
             .Take(pageSize)
             .ToListAsync();
 
-        // 搜索无结果时，给一组「猜你喜欢」推荐
         var recommendations = new List<Product>();
         if (total == 0 && !string.IsNullOrWhiteSpace(query.SearchTerm))
         {
@@ -128,7 +127,6 @@ public class ProductService : IProductService
             .Include(p => p.Categories)
             .Include(p => p.Skus)
             .Include(p => p.Specs)
-            .Include(p => p.Reviews)
             .Include(p => p.Images)
             .FirstOrDefaultAsync(p => p.Id == id);
 
@@ -196,7 +194,6 @@ public class ProductService : IProductService
         var ids = categoryIds.Distinct().ToList();
         var categories = await _context.Categories.Where(c => ids.Contains(c.Id)).ToListAsync();
 
-        // 已跟踪的实体先加载现有分类，再 Clear+Add，EF 才能正确计算多对多联结表差异
         var nav = _context.Entry(product).Collection(p => p.Categories);
         if (!nav.IsLoaded)
         {

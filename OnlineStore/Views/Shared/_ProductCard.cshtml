@@ -1,45 +1,44 @@
 @model Product
 <div class="col">
-    <div class="card h-100 product-card shadow-sm">
-        <a asp-controller="Products" asp-action="Details" asp-route-id="@Model.Id" class="product-thumb d-flex align-items-center justify-content-center">
+    <article class="product-card sf-product-card">
+        <a asp-controller="Products" asp-action="Details" asp-route-id="@Model.Id" class="product-thumb">
             @if (!string.IsNullOrEmpty(Model.ImageUrl))
             {
-                <img src="@Model.ImageUrl" class="product-thumb-img" alt="@L10n.Name(Model)" loading="lazy" />
+                <img src="@Model.ImageUrl" class="product-thumb-img" alt="@L10n.Name(Model)" loading="lazy" width="600" height="600" />
             }
             else
             {
-                <i class="bi bi-image product-thumb-placeholder"></i>
+                <span class="sf-image-empty"><i class="bi bi-image" aria-hidden="true"></i><span>@L10n.Text("暂无图片", "Image unavailable")</span></span>
             }
         </a>
-        <div class="card-body d-flex flex-column">
-            <span class="category-badge text-uppercase">@L10n.Name(Model.Categories.FirstOrDefault())</span>
-            <h5 class="card-title fs-6">
-                <a asp-controller="Products" asp-action="Details" asp-route-id="@Model.Id" class="product-link">@L10n.Name(Model)</a>
-            </h5>
-            <div class="mt-auto d-flex justify-content-between align-items-center">
+        <div class="sf-product-info">
+            @if (Model.IsOnSale)
+            {
+                <p class="sf-product-note">@Loc["LimitedTimeDiscount"]</p>
+            }
+            <h3 class="sf-product-title"><a asp-controller="Products" asp-action="Details" asp-route-id="@Model.Id">@L10n.Name(Model)</a></h3>
+            <p class="sf-product-category">@L10n.Name(Model.Categories.FirstOrDefault())</p>
+            <div class="sf-product-price">
+                <span>¥@Model.Price.ToString("F2")</span>
                 @if (Model.IsOnSale)
                 {
-                    <div class="d-flex align-items-center gap-1 flex-wrap">
-                        <span class="price text-danger">¥@Model.Price.ToString("F2")</span>
-                        <span class="text-muted small text-decoration-line-through">¥@Model.OriginalPrice!.Value.ToString("F2")</span>
-                        <span class="badge bg-danger">@Loc["DiscountPercent", Model.DiscountPercent ?? 0]</span>
-                    </div>
+                    <del>¥@Model.OriginalPrice!.Value.ToString("F2")</del>
+                    <span class="sf-product-discount">@Loc["DiscountPercent", Model.DiscountPercent ?? 0]</span>
                 }
-                else
-                {
-                    <span class="price">¥@Model.Price.ToString("F2")</span>
-                }
-                <span class="badge @(Model.Stock > 0 ? "bg-success-subtle text-success" : "bg-danger-subtle text-danger")">@(Model.Stock > 0 ? Loc["InStock"].Value : Loc["OutOfStock"].Value)</span>
             </div>
             @if (Model.Stock > 0)
             {
-                <form asp-controller="Cart" asp-action="Add" method="post" class="mt-2">
+                <form asp-controller="Cart" asp-action="Add" method="post" class="sf-product-action">
                     <input type="hidden" name="productId" value="@Model.Id" />
                     <input type="hidden" name="quantity" value="1" />
                     <input type="hidden" name="returnUrl" value="@($"{Context.Request.Path}{Context.Request.QueryString}")" />
-                    <button type="submit" class="btn btn-sm btn-amazon w-100"><i class="bi bi-cart-plus me-1"></i>@Loc["AddToCart"]</button>
+                    <button type="submit" aria-label="@Loc["AddToCart"] · @L10n.Name(Model)"><span>@Loc["AddToCart"]</span><i class="bi bi-plus-lg" aria-hidden="true"></i></button>
                 </form>
             }
+            else
+            {
+                <p class="sf-sold-out">@Loc["OutOfStock"]</p>
+            }
         </div>
-    </div>
+    </article>
 </div>

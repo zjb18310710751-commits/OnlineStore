@@ -1,0 +1,173 @@
+.storefront .sf-home-hero {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+}
+.storefront .sf-carousel {
+    --campaign-heading: clamp(36px, 4.5vw, 72px);
+    --campaign-copy-bottom: 96px;
+    --campaign-control-inset: 24px;
+    position: relative;
+    width: 100%;
+    color: #fff;
+    background: #202425;
+}
+.storefront .sf-carousel-stage {
+    display: grid;
+    min-height: clamp(500px, calc(100vh - var(--sf-header-height, 76px)), 900px);
+    min-height: clamp(500px, calc(100svh - var(--sf-header-height, 76px)), 900px);
+    overflow: hidden;
+    isolation: isolate;
+}
+.storefront .sf-campaign {
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    grid-area: 1 / 1;
+    min-width: 0;
+    min-height: 0;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 650ms ease, visibility 650ms;
+}
+.storefront .sf-campaign.is-active {
+    z-index: 1;
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+.storefront .sf-campaign-media {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+}
+.storefront .sf-campaign-media img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+.storefront .sf-campaign-media::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, transparent 30%, rgb(0 0 0 / 8%) 46%, rgb(0 0 0 / 55%) 80%, rgb(0 0 0 / 65%) 100%);
+    pointer-events: none;
+}
+.storefront .sf-campaign-copy {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    padding: 128px var(--sf-gutter, 24px) var(--campaign-copy-bottom);
+    text-align: center;
+}
+.storefront .sf-campaign-copy h2 {
+    max-width: 1400px;
+    margin: 0 auto;
+    color: #fff;
+    font-size: var(--campaign-heading);
+    font-weight: 900;
+    line-height: 1.1;
+    letter-spacing: -.045em;
+    text-wrap: balance;
+    overflow-wrap: anywhere;
+}
+.storefront .sf-campaign-description {
+    max-width: 760px;
+    margin: 16px auto 22px;
+    color: #fff;
+    font-size: 16px;
+    line-height: 1.6;
+    text-wrap: pretty;
+    overflow-wrap: anywhere;
+}
+.storefront .sf-campaign-copy h2 + .sf-button { margin-top: 22px; }
+.storefront .sf-campaign-copy .sf-button {
+    min-width: 92px;
+    min-height: 44px;
+    padding: 10px 26px;
+    border: 1px solid #fff;
+    border-radius: 999px;
+    background: #fff;
+    color: #111;
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.4;
+    text-decoration: none;
+}
+.storefront .sf-campaign-copy .sf-button:hover {
+    border-color: #e5e5e5;
+    background: #e5e5e5;
+    color: #111;
+}
+.storefront .sf-carousel-controls {
+    position: absolute;
+    z-index: 3;
+    inset: 0;
+    pointer-events: none;
+}
+.storefront .sf-carousel-controls[hidden] { display: none; }
+.storefront .sf-carousel-navigation {
+    position: absolute;
+    bottom: var(--campaign-control-inset);
+    left: 50%;
+    display: flex;
+    align-items: center;
+    transform: translateX(-50%);
+    pointer-events: auto;
+}
+.storefront .sf-carousel-navigation { max-width: calc(100% - 32px); overflow-x: auto; scrollbar-width: thin; }
+.storefront .sf-carousel-dot { flex-shrink: 0; }
+.storefront .sf-carousel-dot {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+}
+.storefront .sf-carousel-dot-mark {
+    width: 7px;
+    height: 7px;
+    border: 1px solid rgb(255 255 255 / 90%);
+    border-radius: 50%;
+    background: rgb(255 255 255 / 35%);
+    transition: background 180ms ease, transform 180ms ease;
+}
+.storefront .sf-carousel-dot[aria-current="true"] .sf-carousel-dot-mark {
+    background: #fff;
+    transform: scale(1.25);
+}
+.storefront .sf-carousel :is(button, a):focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 4px;
+    box-shadow: 0 0 0 6px rgb(0 0 0 / 55%);
+}
+@media (max-width: 767px) {
+    .storefront .sf-carousel {
+        --campaign-heading: clamp(30px, 7.5vw, 46px);
+        --campaign-copy-bottom: 92px;
+        --campaign-control-inset: 16px;
+    }
+    .storefront .sf-campaign-media img { object-position: 75% center; }
+    .storefront .sf-campaign-description {
+        max-width: 480px;
+        margin: 14px auto 20px;
+        font-size: 14px;
+        line-height: 1.6;
+    }
+}
+@media (max-width: 575px) {
+    .storefront .sf-carousel { --campaign-copy-bottom: 136px; }
+    .storefront .sf-carousel-navigation { max-width: calc(100% - 32px); }
+}
+@media (prefers-reduced-motion: reduce) {
+    .storefront .sf-campaign,
+    .storefront .sf-carousel-dot-mark { transition: none; }
+}

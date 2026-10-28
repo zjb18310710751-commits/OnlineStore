@@ -5,13 +5,9 @@ using OnlineStore.Services;
 
 namespace OnlineStore.Tests.Services;
 
-/// <summary>
-/// 购物车业务层单元测试：验证加入、累加、库存上限、更新数量、移除与清空。
-/// 通过 <see cref="ICartStore"/> 抽象隔离存储，用内存假实现替代 Session（可测试性）。
-/// </summary>
 public class CartServiceTests
 {
-    /// <summary>内存版购物车存储：替代真实的 Session 存储。</summary>
+
     private sealed class FakeCartStore : ICartStore
     {
         public List<CartItem> Items { get; private set; } = new();
@@ -64,8 +60,8 @@ public class CartServiceTests
         using var context = await CreateSeededContextAsync();
         var cartService = new CartService(new FakeCartStore(), new ProductService(context), new ProductSkuService(context));
 
-        await cartService.AddAsync(1, 3); // 库存 5，加 3
-        await cartService.AddAsync(1, 3); // 再累加应被库存上限截断
+        await cartService.AddAsync(1, 3);
+        await cartService.AddAsync(1, 3);
 
         var cart = await cartService.GetCartAsync();
         Assert.Single(cart.Items);
@@ -78,8 +74,8 @@ public class CartServiceTests
         using var context = await CreateSeededContextAsync();
         var cartService = new CartService(new FakeCartStore(), new ProductService(context), new ProductSkuService(context));
 
-        await cartService.AddAsync(2); // 缺货
-        await cartService.AddAsync(3); // 已下架
+        await cartService.AddAsync(2);
+        await cartService.AddAsync(3);
 
         Assert.Empty((await cartService.GetCartAsync()).Items);
     }

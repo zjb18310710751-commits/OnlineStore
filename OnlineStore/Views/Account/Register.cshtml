@@ -1,121 +1,106 @@
 @model RegisterViewModel
 @{
     ViewData["Title"] = Loc["RegisterTitle"].Value;
-    var isPhone = string.Equals(Model.RegisterBy, "phone", StringComparison.OrdinalIgnoreCase);
 }
-<div class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-md-6 col-lg-4">
-            <div class="card shadow-sm">
-                <div class="card-body p-4">
-                    <h1 class="h4 mb-3 text-center">@Loc["RegisterTitle"]</h1>
+<div class="account-auth-page">
+    <div class="account-auth-panel">
+        <header class="account-auth-header">
+            <a class="account-auth-wordmark" asp-controller="Home" asp-action="Index" aria-label="ZHY">ZHY.</a>
+            <h1 class="account-auth-title">@L10n.Text("创建你的账户，收藏喜欢的好物。", "Create your account and start saving favourites.")</h1>
+            <p class="account-auth-subtitle">@L10n.Text("填写信息并验证邮箱，订单与常用地址会自动同步。", "Fill in your details and verify your email. Orders and saved addresses will stay in sync.")</p>
+        </header>
 
-                    <ul class="nav nav-pills nav-fill mb-3" role="tablist">
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link @(isPhone ? "" : "active")" id="email-register-tab" data-bs-toggle="pill" data-bs-target="#email-register" type="button" role="tab" aria-selected="@(!isPhone)">@Loc["EmailRegister"]</button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link @(isPhone ? "active" : "")" id="phone-register-tab" data-bs-toggle="pill" data-bs-target="#phone-register" type="button" role="tab" aria-selected="@(isPhone)">@Loc["PhoneRegister"]</button>
-                        </li>
-                    </ul>
+        <form id="registerForm" class="account-auth-form" method="post" asp-controller="Account" asp-action="Register">
+            <input type="hidden" id="RegisterBy" name="RegisterBy" value="email" />
+            <div asp-validation-summary="All" class="text-danger"></div>
 
-                    <form method="post" asp-controller="Account" asp-action="Register">
-                        <input type="hidden" asp-for="RegisterBy" />
-                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+            <div>
+                <label asp-for="Email" class="account-auth-label">@Loc["Email"]</label>
+                <div class="input-group">
+                    <input asp-for="Email" class="form-control account-auth-control" autocomplete="username" />
+                    <button type="button" class="btn btn-outline-primary account-auth-code-button"
+                            data-send-code-url="@Url.Action("SendCode", "Account")"
+                            data-send-code-purpose="register"
+                            data-send-code-channel="email"
+                            data-send-code-target="#Email"
+                            data-send-code-status="#emailSendCodeStatus"
+                            data-send-code-success="@Loc["SendCodeSuccess"].Value"
+                            data-send-code-failed="@Loc["SendCodeFailed"].Value"
+                            data-send-code-invalid="@Loc["InvalidEmail"].Value"
+                            data-send-code-label="@Loc["SendVerificationCode"].Value"
+                            data-send-code-demo="@Loc["DemoCode"].Value">@Loc["SendVerificationCode"]</button>
+                </div>
+                <div id="emailSendCodeStatus" class="form-text"></div>
+                <span asp-validation-for="Email" class="text-danger small"></span>
+            </div>
 
-                        <div class="tab-content">
-                            <div class="tab-pane fade @(isPhone ? "" : "show active")" id="email-register" role="tabpanel" aria-labelledby="email-register-tab">
-                                <div class="mb-3">
-                                    <label asp-for="Email" class="form-label">@Loc["Email"]</label>
-                                    <div class="input-group">
-                                        <input asp-for="Email" class="form-control" autocomplete="username" />
-                                        <button type="button" class="btn btn-outline-primary"
-                                                data-send-code-url="@Url.Action("SendCode", "Account")"
-                                                data-send-code-purpose="register"
-                                                data-send-code-channel="email"
-                                                data-send-code-target="#Email"
-                                                data-send-code-status="#emailSendCodeStatus"
-                                                data-send-code-success="@Loc["SendCodeSuccess"].Value"
-                                                data-send-code-failed="@Loc["SendCodeFailed"].Value"
-                                                data-send-code-invalid="@Loc["InvalidEmail"].Value"
-                                                data-send-code-label="@Loc["SendVerificationCode"].Value"
-                                                data-send-code-demo="@Loc["DemoCode"].Value">@Loc["SendVerificationCode"]</button>
-                                    </div>
-                                    <div id="emailSendCodeStatus" class="form-text"></div>
-                                    <span asp-validation-for="Email" class="text-danger small"></span>
-                                </div>
-                            </div>
-                            <div class="tab-pane fade @(isPhone ? "show active" : "")" id="phone-register" role="tabpanel" aria-labelledby="phone-register-tab">
-                                <div class="mb-3">
-                                    <label asp-for="PhoneNumber" class="form-label">@Loc["PhoneNumber"]</label>
-                                    <div class="input-group">
-                                        <input asp-for="PhoneNumber" class="form-control" autocomplete="tel" />
-                                        <button type="button" class="btn btn-outline-primary"
-                                                data-send-code-url="@Url.Action("SendCode", "Account")"
-                                                data-send-code-purpose="register"
-                                                data-send-code-channel="sms"
-                                                data-send-code-target="#PhoneNumber"
-                                                data-send-code-status="#phoneSendCodeStatus"
-                                                data-send-code-success="@Loc["SendCodeSuccess"].Value"
-                                                data-send-code-failed="@Loc["SendCodeFailed"].Value"
-                                                data-send-code-invalid="@Loc["InvalidPhone"].Value"
-                                                data-send-code-label="@Loc["SendVerificationCode"].Value"
-                                                data-send-code-demo="@Loc["DemoCode"].Value">@Loc["SendVerificationCode"]</button>
-                                    </div>
-                                    <div id="phoneSendCodeStatus" class="form-text"></div>
-                                    <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
-                                </div>
-                            </div>
-                        </div>
+            <div class="account-auth-code-field">
+                <label asp-for="VerificationCode" class="account-auth-label">@Loc["VerificationCode"]</label>
+                <input asp-for="VerificationCode" class="form-control account-auth-control" inputmode="numeric" maxlength="6" autocomplete="one-time-code" />
+                <span asp-validation-for="VerificationCode" class="text-danger small"></span>
+            </div>
 
-                        <div class="mb-3">
-                            <label asp-for="VerificationCode" class="form-label">@Loc["VerificationCode"]</label>
-                            <input asp-for="VerificationCode" class="form-control" autocomplete="one-time-code" />
-                            <span asp-validation-for="VerificationCode" class="text-danger small"></span>
-                        </div>
-                        <div class="row g-3 mb-1">
-                            <div class="col-6">
-                                <label asp-for="FirstName" class="form-label">@Loc["FirstName"]</label>
-                                <input asp-for="FirstName" class="form-control" autocomplete="given-name" />
-                                <span asp-validation-for="FirstName" class="text-danger small"></span>
-                            </div>
-                            <div class="col-6">
-                                <label asp-for="LastName" class="form-label">@Loc["LastName"]</label>
-                                <input asp-for="LastName" class="form-control" autocomplete="family-name" />
-                                <span asp-validation-for="LastName" class="text-danger small"></span>
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">@Loc["Address"]</label>
-                            <button type="button" class="register-address-trigger"
-                                    data-bs-toggle="modal" data-bs-target="#registerAddressModal">
-                                <span id="registerAddressSummary">
-                                    @(string.IsNullOrWhiteSpace(Model.Address) ? Loc["AddAddress"].Value : Model.Address)
-                                </span>
-                                <i class="bi bi-chevron-right"></i>
-                            </button>
-                            <input asp-for="Address" id="registerAddressHidden" type="hidden" autocomplete="street-address" />
-                            <span asp-validation-for="Address" class="text-danger small"></span>
-                        </div>
-                        <div class="mb-3">
-                            <label asp-for="Password" class="form-label">@Loc["Password"]</label>
-                            <input asp-for="Password" class="form-control" autocomplete="new-password" />
-                            <span asp-validation-for="Password" class="text-danger small"></span>
-                        </div>
-                        <div class="mb-3">
-                            <label asp-for="ConfirmPassword" class="form-label">@Loc["ConfirmPassword"]</label>
-                            <input asp-for="ConfirmPassword" class="form-control" autocomplete="new-password" />
-                            <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
-                        </div>
-                        <button type="submit" class="btn btn-primary w-100">@Loc["Register"]</button>
-                    </form>
+            <div class="row g-3">
+                <div class="col-6">
+                    <label asp-for="FirstName" class="account-auth-label">@Loc["FirstName"]</label>
+                    <input asp-for="FirstName" class="form-control account-auth-control" autocomplete="given-name" />
+                    <span asp-validation-for="FirstName" class="text-danger small"></span>
+                </div>
+                <div class="col-6">
+                    <label asp-for="LastName" class="account-auth-label">@Loc["LastName"]</label>
+                    <input asp-for="LastName" class="form-control account-auth-control" autocomplete="family-name" />
+                    <span asp-validation-for="LastName" class="text-danger small"></span>
                 </div>
             </div>
-            <p class="text-center small mt-3">
-                @Loc["HaveAccount"] <a asp-controller="Account" asp-action="Login">@Loc["Login"]</a>
-            </p>
-            <p class="text-center text-muted small mt-2">@Loc["RegisterHint"]</p>
-        </div>
+
+            <div>
+                <label asp-for="Password" class="account-auth-label">@Loc["Password"]</label>
+                <div class="password-field">
+                    <input asp-for="Password" class="form-control account-auth-control" autocomplete="new-password" />
+                    <button type="button" class="password-toggle" data-password-target="Password"
+                            data-show-label="@L10n.Text("显示密码", "Show password")"
+                            data-hide-label="@L10n.Text("隐藏密码", "Hide password")"
+                            aria-label="@L10n.Text("显示密码", "Show password")" aria-pressed="false">
+                        <i class="bi bi-eye" aria-hidden="true"></i>
+                    </button>
+                </div>
+                <span asp-validation-for="Password" class="text-danger small"></span>
+            </div>
+
+            <div>
+                <label asp-for="ConfirmPassword" class="account-auth-label">@Loc["ConfirmPassword"]</label>
+                <div class="password-field">
+                    <input asp-for="ConfirmPassword" class="form-control account-auth-control" autocomplete="new-password" />
+                    <button type="button" class="password-toggle" data-password-target="ConfirmPassword"
+                            data-show-label="@L10n.Text("显示密码", "Show password")"
+                            data-hide-label="@L10n.Text("隐藏密码", "Hide password")"
+                            aria-label="@L10n.Text("显示密码", "Show password")" aria-pressed="false">
+                        <i class="bi bi-eye" aria-hidden="true"></i>
+                    </button>
+                </div>
+                <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+            </div>
+
+            <div>
+                <label class="account-auth-label">@Loc["Address"]</label>
+                <button type="button" class="account-auth-address-trigger"
+                        data-bs-toggle="modal" data-bs-target="#registerAddressModal">
+                    <span id="registerAddressSummary">
+                        @(string.IsNullOrWhiteSpace(Model.Address) ? Loc["AddAddress"].Value : Model.Address)
+                    </span>
+                    <i class="bi bi-chevron-right" aria-hidden="true"></i>
+                </button>
+                <input asp-for="Address" id="registerAddressHidden" type="hidden" autocomplete="street-address" />
+                <span asp-validation-for="Address" class="text-danger small"></span>
+            </div>
+
+            <button type="submit" class="btn btn-primary account-auth-submit">@Loc["Register"]</button>
+            <p class="account-auth-hint">@Loc["RegisterHint"]</p>
+        </form>
+
+        <p class="account-auth-footer">
+            @Loc["HaveAccount"] <a asp-controller="Account" asp-action="Login">@Loc["Login"]</a>
+        </p>
     </div>
 </div>
 
@@ -137,38 +122,38 @@
                         <label for="registerAddressLine1" class="form-label">
                             @Loc["AddressLine1"] <span class="address-required">*</span>
                         </label>
-                        <input id="registerAddressLine1" class="form-control address-form-control"
-                               value="@Model.AddressLine1" autocomplete="address-line1"
+                        <input asp-for="AddressLine1" id="registerAddressLine1" form="registerForm" maxlength="200" class="form-control address-form-control"
+                               autocomplete="address-line1"
                                placeholder="@Loc["AddressLine1"]" />
                     </div>
                     <div class="col-12">
                         <label for="registerAddressLine2" class="form-label">@Loc["AddressLine2Optional"]</label>
-                        <input id="registerAddressLine2" class="form-control address-form-control"
-                               value="@Model.AddressLine2" autocomplete="address-line2"
+                        <input asp-for="AddressLine2" id="registerAddressLine2" form="registerForm" maxlength="200" class="form-control address-form-control"
+                               autocomplete="address-line2"
                                placeholder="@Loc["AddressLine2Optional"]" />
                     </div>
                     <div class="col-6 col-md-4">
                         <label for="registerAddressCity" class="form-label">
                             @Loc["City"] <span class="address-required">*</span>
                         </label>
-                        <input id="registerAddressCity" class="form-control address-form-control"
-                               value="@Model.City" autocomplete="address-level2"
+                        <input asp-for="City" id="registerAddressCity" form="registerForm" maxlength="100" class="form-control address-form-control"
+                               autocomplete="address-level2"
                                placeholder="@Loc["City"]" />
                     </div>
                     <div class="col-6 col-md-4">
                         <label for="registerAddressPostal" class="form-label">
                             @Loc["PostalCode"] <span class="address-required">*</span>
                         </label>
-                        <input id="registerAddressPostal" class="form-control address-form-control"
-                               value="@Model.PostalCode" autocomplete="postal-code"
+                        <input asp-for="PostalCode" id="registerAddressPostal" form="registerForm" maxlength="100" class="form-control address-form-control"
+                               autocomplete="postal-code"
                                placeholder="@Loc["PostalCode"]" />
                     </div>
                     <div class="col-12 col-md-4">
                         <label for="registerAddressCountry" class="form-label">
                             @Loc["Country"] <span class="address-required">*</span>
                         </label>
-                        <input id="registerAddressCountry" class="form-control address-form-control"
-                               value="@Model.Country" autocomplete="country-name"
+                        <input asp-for="Country" id="registerAddressCountry" form="registerForm" maxlength="100" class="form-control address-form-control"
+                               autocomplete="country-name"
                                placeholder="@Loc["Country"]" />
                     </div>
                 </div>
@@ -186,17 +171,7 @@
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
     <script>
-        // 切换邮箱/手机号 Tab 时，同步隐藏字段 RegisterBy 的值，供后端判断账号标识
         document.addEventListener('DOMContentLoaded', function () {
-            document.querySelectorAll('#email-register-tab, #phone-register-tab').forEach(function (btn) {
-                btn.addEventListener('shown.bs.tab', function () {
-                    var registerBy = document.getElementById('RegisterBy');
-                    if (registerBy) {
-                        registerBy.value = btn.id === 'email-register-tab' ? 'email' : 'phone';
-                    }
-                });
-            });
-
             var addressModal = document.getElementById('registerAddressModal');
             document.getElementById('registerAddressSave').addEventListener('click', function () {
                 var parts = [

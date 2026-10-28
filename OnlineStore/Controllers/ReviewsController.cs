@@ -7,13 +7,13 @@ using OnlineStore.Services;
 
 namespace OnlineStore.Controllers;
 
-/// <summary>前台评价：登录用户可为商品提交星级评价。</summary>
 [Authorize]
 public class ReviewsController : Controller
 {
     private readonly IReviewService _reviewService;
     private readonly IProductService _productService;
     private readonly IImageStorageService _imageStorage;
+    private readonly IOrderService _orderService;
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly IStringLocalizer<SharedResource> _loc;
 
@@ -21,19 +21,26 @@ public class ReviewsController : Controller
         IReviewService reviewService,
         IProductService productService,
         IImageStorageService imageStorage,
+        IOrderService orderService,
         UserManager<ApplicationUser> userManager,
         IStringLocalizer<SharedResource> localizer)
     {
         _reviewService = reviewService;
         _productService = productService;
         _imageStorage = imageStorage;
+        _orderService = orderService;
         _userManager = userManager;
         _loc = localizer;
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create(int productId, int rating, string? comment, IFormFile? image)
+    public async Task<IActionResult> Create(
+        int productId,
+        int rating,
+        string? comment,
+        IFormFile? image,
+        int orderId)
     {
         var product = await _productService.GetByIdAsync(productId);
         if (product is null)
@@ -42,8 +49,28 @@ public class ReviewsController : Controller
         }
 
         var user = await _userManager.GetUserAsync(User);
+        if (user is null) return Challenge();
 
-        // 可选：上传买家秀图片（不合法时忽略图片，评价仍可提交）
+        var order = await _orderService.GetByIdAsync(orderId);
+        if (order is null
+            || order.UserId != user.Id
+            || order.Status != OrderStatus.Completed
+            || order.Items.All(item => item.ProductId != productId))
+        {
+            TempData["Error"] = L10n.Text(
+                "只有已完成订单中的商品可以评价。",
+                "Only products from completed orders can be reviewed.");
+            return RedirectToAction("Details", "Products", new { id = productId });
+        }
+
+        comment = string.IsNullOrWhiteSpace(comment) ? null : comment.Trim();
+        if (comment?.Length > 1000 || rating is < 1 or > 5 || !ModelState.IsValid)
+        {
+            TempData["Error"] = L10n.Text("请选择有效评分，评价内容不能超过 1000 个字符。",
+                "Choose a valid rating and keep your review within 1,000 characters.");
+            return RedirectToAction("Details", "Products", new { id = productId });
+        }
+
         string? imageUrl = null;
         if (image is { Length: > 0 })
         {
@@ -51,19 +78,21 @@ public class ReviewsController : Controller
             {
                 imageUrl = await _imageStorage.SaveAsync(image);
             }
-            catch (InvalidOperationException)
+            catch (InvalidOperationException ex)
             {
-                imageUrl = null;
+                TempData["Error"] = ex.Message;
+                return RedirectToAction("Details", "Products", new { id = productId });
             }
         }
 
         var review = new Review
         {
             ProductId = productId,
+            OrderId = orderId,
             UserId = user?.Id,
             UserName = ResolveUserName(user),
             Rating = Math.Clamp(rating, 1, 5),
-            Comment = string.IsNullOrWhiteSpace(comment) ? null : comment.Trim(),
+            Comment = comment,
             ImageUrl = imageUrl
         };
 
@@ -76,12 +105,13 @@ public class ReviewsController : Controller
     {
         if (user is null)
         {
-            return "匿名用户";
+            return L10n.Text("匿名用户", "Anonymous");
         }
 
         var fullName = $"{user.LastName}{user.FirstName}".Trim();
-        return !string.IsNullOrWhiteSpace(fullName)
+        var name = !string.IsNullOrWhiteSpace(fullName)
             ? fullName
-            : user.Email?.Split('@')[0] ?? "用户";
+            : user.Email?.Split('@')[0] ?? L10n.Text("用户", "User");
+        return name[..Math.Min(name.Length, 50)];
     }
 }

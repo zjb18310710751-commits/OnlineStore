@@ -4,7 +4,6 @@ using OnlineStore.Services;
 
 namespace OnlineStore.Controllers;
 
-/// <summary>购物车：查看、加入、更新数量、移除、清空（基于会话，无需登录）。</summary>
 public class CartController : Controller
 {
     private readonly ICartService _cartService;
@@ -18,7 +17,7 @@ public class CartController : Controller
 
     public async Task<IActionResult> Index()
     {
-        var cart = await _cartService.GetCartAsync();
+        var cart = await _cartService.RefreshAsync();
         return View(cart);
     }
 
@@ -26,7 +25,13 @@ public class CartController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Add(int productId, int quantity = 1, int? skuId = null, string? returnUrl = null, bool buyNow = false)
     {
-        await _cartService.AddAsync(productId, quantity, skuId);
+        var added = await _cartService.AddAsync(productId, quantity, skuId);
+
+        if (!added)
+        {
+            TempData["Error"] = _loc["CartUnavailable"].Value;
+            return RedirectToLocal(returnUrl) ?? RedirectToAction("Index", "Products");
+        }
 
         if (buyNow)
         {
@@ -67,7 +72,6 @@ public class CartController : Controller
         return RedirectToAction(nameof(Index));
     }
 
-    /// <summary>仅当 returnUrl 为站内地址时回跳，避免开放重定向（安全性）。</summary>
     private IActionResult? RedirectToLocal(string? returnUrl)
     {
         if (!string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl))

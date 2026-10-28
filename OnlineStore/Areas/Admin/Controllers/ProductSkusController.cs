@@ -54,6 +54,11 @@ public class ProductSkusController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(ProductSku sku)
     {
+        if (await _productService.GetByIdAsync(sku.ProductId) is null)
+        {
+            return NotFound();
+        }
+
         if (!ModelState.IsValid)
         {
             await LoadProductAsync(sku.ProductId);
@@ -87,13 +92,28 @@ public class ProductSkusController : Controller
             return NotFound();
         }
 
+        var existing = await _skuService.GetByIdAsync(id);
+        if (existing is null || existing.ProductId != sku.ProductId
+            || await _productService.GetByIdAsync(sku.ProductId) is null)
+        {
+            return NotFound();
+        }
+
         if (!ModelState.IsValid)
         {
             await LoadProductAsync(sku.ProductId);
             return View(sku);
         }
 
-        await _skuService.UpdateAsync(sku);
+        existing.Color = sku.Color;
+        existing.ColorEn = sku.ColorEn;
+        existing.Spec = sku.Spec;
+        existing.SpecEn = sku.SpecEn;
+        existing.Price = sku.Price;
+        existing.Stock = sku.Stock;
+        existing.ImageUrl = sku.ImageUrl;
+        existing.IsActive = sku.IsActive;
+        await _skuService.UpdateAsync(existing);
         TempData["Success"] = _loc["SkuUpdated"].Value;
         return RedirectToAction(nameof(Index), new { productId = sku.ProductId });
     }

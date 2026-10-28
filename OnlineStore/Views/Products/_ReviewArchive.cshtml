@@ -1,0 +1,124 @@
+@model ProductReviewsPageViewModel
+@{
+    var averageFill = (Math.Clamp(Model.Average, 0, 5) * 20).ToString("0.#", System.Globalization.CultureInfo.InvariantCulture);
+    var ratingLabel = L10n.Text("{0} 分，满分 5 分", "{0} out of 5 stars");
+}
+<div class="sf-container reviews-archive-page">
+    <nav aria-label="breadcrumb" class="mb-3 reviews-archive-breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a asp-controller="Products" asp-action="Details" asp-route-id="@Model.Product.Id">@L10n.Name(Model.Product)</a></li>
+            <li class="breadcrumb-item active" aria-current="page">@Loc["Reviews"]</li>
+        </ol>
+    </nav>
+    <header class="reviews-archive-heading">
+        <div>
+            <p class="sf-reviews-eyebrow">@L10n.Text("来自日常的真实感受", "THE EVERYDAY PERSPECTIVE")</p>
+            <h1 tabindex="-1">@Loc["Reviews"] <span>(@Model.TotalCount)</span></h1>
+            <p class="reviews-archive-intro">@L10n.Text("看看大家怎么说，分享你的使用体验。", "Read their experience. Share your own.")</p>
+        </div>
+        <a asp-controller="Products" asp-action="Details" asp-route-id="@Model.Product.Id" class="reviews-archive-back">
+            @L10n.Text("返回商品", "Back to product") <i class="bi bi-arrow-right" aria-hidden="true"></i>
+        </a>
+    </header>
+    <div class="sf-reviews-layout reviews-archive-layout">
+        <aside class="sf-reviews-overview">
+            <div class="sf-review-score">
+                <span class="sf-review-score-value">@(Model.TotalCount > 0 ? Model.Average.ToString("0.0") : "—")</span>
+                <span class="sf-review-score-scale">/ 5</span>
+            </div>
+            <div class="sf-review-stars" role="img" aria-label="@(Model.TotalCount > 0 ? string.Format(ratingLabel, Model.Average.ToString("0.0")) : L10n.Text("暂无评分", "No ratings yet"))">
+                <span class="sf-review-average-stars" style="--review-rating-fill: @(averageFill)%;" aria-hidden="true"><span class="sf-review-stars-empty">★★★★★</span><span class="sf-review-average-stars-fill">★★★★★</span></span>
+            </div>
+            <p class="sf-review-count">@L10n.Text($"基于 {Model.TotalCount} 条评价", $"Based on {Model.TotalCount} {(Model.TotalCount == 1 ? "review" : "reviews")}")</p>
+            <div class="sf-review-distribution">
+                @for (var star = 5; star >= 1; star--)
+                {
+                    var count = Model.RatingCounts[star];
+                    <div class="sf-review-distribution-row">
+                        <span aria-hidden="true">@star <span class="sf-review-distribution-star">★</span></span>
+                        <progress value="@count" max="@Math.Max(Model.TotalCount, 1)" aria-label="@L10n.Text($"{star} 星：{count} 条评价", $"{star} stars: {count} reviews")">@count</progress>
+                        <span class="sf-review-distribution-count" aria-hidden="true">@count</span>
+                    </div>
+                }
+            </div>
+        </aside>
+        <div class="sf-reviews-content">
+            <div class="sf-review-toolbar reviews-archive-toolbar">
+                <div class="sf-review-filters" aria-label="@L10n.Text("筛选评价", "Filter reviews")">
+                    <a class="sf-review-filter @(Model.Filter == "all" ? "is-active" : "")" asp-action="Reviews" asp-route-id="@Model.Product.Id" asp-route-filter="all" asp-route-sort="@Model.Sort">@L10n.Text("全部评价", "All reviews")</a>
+                    @if (Model.PhotoCount > 0)
+                    {
+                        <a class="sf-review-filter @(Model.Filter == "photos" ? "is-active" : "")" asp-action="Reviews" asp-route-id="@Model.Product.Id" asp-route-filter="photos" asp-route-sort="@Model.Sort">@L10n.Text($"有图 ({Model.PhotoCount})", $"With photos ({Model.PhotoCount})")</a>
+                    }
+                </div>
+                <form method="get" asp-action="Reviews" asp-route-id="@Model.Product.Id" class="sf-review-sort reviews-archive-sort" data-review-archive-sort>
+                    <input type="hidden" name="filter" value="@Model.Filter" />
+                    <label for="archive-review-sort">@L10n.Text("排序", "Sort")</label>
+                    <select id="archive-review-sort" name="sort" data-review-archive-sort-select>
+                        <option value="newest" selected="@(Model.Sort == "newest")">@L10n.Text("最新发布", "Most recent")</option>
+                        <option value="highest" selected="@(Model.Sort == "highest")">@L10n.Text("评分从高到低", "Highest rating")</option>
+                        <option value="lowest" selected="@(Model.Sort == "lowest")">@L10n.Text("评分从低到高", "Lowest rating")</option>
+                    </select>
+                </form>
+            </div>
+            @if (Model.Reviews.Count == 0)
+            {
+                <div class="sf-reviews-empty">
+                    <h2>@L10n.Text("没有符合条件的评价", "No matching reviews")</h2>
+                    <p>@L10n.Text("可以切换筛选条件查看其他评价。", "Try another filter to see more reviews.")</p>
+                </div>
+            }
+            else
+            {
+                <div class="sf-review-list">
+                    @foreach (var review in Model.Reviews)
+                    {
+                        var name = L10n.Text(review.UserName, review.UserNameEn);
+                        var initial = string.IsNullOrWhiteSpace(name) ? "?" : System.Globalization.StringInfo.GetNextTextElement(name.Trim()).ToUpperInvariant();
+                        var comment = L10n.Text(review.Comment ?? string.Empty, review.CommentEn);
+                        var photoLabel = L10n.Text($"查看 {name} 的评价图片", $"View review photo from {name}");
+                        <article class="sf-review-row">
+                            <header class="sf-review-row-header">
+                                <div class="sf-review-person">
+                                    <span class="sf-review-avatar" aria-hidden="true">@initial</span>
+                                    <span class="sf-review-name">@name</span>
+                                </div>
+                                <time datetime="@review.CreatedAt.ToString("O")">@review.CreatedAt.ToLocalTime().ToString(L10n.IsEnglish ? "dd MMM yyyy" : "yyyy年M月d日")</time>
+                            </header>
+                            <div class="sf-review-stars sf-review-row-stars" role="img" aria-label="@string.Format(ratingLabel, review.Rating)">
+                                <span aria-hidden="true">@(new string('★', Math.Clamp(review.Rating, 0, 5)))<span class="sf-review-stars-empty">@(new string('★', 5 - Math.Clamp(review.Rating, 0, 5)))</span></span>
+                            </div>
+                            @if (!string.IsNullOrWhiteSpace(comment))
+                            {
+                                <p class="sf-review-comment">@comment</p>
+                            }
+                            @if (!string.IsNullOrWhiteSpace(review.ImageUrl))
+                            {
+                                <a class="sf-review-photo" href="@review.ImageUrl" target="_blank" rel="noopener" aria-label="@photoLabel">
+                                    <img src="@review.ImageUrl" alt="@photoLabel" loading="lazy" width="104" height="104" />
+                                </a>
+                            }
+                        </article>
+                    }
+                </div>
+                @if (Model.TotalPages > 1)
+                {
+                    <nav class="sf-catalog-pagination reviews-archive-pagination" aria-label="@L10n.Text("评价分页", "Review pages")">
+                        @if (Model.HasPrevious)
+                        {
+                            <a asp-action="Reviews" asp-route-id="@Model.Product.Id" asp-route-page="@(Model.Page - 1)" asp-route-filter="@Model.Filter" asp-route-sort="@Model.Sort">@Loc["Previous"]</a>
+                        }
+                        @for (var page = 1; page <= Model.TotalPages; page++)
+                        {
+                            <a asp-action="Reviews" asp-route-id="@Model.Product.Id" asp-route-page="@(page)" asp-route-filter="@Model.Filter" asp-route-sort="@Model.Sort" class="@(page == Model.Page ? "is-current" : "")" aria-current="@(page == Model.Page ? "page" : null)">@(page)</a>
+                        }
+                        @if (Model.HasNext)
+                        {
+                            <a asp-action="Reviews" asp-route-id="@Model.Product.Id" asp-route-page="@(Model.Page + 1)" asp-route-filter="@Model.Filter" asp-route-sort="@Model.Sort">@Loc["Next"]</a>
+                        }
+                    </nav>
+                }
+            }
+        </div>
+    </div>
+</div>

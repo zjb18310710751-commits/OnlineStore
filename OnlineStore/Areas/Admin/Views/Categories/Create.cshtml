@@ -4,6 +4,8 @@
 }
 <h1 class="h4 mb-4">@Loc["CreateCategory"]</h1>
 <form asp-area="Admin" asp-controller="Categories" asp-action="Create" method="post" class="card card-body shadow-sm">
+    @Html.HiddenFor(model => model.NameEn)
+    @Html.HiddenFor(model => model.DescriptionEn)
     <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
     <div class="mb-3">
         <label asp-for="Name" class="form-label">@Loc["CategoryName"]</label>
@@ -11,19 +13,9 @@
         <span asp-validation-for="Name" class="text-danger small"></span>
     </div>
     <div class="mb-3">
-        <label asp-for="NameEn" class="form-label">@Loc["CategoryNameEn"]</label>
-        <input asp-for="NameEn" class="form-control" />
-        <span asp-validation-for="NameEn" class="text-danger small"></span>
-    </div>
-    <div class="mb-3">
         <label asp-for="Description" class="form-label">@Loc["CategoryDescription"]</label>
         <textarea asp-for="Description" class="form-control" rows="3"></textarea>
         <span asp-validation-for="Description" class="text-danger small"></span>
-    </div>
-    <div class="mb-3">
-        <label asp-for="DescriptionEn" class="form-label">@Loc["CategoryDescriptionEn"]</label>
-        <textarea asp-for="DescriptionEn" class="form-control" rows="3"></textarea>
-        <span asp-validation-for="DescriptionEn" class="text-danger small"></span>
     </div>
     <div class="mb-3">
         <label asp-for="DisplayOrder" class="form-label">@Loc["DisplayOrder"]</label>

@@ -6,16 +6,15 @@
     var specs = skus.Select(s => s.Spec).Where(s => !string.IsNullOrWhiteSpace(s)).Distinct().ToList();
     var colorEn = skus.Where(s => s.ColorEn != null).GroupBy(s => s.Color).ToDictionary(g => g.Key, g => g.First().ColorEn);
     var specEn = skus.Where(s => s.SpecEn != null).GroupBy(s => s.Spec).ToDictionary(g => g.Key, g => g.First().SpecEn);
-    var reviews = Model.Reviews.OrderByDescending(r => r.CreatedAt).ToList();
-    var avgRating = reviews.Count > 0 ? Math.Round(reviews.Average(r => r.Rating), 1) : 0;
     var hasSku = skus.Count > 0;
     var skusJson = System.Text.Json.JsonSerializer.Serialize(
         skus.Select(s => new { s.Id, s.Color, s.Spec, s.Price, s.Stock, s.ImageUrl }));
     var images = Model.Images.OrderBy(i => i.SortOrder).Select(i => i.ImageUrl).ToList();
     if (images.Count == 0 && !string.IsNullOrEmpty(Model.ImageUrl)) images.Add(Model.ImageUrl);
     var isFavorite = ViewData["IsFavorite"] as bool? ?? false;
+    var reviewCount = ViewData["ReviewCount"] as int? ?? 0;
 }
-<div class="container py-4">
+<div class="sf-container pd-product-page">
     <nav aria-label="breadcrumb" class="mb-3">
         <ol class="breadcrumb mb-0">
             <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">@Loc["Home"]</a></li>
@@ -28,12 +27,21 @@
         </ol>
     </nav>
 
-    <div class="row g-4">
+    <div class="row g-4" id="product-overview">
         <div class="col-lg-4 order-lg-2">
             <div class="card shadow-sm mb-3">
                 <div class="card-body">
                     <div class="d-flex align-items-center gap-3">
-                        <div class="shop-avatar"><i class="bi bi-shop"></i></div>
+                        <div class="shop-avatar shop-avatar--logo">
+                            @if (!string.IsNullOrWhiteSpace(Model.Shop?.LogoUrl))
+                            {
+                                <img src="@Model.Shop.LogoUrl" alt="@L10n.Name(Model.Shop)" />
+                            }
+                            else
+                            {
+                                <i class="bi bi-shop"></i>
+                            }
+                        </div>
                         <div>
                             <div class="fw-semibold">@(Model.Shop is null ? "—" : L10n.Name(Model.Shop))</div>
                             <div class="text-warning small">
@@ -52,7 +60,7 @@
             </div>
 
             <div class="card shadow-sm">
-                <div class="card-header bg-white fw-semibold">@Loc["Parameters"]</div>
+                <div class="card-header bg-white fw-semibold" id="product-specifications">@Loc["Parameters"]</div>
                 <div class="card-body">
                     @if (Model.Specs.Count == 0)
                     {
@@ -120,8 +128,26 @@
                                 }
                             </div>
 
-                            <div class="shipping-box small text-muted mb-3">
-                                <i class="bi bi-truck me-1"></i>@Loc["Delivery"]：@L10n.Text(Model.ShippingFrom ?? "—", Model.ShippingFromEn) · @L10n.Text(Model.ShippingFee ?? "—", Model.ShippingFeeEn) · @L10n.Text(Model.DeliveryTime ?? "—", Model.DeliveryTimeEn)
+                            <div class="pd-shipping-panel mb-3">
+                                <div class="pd-shipping-title">
+                                    <i class="bi bi-truck" aria-hidden="true"></i>
+                                    @L10n.Text("配送与发货", "Shipping information")
+                                </div>
+                                <div class="pd-shipping-grid">
+                                    <div>
+                                        <span>@L10n.Text("发货地", "Ships from")</span>
+                                        <strong>@L10n.Text(Model.ShippingFrom ?? "—", Model.ShippingFromEn)</strong>
+                                    </div>
+                                    <div>
+                                        <span>@L10n.Text("运费", "Shipping fee")</span>
+                                        <strong>@L10n.Text(Model.ShippingFee ?? "—", Model.ShippingFeeEn)</strong>
+                                    </div>
+                                    <div>
+                                        <span>@L10n.Text("发货时效", "Dispatch time")</span>
+                                        <strong>@L10n.Text(Model.DeliveryTime ?? "—", Model.DeliveryTimeEn)</strong>
+                                    </div>
+                                </div>
+                                <p>@L10n.Text("发货后可在“我的订单”中查看物流进度。", "Track delivery progress from My Orders after dispatch.")</p>
                             </div>
 
                             @if (hasSku)
@@ -152,11 +178,11 @@
                                 <input type="hidden" name="returnUrl" value="@($"{Context.Request.Path}{Context.Request.QueryString}")" />
                                 <div class="mb-3">
                                     <div class="sku-label">@Loc["Quantity"]</div>
-                                    <div class="input-group" style="max-width:150px;">
-                                        <button type="button" class="btn btn-outline-secondary" onclick="stepQty(this,-1)"><i class="bi bi-dash"></i></button>
-                                        <input id="qty" name="quantity" type="number" class="form-control text-center" value="1"
+                                    <div class="input-group pd-quantity-stepper">
+                                        <button type="button" class="pd-qty-btn" onclick="stepQty(this,-1)" aria-label="@L10n.Text("减少数量", "Decrease quantity")"><i class="bi bi-dash"></i></button>
+                                        <input id="qty" name="quantity" type="number" class="form-control text-center pd-qty-input" value="1"
                                                min="1" max="@Model.Stock" inputmode="numeric" required aria-label="@Loc["Quantity"].Value" />
-                                        <button type="button" class="btn btn-outline-secondary" onclick="stepQty(this,1)"><i class="bi bi-plus"></i></button>
+                                        <button type="button" class="pd-qty-btn" onclick="stepQty(this,1)" aria-label="@L10n.Text("增加数量", "Increase quantity")"><i class="bi bi-plus"></i></button>
                                     </div>
                                 </div>
                                 <div class="d-flex gap-2">
@@ -176,120 +202,32 @@
                 </div>
             </div>
 
-            <div class="card shadow-sm">
-                <div class="card-header bg-white fw-semibold">
-                    @Loc["Reviews"]
-                    @if (reviews.Count > 0)
-                    {
-                        <span class="text-warning ms-1">@(new string('★', (int)Math.Round(avgRating)))</span>
-                        <span class="text-muted small ms-1">@avgRating.ToString("0.0")（@reviews.Count）</span>
-                    }
-                </div>
-                <div class="card-body">
-                    @if (reviews.Count > 0)
-                    {
-                        <div class="d-flex align-items-center gap-4 mb-3 pb-3 border-bottom">
-                            <div class="text-center" style="min-width:84px">
-                                <div class="fs-2 fw-bold text-danger">@avgRating.ToString("0.0")</div>
-                                <div class="text-warning">@(new string('★', (int)Math.Round(avgRating)))</div>
-                                <div class="text-muted small">@reviews.Count @Loc["ReviewsCount"]</div>
-                            </div>
-                            <div class="flex-grow-1">
-                                @for (var star = 5; star >= 1; star--)
-                                {
-                                    var cnt = reviews.Count(r => r.Rating == star);
-                                    var pct = reviews.Count > 0 ? (int)Math.Round(cnt * 100.0 / reviews.Count) : 0;
-                                    <div class="d-flex align-items-center gap-2 small mb-1">
-                                        <span class="text-nowrap text-muted" style="width:28px">@star★</span>
-                                        <div class="progress flex-grow-1" style="height:8px"><div class="progress-bar bg-warning" style="width:@pct%"></div></div>
-                                        <span class="text-muted" style="width:24px">@cnt</span>
-                                    </div>
-                                }
-                            </div>
-                        </div>
-                    }
-                    @if (reviews.Count == 0)
-                    {
-                        <p class="text-muted mb-0">@Loc["NoReviews"]</p>
-                    }
-                    else
-                    {
-                        <ul class="list-unstyled mb-0">
-                            @foreach (var r in reviews)
-                            {
-                                <li class="review-item py-3 @(r != reviews.First() ? "border-top" : "")">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <span class="fw-semibold">@L10n.Text(r.UserName, r.UserNameEn)</span>
-                                        <span class="text-muted small">@r.CreatedAt.ToLocalTime().ToString("yyyy-MM-dd")</span>
-                                    </div>
-                                    <div class="text-warning small">@(new string('★', r.Rating))</div>
-                                    @if (!string.IsNullOrEmpty(r.Comment))
-                                    {
-                                        <p class="mb-0 text-secondary">@L10n.Text(r.Comment ?? "", r.CommentEn)</p>
-                                    }
-                                    @if (!string.IsNullOrEmpty(r.ImageUrl))
-                                    {
-                                        <img src="@r.ImageUrl" class="review-img mt-2" alt="@L10n.Text(r.UserName, r.UserNameEn)" loading="lazy" />
-                                    }
-                                </li>
-                            }
-                        </ul>
-                    }
-
-                    @if (User.Identity?.IsAuthenticated == true)
-                    {
-                        <form asp-controller="Reviews" asp-action="Create" method="post" enctype="multipart/form-data" class="border-top pt-3 mt-3">
-                            <input type="hidden" name="productId" value="@Model.Id" />
-                            <div class="mb-2">
-                                <label class="form-label small fw-semibold">@Loc["YourRating"]</label>
-                                <select name="rating" class="form-select form-select-sm" style="max-width:140px;">
-                                    <option value="5">★★★★★</option>
-                                    <option value="4">★★★★</option>
-                                    <option value="3">★★★</option>
-                                    <option value="2">★★</option>
-                                    <option value="1">★</option>
-                                </select>
-                            </div>
-                            <div class="mb-2">
-                                <textarea name="comment" class="form-control" rows="3" placeholder="@Loc["ReviewPlaceholder"]"></textarea>
-                            </div>
-                            <div class="mb-2">
-                                <label class="form-label small fw-semibold">@Loc["ReviewImage"]</label>
-                                <input type="file" name="image" class="form-control form-control-sm" accept=".jpg,.jpeg,.png,.webp,.gif" />
-                            </div>
-                            <button type="submit" class="btn btn-primary btn-sm">@Loc["SubmitReview"]</button>
-                        </form>
-                    }
-                    else
-                    {
-                        <p class="text-muted small mb-0 mt-3"><a asp-controller="Account" asp-action="Login">@Loc["Login"]</a> @Loc["LoginToReview"]</p>
-                    }
-                </div>
-            </div>
         </div>
     </div>
-    <div class="card shadow-sm mt-4">
-        <div class="card-header bg-white fw-semibold">@Loc["DetailIntro"]</div>
-        <div class="card-body">
-            @if (!string.IsNullOrEmpty(L10n.DetailHtml(Model)))
-            {
-                @Html.Raw(L10n.DetailHtml(Model))
-            }
-            else
-            {
-                <p class="text-muted mb-0">@L10n.Description(Model)</p>
-            }
+    <nav class="pd-section-nav" aria-label="@L10n.Text("商品信息", "Product information")">
+        <div class="pd-section-links">
+            <a href="#product-reviews">@Loc["Reviews"] <span>@reviewCount</span></a>
+            <a href="#product-story">@Loc["DetailIntro"]</a>
         </div>
-    </div>
+        <a class="pd-back-to-product" href="#product-overview">@L10n.Text("返回商品", "Back to product") <i class="bi bi-arrow-up" aria-hidden="true"></i></a>
+    </nav>
+    <partial name="_ProductReviews" model="Model" />
+    <partial name="_ProductStory" model="Model" />
 </div>
 
+@section Styles {
+    <link rel="stylesheet" href="~/css/product-reviews.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/product-story.css" asp-append-version="true" />
+}
+
 @section Scripts {
+    <script src="~/js/product-reviews.js" asp-append-version="true"></script>
     @if (hasSku)
     {
         <script>
             (function () {
                 const skus = @Html.Raw(skusJson);
-                const stockTemplate = '@Loc["StockLeft"].Value';
+                const stockTemplate = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Loc["StockLeft"].Value));
                 let selectedColor = null, selectedSpec = null;
 
                 const priceEl = document.getElementById('priceText');
@@ -298,6 +236,7 @@
                 const mainImg = document.getElementById('mainImage');
                 const skuInput = document.getElementById('skuIdInput');
                 const qtyInput = document.getElementById('qty');
+                const purchaseButtons = document.getElementById('addToCartForm').querySelectorAll('button[type="submit"]');
                 const galleryStrip = document.getElementById('galleryStrip');
                 const originalGallery = galleryStrip ? galleryStrip.innerHTML : '';
 
@@ -306,12 +245,15 @@
                 }
                 function refresh() {
                     const sku = findSku();
+                    const available = sku && sku.Stock > 0;
+                    skuInput.value = sku ? sku.Id : '';
+                    qtyInput.max = sku ? sku.Stock : 0;
+                    purchaseButtons.forEach(button => { button.disabled = !available; });
+                    priceEl.textContent = sku ? sku.Price.toFixed(2) : '—';
+                    stockEl.textContent = stockTemplate.replace('{0}', sku ? sku.Stock : 0);
+                    if (originalBox) originalBox.classList.add('d-none');
                     if (sku) {
-                        priceEl.textContent = sku.Price.toFixed(2);
-                        stockEl.textContent = stockTemplate.replace('{0}', sku.Stock);
-                        skuInput.value = sku.Id;
-                        qtyInput.max = sku.Stock;
-                        if (originalBox) originalBox.classList.add('d-none');
+                        if (available) qtyInput.value = Math.min(Math.max(parseInt(qtyInput.value, 10) || 1, 1), sku.Stock);
                         if (sku.ImageUrl) {
                             setMainImage(sku.ImageUrl);
                             if (galleryStrip) {
@@ -331,7 +273,6 @@
                         refresh();
                     });
                 });
-                // 默认选中第一组颜色+规格
                 const firstColor = document.querySelector('.sku-chip[data-dim="color"]');
                 const firstSpec = document.querySelector('.sku-chip[data-dim="spec"]');
                 if (firstColor) firstColor.click();
