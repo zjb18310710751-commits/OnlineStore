@@ -88,6 +88,7 @@ public static class L10n
                 OrderStatus.PendingShipment => "Pending shipment",
                 OrderStatus.Shipped => "Shipped",
                 OrderStatus.Delivered => "Delivered",
+                OrderStatus.ReceiptException => "Receipt exception",
                 OrderStatus.Completed => "Completed",
                 OrderStatus.Cancelled => "Cancelled",
                 OrderStatus.Refunded => "Refunded",

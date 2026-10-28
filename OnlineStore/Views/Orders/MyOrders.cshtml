@@ -134,9 +134,13 @@
                                         <button type="submit" class="btn btn-sm btn-outline-dark">@Loc["CancelOrder"]</button>
                                     </form>
                                 }
-                                else if (o.Status is OrderStatus.Shipped or OrderStatus.Delivered)
+                                else if (o.Status == OrderStatus.Shipped)
                                 {
-                                    <button type="button" class="btn btn-sm btn-outline-dark" onclick="openTrackingModal(@o.Id)">@L10n.Text("查看物流", "Track parcel")</button>
+                                    <button type="button" class="btn btn-sm btn-outline-dark" onclick="openTrackingModal(@o.Id, '@o.OrderNo')">@L10n.Text("查看物流", "Track parcel")</button>
+                                }
+                                else if (o.Status == OrderStatus.Delivered)
+                                {
+                                    <button type="button" class="btn btn-sm btn-outline-dark" onclick="openTrackingModal(@o.Id, '@o.OrderNo')">@L10n.Text("查看物流", "Track parcel")</button>
                                     <button type="button" class="btn btn-sm btn-outline-dark" onclick="confirmReceipt(@o.Id, '@o.OrderNo')">@L10n.Text("确认收货", "Confirm receipt")</button>
                                 }
                                 else if (o.Status == OrderStatus.Completed)
@@ -165,6 +169,14 @@
                             </div>
                             <span class="member-order-total">@Loc["Total"]：<span class="text-danger">¥@o.Total.ToString("F2")</span></span>
                         </div>
+                        @if (o.Status == OrderStatus.Delivered && o.AutoConfirmAt.HasValue)
+                        {
+                            <div class="member-order-confirmation">
+                                <i class="bi bi-clock" aria-hidden="true"></i>
+                                <span>@L10n.Text("等待买家确认收货", "Awaiting buyer confirmation")</span>
+                                <strong data-auto-confirm-at="@DateTime.SpecifyKind(o.AutoConfirmAt.Value, DateTimeKind.Utc).ToString("O")"></strong>
+                            </div>
+                        }
                     </div>
                 }
             </div>
@@ -189,6 +201,14 @@
             </div>
             <div class="modal-body">
                 <div id="trackingTimeline" class="order-tracking-timeline"></div>
+                <div id="trackingConfirmationPanel" class="member-order-confirmation" hidden>
+                    <i class="bi bi-clock" aria-hidden="true"></i>
+                    <span>@L10n.Text("等待买家确认收货", "Awaiting buyer confirmation")</span>
+                    <strong id="trackingAutoConfirmCountdown"></strong>
+                    <button type="button" class="btn btn-sm btn-outline-dark" id="trackingConfirmButton">
+                        @L10n.Text("确认收货", "Confirm receipt")
+                    </button>
+                </div>
                 <a id="officialTrackingLink" href="#" target="_blank" rel="noopener" class="btn btn-outline-dark w-100 mt-3">@L10n.Text("官方物流查询", "Official tracking")</a>
             </div>
         </div>
@@ -230,6 +250,43 @@
     <script>
         const orderToken = document.querySelector('input[name="__RequestVerificationToken"]')?.value || '';
         let buyerTrackingPollTimer = null;
+        let activeTrackingOrderId = null;
+        let activeTrackingOrderNo = '';
+        const autoConfirmTemplate = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
+            L10n.Text("{0} 后自动确认", "Auto-confirms in {0}")));
+        const autoConfirmExpired = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
+            L10n.Text("正在自动确认收货…", "Processing automatic confirmation…")));
+        const confirmReceiptPrompt = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
+            L10n.Text("确认已经收到订单 {0} 的商品吗？", "Have you received order {0}?")));
+
+        function formatAutoConfirmRemaining(target) {
+            const milliseconds = Date.parse(target) - Date.now();
+            if (!Number.isFinite(milliseconds)) return '';
+            if (milliseconds <= 0) return autoConfirmExpired;
+            const totalSeconds = Math.floor(milliseconds / 1000);
+            const days = Math.floor(totalSeconds / 86400);
+            const hours = Math.floor(totalSeconds % 86400 / 3600);
+            const minutes = Math.floor(totalSeconds % 3600 / 60);
+            const seconds = totalSeconds % 60;
+            const value = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
+                L10n.IsEnglish ? "{0}d {1}h {2}m {3}s" : "{0}天 {1}小时 {2}分 {3}秒"));
+            return autoConfirmTemplate.replace('{0}', value
+                .replace('{0}', String(days))
+                .replace('{1}', String(hours))
+                .replace('{2}', String(minutes))
+                .replace('{3}', String(seconds)));
+        }
+
+        function updateAutoConfirmCountdowns() {
+            document.querySelectorAll('[data-auto-confirm-at]').forEach(element => {
+                element.textContent = formatAutoConfirmRemaining(element.dataset.autoConfirmAt);
+            });
+            const trackingCountdown = document.getElementById('trackingAutoConfirmCountdown');
+            const panel = document.getElementById('trackingConfirmationPanel');
+            if (trackingCountdown && panel && !panel.hidden) {
+                trackingCountdown.textContent = formatAutoConfirmRemaining(trackingCountdown.dataset.autoConfirmAt);
+            }
+        }
 
         function showOrderAlert(message, success) {
             const el = document.getElementById('orderAlert');
@@ -251,6 +308,17 @@
                     document.getElementById('trackingCarrier').textContent = t.carrier || 'Carrier';
                     document.getElementById('trackingNumber').textContent = t.trackingNumber || 'Pending';
                     document.getElementById('officialTrackingLink').href = t.officialTrackingUrl || '#';
+                    const confirmationPanel = document.getElementById('trackingConfirmationPanel');
+                    const countdown = document.getElementById('trackingAutoConfirmCountdown');
+                    if (t.status === '@OrderStatus.Delivered' && t.autoConfirmAt) {
+                        countdown.dataset.autoConfirmAt = t.autoConfirmAt;
+                        countdown.textContent = formatAutoConfirmRemaining(t.autoConfirmAt);
+                        confirmationPanel.hidden = false;
+                    } else {
+                        confirmationPanel.hidden = true;
+                        countdown.textContent = '';
+                        delete countdown.dataset.autoConfirmAt;
+                    }
                     timeline.innerHTML = t.nodes.map(node => `
                         <div class="order-tracking-node ${node.isReached ? 'is-reached' : 'is-future'} ${node.isCurrentActive ? 'is-current' : ''}">
                             <div class="order-tracking-dot">${node.isReached ? '✓' : ''}</div>
@@ -264,7 +332,9 @@
                 .catch(() => timeline.innerHTML = '<div class="alert alert-danger">Failed to load tracking.</div>');
         }
 
-        function openTrackingModal(orderId) {
+        function openTrackingModal(orderId, orderNo) {
+            activeTrackingOrderId = orderId;
+            activeTrackingOrderNo = orderNo || '';
             const timeline = document.getElementById('trackingTimeline');
             timeline.innerHTML = '<div class="text-center text-muted py-4">Loading…</div>';
             bootstrap.Modal.getOrCreateInstance(document.getElementById('trackingModal')).show();
@@ -278,10 +348,16 @@
                 clearInterval(buyerTrackingPollTimer);
                 buyerTrackingPollTimer = null;
             }
+            activeTrackingOrderId = null;
+            activeTrackingOrderNo = '';
+        });
+
+        document.getElementById('trackingConfirmButton')?.addEventListener('click', function () {
+            if (activeTrackingOrderId) confirmReceipt(activeTrackingOrderId, activeTrackingOrderNo);
         });
 
         function confirmReceipt(orderId, orderNo) {
-            if (!confirm(`Have you received order ${orderNo}?`)) return;
+            if (!confirm(confirmReceiptPrompt.replace('{0}', orderNo || ''))) return;
             fetch('/Orders/ConfirmReceipt', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'RequestVerificationToken': orderToken },
@@ -296,5 +372,8 @@
             document.getElementById('afterSalesOrderId').value = orderId;
             bootstrap.Modal.getOrCreateInstance(document.getElementById('afterSalesModal')).show();
         }
+
+        updateAutoConfirmCountdowns();
+        window.setInterval(updateAutoConfirmCountdowns, 1000);
     </script>
 }

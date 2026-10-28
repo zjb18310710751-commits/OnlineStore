@@ -106,6 +106,15 @@
                             {
                                 <span>—</span>
                             }
+                            @if (o.Status == OrderStatus.ReceiptException && !string.IsNullOrWhiteSpace(o.ReceiptExceptionReason))
+                            {
+                                <div class="mt-2 text-danger">@L10n.Text("签收异常", "Receipt exception")：@o.ReceiptExceptionReason</div>
+                                <div>@o.ReceiptExceptionReportedBy · @o.ReceiptExceptionReportedAt?.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</div>
+                            }
+                            else if (o.Status == OrderStatus.Completed && o.ReceiptConfirmedAutomatically)
+                            {
+                                <div class="mt-2">@L10n.Text("确认期届满，系统自动确认收货", "Auto-confirmed after the 7-day window")</div>
+                            }
                         </td>
                         <td class="text-end text-nowrap">
                             @if (o.Status == OrderStatus.PendingShipment)
@@ -122,8 +131,16 @@
                             else if (o.Status == OrderStatus.Delivered)
                             {
                                 <button type="button" class="btn btn-sm btn-outline-dark" onclick="openAdminTrackingModal(@o.Id)">@L10n.Text("查看物流", "Track")</button>
-                                <form asp-action="Complete" asp-route-id="@o.Id" method="post" class="d-inline">
-                                    <button type="submit" class="btn btn-sm btn-outline-dark">@Loc["Complete"]</button>
+                                <button type="button" class="btn btn-sm btn-outline-dark"
+                                        onclick="openReceiptExceptionModal(@o.Id, '@o.OrderNo')">
+                                    @L10n.Text("签收异常", "Receipt exception")
+                                </button>
+                            }
+                            else if (o.Status == OrderStatus.ReceiptException)
+                            {
+                                <button type="button" class="btn btn-sm btn-outline-dark" onclick="openAdminTrackingModal(@o.Id)">@L10n.Text("查看物流", "Track")</button>
+                                <form asp-action="Refund" asp-route-id="@o.Id" method="post" class="d-inline" data-confirm="@L10n.Text("确定为该异常签收订单退款并恢复库存吗？", "Refund this receipt-exception order and restore stock?")" onsubmit="return confirm(this.dataset.confirm);">
+                                    <button type="submit" class="btn btn-sm btn-outline-dark">@Loc["Refund"]</button>
                                 </form>
                             }
                             else if (o.Status == OrderStatus.Completed)
@@ -236,6 +253,30 @@ else
     </div>
 </div>
 
+<div class="modal fade" id="receiptExceptionModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <form asp-action="ReportReceiptException" method="post" class="modal-content">
+            <input type="hidden" name="id" id="receiptExceptionOrderId" />
+            <div class="modal-header">
+                <div>
+                    <h2 class="modal-title fs-5 fw-bold">@L10n.Text("记录签收异常", "Record receipt exception")</h2>
+                    <p class="text-muted small mb-0" id="receiptExceptionOrderNo"></p>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="@Loc["Cancel"]"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-muted small">@L10n.Text("此操作会暂停自动确认，并记录管理员、时间和异常原因。", "This pauses auto-confirmation and records the admin, time and reason.")</p>
+                <label for="receiptExceptionReason" class="form-label">@L10n.Text("异常原因", "Exception reason")</label>
+                <textarea id="receiptExceptionReason" name="reason" class="form-control" rows="4" maxlength="500" required></textarea>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">@Loc["Cancel"]</button>
+                <button type="submit" class="btn btn-primary">@L10n.Text("确认记录", "Record exception")</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <div class="modal fade" id="adminTrackingModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -264,6 +305,13 @@ else
         function openDispatchModal(orderId, orderNo) {
             document.getElementById('dispatchOrderId').value = orderId;
             bootstrap.Modal.getOrCreateInstance(document.getElementById('dispatchModal')).show();
+        }
+
+        function openReceiptExceptionModal(orderId, orderNo) {
+            document.getElementById('receiptExceptionOrderId').value = orderId;
+            document.getElementById('receiptExceptionOrderNo').textContent = orderNo;
+            document.getElementById('receiptExceptionReason').value = '';
+            bootstrap.Modal.getOrCreateInstance(document.getElementById('receiptExceptionModal')).show();
         }
 
         function loadAdminTracking(timelineEl, metaEl, linkEl, orderId) {
