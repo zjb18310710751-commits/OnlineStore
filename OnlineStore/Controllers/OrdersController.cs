@@ -208,6 +208,7 @@ public class OrdersController : Controller
                 SkuId = i.SkuId,
                 ProductName = i.Name,
                 ProductNameEn = i.NameEn,
+                ImageUrl = i.ImageUrl,
                 Color = i.Color,
                 ColorEn = i.ColorEn,
                 Spec = i.Spec,

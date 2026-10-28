@@ -86,6 +86,7 @@ public class OrderService : IOrderService
 
                 item.ProductName = product.Name;
                 item.ProductNameEn = product.NameEn;
+                item.ImageUrl = string.IsNullOrWhiteSpace(sku?.ImageUrl) ? product.ImageUrl : sku.ImageUrl;
                 item.Color = sku?.Color;
                 item.ColorEn = sku?.ColorEn;
                 item.Spec = sku?.Spec;
@@ -609,6 +610,7 @@ public class OrderService : IOrderService
             SkuId = item.SkuId,
             ProductName = item.ProductName,
             ProductNameEn = item.ProductNameEn,
+            ImageUrl = item.ImageUrl,
             Color = item.Color,
             ColorEn = item.ColorEn,
             Spec = item.Spec,

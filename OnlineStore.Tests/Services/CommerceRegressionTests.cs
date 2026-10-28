@@ -126,6 +126,19 @@ public class CommerceRegressionTests
     }
 
     [Fact]
+    public async Task CreateOrder_SnapshotsProductImage()
+    {
+        using var context = await CreateContextAsync();
+        (await context.Products.FindAsync(1))!.ImageUrl = "/images/order-product.jpg";
+        await context.SaveChangesAsync();
+        var order = NewOrder();
+
+        await new OrderService(context).CreateAsync(order);
+
+        Assert.Equal("/images/order-product.jpg", Assert.Single(order.Items).ImageUrl);
+    }
+
+    [Fact]
     public async Task FreeShippingCoupon_RemovesCalculatedShipping()
     {
         using var context = await CreateContextAsync();

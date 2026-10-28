@@ -73,16 +73,30 @@
                             @foreach (var i in o.Items)
                             {
                                 <li class="member-order-line">
-                                    <div class="d-flex justify-content-between">
-                                        <span>
-                                            @L10n.Text(i.ProductName, i.ProductNameEn)
-                                            @if (!string.IsNullOrEmpty(i.Color) || !string.IsNullOrEmpty(i.Spec))
+                                    <div class="member-order-line-summary">
+                                        <span class="member-order-line-media">
+                                            @if (!string.IsNullOrWhiteSpace(i.ImageUrl))
                                             {
-                                                <small class="text-muted member-order-detail">@L10n.Text(i.Color ?? "", i.ColorEn) @L10n.Text(i.Spec ?? "", i.SpecEn)</small>
+                                                <img src="@i.ImageUrl" alt="" loading="lazy" />
                                             }
-                                            <small class="text-muted member-order-detail">× @i.Quantity</small>
+                                            else
+                                            {
+                                                <i class="bi bi-image" aria-hidden="true"></i>
+                                            }
                                         </span>
-                                        <span>¥@i.LineTotal.ToString("F2")</span>
+                                        <div class="member-order-line-copy">
+                                            <a asp-controller="Products" asp-action="Details" asp-route-id="@i.ProductId" class="member-order-line-name">
+                                                @L10n.Text(i.ProductName, i.ProductNameEn)
+                                            </a>
+                                            <div class="member-order-line-meta">
+                                                @if (!string.IsNullOrEmpty(i.Color) || !string.IsNullOrEmpty(i.Spec))
+                                                {
+                                                    <span>@L10n.Text(i.Color ?? "", i.ColorEn) @L10n.Text(i.Spec ?? "", i.SpecEn)</span>
+                                                }
+                                                <span>× @i.Quantity</span>
+                                            </div>
+                                        </div>
+                                        <span class="member-order-line-price">¥@i.LineTotal.ToString("F2")</span>
                                     </div>
                                     @if (myReviews.TryGetValue($"{o.Id}:{i.ProductId}", out var myReview) && myReview is not null)
                                     {

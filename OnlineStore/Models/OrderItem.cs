@@ -20,6 +20,9 @@ public class OrderItem
     [StringLength(150)]
     public string? ProductNameEn { get; set; }
 
+    [StringLength(500)]
+    public string? ImageUrl { get; set; }
+
     [StringLength(50)]
     public string? Color { get; set; }
 
