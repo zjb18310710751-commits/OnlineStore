@@ -43,5 +43,9 @@ public sealed class OrderTrackingView
 
     public DateTime? CompletedAt { get; set; }
 
+    public DateTime? AutoConfirmAt { get; set; }
+
+    public string? ReceiptExceptionReason { get; set; }
+
     public List<OrderTrackingNode> Nodes { get; set; } = new();
 }

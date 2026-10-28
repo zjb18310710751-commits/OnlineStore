@@ -12,6 +12,7 @@ public class OrderService : IOrderService
 {
     private static readonly TimeSpan TrackingStep = TimeSpan.FromSeconds(3);
     private static readonly TimeSpan DeliveryThreshold = TrackingStep * 3;
+    private static readonly TimeSpan AutoConfirmationWindow = TimeSpan.FromDays(7);
 
     private readonly ApplicationDbContext _context;
     private readonly ICouponService _couponService;
@@ -27,13 +28,16 @@ public class OrderService : IOrderService
             .Include(o => o.Items)
             .FirstOrDefaultAsync(o => o.Id == id);
 
-    public async Task<IReadOnlyList<Order>> GetByUserAsync(string userId) =>
-        await _context.Orders
+    public async Task<IReadOnlyList<Order>> GetByUserAsync(string userId)
+    {
+        await ProcessPendingOrderStatesAsync(userId);
+        return await _context.Orders
             .Include(o => o.Items)
             .Include(o => o.AfterSalesRequests)
             .Where(o => o.UserId == userId && o.UserDeletedAt == null)
             .OrderByDescending(o => o.CreatedAt)
             .ToListAsync();
+    }
 
     public async Task<IReadOnlyList<Order>> GetAllAsync() =>
         await _context.Orders
@@ -44,6 +48,7 @@ public class OrderService : IOrderService
 
     public async Task<PagedResult<Order>> GetAdminOrdersPagedAsync(int page, int pageSize)
     {
+        await ProcessPendingOrderStatesAsync();
         var query = _context.Orders
             .AsNoTracking()
             .Include(order => order.Items)
@@ -202,7 +207,7 @@ public class OrderService : IOrderService
         TransitionAsync(id, OrderStatus.Cancelled, true, OrderStatus.PendingShipment);
 
     public Task<bool> RefundAsync(int id) =>
-        TransitionAsync(id, OrderStatus.Refunded, true, OrderStatus.Shipped, OrderStatus.Completed);
+        TransitionAsync(id, OrderStatus.Refunded, true, OrderStatus.Shipped, OrderStatus.ReceiptException, OrderStatus.Completed);
 
     public async Task<bool> ShipAsync(int id, string? carrier, string? trackingNumber)
     {
@@ -225,13 +230,15 @@ public class OrderService : IOrderService
         order.ShippedAt = DateTime.UtcNow;
         order.DeliveredAt = null;
         order.SignedAt = null;
+        order.AutoConfirmAt = null;
+        order.ReceiptConfirmedAutomatically = false;
+        order.ReceiptExceptionReason = null;
+        order.ReceiptExceptionReportedAt = null;
+        order.ReceiptExceptionReportedBy = null;
         order.Status = OrderStatus.Shipped;
         await _context.SaveChangesAsync();
         return true;
     }
-
-    public Task<bool> CompleteAsync(int id) =>
-        TransitionAsync(id, OrderStatus.Completed, false, OrderStatus.Delivered);
 
     public async Task<OrderTrackingView?> GetTrackingAsync(int id)
     {
@@ -242,11 +249,13 @@ public class OrderService : IOrderService
         }
 
         await AdvanceDeliveryAsync(order);
+        await TryAutoConfirmAsync(order);
 
         var now = DateTime.UtcNow;
         var shippedAt = order.ShippedAt!.Value;
         var deliveredAt = shippedAt.Add(DeliveryThreshold);
         var signed = order.Status == OrderStatus.Completed || order.SignedAt.HasValue;
+        var receiptException = order.Status == OrderStatus.ReceiptException;
         var deliveredReached = order.DeliveredAt.HasValue || now >= deliveredAt;
         var origin = !string.IsNullOrWhiteSpace(order.ShippingOrigin)
             ? L10n.Text(order.ShippingOrigin, order.ShippingOriginEn)
@@ -274,16 +283,24 @@ public class OrderService : IOrderService
                 $"{L10n.Text("快递员正在派送至", "The courier is delivering to")} {destination}",
                 shippedAt.Add(TrackingStep * 2), now >= shippedAt.Add(TrackingStep * 2), !deliveredReached && now >= shippedAt.Add(TrackingStep * 2) && now < deliveredAt),
             Node(5,
-                signed
-                    ? L10n.Text("已签收", "Delivered & signed")
-                    : L10n.Text("已送达，等待签收", "Delivered, awaiting confirmation"),
-                signed
-                    ? $"{L10n.Text("买家已在", "Delivered to")} {destination} {L10n.Text("确认收货，订单完成。", "and receipt was confirmed.")}"
-                    : $"{L10n.Text("包裹已送达", "Delivered to")} {destination}，{L10n.Text("等待买家确认收货。", "awaiting buyer confirmation.")}",
+                receiptException
+                    ? L10n.Text("签收异常", "Receipt exception")
+                    : signed
+                        ? order.ReceiptConfirmedAutomatically
+                            ? L10n.Text("自动确认收货", "Receipt auto-confirmed")
+                            : L10n.Text("已签收", "Delivered & signed")
+                        : L10n.Text("已送达，等待确认", "Delivered, awaiting confirmation"),
+                receiptException
+                    ? $"{L10n.Text("物流显示已送达，但买家反馈未收到商品。管理员备注：", "Tracking shows delivery, but the buyer reported not receiving the parcel. Admin note: ")}{order.ReceiptExceptionReason}"
+                    : signed
+                        ? order.ReceiptConfirmedAutomatically
+                            ? $"{L10n.Text("包裹送达", "Delivered to")} {destination}，{L10n.Text("7 天确认期届满，系统已自动确认收货。", "the 7-day confirmation window expired and receipt was auto-confirmed.")}"
+                            : $"{L10n.Text("买家已在", "Delivered to")} {destination} {L10n.Text("确认收货，订单完成。", "and receipt was confirmed.")}"
+                        : $"{L10n.Text("包裹已送达", "Delivered to")} {destination}，{L10n.Text("等待买家确认收货，7 天后将自动确认。", "awaiting buyer confirmation. It will auto-confirm after 7 days.")}",
                 signed ? order.SignedAt : (deliveredReached ? deliveredAt : null),
-                signed || deliveredReached,
-                signed ? false : deliveredReached,
-                !signed && !deliveredReached)
+                signed || deliveredReached || receiptException,
+                !signed && !receiptException && deliveredReached,
+                !signed && !receiptException && !deliveredReached)
         };
 
         return new OrderTrackingView
@@ -300,6 +317,10 @@ public class OrderService : IOrderService
             Status = order.Status,
             ShippedAt = shippedAt,
             CompletedAt = order.SignedAt,
+            AutoConfirmAt = order.AutoConfirmAt.HasValue
+                ? DateTime.SpecifyKind(order.AutoConfirmAt.Value, DateTimeKind.Utc)
+                : null,
+            ReceiptExceptionReason = order.ReceiptExceptionReason,
             Nodes = nodes
         };
     }
@@ -312,10 +333,6 @@ public class OrderService : IOrderService
             return false;
         }
 
-        if (order.Status == OrderStatus.Shipped)
-        {
-            await AdvanceDeliveryAsync(order);
-        }
         if (order.Status != OrderStatus.Delivered)
         {
             return false;
@@ -323,6 +340,29 @@ public class OrderService : IOrderService
 
         order.Status = OrderStatus.Completed;
         order.SignedAt = DateTime.UtcNow;
+        order.ReceiptConfirmedAutomatically = false;
+        await _context.SaveChangesAsync();
+        return true;
+    }
+
+    public async Task<bool> ReportReceiptExceptionAsync(int id, string reason, string reportedBy)
+    {
+        var normalizedReason = reason?.Trim();
+        if (string.IsNullOrWhiteSpace(normalizedReason) || normalizedReason.Length > 500)
+        {
+            return false;
+        }
+
+        var order = await GetByIdAsync(id);
+        if (order is null || order.Status != OrderStatus.Delivered)
+        {
+            return false;
+        }
+
+        order.Status = OrderStatus.ReceiptException;
+        order.ReceiptExceptionReason = normalizedReason;
+        order.ReceiptExceptionReportedAt = DateTime.UtcNow;
+        order.ReceiptExceptionReportedBy = string.IsNullOrWhiteSpace(reportedBy) ? "Admin" : reportedBy.Trim();
         await _context.SaveChangesAsync();
         return true;
     }
@@ -357,20 +397,15 @@ public class OrderService : IOrderService
 
     public async Task<int> GetDeliveredItemCountAsync(string userId)
     {
+        await ProcessPendingOrderStatesAsync(userId);
         var orders = await _context.Orders
             .Include(o => o.Items)
             .Where(o => o.UserId == userId
                 && o.UserDeletedAt == null
-                && (o.Status == OrderStatus.Shipped || o.Status == OrderStatus.Delivered))
+                && o.Status == OrderStatus.Delivered)
             .ToListAsync();
 
-        foreach (var order in orders.Where(o => o.Status == OrderStatus.Shipped))
-        {
-            await AdvanceDeliveryAsync(order);
-        }
-
         return orders
-            .Where(o => o.Status == OrderStatus.Delivered)
             .Sum(o => o.Items.Sum(i => i.Quantity));
     }
 
@@ -547,6 +582,37 @@ public class OrderService : IOrderService
 
     public Task<int> CountAsync() => _context.Orders.CountAsync();
 
+    public Task<int> ProcessPendingOrderStatesAsync() => ProcessPendingOrderStatesAsync(null);
+
+    private async Task<int> ProcessPendingOrderStatesAsync(string? userId)
+    {
+        var query = _context.Orders.Where(order =>
+            order.Status == OrderStatus.Shipped || order.Status == OrderStatus.Delivered);
+        if (!string.IsNullOrWhiteSpace(userId))
+        {
+            query = query.Where(order => order.UserId == userId);
+        }
+
+        var orders = await query.ToListAsync();
+        var changed = 0;
+        foreach (var order in orders)
+        {
+            if (order.Status == OrderStatus.Shipped)
+            {
+                await AdvanceDeliveryAsync(order);
+                changed++;
+            }
+
+            if (order.Status == OrderStatus.Delivered)
+            {
+                await TryAutoConfirmAsync(order);
+                changed++;
+            }
+        }
+
+        return changed;
+    }
+
     private async Task AdvanceDeliveryAsync(Order order)
     {
         if (order.Status != OrderStatus.Shipped || order.ShippedAt is null)
@@ -561,6 +627,32 @@ public class OrderService : IOrderService
 
         order.Status = OrderStatus.Delivered;
         order.DeliveredAt = order.ShippedAt.Value.Add(DeliveryThreshold);
+        order.AutoConfirmAt = order.DeliveredAt.Value.Add(AutoConfirmationWindow);
+        await _context.SaveChangesAsync();
+    }
+
+    private async Task TryAutoConfirmAsync(Order order)
+    {
+        if (order.Status != OrderStatus.Delivered)
+        {
+            return;
+        }
+
+        var now = DateTime.UtcNow;
+        if (!order.AutoConfirmAt.HasValue)
+        {
+            order.AutoConfirmAt = (order.DeliveredAt ?? now).Add(AutoConfirmationWindow);
+            await _context.SaveChangesAsync();
+        }
+
+        if (order.AutoConfirmAt.Value > now)
+        {
+            return;
+        }
+
+        order.Status = OrderStatus.Completed;
+        order.SignedAt = order.AutoConfirmAt.Value;
+        order.ReceiptConfirmedAutomatically = true;
         await _context.SaveChangesAsync();
     }
 

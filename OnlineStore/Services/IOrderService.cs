@@ -20,11 +20,13 @@ public interface IOrderService
 
     Task<bool> ShipAsync(int id, string? carrier, string? trackingNumber);
 
-    Task<bool> CompleteAsync(int id);
-
     Task<OrderTrackingView?> GetTrackingAsync(int id);
 
     Task<bool> ConfirmReceiptAsync(int id, string userId);
+
+    Task<bool> ReportReceiptExceptionAsync(int id, string reason, string reportedBy);
+
+    Task<int> ProcessPendingOrderStatesAsync();
 
     Task<int> GetDeliveredItemCountAsync(string userId);
 

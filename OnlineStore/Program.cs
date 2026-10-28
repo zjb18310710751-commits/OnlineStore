@@ -50,6 +50,7 @@ builder.Services.AddScoped<IProductSkuService, ProductSkuService>();
 builder.Services.AddScoped<IProductSpecService, ProductSpecService>();
 builder.Services.AddScoped<IReviewService, ReviewService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddHostedService<OrderConfirmationBackgroundService>();
 builder.Services.AddScoped<IFavoriteService, FavoriteService>();
 builder.Services.AddScoped<IDeliveryAddressService, DeliveryAddressService>();
 builder.Services.AddScoped<ICartStore, SessionCartStore>();

@@ -64,19 +64,79 @@ public class OrderServiceTests
     }
 
     [Fact]
-    public async Task ShipAsync_ThenCompleteAsync_TransitionsCorrectly()
+    public async Task ShipAsync_DoesNotCompleteOrderAndCreatesNoConfirmationDeadline()
     {
         var (context, order, _) = await SeedAsync();
         var service = new OrderService(context);
 
         Assert.True(await service.ShipAsync(order.Id, "SF Express", "TEST00000001"));
         Assert.Equal(OrderStatus.Shipped, order.Status);
-        Assert.False(await service.CompleteAsync(order.Id));
+        Assert.Null(order.AutoConfirmAt);
+        Assert.Null(order.SignedAt);
+    }
+
+    [Fact]
+    public async Task ConfirmReceipt_RequiresDeliveredAndCompletesManually()
+    {
+        var (context, order, _) = await SeedAsync();
+        var service = new OrderService(context);
+        Assert.True(await service.ShipAsync(order.Id, "SF Express", "TEST00000001"));
+
+        Assert.False(await service.ConfirmReceiptAsync(order.Id, order.UserId!));
+        Assert.Equal(OrderStatus.Shipped, order.Status);
+
         order.ShippedAt = DateTime.UtcNow.AddSeconds(-10);
         await context.SaveChangesAsync();
         await service.GetTrackingAsync(order.Id);
-        Assert.True(await service.CompleteAsync(order.Id));
+        Assert.Equal(OrderStatus.Delivered, order.Status);
+        Assert.NotNull(order.AutoConfirmAt);
+
+        Assert.True(await service.ConfirmReceiptAsync(order.Id, order.UserId!));
         Assert.Equal(OrderStatus.Completed, order.Status);
+        Assert.NotNull(order.SignedAt);
+        Assert.False(order.ReceiptConfirmedAutomatically);
+    }
+
+    [Fact]
+    public async Task ProcessPendingOrderStates_AutoConfirmsAfterSevenDayWindow()
+    {
+        var (context, order, _) = await SeedAsync();
+        var deliveredAt = DateTime.UtcNow.AddDays(-8);
+        var autoConfirmAt = deliveredAt.AddDays(7);
+        order.Status = OrderStatus.Delivered;
+        order.ShippedAt = deliveredAt.AddSeconds(-9);
+        order.DeliveredAt = deliveredAt;
+        order.AutoConfirmAt = autoConfirmAt;
+        await context.SaveChangesAsync();
+        var service = new OrderService(context);
+
+        await service.ProcessPendingOrderStatesAsync();
+
+        Assert.Equal(OrderStatus.Completed, order.Status);
+        Assert.Equal(autoConfirmAt, order.SignedAt);
+        Assert.True(order.ReceiptConfirmedAutomatically);
+    }
+
+    [Fact]
+    public async Task ReportReceiptException_RecordsAuditPausesAutoConfirmAndAllowsRefund()
+    {
+        var (context, order, product) = await SeedAsync();
+        order.Status = OrderStatus.Delivered;
+        order.DeliveredAt = DateTime.UtcNow.AddDays(-1);
+        order.AutoConfirmAt = DateTime.UtcNow.AddDays(-1);
+        await context.SaveChangesAsync();
+        var service = new OrderService(context);
+
+        Assert.True(await service.ReportReceiptExceptionAsync(order.Id, "Buyer did not receive the parcel.", "admin@store.com"));
+        await service.ProcessPendingOrderStatesAsync();
+
+        Assert.Equal(OrderStatus.ReceiptException, order.Status);
+        Assert.Equal("Buyer did not receive the parcel.", order.ReceiptExceptionReason);
+        Assert.Equal("admin@store.com", order.ReceiptExceptionReportedBy);
+        Assert.NotNull(order.ReceiptExceptionReportedAt);
+        Assert.True(await service.RefundAsync(order.Id));
+        Assert.Equal(OrderStatus.Refunded, order.Status);
+        Assert.Equal(7, product.Stock);
     }
 
     [Fact]

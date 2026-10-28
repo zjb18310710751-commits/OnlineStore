@@ -20,15 +20,14 @@ public class OrdersController : Controller
         _loc = localizer;
     }
 
-    public async Task<IActionResult> Index(string? section = null, int ordersPage = 1, int afterSalesPage = 1)
+    public async Task<IActionResult> Index(string? section = null, int page = 1)
     {
-        var orders = await _orderService.GetAdminOrdersPagedAsync(ordersPage, 10);
-        var afterSales = await _orderService.GetAfterSalesPagedAsync(afterSalesPage, 10);
+        var isAfterSales = string.Equals(section, "after-sales", StringComparison.OrdinalIgnoreCase);
+        var orders = await _orderService.GetAdminOrdersPagedAsync(isAfterSales ? 1 : page, 10);
+        var afterSales = await _orderService.GetAfterSalesPagedAsync(isAfterSales ? page : 1, 10);
         return View(new AdminOrdersViewModel
         {
-            ActiveSection = string.Equals(section, "after-sales", StringComparison.OrdinalIgnoreCase)
-                ? "after-sales"
-                : "orders",
+            ActiveSection = isAfterSales ? "after-sales" : "orders",
             Orders = orders.Items,
             AfterSales = afterSales.Items,
             OrdersPage = orders.Page,
@@ -63,10 +62,13 @@ public class OrdersController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Complete(int id)
+    public async Task<IActionResult> ReportReceiptException(int id, string reason)
     {
-        var ok = await _orderService.CompleteAsync(id);
-        TempData[ok ? "Success" : "Error"] = ok ? _loc["OrderCompleted"].Value : _loc["OrderCompleteFailed"].Value;
+        var ok = !string.IsNullOrWhiteSpace(reason)
+            && await _orderService.ReportReceiptExceptionAsync(id, reason, User.Identity?.Name ?? "Admin");
+        TempData[ok ? "Success" : "Error"] = ok
+            ? L10n.Text("签收异常已记录并暂停自动确认。", "Receipt exception recorded. Auto-confirmation is paused.")
+            : L10n.Text("签收异常记录失败，请检查原因和订单状态。", "Could not record the receipt exception. Check the reason and order status.");
         return RedirectToAction(nameof(Index));
     }
 
