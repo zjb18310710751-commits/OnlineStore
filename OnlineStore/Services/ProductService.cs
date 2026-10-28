@@ -127,7 +127,6 @@ public class ProductService : IProductService
             .Include(p => p.Categories)
             .Include(p => p.Skus)
             .Include(p => p.Specs)
-            .Include(p => p.Reviews)
             .Include(p => p.Images)
             .FirstOrDefaultAsync(p => p.Id == id);
 

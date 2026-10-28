@@ -7,6 +7,18 @@
     var total = (int)ViewBag.Total;
     var search = ViewBag.Search as string;
     var categoryId = (int?)ViewBag.CategoryId;
+    var pagination = new AdminPaginationViewModel
+    {
+        Action = "Index",
+        Controller = "Products",
+        Page = page,
+        TotalPages = totalPages,
+        RouteValues = new()
+        {
+            ["search"] = search,
+            ["categoryId"] = categoryId?.ToString()
+        }
+    };
 }
 <div class="admin-store-heading">
     <div>
@@ -95,22 +107,4 @@
     </div>
 </div>
 
-@if (totalPages > 1)
-{
-    <nav class="mt-3">
-        <ul class="pagination justify-content-center">
-            <li class="page-item @(page <= 1 ? "disabled" : "")">
-                <a class="page-link" asp-area="Admin" asp-controller="Products" asp-action="Index" asp-route-search="@search" asp-route-categoryId="@categoryId" asp-route-page="@(page - 1)">@Loc["Previous"]</a>
-            </li>
-            @for (var i = 1; i <= totalPages; i++)
-            {
-                <li class="page-item @(i == page ? "active" : "")">
-                    <a class="page-link" asp-area="Admin" asp-controller="Products" asp-action="Index" asp-route-search="@search" asp-route-categoryId="@categoryId" asp-route-page="@i">@i</a>
-                </li>
-            }
-            <li class="page-item @(page >= totalPages ? "disabled" : "")">
-                <a class="page-link" asp-area="Admin" asp-controller="Products" asp-action="Index" asp-route-search="@search" asp-route-categoryId="@categoryId" asp-route-page="@(page + 1)">@Loc["Next"]</a>
-            </li>
-        </ul>
-    </nav>
-}
+<partial name="_AdminPagination" model="pagination" />

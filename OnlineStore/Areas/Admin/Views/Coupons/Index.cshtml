@@ -1,6 +1,7 @@
-@model IReadOnlyList<Coupon>
+@model PagedResult<Coupon>
 @{
     ViewData["Title"] = Loc["CouponManagement"].Value;
+    var pagination = new AdminPaginationViewModel { Action = "Index", Controller = "Coupons", Page = Model.Page, TotalPages = Model.TotalPages };
 }
 
 <div class="coupon-admin-page">
@@ -16,7 +17,7 @@
         </div>
     </div>
 
-    @if (Model.Count == 0)
+    @if (Model.TotalCount == 0)
     {
         <div class="card coupon-admin-empty">
             <i class="bi bi-ticket-perforated"></i>
@@ -42,7 +43,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach (var coupon in Model)
+                        @foreach (var coupon in Model.Items)
                         {
                             var status = !coupon.IsActive
                                 ? Loc["Disabled"].Value
@@ -122,6 +123,7 @@
             </div>
         </div>
     }
+    <partial name="_AdminPagination" model="pagination" />
 </div>
 
 <div class="modal fade coupon-batch-modal" id="couponBatchModal" tabindex="-1" aria-labelledby="couponBatchTitle" aria-hidden="true">

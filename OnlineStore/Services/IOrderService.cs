@@ -1,4 +1,5 @@
 using OnlineStore.Models;
+using OnlineStore.ViewModels;
 
 namespace OnlineStore.Services;
 
@@ -9,6 +10,7 @@ public interface IOrderService
     Task<IReadOnlyList<Order>> GetByUserAsync(string userId);
 
     Task<IReadOnlyList<Order>> GetAllAsync();
+    Task<PagedResult<Order>> GetAdminOrdersPagedAsync(int page, int pageSize);
 
     Task<Order> CreateAsync(Order order);
 
@@ -31,6 +33,8 @@ public interface IOrderService
     Task<AfterSalesRequest> CreateAfterSalesAsync(int orderId, string userId, string type, string reason);
 
     Task<IReadOnlyList<AfterSalesRequest>> GetAfterSalesAllAsync();
+    Task<PagedResult<AfterSalesRequest>> GetAfterSalesPagedAsync(int page, int pageSize);
+    Task<int> CountPendingAfterSalesAsync();
 
     Task<bool> ReviewAfterSalesAsync(int id, bool approved, string? note);
 

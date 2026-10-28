@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using OnlineStore.Data;
 using OnlineStore.Models;
+using OnlineStore.ViewModels;
 
 namespace OnlineStore.Services;
 
@@ -19,6 +20,16 @@ public class ShopService : IShopService
             .OrderByDescending(s => s.Rating)
             .ThenBy(s => s.Name)
             .ToListAsync();
+
+    public async Task<PagedResult<Shop>> GetPagedAsync(int page, int pageSize)
+    {
+        var query = _context.Shops.AsNoTracking().OrderBy(shop => shop.Name);
+        var total = await query.CountAsync();
+        var totalPages = Math.Max(1, (int)Math.Ceiling(total / (double)pageSize));
+        page = Math.Clamp(page, 1, totalPages);
+        var items = await query.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
+        return new PagedResult<Shop>(items, page, pageSize, total);
+    }
 
     public Task<Shop?> GetByIdAsync(int id) =>
         _context.Shops.FirstOrDefaultAsync(s => s.Id == id);

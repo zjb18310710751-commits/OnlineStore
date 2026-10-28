@@ -1,10 +1,12 @@
 using OnlineStore.Models;
+using OnlineStore.ViewModels;
 
 namespace OnlineStore.Services;
 
 public interface ICategoryService
 {
     Task<IReadOnlyList<Category>> GetAllAsync();
+    Task<PagedResult<Category>> GetPagedAsync(int page, int pageSize);
 
     Task<Category?> GetByIdAsync(int id);
 

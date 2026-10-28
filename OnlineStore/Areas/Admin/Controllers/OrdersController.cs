@@ -20,17 +20,23 @@ public class OrdersController : Controller
         _loc = localizer;
     }
 
-    public async Task<IActionResult> Index(string? section = null)
+    public async Task<IActionResult> Index(string? section = null, int ordersPage = 1, int afterSalesPage = 1)
     {
-        var orders = await _orderService.GetAllAsync();
-        var afterSales = await _orderService.GetAfterSalesAllAsync();
+        var orders = await _orderService.GetAdminOrdersPagedAsync(ordersPage, 10);
+        var afterSales = await _orderService.GetAfterSalesPagedAsync(afterSalesPage, 10);
         return View(new AdminOrdersViewModel
         {
             ActiveSection = string.Equals(section, "after-sales", StringComparison.OrdinalIgnoreCase)
                 ? "after-sales"
                 : "orders",
-            Orders = orders,
-            AfterSales = afterSales
+            Orders = orders.Items,
+            AfterSales = afterSales.Items,
+            OrdersPage = orders.Page,
+            OrdersTotalPages = orders.TotalPages,
+            TotalOrderCount = orders.TotalCount,
+            AfterSalesPage = afterSales.Page,
+            AfterSalesTotalPages = afterSales.TotalPages,
+            PendingAfterSalesCount = await _orderService.CountPendingAfterSalesAsync()
         });
     }
 

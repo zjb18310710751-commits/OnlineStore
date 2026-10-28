@@ -19,7 +19,11 @@ public class HeroSlidesController : Controller
         _images = images;
     }
 
-    public async Task<IActionResult> Index() => View(await _slides.GetAllAsync());
+    public async Task<IActionResult> Index(int page = 1)
+    {
+        ViewData["ActiveSlideCount"] = await _slides.CountActiveAsync();
+        return View(await _slides.GetPagedAsync(page, 10));
+    }
 
     [HttpGet]
     public IActionResult Create() => View(new HeroSlideFormViewModel());

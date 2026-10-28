@@ -1,0 +1,26 @@
+@model AdminPaginationViewModel
+@{
+    var firstPage = Math.Max(1, Model.Page - 2);
+    var lastPage = Math.Min(Model.TotalPages, firstPage + 4);
+    firstPage = Math.Max(1, lastPage - 4);
+}
+@if (Model.ShowWhenSinglePage || Model.TotalPages > 1)
+{
+    <nav class="admin-pagination" aria-label="@L10n.Text("列表分页", "List pages")">
+        <a class="admin-pagination-link @(Model.Page <= 1 ? "is-disabled" : "")"
+           asp-action="@Model.Action" asp-controller="@Model.Controller"
+           asp-all-route-data="@Model.RouteValues" asp-route-page="@(Math.Max(1, Model.Page - 1))"
+           aria-disabled="@(Model.Page <= 1 ? "true" : "false")">@Loc["Previous"]</a>
+        @for (var page = firstPage; page <= lastPage; page++)
+        {
+            <a class="admin-pagination-link @(page == Model.Page ? "is-current" : "")"
+               asp-action="@Model.Action" asp-controller="@Model.Controller"
+               asp-all-route-data="@Model.RouteValues" asp-route-page="@(page)"
+               aria-current="@(page == Model.Page ? "page" : null)">@(page)</a>
+        }
+        <a class="admin-pagination-link @(Model.Page >= Model.TotalPages ? "is-disabled" : "")"
+           asp-action="@Model.Action" asp-controller="@Model.Controller"
+           asp-all-route-data="@Model.RouteValues" asp-route-page="@(Math.Min(Model.TotalPages, Model.Page + 1))"
+           aria-disabled="@(Model.Page >= Model.TotalPages ? "true" : "false")">@Loc["Next"]</a>
+    </nav>
+}

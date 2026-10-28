@@ -20,11 +20,8 @@ public class CategoriesController : Controller
         _loc = localizer;
     }
 
-    public async Task<IActionResult> Index()
-    {
-        var categories = await _categoryService.GetAllAsync();
-        return View(categories);
-    }
+    public async Task<IActionResult> Index(int page = 1) =>
+        View(await _categoryService.GetPagedAsync(page, 10));
 
     [HttpGet]
     public IActionResult Create() => View(new CategoryFormViewModel());

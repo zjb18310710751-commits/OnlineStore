@@ -25,14 +25,13 @@
 .pd-story-content { min-width: 0; color: var(--sf-ink); font-size: 16px; line-height: 1.9; overflow-wrap: anywhere; }
 .pd-story-content > :first-child { margin-top: 0 !important; }
 .pd-story-content > :last-child { margin-bottom: 0 !important; }
-.pd-story-content p { max-width: 72ch; margin: 0 0 28px; }
-.pd-story-content > p:first-child { font-size: clamp(18px, 2vw, 24px); line-height: 1.65; letter-spacing: -.015em; }
+.pd-story-content p { width: 100%; max-width: none; margin: 0 0 28px; font-size: 16px; line-height: 1.8; letter-spacing: 0; }
 .pd-story-content :is(p, div, figure):has(> img) { max-width: none; }
 .pd-story-content img { display: block; width: 100% !important; max-width: 100% !important; height: auto !important; border-radius: 0 !important; margin-block: 28px !important; object-fit: contain; }
 .pd-story-content :is(figure, video, iframe) { max-width: 100%; }
 .pd-story-content figure { margin: 32px 0; }
 .pd-story-content figcaption { margin-top: 12px; color: var(--sf-muted); font-size: 13px; }
-.pd-story-content :is(h1, h2, h3, h4, h5, h6) { margin: 36px 0 16px; color: var(--sf-ink); font-size: 24px; line-height: 1.35; letter-spacing: -.025em; }
+.pd-story-content :is(h1, h2, h3, h4, h5, h6) { width: 100%; max-width: none; margin: 36px 0 16px; color: var(--sf-ink); font-size: 22px; line-height: 1.35; letter-spacing: -.025em; }
 .pd-story-content :is(ul, ol) { padding-left: 1.4em; margin-bottom: 28px; }
 .pd-story-content li + li { margin-top: 8px; }
 .pd-story-content a { text-decoration: underline; text-underline-offset: 4px; }

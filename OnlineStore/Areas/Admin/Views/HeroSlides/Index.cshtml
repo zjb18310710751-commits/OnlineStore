@@ -1,6 +1,13 @@
-@model IReadOnlyList<HeroSlide>
+@model PagedResult<HeroSlide>
 @{
     ViewData["Title"] = L10n.Text("首页轮播图", "Homepage carousel");
+    var pagination = new AdminPaginationViewModel
+    {
+        Action = "Index",
+        Controller = "HeroSlides",
+        Page = Model.Page,
+        TotalPages = Model.TotalPages
+    };
 }
 <section class="admin-carousel-manager" aria-labelledby="carousel-page-title">
     <div class="ac-page-heading">
@@ -12,10 +19,10 @@
         <a asp-action="Create" class="btn btn-primary"><i class="bi bi-plus-lg" aria-hidden="true"></i>@L10n.Text("添加轮播图", "Add slide")</a>
     </div>
     <div class="ac-list-meta">
-        <p><strong>@Model.Count</strong> @L10n.Text("张轮播图", "slides") <span aria-hidden="true">·</span> <strong>@Model.Count(s => s.IsActive)</strong> @L10n.Text("张正在展示", "visible on homepage")</p>
+        <p><strong>@Model.TotalCount</strong> @L10n.Text("张轮播图", "slides") <span aria-hidden="true">·</span> <strong>@ViewData["ActiveSlideCount"]</strong> @L10n.Text("张正在展示", "visible on homepage")</p>
         <a asp-area="" asp-controller="Home" asp-action="Index">@L10n.Text("查看首页", "View homepage") <i class="bi bi-arrow-up-right" aria-hidden="true"></i></a>
     </div>
-    @if (Model.Count == 0)
+    @if (Model.TotalCount == 0)
     {
         <div class="card ac-empty">
             <i class="bi bi-images" aria-hidden="true"></i>
@@ -27,7 +34,7 @@
     else
     {
         <div class="ac-slide-list">
-            @foreach (var slide in Model)
+            @foreach (var slide in Model.Items)
             {
                 var title = L10n.Text(slide.Title, slide.TitleEn);
                 var heading = L10n.Text(slide.Heading, slide.HeadingEn);
@@ -51,6 +58,7 @@
                 </article>
             }
         </div>
+        <partial name="_AdminPagination" model="pagination" />
         <p class="ac-list-note"><i class="bi bi-info-circle" aria-hidden="true"></i>@L10n.Text("排序数字越小越靠前；隐藏的轮播图不会在首页显示。", "Lower order numbers appear first. Hidden slides stay off the homepage.")</p>
     }
 </section>

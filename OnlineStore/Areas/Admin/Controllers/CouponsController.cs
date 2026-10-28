@@ -29,8 +29,8 @@ public class CouponsController : Controller
         _loc = localizer;
     }
 
-    public async Task<IActionResult> Index() =>
-        View(await _couponService.GetAllAsync());
+    public async Task<IActionResult> Index(int page = 1) =>
+        View(await _couponService.GetPagedAsync(page, 10));
 
     [HttpGet]
     public async Task<IActionResult> Create()

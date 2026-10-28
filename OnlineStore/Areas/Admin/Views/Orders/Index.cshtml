@@ -1,7 +1,23 @@
 @model AdminOrdersViewModel
 @{
     ViewData["Title"] = Loc["OrderManagement"].Value;
-    var pendingAfterSales = Model.AfterSales.Count(item => item.Status == AfterSalesStatus.Pending);
+    var pendingAfterSales = Model.PendingAfterSalesCount;
+    var ordersPagination = new AdminPaginationViewModel
+    {
+        Action = "Index",
+        Controller = "Orders",
+        Page = Model.OrdersPage,
+        TotalPages = Model.OrdersTotalPages,
+        RouteValues = new() { ["section"] = "orders" }
+    };
+    var afterSalesPagination = new AdminPaginationViewModel
+    {
+        Action = "Index",
+        Controller = "Orders",
+        Page = Model.AfterSalesPage,
+        TotalPages = Model.AfterSalesTotalPages,
+        RouteValues = new() { ["section"] = "after-sales" }
+    };
 }
 @functions {
     string StatusBadge(string status) => status switch
@@ -18,7 +34,7 @@
 </div>
 <nav class="admin-order-section-nav" aria-label="@L10n.Text("订单管理分区", "Order management sections")">
     <a asp-action="Index" asp-route-section="orders" class="@(Model.ActiveSection == "orders" ? "is-active" : "")">
-        @L10n.Text("订单管理", "Orders") <span>@Model.Orders.Count</span>
+        @L10n.Text("订单管理", "Orders") <span>@Model.TotalOrderCount</span>
     </a>
     <a asp-action="Index" asp-route-section="after-sales" class="@(Model.ActiveSection == "after-sales" ? "is-active" : "")">
         @L10n.Text("售后申请", "After-sales") <span>@pendingAfterSales</span>
@@ -123,6 +139,7 @@
         </table>
     </div>
 </div>
+<partial name="_AdminPagination" model="ordersPagination" />
 }
 else
 {
@@ -184,6 +201,7 @@ else
         </table>
     </div>
 </div>
+<partial name="_AdminPagination" model="afterSalesPagination" />
 }
 
 <div class="modal fade" id="dispatchModal" tabindex="-1" aria-hidden="true">

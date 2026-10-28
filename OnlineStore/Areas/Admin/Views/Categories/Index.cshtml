@@ -1,6 +1,7 @@
-@model IReadOnlyList<Category>
+@model PagedResult<Category>
 @{
     ViewData["Title"] = Loc["CategoryManagement"].Value;
+    var pagination = new AdminPaginationViewModel { Action = "Index", Controller = "Categories", Page = Model.Page, TotalPages = Model.TotalPages };
 }
 <div class="admin-store-heading">
     <div>
@@ -22,11 +23,11 @@
             </tr>
         </thead>
         <tbody>
-            @if (Model.Count == 0)
+            @if (Model.TotalCount == 0)
             {
                 <tr><td colspan="4" class="text-center text-muted py-4">@Loc["NoCategories"]</td></tr>
             }
-            @foreach (var c in Model)
+            @foreach (var c in Model.Items)
             {
                 <tr>
                     <td>@c.DisplayOrder</td>
@@ -43,3 +44,4 @@
         </tbody>
     </table>
 </div>
+<partial name="_AdminPagination" model="pagination" />

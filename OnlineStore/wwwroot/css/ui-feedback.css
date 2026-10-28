@@ -43,9 +43,10 @@
 .ui-feedback-scope .alert-danger { border-left: 3px solid var(--feedback-error); color: var(--feedback-error); background: #fffafa; }
 .ui-feedback-scope .alert-warning { border-left: 3px solid var(--feedback-warning); color: var(--feedback-warning); background: #fffcf7; }
 
-.ui-confirm-dialog { width: min(420px, calc(100vw - 32px)); max-width: none; max-height: calc(100dvh - 32px); margin: auto; padding: 28px; overflow-y: auto; border: 1px solid var(--feedback-line); border-radius: 16px; background: #fff; color: var(--feedback-ink); box-shadow: 0 24px 80px #00000024; }
+.ui-confirm-dialog, .ui-dialog-surface { border: 1px solid var(--feedback-line, #e3e3e3); border-radius: 16px; background: #fff; color: var(--feedback-ink, #171717); box-shadow: 0 24px 80px #00000024; }
+.ui-confirm-dialog { width: min(420px, calc(100vw - 32px)); max-width: none; max-height: calc(100dvh - 32px); margin: auto; padding: 28px; overflow-y: auto; }
 .ui-confirm-dialog:not([open]) { display: none; }
-.ui-confirm-dialog::backdrop { background: #00000066; backdrop-filter: blur(3px); }
+.ui-confirm-dialog::backdrop, .ui-dialog-surface::backdrop { background: #00000066; backdrop-filter: blur(3px); }
 .ui-confirm-dialog .ui-dialog-close { position: absolute; top: 12px; right: 12px; margin: 0; }
 .ui-dialog-icon { display: inline-flex; align-items: center; justify-content: center; width: 48px; height: 48px; border: 1px solid #eee1df; border-radius: 50%; color: var(--feedback-error); background: #fcf7f6; font-size: 22px; }
 .ui-dialog-title { margin: 20px 0 10px; color: var(--feedback-ink); font-size: 24px; font-weight: 700; line-height: 1.3; letter-spacing: -.03em; }

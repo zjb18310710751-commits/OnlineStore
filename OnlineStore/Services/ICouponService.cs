@@ -1,4 +1,5 @@
 using OnlineStore.Models;
+using OnlineStore.ViewModels;
 
 namespace OnlineStore.Services;
 
@@ -29,6 +30,7 @@ public record CouponWalletItem(
 public interface ICouponService
 {
     Task<IReadOnlyList<Coupon>> GetAllAsync();
+    Task<PagedResult<Coupon>> GetPagedAsync(int page, int pageSize);
 
     Task<Coupon?> GetByIdAsync(int id);
 

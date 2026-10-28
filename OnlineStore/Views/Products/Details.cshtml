@@ -12,6 +12,7 @@
     var images = Model.Images.OrderBy(i => i.SortOrder).Select(i => i.ImageUrl).ToList();
     if (images.Count == 0 && !string.IsNullOrEmpty(Model.ImageUrl)) images.Add(Model.ImageUrl);
     var isFavorite = ViewData["IsFavorite"] as bool? ?? false;
+    var reviewCount = ViewData["ReviewCount"] as int? ?? 0;
 }
 <div class="sf-container pd-product-page">
     <nav aria-label="breadcrumb" class="mb-3">
@@ -205,7 +206,7 @@
     </div>
     <nav class="pd-section-nav" aria-label="@L10n.Text("商品信息", "Product information")">
         <div class="pd-section-links">
-            <a href="#product-reviews">@Loc["Reviews"] <span>@Model.Reviews.Count</span></a>
+            <a href="#product-reviews">@Loc["Reviews"] <span>@reviewCount</span></a>
             <a href="#product-story">@Loc["DetailIntro"]</a>
         </div>
         <a class="pd-back-to-product" href="#product-overview">@L10n.Text("返回商品", "Back to product") <i class="bi bi-arrow-up" aria-hidden="true"></i></a>

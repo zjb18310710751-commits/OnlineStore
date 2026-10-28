@@ -18,11 +18,8 @@ public class ReviewsController : Controller
         _loc = localizer;
     }
 
-    public async Task<IActionResult> Index()
-    {
-        var reviews = await _reviewService.GetAllAsync();
-        return View(reviews);
-    }
+    public async Task<IActionResult> Index(int page = 1) =>
+        View(await _reviewService.GetPagedAsync(page, 10));
 
     [HttpPost]
     [ValidateAntiForgeryToken]

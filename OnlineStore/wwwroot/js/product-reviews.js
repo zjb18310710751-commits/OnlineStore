@@ -18,42 +18,6 @@
         if (location.hash === '#write-review') openCompose();
     });
 
-    const list = section.querySelector('[data-review-list]');
-    const tools = section.querySelector('[data-review-tools]');
-    const sort = section.querySelector('[data-review-sort]');
-    const status = section.querySelector('[data-review-status]');
-    const filters = [...section.querySelectorAll('[data-review-filter]')];
-    const rows = [...section.querySelectorAll('[data-review-row]')].map((element, index) => ({
-        element,
-        index,
-        rating: Number(element.dataset.rating),
-        hasPhoto: element.dataset.hasPhoto === 'true'
-    }));
-    let activeFilter = 'all';
-    const updateReviews = () => {
-        let visibleCount = 0;
-        const sorted = [...rows].sort((a, b) => {
-            if (sort?.value === 'highest') return b.rating - a.rating || a.index - b.index;
-            if (sort?.value === 'lowest') return a.rating - b.rating || a.index - b.index;
-            return a.index - b.index;
-        });
-        sorted.forEach(row => {
-            row.element.hidden = activeFilter === 'photos' && !row.hasPhoto;
-            if (!row.element.hidden) visibleCount += 1;
-            list.append(row.element);
-        });
-        if (status) status.textContent = status.dataset.countTemplate.replace('{0}', String(visibleCount));
-    };
-    if (list && tools) {
-        tools.hidden = false;
-        filters.forEach(button => button.addEventListener('click', () => {
-            activeFilter = button.dataset.reviewFilter;
-            filters.forEach(filter => filter.setAttribute('aria-pressed', String(filter === button)));
-            updateReviews();
-        }));
-        sort?.addEventListener('change', updateReviews);
-    }
-
     const comment = section.querySelector('[data-review-comment]');
     const characterCount = section.querySelector('[data-review-character-count]');
     const updateCharacterCount = () => {
@@ -120,29 +84,69 @@
     });
     window.addEventListener('pagehide', clearPreview);
 
-    const dialog = section.querySelector('[data-review-dialog]');
-    const dialogImage = section.querySelector('[data-review-dialog-image]');
-    let photoTrigger = null;
-    if (dialog && typeof dialog.showModal === 'function') {
-        section.querySelectorAll('[data-review-photo]').forEach(link => {
-            link.addEventListener('click', event => {
-                if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+    const archiveTrigger = section.querySelector('[data-review-archive-open]');
+    const archiveDialog = section.querySelector('[data-review-archive-dialog]');
+    const archiveBody = archiveDialog?.querySelector('[data-review-archive-body]');
+    if (archiveTrigger && archiveDialog && archiveBody && typeof archiveDialog.showModal === 'function') {
+        const archivePath = new URL(archiveTrigger.href, location.href).pathname;
+        let archiveRequest = null;
+
+        const loadArchive = async (url, focusHeading = false) => {
+            archiveRequest?.abort();
+            archiveRequest = new AbortController();
+            archiveBody.setAttribute('aria-busy', 'true');
+            archiveBody.classList.add('is-loading');
+            try {
+                const response = await fetch(url, {
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                    signal: archiveRequest.signal
+                });
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                archiveBody.innerHTML = await response.text();
+                archiveBody.classList.remove('is-loading');
+                archiveBody.removeAttribute('aria-busy');
+                if (focusHeading) archiveBody.querySelector('h1')?.focus({ preventScroll: true });
+            } catch (error) {
+                if (error.name === 'AbortError') return;
+                archiveBody.classList.remove('is-loading');
+                archiveBody.removeAttribute('aria-busy');
+                archiveBody.innerHTML = `<div class="sf-review-archive-error" role="alert">${archiveBody.dataset.loadError}</div>`;
+            }
+        };
+
+        archiveTrigger.addEventListener('click', event => {
+            if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+            event.preventDefault();
+            archiveDialog.showModal();
+            loadArchive(archiveTrigger.href);
+        });
+
+        archiveDialog.querySelector('[data-review-archive-close]')?.addEventListener('click', () => archiveDialog.close());
+        archiveDialog.addEventListener('click', event => {
+            const link = event.target.closest('a');
+            if (link && !event.ctrlKey && !event.metaKey && !event.shiftKey && !event.altKey
+                && link.target !== '_blank' && new URL(link.href, location.href).pathname === archivePath) {
                 event.preventDefault();
-                photoTrigger = link;
-                dialogImage.src = link.href;
-                dialogImage.alt = link.querySelector('img').alt;
-                dialog.showModal();
-            });
+                loadArchive(link.href, true);
+                return;
+            }
+            if (event.target === archiveDialog) archiveDialog.close();
         });
-        section.querySelector('[data-review-dialog-close]')?.addEventListener('click', () => dialog.close());
-        dialog.addEventListener('click', event => {
-            if (event.target !== dialog) return;
-            const bounds = dialog.getBoundingClientRect();
-            if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) dialog.close();
+
+        archiveDialog.addEventListener('submit', event => {
+            const form = event.target;
+            if (!(form instanceof HTMLFormElement) || !form.matches('[data-review-archive-sort]')) return;
+            event.preventDefault();
+            const url = new URL(form.action, location.href);
+            url.search = new URLSearchParams(new FormData(form)).toString();
+            loadArchive(url, true);
         });
-        dialog.addEventListener('close', () => {
-            dialogImage.removeAttribute('src');
-            photoTrigger?.focus({ preventScroll: true });
+        archiveDialog.addEventListener('change', event => {
+            if (event.target.matches('[data-review-archive-sort-select]')) event.target.form?.requestSubmit();
+        });
+        archiveDialog.addEventListener('close', () => {
+            archiveRequest?.abort();
+            archiveTrigger.focus({ preventScroll: true });
         });
     }
 })();

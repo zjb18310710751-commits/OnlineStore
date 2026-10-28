@@ -4,6 +4,7 @@ using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using OnlineStore.Data;
 using OnlineStore.Models;
+using OnlineStore.ViewModels;
 
 namespace OnlineStore.Services;
 
@@ -40,6 +41,20 @@ public class OrderService : IOrderService
             .Include(o => o.AfterSalesRequests)
             .OrderByDescending(o => o.CreatedAt)
             .ToListAsync();
+
+    public async Task<PagedResult<Order>> GetAdminOrdersPagedAsync(int page, int pageSize)
+    {
+        var query = _context.Orders
+            .AsNoTracking()
+            .Include(order => order.Items)
+            .Include(order => order.AfterSalesRequests)
+            .OrderByDescending(order => order.CreatedAt);
+        var total = await query.CountAsync();
+        var totalPages = Math.Max(1, (int)Math.Ceiling(total / (double)pageSize));
+        page = Math.Clamp(page, 1, totalPages);
+        var items = await query.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
+        return new PagedResult<Order>(items, page, pageSize, total);
+    }
 
     public async Task<Order> CreateAsync(Order order)
     {
@@ -429,6 +444,22 @@ public class OrderService : IOrderService
             .Include(a => a.Order)
             .OrderByDescending(a => a.RequestedAt)
             .ToListAsync();
+
+    public async Task<PagedResult<AfterSalesRequest>> GetAfterSalesPagedAsync(int page, int pageSize)
+    {
+        var query = _context.AfterSalesRequests
+            .AsNoTracking()
+            .Include(request => request.Order)
+            .OrderByDescending(request => request.RequestedAt);
+        var total = await query.CountAsync();
+        var totalPages = Math.Max(1, (int)Math.Ceiling(total / (double)pageSize));
+        page = Math.Clamp(page, 1, totalPages);
+        var items = await query.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
+        return new PagedResult<AfterSalesRequest>(items, page, pageSize, total);
+    }
+
+    public Task<int> CountPendingAfterSalesAsync() =>
+        _context.AfterSalesRequests.CountAsync(request => request.Status == AfterSalesStatus.Pending);
 
     public async Task<bool> ReviewAfterSalesAsync(int id, bool approved, string? note)
     {
