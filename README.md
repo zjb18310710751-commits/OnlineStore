@@ -6,9 +6,9 @@
 
 - Azure App Service：<https://zhy-onlinestore-31072.azurewebsites.net/>
 - 部署环境：Azure App Service（Linux F1）+ Azure SQL Database（Basic）
-- 首次访问可能需要等待片刻（F1 免费档冷启动），应用启动时会自动建表并写入种子数据。
+- 首次访问可能需要等待片刻（F1 免费档冷启动）；是否在启动时应用迁移和写入示例目录由 `Initialization` 配置控制。
 - 资源组：`rg-onlinestore-demo`；删除该资源组会同时删除 Azure 网站和 Azure SQL，停止相关计费（本地数据库不受影响）。
-- 重新部署：本地执行 `dotnet publish` 生成 zip，通过 Azure Cloud Shell 的 `az webapp deploy --type zip` 上传；不依赖 GitHub 推送。
+- 推送到 `main` 后由 GitHub Actions 自动发布，也可在 Actions 页面手动运行工作流。
 
 ```bash
 # 在 Azure Cloud Shell 中重新部署（先完成 az login）
@@ -24,20 +24,22 @@ az group delete --name rg-onlinestore-demo --yes --no-wait
 
 ### 自动化部署
 
-- 推送到 `main` 后，GitHub Actions 会依次执行还原、构建、159 个后端测试、6 个前端回归测试，并发布到 Azure App Service。
+- 推送到 `main` 后，GitHub Actions 会依次执行依赖审计、还原、构建、166 个后端测试、6 个前端回归测试，并发布到 Azure App Service。
+- 工作流使用生产并发锁，旧运行会被新运行取消；部署完成后自动验证 `/health`，未恢复健康会使工作流失败。
 - 仓库的 Actions Secrets 需要配置 `AZURE_WEBAPP_PUBLISH_PROFILE`，内容来自 Azure App Service 概览页的「获取发布配置文件 / Get publish profile」。
 - 本地仓库配置了 `post-commit` hook：在 `main` 分支提交后会自动执行 `git push origin main`；未提交的修改不会自动推送。
 
 ## 技术栈
 
 - ASP.NET Core 8 MVC（Razor 视图）
-- Entity Framework Core 8 + **Microsoft.EntityFrameworkCore.SqlServer**（SQL Server Express，SSMS 管理）
+- Entity Framework Core 8.0.33 + **Microsoft.EntityFrameworkCore.SqlServer**（SQL Server Express / Azure SQL，SSMS 管理）
 - Azure SQL Database（Azure 演示环境，通过 App Service 连接串配置）
 - ASP.NET Core Identity（Cookie 认证 + 角色授权）
 - Bootstrap 5.3 + Bootstrap Icons（前端主题）
 - ASP.NET Core Health Checks（健康检查）
 - ASP.NET Core Session（购物车会话存储）
 - xUnit + EF Core InMemory（单元测试）
+- NuGet Audit（构建时检查已知漏洞）
 
 ## 已实现功能
 
@@ -69,15 +71,15 @@ az group delete --name rg-onlinestore-demo --yes --no-wait
 | 优惠券 | 支持百分比、固定金额、免运费、最高优惠、最低消费、日期范围、全局/每用户次数、首单限制、排除促销商品、全店/分类/商品范围；后台支持优惠券名称、批量创建、CSV 导出与核销记录，系统内部唯一标识不在页面展示；个人中心“我的优惠券”展示可用/未开始/已用完/已过期状态，结算页可直接选择优惠券并默认选择最优方案 |
 | 取消订单与退款 | 用户取消自己的订单；后台订单管理（发货/完成/取消/退款）；取消/退款自动恢复库存 |
 | 完整中英双语 | 界面文案 + 商品/分类/店铺/评价/参数/SKU 颜色规格/快递/图文详情等数据库内容全部随语言切换 |
-| 单元测试 | xUnit 测试项目：商品筛选/分页/排序、购物车增删改清空、图片上传校验、优惠券计算/校验/核销、订单评价关联、邮箱/手机号验证码、订单状态流转与库存扣减/恢复、记住账号密码（共 159 个 .NET 用例，另有 6 个前端规格选择与自定义选择器回归用例） |
+| 单元测试 | xUnit 测试项目：商品筛选/分页/排序、购物车增删改清空、图片上传校验、优惠券计算/校验/核销、订单评价关联、邮箱/手机号验证码、订单状态流转与库存扣减/恢复、记住账号密码、支付方式目录与 Header 服务（共 166 个 .NET 用例，另有 6 个前端规格选择与自定义选择器回归用例） |
 
 ## 目录结构
 
 ```
 OnlineStore/
 ├── Models/         领域实体（Product、Category、Shop、ProductSku、ProductSpec、Review、CartItem、Cart、Order、Coupon、DeliveryAddress、HeroSlide、ApplicationUser）
-├── Data/           数据上下文（ApplicationDbContext）与数据库初始化（DbInitializer）
-├── Services/       业务抽象层（IProductService、ICategoryService、IShopService、IProductSkuService、IProductSpecService、IReviewService、ICartService、ICartStore、IHeroSlideService、IDeliveryAddressService 等接口 + 实现）
+├── Data/           数据上下文（ApplicationDbContext）、初始化配置与数据库初始化（DbInitializer）
+├── Services/       业务抽象层（产品、购物车、订单、优惠券、商城 Header、图片存储等接口 + 实现）
 ├── ViewModels/     表单与列表视图模型
 ├── ViewComponents/ 购物车徽标、首页轮播与分类导航组件（CartSummary、HeroCarousel、CategoryNavigation）
 ├── Controllers/    前台控制器（Home、Products、Cart、Reviews、Account、Language、Shops、Favorites、Orders）
@@ -116,7 +118,7 @@ OnlineStore.Tests/  xUnit 单元测试项目（引用 OnlineStore，使用 EF Co
 "DefaultConnection": "Server=localhost\\SQLEXPRESS;Database=OnlineStore_Main;Trusted_Connection=True;TrustServerCertificate=True;"
 ```
 
-首次运行会经 EF Migrations 自动创建 `OnlineStore_Main` 数据库与全部表，并写入种子数据（5 个分类、100 个示例商品、5 家店铺与管理员账号）。用 SSMS 连接 `localhost\SQLEXPRESS` 即可查看/管理数据库；也可先在 SSMS 中建好空库 `OnlineStore_Main`，应用首次启动时会自动建表并写入种子数据。
+首次运行会经 EF Migrations 自动创建 `OnlineStore_Main` 数据库与全部表。示例目录、管理员和演示买家由 `Initialization` 配置控制。用 SSMS 连接 `localhost\SQLEXPRESS` 即可查看/管理数据库。
 
 > `appsettings.json` 与 `appsettings.Development.json` 默认都指向 `OnlineStore_Main`。如果你使用其他数据库名，请同时修改这两个文件，或通过环境变量覆盖连接串。
 
@@ -182,37 +184,51 @@ dotnet run
 dotnet test
 ```
 
-前端规格选择回归测试：`node --test OnlineStore.Tests/Frontend/product-details.test.cjs`。
+前端回归测试：`node --test OnlineStore.Tests/Frontend/*.test.cjs`。
 
-## 默认管理员账号
+## 初始化与管理员配置
 
-首次运行会自动建库建表并写入种子数据（5 个分类、100 个示例商品、5 家店铺）与管理员账号：
+源码不再包含管理员或演示买家的默认凭据。通过环境变量、Azure App Service 配置或用户机密提供初始化值：
 
-- 邮箱：`admin@store.com`
-- 密码：`Admin@123456`
+| 配置项 | 默认值 | 说明 |
+| --- | --- | --- |
+| `Initialization__ApplyMigrationsOnStartup` | `true` | 启动时是否执行 EF Migrations |
+| `Initialization__SeedSampleCatalogOnEmpty` | `true` | 空数据库是否写入示例分类、商品和店铺 |
+| `Initialization__AdminEmail` | 空 | 首次创建管理员时使用的邮箱 |
+| `Initialization__AdminPassword` | 空 | 首次创建管理员时使用的密码 |
+| `Initialization__SeedDemoData` | `false` | 是否创建演示买家与演示订单 |
+| `Initialization__DemoBuyerEmail` | 空 | 演示买家邮箱 |
+| `Initialization__DemoBuyerPassword` | 空 | 演示买家密码 |
 
-> ⚠️ 首次登录后请尽快修改密码（生产环境务必修改）。密码策略要求：至少 6 位，含大小写字母、数字与特殊字符（注册/找回密码时前端即时校验，与 Identity 服务端规则一致）。
+本地开发可使用 .NET User Secrets：
+
+```bash
+dotnet user-secrets set "Initialization:AdminEmail" "admin@example.com" --project OnlineStore
+dotnet user-secrets set "Initialization:AdminPassword" "<strong-password>" --project OnlineStore
+```
+
+管理员只在对应邮箱不存在时创建，应用不会在后续启动中覆盖已有密码。密码策略要求至少 6 位，并包含大小写字母、数字和特殊字符。
 
 ## 质量属性如何落地（属性 → 关键代码片段）
 
 | 质量属性 | 关键代码片段（位置） | 如何保证 |
 | --- | --- | --- |
-| **可用性 Availability** | `Program.cs` 的 `/health` 健康检查（`AddHealthChecks().AddDbContextCheck`）；`DbInitializer` 用 try/catch 包裹，数据库异常仅记日志不阻塞启动；`UseExceptionHandler` + `UseStatusCodePagesWithReExecute` 友好错误页；全链路 `async/await` 避免阻塞线程 | 应用可被探活、故障可观测、异常有兜底页，单个依赖故障不致整体不可用 |
-| **可修改性 Modifiability** | `Services/*` 接口抽象（`IProductService`、`ICategoryService`、`ICartService`、`ICartStore`、`IImageStorageService`、`IRememberedLoginService`）经 DI 注入；`Program.cs` 的 `AddScoped` 注册；`SessionCartStore` 可替换为数据库/Redis、`ImageStorageService` 可替换为 OSS/S3 而不改业务；`Areas/Admin` 区域隔离；`ViewModels` 与 `Models` 分离 | 面向接口编程 + 依赖注入，新增/替换实现、扩展功能时不改动调用方 |
-| **可测试性 Testability** | `OnlineStore.Tests/` 测试项目：`ProductServiceTests`（分页/分类/关键词/价格筛选/排序/促销商品）、`CartServiceTests`（加入/累加/库存上限/更新/移除/清空）、`ImageStorageServiceTests`（上传校验）、`CouponCalculatorTests`/`CouponServiceTests`（优惠券计算、范围、首单、每用户限制、批量生成、核销与钱包状态）、`ReviewOrderTests`（订单评价归属与更新）、`VerificationCodeServiceTests`（邮箱/手机号验证码生成/校验/过期/冷却）、`OrderServiceTests`（取消/退款/发货/完成与库存扣减/恢复）、`RememberedLoginCookieServiceTests`（记住账号密码的保存/读取/清除与密码不明文落盘），用 EF Core InMemory 与 `FakeCartStore` 假存储替代真实依赖 | 业务逻辑不依赖 HTTP/数据库细节，可独立实例化并快速验证；`dotnet test` 一键运行 159 个用例 |
+| **可用性 Availability** | `Program.cs` 的 `/health`、SQL Server 瞬时故障重试和 `Initialization` 配置；`DbInitializer` 用 try/catch 包裹初始化；统一的异常处理器和状态码页面 | 应用可被探活、数据库暂时不可用时可自动重试，初始化失败可观测 |
+| **可修改性 Modifiability** | `Services/*` 接口抽象经 DI 注入；`PaymentMethods` 集中支付方式定义；`StorefrontHeaderService` 隔离导航数据查询；`ViewModels` 与 `Models` 分离；`SessionCartStore` 和 `IImageStorageService` 可替换实现 | 面向接口和单一配置源组织代码，新增支付方式或替换存储时不改动多个页面 |
+| **可测试性 Testability** | 覆盖面包括产品、购物车、订单、优惠券、账户安全、图片上传、支付方式目录、商城 Header 服务等；使用 EF Core InMemory、服务替身和前端 Node 回归测试 | `dotnet test` 运行 166 个 .NET 用例，`node --test` 运行 6 个前端用例 |
 | **易用性 Usability** | Bootstrap 5.3 响应式主题（`Views/Shared/_Layout.cshtml`、`wwwroot/css/site.css`）；商品卡片 `_ProductCard.cshtml`、详情页数量步进器 `js/site.js` 的 `stepQty`；中英多语言（`Resources/*.resx`）；购物车徽标 `ViewComponents/CartSummaryViewComponent` | 界面一致美观、导航清晰、交互直观，减少用户操作成本 |
-| **安全性 Security** | Identity 密码哈希 + Cookie 认证（`Program.cs` 密码策略/锁定）；统一账号登录，后台控制器使用 `[Authorize(Roles="Admin")]` 校验管理员角色；Razor 默认 HTML 编码 + EF Core 参数化查询防 XSS/SQL 注入；表单 `[ValidateAntiForgeryToken]` 防 CSRF；`RedirectToLocal` 校验 `Url.IsLocalUrl` 防开放重定向；`ImageStorageService` 校验图片扩展名/大小/Content-Type 并 GUID 命名防路径注入；「记住账号密码」凭据经 Data Protection 加密后写入 HttpOnly Cookie，密码不以明文存储；登录失败统一提示不泄露账号是否存在 | 纵深防御：认证、授权、输入编码、防伪令牌、上传校验、开放重定向防护层层把关 |
+| **安全性 Security** | Identity 密码哈希 + Cookie 认证；后台统一要求 Admin 角色；Razor 默认 HTML 编码、EF Core 参数化查询、CSRF 防护和站内重定向校验；上传图片校验扩展名、大小、Content-Type 与文件头；管理员和演示买家凭据只从外部配置读取；NuGet Audit 在构建阶段阻断已知高危依赖 | 认证、授权、输入编码、上传校验、秘密管理和依赖审计形成纵深防御 |
 
 > **答辩提示（Question Handling）**：上述表格即"每个属性由哪些代码体现"的索引。被问及时，建议按「**属性 → 落在哪个文件哪一段 → 解决了什么问题 → 若去掉会怎样**」的思路回答，例如：
 > - 问"如何保证可修改性"→ 指 `Services/ICartStore.cs` + `SessionCartStore.cs`：换存储只需新增一个 `ICartStore` 实现并在 `Program.cs` 改一行注册，业务层零改动。
 > - 问"购物车怎么防越权/防篡改"→ 会话隔离 + 防伪令牌 + `AddAsync` 内校验商品是否上架、库存是否大于 0。
-> - 问"如何证明可测试"→ `dotnet test` 运行 159 个用例，均不依赖真实数据库与 HTTP 会话。
+> - 问"如何证明可测试"→ `dotnet test` 运行 166 个用例，另有 6 个前端回归用例。
 
 ## 后续扩展
 
 当前未包含（可按需加入，服务层与模型已预留扩展点）：
 
-- 支付（下单已实现，支付环节为模拟，未接入真实支付网关）
+- 支付宝、微信、银行卡和货到付款流程已提供演示选项；真实支付网关与回调验签仍需按商户配置接入
 - 分类层级（父子分类）
 - 购物车从 Session 持久化到数据库/Redis（实现 `ICartStore` 接口即可）
 - 真实邮件发送需要在 Azure App Settings 中配置个人邮箱 SMTP 授权码，或配置 Brevo API

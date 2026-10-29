@@ -38,7 +38,7 @@ public class Order
     public decimal ShippingAmount { get; set; }
 
     [StringLength(50)]
-    public string PaymentMethod { get; set; } = "cash_on_delivery";
+    public string PaymentMethod { get; set; } = PaymentMethods.CashOnDelivery;
 
     [StringLength(500)]
     public string? OrderNotes { get; set; }

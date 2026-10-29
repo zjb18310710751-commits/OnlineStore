@@ -6,11 +6,27 @@ namespace OnlineStore.Tests.Models;
 
 public class L10nPaymentMethodTests
 {
+    [Fact]
+    public void Options_DefineSupportedCheckoutMethodsOnce()
+    {
+        Assert.Equal(
+            [
+                PaymentMethods.CashOnDelivery,
+                PaymentMethods.Card,
+                PaymentMethods.Alipay,
+                PaymentMethods.WeChatPay
+            ],
+            PaymentMethods.Options.Select(option => option.Code));
+
+        Assert.All(PaymentMethods.Options, option => Assert.True(PaymentMethods.IsSupported(option.Code)));
+        Assert.False(PaymentMethods.IsSupported(PaymentMethods.LegacyBankTransfer));
+    }
+
     [Theory]
-    [InlineData("cash_on_delivery", "货到付款", "Cash on delivery")]
-    [InlineData("card_demo", "银行卡支付", "Card payment")]
-    [InlineData("alipay_demo", "支付宝支付（Alipay+）", "Alipay+")]
-    [InlineData("wechat_pay_demo", "微信支付", "WeChat Pay")]
+    [InlineData(PaymentMethods.CashOnDelivery, "货到付款", "Cash on delivery")]
+    [InlineData(PaymentMethods.Card, "银行卡支付", "Card payment")]
+    [InlineData(PaymentMethods.Alipay, "支付宝支付（Alipay+）", "Alipay+")]
+    [InlineData(PaymentMethods.WeChatPay, "微信支付", "WeChat Pay")]
     public void PaymentMethod_LocalizesCheckoutOptions(
         string method,
         string chineseLabel,

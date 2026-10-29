@@ -1,10 +1,7 @@
-@model IReadOnlyList<Order>
+@model MyOrdersViewModel
 @{
     ViewData["Title"] = Loc["MyOrders"].Value;
-    var myReviews = ViewBag.MyReviews as IDictionary<string, Review> ?? new Dictionary<string, Review>();
-}
-@functions {
-    string StatusBadge(string status) => "bg-white text-dark border";
+    var myReviews = Model.Reviews;
 }
 <div class="container coupon-wallet-page member-orders-page">
     <header class="coupon-wallet-header">
@@ -14,14 +11,14 @@
             <p>@L10n.Text("查看订单、物流进度与售后状态。", "Review orders, delivery progress and after-sales status.")</p>
         </div>
         <div class="coupon-wallet-count">
-            <strong>@Model.Count</strong>
+            <strong>@Model.Orders.Count</strong>
             <span>@L10n.Text("笔订单", "orders")</span>
         </div>
     </header>
 
     <div id="orderAlert" class="alert d-none"></div>
 
-    @if (Model.Count == 0)
+    @if (Model.Orders.Count == 0)
     {
         <section class="coupon-wallet-empty">
             <i class="bi bi-inbox"></i>
@@ -34,7 +31,7 @@
     {
         <div class="card member-orders-card">
             <div class="list-group list-group-flush">
-                @foreach (var o in Model)
+                @foreach (var o in Model.Orders)
                 {
                     <div class="list-group-item member-order-item">
                         <div class="d-flex justify-content-between align-items-start gap-3 mb-2">
@@ -66,7 +63,7 @@
                                     <div class="member-order-meta mt-1">@L10n.Text("备注", "Notes")：@o.OrderNotes</div>
                                 }
                             </div>
-                            <span class="badge member-order-status @StatusBadge(o.Status)">@L10n.Status(o.Status)</span>
+                            <span class="badge member-order-status bg-white text-dark border">@L10n.Status(o.Status)</span>
                         </div>
 
                         <ul class="list-unstyled member-order-lines mb-2">

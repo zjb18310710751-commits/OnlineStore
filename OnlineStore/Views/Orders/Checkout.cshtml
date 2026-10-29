@@ -74,34 +74,16 @@
                 <div class="card shadow-sm">
                     <div class="card-header bg-white fw-semibold">@Loc["Payment"]</div>
                     <div class="card-body">
-                        <label class="checkout-payment-option">
-                            <input asp-for="PaymentMethod" id="paymentCash" type="radio" value="cash_on_delivery" class="form-check-input" />
-                            <span>
-                                <span class="checkout-payment-title"><i class="bi bi-cash-coin me-2"></i>@Loc["CashOnDelivery"]</span>
-                                <span class="checkout-payment-hint">@Loc["CashOnDeliveryHint"]</span>
-                            </span>
-                        </label>
-                        <label class="checkout-payment-option">
-                            <input asp-for="PaymentMethod" id="paymentCard" type="radio" value="card_demo" class="form-check-input" />
-                            <span>
-                                <span class="checkout-payment-title"><i class="bi bi-credit-card me-2"></i>@Loc["CardPaymentDemo"]</span>
-                                <span class="checkout-payment-hint">@Loc["CardPaymentHint"]</span>
-                            </span>
-                        </label>
-                        <label class="checkout-payment-option">
-                            <input asp-for="PaymentMethod" id="paymentAlipay" type="radio" value="alipay_demo" class="form-check-input" />
-                            <span>
-                                <span class="checkout-payment-title"><i class="bi bi-phone me-2"></i>@Loc["AlipayPaymentDemo"]</span>
-                                <span class="checkout-payment-hint">@Loc["AlipayPaymentHint"]</span>
-                            </span>
-                        </label>
-                        <label class="checkout-payment-option">
-                            <input asp-for="PaymentMethod" id="paymentWeChat" type="radio" value="wechat_pay_demo" class="form-check-input" />
-                            <span>
-                                <span class="checkout-payment-title"><i class="bi bi-chat-dots me-2"></i>@Loc["WeChatPaymentDemo"]</span>
-                                <span class="checkout-payment-hint">@Loc["WeChatPaymentHint"]</span>
-                            </span>
-                        </label>
+                        @foreach (var paymentMethod in PaymentMethods.Options)
+                        {
+                            <label class="checkout-payment-option">
+                                <input asp-for="PaymentMethod" id="@paymentMethod.InputId" type="radio" value="@paymentMethod.Code" class="form-check-input" />
+                                <span>
+                                    <span class="checkout-payment-title"><i class="@paymentMethod.IconClass me-2"></i>@Loc[paymentMethod.LabelResourceKey]</span>
+                                    <span class="checkout-payment-hint">@Loc[paymentMethod.HintResourceKey]</span>
+                                </span>
+                            </label>
+                        }
 
                         <div class="mt-4">
                             <label asp-for="OrderNotes" class="form-label">@Loc["OrderNotesOptional"]</label>

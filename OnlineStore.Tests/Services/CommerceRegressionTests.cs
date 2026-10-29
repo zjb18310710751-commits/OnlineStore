@@ -114,14 +114,14 @@ public class CommerceRegressionTests
         (await context.Products.FindAsync(1))!.ShippingFeeAmount = 6m;
         await context.SaveChangesAsync();
         var order = NewOrder(2);
-        order.PaymentMethod = "card_demo";
+        order.PaymentMethod = PaymentMethods.Card;
         order.OrderNotes = "Leave at reception";
 
         await new OrderService(context).CreateAsync(order);
 
         Assert.Equal(6m, order.ShippingAmount);
         Assert.Equal(26m, order.Total);
-        Assert.Equal("card_demo", order.PaymentMethod);
+        Assert.Equal(PaymentMethods.Card, order.PaymentMethod);
         Assert.Equal("Leave at reception", order.OrderNotes);
     }
 

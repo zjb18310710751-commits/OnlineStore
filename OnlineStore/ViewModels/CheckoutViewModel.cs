@@ -51,7 +51,7 @@ public class CheckoutViewModel
 
     [Required]
     [Display(Name = "支付方式")]
-    public string PaymentMethod { get; set; } = "cash_on_delivery";
+    public string PaymentMethod { get; set; } = PaymentMethods.CashOnDelivery;
 
     [StringLength(500)]
     [Display(Name = "订单备注（可选）")]

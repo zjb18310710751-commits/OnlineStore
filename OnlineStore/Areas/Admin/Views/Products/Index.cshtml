@@ -1,12 +1,12 @@
-@model IReadOnlyList<Product>
+@model AdminProductListViewModel
 @{
     ViewData["Title"] = Loc["ProductManagement"].Value;
-    var categories = (IReadOnlyList<Category>)ViewBag.Categories;
-    var page = (int)ViewBag.Page;
-    var totalPages = (int)ViewBag.TotalPages;
-    var total = (int)ViewBag.Total;
-    var search = ViewBag.Search as string;
-    var categoryId = (int?)ViewBag.CategoryId;
+    var categories = Model.Categories;
+    var page = Model.Page;
+    var totalPages = Model.TotalPages;
+    var total = Model.Total;
+    var search = Model.Search;
+    var categoryId = Model.CategoryId;
 }
 <div class="admin-store-heading">
     <div>
@@ -51,11 +51,11 @@
                 </tr>
             </thead>
             <tbody>
-                @if (Model.Count == 0)
+                @if (Model.Products.Count == 0)
                 {
                     <tr><td colspan="8" class="text-center text-muted py-4">@Loc["NoProducts"]</td></tr>
                 }
-                @foreach (var p in Model)
+                @foreach (var p in Model.Products)
                 {
                     <tr>
                         <td>

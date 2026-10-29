@@ -37,16 +37,19 @@ public class ProductsController : Controller
     public async Task<IActionResult> Index(string? search, int? categoryId, int page = 1)
     {
         var (items, total) = await _productService.GetAdminPagedAsync(search, categoryId, page, PageSize);
+        var categories = await _categoryService.GetAllAsync();
 
-        ViewBag.Search = search;
-        ViewBag.CategoryId = categoryId;
-        ViewBag.Page = page;
-        ViewBag.PageSize = PageSize;
-        ViewBag.Total = total;
-        ViewBag.TotalPages = (int)Math.Ceiling(total / (double)PageSize);
-        ViewBag.Categories = await _categoryService.GetAllAsync();
-
-        return View(items);
+        return View(new AdminProductListViewModel
+        {
+            Products = items,
+            Categories = categories,
+            Search = search,
+            CategoryId = categoryId,
+            Page = page,
+            PageSize = PageSize,
+            Total = total,
+            TotalPages = (int)Math.Ceiling(total / (double)PageSize)
+        });
     }
 
     [HttpGet]

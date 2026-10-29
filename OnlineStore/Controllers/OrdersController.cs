@@ -332,13 +332,18 @@ public class OrdersController : Controller
         var reviews = _reviewService is null
             ? Array.Empty<Review>()
             : await _reviewService.GetByUserAsync(user.Id);
-        ViewBag.MyReviews = reviews
+        var reviewLookup = reviews
             .Where(review => review.OrderId.HasValue)
             .GroupBy(review => $"{review.OrderId}:{review.ProductId}")
             .ToDictionary(
                 group => group.Key,
                 group => group.OrderByDescending(review => review.CreatedAt).First());
-        return View(orders);
+
+        return View(new MyOrdersViewModel
+        {
+            Orders = orders,
+            Reviews = reviewLookup
+        });
     }
 
     [HttpPost]
@@ -487,7 +492,7 @@ public class OrdersController : Controller
             ModelState.AddModelError(nameof(vm.Country), _loc["CheckoutCountryRequired"]);
         }
 
-        if (vm.PaymentMethod is not ("cash_on_delivery" or "card_demo" or "alipay_demo" or "wechat_pay_demo"))
+        if (!PaymentMethods.IsSupported(vm.PaymentMethod))
         {
             ModelState.AddModelError(nameof(vm.PaymentMethod), _loc["InvalidPaymentMethod"].Value);
         }

@@ -1,14 +1,13 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using OnlineStore.Models;
 
 namespace OnlineStore.Data;
 
 public static class DbInitializer
 {
-    public const string AdminEmail = "admin@store.com";
-    public const string AdminPassword = "Admin@123456";
-    public const string AdminRole = "Admin";
+    private const string AdminRole = "Admin";
 
     public static async Task InitializeAsync(IServiceProvider services)
     {
@@ -16,16 +15,21 @@ public static class DbInitializer
         var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
         var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
         var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+        var options = scope.ServiceProvider.GetRequiredService<IOptions<InitializationOptions>>().Value;
 
-        await context.Database.MigrateAsync();
+        if (options.ApplyMigrationsOnStartup)
+        {
+            await context.Database.MigrateAsync();
+        }
 
-        await SeedAsync(context, userManager, roleManager);
+        await SeedAsync(context, userManager, roleManager, options);
     }
 
     private static async Task SeedAsync(
         ApplicationDbContext context,
         UserManager<ApplicationUser> userManager,
-        RoleManager<IdentityRole> roleManager)
+        RoleManager<IdentityRole> roleManager,
+        InitializationOptions options)
     {
 
         if (!await roleManager.RoleExistsAsync(AdminRole))
@@ -33,15 +37,18 @@ public static class DbInitializer
             await roleManager.CreateAsync(new IdentityRole(AdminRole));
         }
 
-        if (await userManager.FindByEmailAsync(AdminEmail) is null)
+        var adminEmail = options.AdminEmail?.Trim();
+        if (!string.IsNullOrWhiteSpace(adminEmail)
+            && !string.IsNullOrWhiteSpace(options.AdminPassword)
+            && await userManager.FindByEmailAsync(adminEmail) is null)
         {
             var admin = new ApplicationUser
             {
-                UserName = AdminEmail,
-                Email = AdminEmail,
+                UserName = adminEmail,
+                Email = adminEmail,
                 EmailConfirmed = true
             };
-            var result = await userManager.CreateAsync(admin, AdminPassword);
+            var result = await userManager.CreateAsync(admin, options.AdminPassword);
             if (result.Succeeded)
             {
                 await userManager.AddToRoleAsync(admin, AdminRole);
@@ -52,7 +59,15 @@ public static class DbInitializer
 
         if (await context.Categories.AnyAsync())
         {
-            await SeedDemoOrdersAsync(context, userManager);
+            if (options.SeedDemoData)
+            {
+                await SeedDemoOrdersAsync(context, userManager, options);
+            }
+            return;
+        }
+
+        if (!options.SeedSampleCatalogOnEmpty)
+        {
             return;
         }
 
@@ -397,15 +412,24 @@ public static class DbInitializer
         context.Products.AddRange(products);
         await context.SaveChangesAsync();
 
-        await SeedDemoOrdersAsync(context, userManager);
+        if (options.SeedDemoData)
+        {
+            await SeedDemoOrdersAsync(context, userManager, options);
+        }
     }
 
     private static async Task SeedDemoOrdersAsync(
         ApplicationDbContext context,
-        UserManager<ApplicationUser> userManager)
+        UserManager<ApplicationUser> userManager,
+        InitializationOptions options)
     {
-        const string demoBuyerEmail = "3293906920@qq.com";
-        const string demoBuyerPassword = "Admin@123456";
+        var demoBuyerEmail = options.DemoBuyerEmail?.Trim();
+        var demoBuyerPassword = options.DemoBuyerPassword;
+        if (string.IsNullOrWhiteSpace(demoBuyerEmail)
+            || string.IsNullOrWhiteSpace(demoBuyerPassword))
+        {
+            return;
+        }
 
         var buyer = await userManager.FindByEmailAsync(demoBuyerEmail);
         if (buyer is null)
@@ -421,15 +445,6 @@ public static class DbInitializer
             };
             var createResult = await userManager.CreateAsync(buyer, demoBuyerPassword);
             if (!createResult.Succeeded)
-            {
-                return;
-            }
-        }
-        else if (!await userManager.CheckPasswordAsync(buyer, demoBuyerPassword))
-        {
-            var resetToken = await userManager.GeneratePasswordResetTokenAsync(buyer);
-            var resetResult = await userManager.ResetPasswordAsync(buyer, resetToken, demoBuyerPassword);
-            if (!resetResult.Succeeded)
             {
                 return;
             }

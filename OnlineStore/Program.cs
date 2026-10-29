@@ -13,7 +13,13 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
     ?? throw new InvalidOperationException("未配置连接字符串 ConnectionStrings:DefaultConnection。");
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(connectionString));
+    options.UseSqlServer(connectionString, sql => sql.EnableRetryOnFailure(
+        maxRetryCount: 5,
+        maxRetryDelay: TimeSpan.FromSeconds(10),
+        errorNumbersToAdd: null)));
+
+builder.Services.Configure<InitializationOptions>(
+    builder.Configuration.GetSection(InitializationOptions.SectionName));
 
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 {
@@ -44,6 +50,7 @@ builder.Services.ConfigureApplicationCookie(options =>
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IAdminDashboardService, AdminDashboardService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<IStorefrontHeaderService, StorefrontHeaderService>();
 builder.Services.AddScoped<IHeroSlideService, HeroSlideService>();
 builder.Services.AddScoped<IShopService, ShopService>();
 builder.Services.AddScoped<IProductSkuService, ProductSkuService>();

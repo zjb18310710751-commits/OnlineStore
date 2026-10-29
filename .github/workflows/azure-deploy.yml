@@ -9,14 +9,20 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: azure-production
+  cancel-in-progress: true
+
 env:
   DOTNET_VERSION: "8.0.x"
   AZURE_WEBAPP_NAME: "zhy-onlinestore-31072"
+  AZURE_WEBAPP_URL: "https://zhy-onlinestore-31072.azurewebsites.net"
   PUBLISH_PATH: "${{ github.workspace }}/publish"
 
 jobs:
   build-test-deploy:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
 
     steps:
       - name: Checkout
@@ -30,6 +36,9 @@ jobs:
       - name: Restore
         run: dotnet restore OnlineStore.sln
 
+      - name: Audit dependencies
+        run: dotnet list OnlineStore.sln package --vulnerable --include-transitive
+
       - name: Build
         run: dotnet build OnlineStore.sln --configuration Release --no-restore
 
@@ -37,7 +46,7 @@ jobs:
         run: dotnet test OnlineStore.Tests/OnlineStore.Tests.csproj --configuration Release --no-build --no-restore
 
       - name: Frontend regression tests
-        run: node --test OnlineStore.Tests/Frontend/product-details.test.cjs
+        run: node --test OnlineStore.Tests/Frontend/*.test.cjs
 
       - name: Publish
         run: dotnet publish OnlineStore/OnlineStore.csproj --configuration Release --no-restore --output "$PUBLISH_PATH"
@@ -48,3 +57,18 @@ jobs:
           app-name: ${{ env.AZURE_WEBAPP_NAME }}
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
           package: ${{ env.PUBLISH_PATH }}
+
+      - name: Verify health
+        shell: bash
+        run: |
+          for attempt in {1..12}; do
+            status="$(curl --silent --output /dev/null --write-out '%{http_code}' "${AZURE_WEBAPP_URL}/health" || true)"
+            echo "Health check attempt ${attempt}: HTTP ${status}"
+            if [ "${status}" = "200" ]; then
+              exit 0
+            fi
+            sleep 10
+          done
+
+          echo "The application did not become healthy within 120 seconds."
+          exit 1

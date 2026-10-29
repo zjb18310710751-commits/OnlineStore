@@ -1,17 +1,11 @@
-@inject ICategoryService CategoryService
-@inject IFavoriteService FavoriteService
-@inject IOrderService OrderService
-@inject ICouponService CouponService
-@inject Microsoft.AspNetCore.Identity.UserManager<ApplicationUser> UserManager
+@inject IStorefrontHeaderService HeaderService
 @{
-    var categories = (await CategoryService.GetAllAsync()).ToList();
-    var currentUser = User.Identity?.IsAuthenticated == true ? await UserManager.GetUserAsync(User) : null;
-    var favoriteCount = currentUser is null ? 0 : await FavoriteService.CountAsync(currentUser.Id);
-    var deliveredItemCount = currentUser is null ? 0 : await OrderService.GetDeliveredItemCountAsync(currentUser.Id);
-    var availableCouponCount = currentUser is null
-        ? 0
-        : (await CouponService.GetCustomerCouponsAsync(currentUser.Id))
-            .Count(item => item.Status == CouponWalletStatus.Available);
+    var header = await HeaderService.GetAsync(User);
+    var categories = header.Categories;
+    var currentUser = header.CurrentUser;
+    var favoriteCount = header.FavoriteCount;
+    var deliveredItemCount = header.DeliveredItemCount;
+    var availableCouponCount = header.AvailableCouponCount;
     var isAdmin = User.IsInRole("Admin");
     var isZh = CultureInfo.CurrentUICulture.Name.StartsWith("zh", StringComparison.OrdinalIgnoreCase);
     var returnUrl = $"{Context.Request.Path}{Context.Request.QueryString}";
