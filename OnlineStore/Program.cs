@@ -1,6 +1,8 @@
+using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using OnlineStore;
@@ -108,11 +110,37 @@ builder.Services.AddSession(options =>
     options.Cookie.SecurePolicy = builder.Environment.IsDevelopment()
         ? CookieSecurePolicy.SameAsRequest
         : CookieSecurePolicy.Always;
+    options.Cookie.SameSite = SameSiteMode.Lax;
+});
+
+var authenticationPermitLimit = builder.Configuration.GetValue(
+    "Security:AuthenticationRateLimit:PermitLimit",
+    10);
+var authenticationWindowSeconds = builder.Configuration.GetValue(
+    "Security:AuthenticationRateLimit:WindowSeconds",
+    60);
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+    options.AddPolicy("authentication", context =>
+    {
+        var clientKey = context.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+        return RateLimitPartition.GetFixedWindowLimiter(
+            clientKey,
+            _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = Math.Max(1, authenticationPermitLimit),
+                Window = TimeSpan.FromSeconds(Math.Max(1, authenticationWindowSeconds)),
+                QueueLimit = 0,
+                AutoReplenishment = true
+            });
+    });
 });
 
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
 {
     options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+    options.ForwardLimit = 1;
     options.KnownNetworks.Clear();
     options.KnownProxies.Clear();
 });
@@ -123,6 +151,8 @@ builder.Services.AddHealthChecks()
 builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
 
 builder.Services.AddHttpClient();
+builder.Services.AddSingleton(TimeProvider.System);
+builder.Services.AddSingleton<IOrderNumberGenerator, OrderNumberGenerator>();
 
 builder.Services.AddControllersWithViews()
 
@@ -144,13 +174,27 @@ else
 }
 
 app.UseStatusCodePagesWithReExecute("/Home/Error", "?code={0}");
+app.Use(async (context, next) =>
+{
+    var headers = context.Response.Headers;
+    headers["X-Content-Type-Options"] = "nosniff";
+    headers["X-Frame-Options"] = "DENY";
+    headers["Referrer-Policy"] = "strict-origin-when-cross-origin";
+    headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=()";
+    headers["Cross-Origin-Opener-Policy"] = "same-origin";
+    await next();
+});
 
 var startupLogger = app.Services.GetRequiredService<ILoggerFactory>().CreateLogger("Startup");
 var uploadsRoot = UploadStoragePath.Prepare(app.Environment, app.Configuration, startupLogger);
 app.UseStaticFiles(new StaticFileOptions
 {
     RequestPath = UploadStoragePath.RequestPath,
-    FileProvider = new PhysicalFileProvider(uploadsRoot)
+    FileProvider = new PhysicalFileProvider(uploadsRoot),
+    OnPrepareResponse = context =>
+    {
+        context.Context.Response.Headers.CacheControl = "public,max-age=604800,immutable";
+    }
 });
 app.UseStaticFiles();
 
@@ -161,6 +205,7 @@ app.UseRequestLocalization(new RequestLocalizationOptions()
     .AddSupportedUICultures(supportedCultures));
 
 app.UseRouting();
+app.UseRateLimiter();
 
 app.UseSession();
 

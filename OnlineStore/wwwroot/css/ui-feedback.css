@@ -30,6 +30,11 @@
 @keyframes notice-duration { to { transform: scaleX(0); } }
 
 .ui-feedback-scope .validation-summary-valid, .ui-feedback-scope .field-validation-valid { display: none; }
+.ui-feedback-scope form[aria-busy="true"] .is-submitting {
+    cursor: wait;
+    opacity: .68;
+    pointer-events: none;
+}
 .ui-feedback-scope .validation-summary-errors { padding: 14px 16px; border: 1px solid #ebd7d5; border-left: 3px solid var(--feedback-error); border-radius: 8px; color: var(--feedback-error) !important; background: #fffafa; font-size: 13px; line-height: 1.65; }
 .ui-feedback-scope .validation-summary-errors ul { margin: 0; padding-left: 18px; }
 .ui-feedback-scope .validation-summary-errors li + li { margin-top: 5px; }

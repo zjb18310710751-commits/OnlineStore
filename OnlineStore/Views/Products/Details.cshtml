@@ -239,6 +239,17 @@
                 const galleryStrip = document.getElementById('galleryStrip');
                 const originalGallery = galleryStrip ? galleryStrip.innerHTML : '';
 
+                function createSkuGalleryThumb(url) {
+                    const button = document.createElement('button');
+                    button.type = 'button';
+                    button.className = 'gallery-thumb active';
+                    const image = document.createElement('img');
+                    image.src = url;
+                    image.alt = '';
+                    button.append(image);
+                    return button;
+                }
+
                 function findSku() {
                     return skus.find(s => s.Color === selectedColor && s.Spec === selectedSpec) || null;
                 }
@@ -256,7 +267,7 @@
                         if (sku.ImageUrl) {
                             setMainImage(sku.ImageUrl);
                             if (galleryStrip) {
-                                galleryStrip.innerHTML = '<button type="button" class="gallery-thumb active"><img src="' + sku.ImageUrl + '" alt="" /></button>';
+                                galleryStrip.replaceChildren(createSkuGalleryThumb(sku.ImageUrl));
                             }
                         } else if (galleryStrip) {
                             galleryStrip.innerHTML = originalGallery;

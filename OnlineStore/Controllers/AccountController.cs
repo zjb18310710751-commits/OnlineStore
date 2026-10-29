@@ -3,6 +3,7 @@ using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Extensions.Localization;
 using OnlineStore.Models;
 using OnlineStore.Services;
@@ -58,6 +59,7 @@ public class AccountController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [EnableRateLimiting("authentication")]
     public async Task<IActionResult> Login(LoginViewModel model, string? returnUrl = null)
     {
         ViewData["ReturnUrl"] = returnUrl;
@@ -131,6 +133,7 @@ public class AccountController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [EnableRateLimiting("authentication")]
     public async Task<IActionResult> SendCode([FromBody] SendCodeViewModel model)
     {
         if (model is null || !ModelState.IsValid)
@@ -154,18 +157,16 @@ public class AccountController : Controller
 
         if (model.Purpose == "reset")
         {
-
             if (user is null)
             {
-                return Json(new { ok = false, error = _loc["EmailNotRegistered"].Value });
+                return Json(new { ok = true });
             }
         }
         else
         {
-
             if (user is not null)
             {
-                return Json(new { ok = false, error = _loc["EmailAlreadyRegistered"].Value });
+                return Json(new { ok = true });
             }
         }
 
@@ -174,6 +175,7 @@ public class AccountController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [EnableRateLimiting("authentication")]
     public async Task<IActionResult> Register(RegisterViewModel model)
     {
         if (!string.Equals(model.RegisterBy, "email", StringComparison.OrdinalIgnoreCase))
@@ -269,6 +271,7 @@ public class AccountController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [EnableRateLimiting("authentication")]
     public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel model)
     {
         if (!ModelState.IsValid)
@@ -279,7 +282,7 @@ public class AccountController : Controller
         var user = await _userManager.FindByEmailAsync(model.Email);
         if (user is null)
         {
-            ModelState.AddModelError(nameof(model.Email), _loc["EmailNotRegistered"].Value);
+            ModelState.AddModelError(nameof(model.VerificationCode), _loc["InvalidVerificationCode"].Value);
             return View(model);
         }
 
@@ -437,6 +440,7 @@ public class AccountController : Controller
     [HttpPost]
     [Authorize]
     [ValidateAntiForgeryToken]
+    [EnableRateLimiting("authentication")]
     public async Task<IActionResult> SendProfileEmailCode([FromBody] SendCodeViewModel model)
     {
         var user = await _userManager.GetUserAsync(User);

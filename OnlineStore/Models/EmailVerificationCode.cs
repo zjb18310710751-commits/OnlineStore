@@ -14,6 +14,8 @@ public class EmailVerificationCode
     [StringLength(6)]
     public string Code { get; set; } = string.Empty;
 
+    public int FailedAttempts { get; set; }
+
     public DateTime ExpiresAt { get; set; }
 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

@@ -615,6 +615,9 @@ namespace OnlineStore.Migrations
                     b.Property<DateTime>("ExpiresAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("FailedAttempts")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("Email");

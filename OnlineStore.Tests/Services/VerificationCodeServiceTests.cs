@@ -72,6 +72,28 @@ public class VerificationCodeServiceTests
     }
 
     [Fact]
+    public async Task VerifyAsync_TooManyWrongCodes_InvalidatesCode()
+    {
+        using var context = CreateContext();
+        context.EmailVerificationCodes.Add(new EmailVerificationCode
+        {
+            Email = "a@b.com",
+            Code = "123456",
+            ExpiresAt = DateTime.UtcNow.AddMinutes(10)
+        });
+        await context.SaveChangesAsync();
+        var service = new VerificationCodeService(context);
+
+        for (var attempt = 0; attempt < 5; attempt++)
+        {
+            Assert.False(await service.VerifyAsync("a@b.com", "654321"));
+        }
+
+        Assert.Empty(await context.EmailVerificationCodes.ToListAsync());
+        Assert.False(await service.VerifyAsync("a@b.com", "123456"));
+    }
+
+    [Fact]
     public async Task VerifyAsync_Expired_Fails()
     {
         using var context = CreateContext();

@@ -42,7 +42,31 @@ document.addEventListener('DOMContentLoaded', function () {
     document.querySelectorAll('[data-send-code-url]').forEach(initSendCodeButton);
     initPasswordToggles();
     initCustomSelects();
+    initSubmitGuards();
 });
+
+function initSubmitGuards() {
+    document.querySelectorAll('form').forEach(function (form) {
+        if (form.dataset.submitGuardReady) return;
+        form.dataset.submitGuardReady = 'true';
+
+        form.addEventListener('submit', function (event) {
+            if (event.defaultPrevented || form.dataset.submitting === 'true') {
+                event.preventDefault();
+                return;
+            }
+
+            var submitter = event.submitter || form.querySelector('button[type="submit"], input[type="submit"]');
+            form.dataset.submitting = 'true';
+            form.setAttribute('aria-busy', 'true');
+
+            if (submitter) {
+                submitter.classList.add('is-submitting');
+                submitter.setAttribute('aria-disabled', 'true');
+            }
+        });
+    });
+}
 
 function initCustomSelects() {
     var selectId = 0;

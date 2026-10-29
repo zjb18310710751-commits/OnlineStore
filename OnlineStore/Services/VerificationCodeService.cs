@@ -11,6 +11,7 @@ public class VerificationCodeService : IVerificationCodeService
 {
     private static readonly TimeSpan Cooldown = TimeSpan.FromSeconds(60);
     private static readonly TimeSpan Validity = TimeSpan.FromMinutes(10);
+    private const int MaxFailedAttempts = 5;
 
     private readonly ApplicationDbContext _context;
     private readonly IStringLocalizer<SharedResource> _loc;
@@ -62,8 +63,15 @@ public class VerificationCodeService : IVerificationCodeService
             .OrderByDescending(c => c.CreatedAt)
             .FirstOrDefaultAsync();
 
-        if (record is null || record.ExpiresAt <= DateTime.UtcNow)
+        if (record is null)
         {
+            return false;
+        }
+
+        if (record.ExpiresAt <= DateTime.UtcNow)
+        {
+            _context.EmailVerificationCodes.Remove(record);
+            await _context.SaveChangesAsync();
             return false;
         }
 
@@ -71,6 +79,12 @@ public class VerificationCodeService : IVerificationCodeService
         var actual = Encoding.UTF8.GetBytes(code);
         if (!CryptographicOperations.FixedTimeEquals(expected, actual))
         {
+            record.FailedAttempts++;
+            if (record.FailedAttempts >= MaxFailedAttempts)
+            {
+                _context.EmailVerificationCodes.Remove(record);
+            }
+            await _context.SaveChangesAsync();
             return false;
         }
 
