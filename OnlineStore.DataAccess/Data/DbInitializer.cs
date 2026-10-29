@@ -1,3 +1,4 @@
+using System.Net.Mail;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using OnlineStore.Models;
@@ -6,8 +7,8 @@ namespace OnlineStore.Data;
 
 public static class DbInitializer
 {
-    public const string AdminEmail = "admin@store.com";
-    public const string AdminPassword = "Admin@123456";
+    private const string DevelopmentAdminEmail = "admin@store.com";
+    private const string DevelopmentPassword = "Admin@123456";
     public const string AdminRole = "Admin";
 
     public static async Task InitializeAsync(IServiceProvider services)
@@ -16,43 +17,31 @@ public static class DbInitializer
         var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
         var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
         var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+        var configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+        var environment = scope.ServiceProvider.GetRequiredService<IHostEnvironment>();
 
         await context.Database.MigrateAsync();
 
-        await SeedAsync(context, userManager, roleManager);
+        await SeedAsync(context, userManager, roleManager, configuration, environment);
     }
 
     private static async Task SeedAsync(
         ApplicationDbContext context,
         UserManager<ApplicationUser> userManager,
-        RoleManager<IdentityRole> roleManager)
+        RoleManager<IdentityRole> roleManager,
+        IConfiguration configuration,
+        IHostEnvironment environment)
     {
-
-        if (!await roleManager.RoleExistsAsync(AdminRole))
-        {
-            await roleManager.CreateAsync(new IdentityRole(AdminRole));
-        }
-
-        if (await userManager.FindByEmailAsync(AdminEmail) is null)
-        {
-            var admin = new ApplicationUser
-            {
-                UserName = AdminEmail,
-                Email = AdminEmail,
-                EmailConfirmed = true
-            };
-            var result = await userManager.CreateAsync(admin, AdminPassword);
-            if (result.Succeeded)
-            {
-                await userManager.AddToRoleAsync(admin, AdminRole);
-            }
-        }
+        await SeedAdministratorAsync(userManager, roleManager, configuration, environment);
 
         await BackfillContentTranslationsAsync(context);
 
         if (await context.Categories.AnyAsync())
         {
-            await SeedDemoOrdersAsync(context, userManager);
+            if (environment.IsDevelopment())
+            {
+                await SeedDemoOrdersAsync(context, userManager);
+            }
             return;
         }
 
@@ -397,15 +386,63 @@ public static class DbInitializer
         context.Products.AddRange(products);
         await context.SaveChangesAsync();
 
-        await SeedDemoOrdersAsync(context, userManager);
+        if (environment.IsDevelopment())
+        {
+            await SeedDemoOrdersAsync(context, userManager);
+        }
+    }
+
+    private static async Task SeedAdministratorAsync(
+        UserManager<ApplicationUser> userManager,
+        RoleManager<IdentityRole> roleManager,
+        IConfiguration configuration,
+        IHostEnvironment environment)
+    {
+        var email = configuration["Bootstrap:AdminEmail"]?.Trim();
+        var password = configuration["Bootstrap:AdminPassword"];
+        if (environment.IsDevelopment() && string.IsNullOrWhiteSpace(email) && string.IsNullOrWhiteSpace(password))
+        {
+            email = DevelopmentAdminEmail;
+            password = DevelopmentPassword;
+        }
+        if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
+        {
+            return;
+        }
+        if (!MailAddress.TryCreate(email, out var address) || address.Address != email)
+        {
+            throw new InvalidOperationException("Bootstrap administrator email is invalid.");
+        }
+        if (await userManager.FindByEmailAsync(email) is not null
+            || await userManager.FindByNameAsync(email) is not null)
+        {
+            return;
+        }
+        if (!await roleManager.RoleExistsAsync(AdminRole))
+        {
+            var roleResult = await roleManager.CreateAsync(new IdentityRole(AdminRole));
+            if (!roleResult.Succeeded)
+            {
+                throw new InvalidOperationException("Bootstrap administrator role could not be created.");
+            }
+        }
+        var admin = new ApplicationUser { UserName = email, Email = email, EmailConfirmed = true };
+        var createResult = await userManager.CreateAsync(admin, password);
+        if (!createResult.Succeeded)
+        {
+            throw new InvalidOperationException("Bootstrap administrator could not be created. Check the configured email and password policy.");
+        }
+        if (!(await userManager.AddToRoleAsync(admin, AdminRole)).Succeeded)
+        {
+            throw new InvalidOperationException("Bootstrap administrator role could not be assigned.");
+        }
     }
 
     private static async Task SeedDemoOrdersAsync(
         ApplicationDbContext context,
         UserManager<ApplicationUser> userManager)
     {
-        const string demoBuyerEmail = "3293906920@qq.com";
-        const string demoBuyerPassword = "Admin@123456";
+        const string demoBuyerEmail = "buyer@store.example";
 
         var buyer = await userManager.FindByEmailAsync(demoBuyerEmail);
         if (buyer is null)
@@ -419,22 +456,12 @@ public static class DbInitializer
                 LastName = "Buyer",
                 PhoneNumber = "13800138000"
             };
-            var createResult = await userManager.CreateAsync(buyer, demoBuyerPassword);
+            var createResult = await userManager.CreateAsync(buyer, DevelopmentPassword);
             if (!createResult.Succeeded)
             {
                 return;
             }
         }
-        else if (!await userManager.CheckPasswordAsync(buyer, demoBuyerPassword))
-        {
-            var resetToken = await userManager.GeneratePasswordResetTokenAsync(buyer);
-            var resetResult = await userManager.ResetPasswordAsync(buyer, resetToken, demoBuyerPassword);
-            if (!resetResult.Succeeded)
-            {
-                return;
-            }
-        }
-
         await BackfillDemoShippingSnapshotsAsync(context);
 
         if (await context.Orders.AnyAsync(o => o.OrderNo.StartsWith("DEMO-")))

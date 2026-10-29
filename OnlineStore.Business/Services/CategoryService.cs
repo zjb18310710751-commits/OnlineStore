@@ -21,6 +21,31 @@ public class CategoryService : ICategoryService
             .ThenBy(c => c.Name)
             .ToListAsync();
 
+    public async Task<IReadOnlyList<CategoryNavigationCategory>> GetNavigationAsync(CancellationToken cancellationToken = default) =>
+        await _context.Categories
+            .AsNoTracking()
+            .OrderBy(category => category.DisplayOrder)
+            .ThenBy(category => category.Name)
+            .Select(category => new CategoryNavigationCategory
+            {
+                Id = category.Id,
+                Name = category.Name,
+                NameEn = category.NameEn,
+                Products = category.Products
+                    .Where(product => product.IsActive)
+                    .OrderByDescending(product => product.CreatedAt)
+                    .ThenByDescending(product => product.Id)
+                    .Take(12)
+                    .Select(product => new CategoryNavigationProduct
+                    {
+                        Id = product.Id,
+                        Name = product.Name,
+                        NameEn = product.NameEn
+                    })
+                    .ToList()
+            })
+            .ToListAsync(cancellationToken);
+
     public async Task<PagedResult<Category>> GetPagedAsync(int page, int pageSize)
     {
         var query = _context.Categories.AsNoTracking()
@@ -70,5 +95,4 @@ public class CategoryService : ICategoryService
         return true;
     }
 
-    public Task<int> CountAsync() => _context.Categories.CountAsync();
 }

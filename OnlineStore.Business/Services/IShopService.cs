@@ -16,5 +16,4 @@ public interface IShopService
 
     Task<bool> DeleteAsync(int id);
 
-    Task<int> CountAsync();
 }

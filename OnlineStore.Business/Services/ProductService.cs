@@ -250,10 +250,6 @@ public class ProductService : IProductService
         return products;
     }
 
-    public Task<int> CountAsync() => _context.Products.CountAsync();
-
-    public Task<int> CountActiveAsync() => _context.Products.CountAsync(p => p.IsActive);
-
     public Task<int> CountLowStockAsync(int threshold = 5) =>
         _context.Products.CountAsync(p => p.Stock < threshold);
 

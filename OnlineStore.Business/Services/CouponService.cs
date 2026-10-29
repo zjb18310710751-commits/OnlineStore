@@ -27,6 +27,21 @@ public class CouponService : ICouponService
             .OrderByDescending(c => c.CreatedAt)
             .ToListAsync();
 
+    public async Task<CouponFormOptions> GetFormOptionsAsync(CancellationToken cancellationToken = default)
+    {
+        var categories = await _context.Categories
+            .AsNoTracking()
+            .OrderBy(category => category.DisplayOrder)
+            .ThenBy(category => category.Name)
+            .ToListAsync(cancellationToken);
+        var products = await _context.Products
+            .AsNoTracking()
+            .OrderBy(product => product.Name)
+            .ToListAsync(cancellationToken);
+
+        return new CouponFormOptions(categories, products);
+    }
+
     public async Task<PagedResult<Coupon>> GetPagedAsync(int page, int pageSize)
     {
         var query = CouponQuery()

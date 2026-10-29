@@ -16,5 +16,8 @@ public class EmailVerificationCode
 
     public DateTime ExpiresAt { get; set; }
 
+    [ConcurrencyCheck]
+    public int FailedAttempts { get; set; }
+
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 }

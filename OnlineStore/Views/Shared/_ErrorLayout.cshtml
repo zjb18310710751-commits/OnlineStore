@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="@CultureInfo.CurrentUICulture.Name">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] · ZHY</title>
+    <style>
+        body { margin: 0; color: #111; background: #fff; font-family: system-ui, sans-serif; }
+        header { padding: 24px clamp(24px, 5vw, 72px); border-bottom: 1px solid #e5e5e5; }
+        header a { color: inherit; font-size: 28px; font-weight: 900; font-style: italic; text-decoration: none; }
+        main { max-width: 680px; margin: 12vh auto; padding: 0 24px; text-align: center; }
+        h1 { margin: 0 0 20px; font-size: clamp(48px, 10vw, 80px); line-height: 1; }
+        .lead { font-size: 24px; font-weight: 650; }
+        p { line-height: 1.7; }
+        .btn { display: inline-block; padding: 14px 28px; margin-top: 20px; border-radius: 30px; background: #111; color: #fff; font-weight: 600; text-decoration: none; }
+        .small { margin-top: 28px; font-size: 12px; color: #666; overflow-wrap: anywhere; }
+        a:focus-visible { outline: 3px solid #1473e6; outline-offset: 5px; }
+    </style>
+</head>
+<body>
+    <header><a asp-controller="Home" asp-action="Index" aria-label="@Loc["Home"]">ZHY.</a></header>
+    <main id="main-content">@RenderBody()</main>
+</body>
+</html>

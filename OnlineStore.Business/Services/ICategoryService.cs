@@ -6,6 +6,7 @@ namespace OnlineStore.Services;
 public interface ICategoryService
 {
     Task<IReadOnlyList<Category>> GetAllAsync();
+    Task<IReadOnlyList<CategoryNavigationCategory>> GetNavigationAsync(CancellationToken cancellationToken = default);
     Task<PagedResult<Category>> GetPagedAsync(int page, int pageSize);
 
     Task<Category?> GetByIdAsync(int id);
@@ -16,5 +17,4 @@ public interface ICategoryService
 
     Task<bool> DeleteAsync(int id);
 
-    Task<int> CountAsync();
 }

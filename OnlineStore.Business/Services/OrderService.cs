@@ -60,13 +60,6 @@ public class OrderService : IOrderService
             .ToList();
     }
 
-    public async Task<IReadOnlyList<Order>> GetAllAsync() =>
-        await _context.Orders
-            .Include(o => o.Items)
-            .Include(o => o.AfterSalesRequests)
-            .OrderByDescending(o => o.CreatedAt)
-            .ToListAsync();
-
     public async Task<IReadOnlyDictionary<int, OrderItemPreviewViewModel>> GetOrderItemPreviewsAsync(IEnumerable<OrderItem> items)
     {
         var orderItems = items.ToArray();
@@ -417,22 +410,48 @@ public class OrderService : IOrderService
 
     public async Task<bool> ConfirmReceiptAsync(int id, string userId)
     {
-        var order = await GetByIdAsync(id);
-        if (order is null || !string.Equals(order.UserId, userId, StringComparison.Ordinal))
+        await using var transaction = _context.Database.IsRelational()
+            ? await _context.Database.BeginTransactionAsync(IsolationLevel.Serializable)
+            : null;
+        try
         {
+            var order = await GetByIdAsync(id);
+            if (order is null)
+            {
+                return false;
+            }
+            await _context.Entry(order).ReloadAsync();
+            if (_context.Entry(order).State == EntityState.Detached
+                || !string.Equals(order.UserId, userId, StringComparison.Ordinal)
+                || order.Status != OrderStatus.Delivered)
+            {
+                return false;
+            }
+
+            var hasActiveAfterSales = await _context.AfterSalesRequests.AnyAsync(request =>
+                request.OrderId == id
+                && request.Status != AfterSalesStatus.Completed
+                && request.Status != AfterSalesStatus.Rejected);
+            if (hasActiveAfterSales)
+            {
+                return false;
+            }
+
+            order.Status = OrderStatus.Completed;
+            order.SignedAt = DateTime.UtcNow;
+            order.ReceiptConfirmedAutomatically = false;
+            await _context.SaveChangesAsync();
+            if (transaction is not null)
+            {
+                await transaction.CommitAsync();
+            }
+            return true;
+        }
+        catch (Exception exception) when (IsConcurrencyFailure(exception))
+        {
+            _context.ChangeTracker.Clear();
             return false;
         }
-
-        if (order.Status != OrderStatus.Delivered)
-        {
-            return false;
-        }
-
-        order.Status = OrderStatus.Completed;
-        order.SignedAt = DateTime.UtcNow;
-        order.ReceiptConfirmedAutomatically = false;
-        await _context.SaveChangesAsync();
-        return true;
     }
 
     public async Task<bool> ReportReceiptExceptionAsync(int id, string reason, string reportedBy)
@@ -570,13 +589,6 @@ public class OrderService : IOrderService
                 "This order already has an active after-sales request."), exception);
         }
     }
-
-    public async Task<IReadOnlyList<AfterSalesRequest>> GetAfterSalesAllAsync() =>
-        await _context.AfterSalesRequests
-            .AsNoTracking()
-            .Include(a => a.Order)
-            .OrderByDescending(a => a.RequestedAt)
-            .ToListAsync();
 
     public async Task<PagedResult<AfterSalesRequest>> GetAfterSalesPagedAsync(int page, int pageSize)
     {
@@ -1005,12 +1017,12 @@ public class OrderService : IOrderService
             return;
         }
 
-        order.ShippingOrigin = JoinDistinct(products.Select(p => p.ShippingFrom));
-        order.ShippingOriginEn = JoinDistinct(products.Select(p => p.ShippingFromEn));
-        order.ShippingFeeText = JoinDistinct(products.Select(p => p.ShippingFee));
-        order.ShippingFeeTextEn = JoinDistinct(products.Select(p => p.ShippingFeeEn));
-        order.DispatchTimeText = JoinDistinct(products.Select(p => p.DeliveryTime));
-        order.DispatchTimeTextEn = JoinDistinct(products.Select(p => p.DeliveryTimeEn));
+        order.ShippingOrigin = JoinDistinct(products.Select(p => p.ShippingFrom), 200);
+        order.ShippingOriginEn = JoinDistinct(products.Select(p => p.ShippingFromEn), 200);
+        order.ShippingFeeText = JoinDistinct(products.Select(p => p.ShippingFee), 100);
+        order.ShippingFeeTextEn = JoinDistinct(products.Select(p => p.ShippingFeeEn), 100);
+        order.DispatchTimeText = JoinDistinct(products.Select(p => p.DeliveryTime), 100);
+        order.DispatchTimeTextEn = JoinDistinct(products.Select(p => p.DeliveryTimeEn), 100);
 
         var dispatchHours = products
             .Select(p => ParseDispatchHours(p.DeliveryTime))
@@ -1064,10 +1076,22 @@ public class OrderService : IOrderService
         }).ToList()
     };
 
-    private static string? JoinDistinct(IEnumerable<string?> values) =>
-        string.Join("、", values.Where(v => !string.IsNullOrWhiteSpace(v))
+    private static string JoinDistinct(IEnumerable<string?> values, int maxLength)
+    {
+        var text = string.Join("、", values.Where(v => !string.IsNullOrWhiteSpace(v))
             .Select(v => v!.Trim())
             .Distinct());
+        if (text.Length <= maxLength)
+        {
+            return text;
+        }
+        var prefixLength = maxLength - 1;
+        if (char.IsHighSurrogate(text[prefixLength - 1]) && char.IsLowSurrogate(text[prefixLength]))
+        {
+            prefixLength--;
+        }
+        return text[..prefixLength] + "…";
+    }
 
     private static int ParseDispatchHours(string? text)
     {

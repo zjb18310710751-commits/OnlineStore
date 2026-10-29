@@ -13,7 +13,6 @@ public interface IOrderService
         IReadOnlyCollection<int> orderIds);
     Task<IReadOnlyDictionary<int, OrderItemPreviewViewModel>> GetOrderItemPreviewsAsync(IEnumerable<OrderItem> items);
 
-    Task<IReadOnlyList<Order>> GetAllAsync();
     Task<PagedResult<Order>> GetAdminOrdersPagedAsync(int page, int pageSize);
     Task<IReadOnlyList<Order>> GetAdminOrderUpdatesAsync(IReadOnlyCollection<int> orderIds);
 
@@ -39,7 +38,6 @@ public interface IOrderService
 
     Task<AfterSalesRequest> CreateAfterSalesAsync(int orderId, string userId, string type, string reason);
 
-    Task<IReadOnlyList<AfterSalesRequest>> GetAfterSalesAllAsync();
     Task<PagedResult<AfterSalesRequest>> GetAfterSalesPagedAsync(int page, int pageSize);
     Task<IReadOnlyList<AfterSalesUpdateViewModel>> GetAfterSalesUpdatesAsync(IReadOnlyCollection<int> ids);
     Task<int> CountOpenAfterSalesAsync();

@@ -27,10 +27,6 @@ public interface IProductService
 
     Task<IReadOnlyList<Product>> GetByShopAsync(int shopId);
 
-    Task<int> CountAsync();
-
-    Task<int> CountActiveAsync();
-
     Task<int> CountLowStockAsync(int threshold = 5);
 
     Task<IReadOnlyList<Product>> GetSaleItemsAsync(int count = 8);

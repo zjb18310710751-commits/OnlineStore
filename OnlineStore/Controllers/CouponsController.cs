@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Localization;
 using OnlineStore.Models;
 using OnlineStore.Services;
 
@@ -12,16 +11,13 @@ public class CouponsController : Controller
 {
     private readonly ICouponService _couponService;
     private readonly UserManager<ApplicationUser> _userManager;
-    private readonly IStringLocalizer<SharedResource> _loc;
 
     public CouponsController(
         ICouponService couponService,
-        UserManager<ApplicationUser> userManager,
-        IStringLocalizer<SharedResource> localizer)
+        UserManager<ApplicationUser> userManager)
     {
         _couponService = couponService;
         _userManager = userManager;
-        _loc = localizer;
     }
 
     [HttpGet]

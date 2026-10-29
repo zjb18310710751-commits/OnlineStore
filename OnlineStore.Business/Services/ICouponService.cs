@@ -12,6 +12,8 @@ public record CouponApplyResult(
 
 public record CouponEvaluationItem(int ProductId, decimal Price, int Quantity);
 
+public record CouponFormOptions(IReadOnlyList<Category> Categories, IReadOnlyList<Product> Products);
+
 public enum CouponWalletStatus
 {
     Available = 0,
@@ -30,6 +32,7 @@ public record CouponWalletItem(
 public interface ICouponService
 {
     Task<IReadOnlyList<Coupon>> GetAllAsync();
+    Task<CouponFormOptions> GetFormOptionsAsync(CancellationToken cancellationToken = default);
     Task<PagedResult<Coupon>> GetPagedAsync(int page, int pageSize);
 
     Task<Coupon?> GetByIdAsync(int id);

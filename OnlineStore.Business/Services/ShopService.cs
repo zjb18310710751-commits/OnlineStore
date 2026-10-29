@@ -68,5 +68,4 @@ public class ShopService : IShopService
         return true;
     }
 
-    public Task<int> CountAsync() => _context.Shops.CountAsync();
 }

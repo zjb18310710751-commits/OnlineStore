@@ -13,7 +13,8 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
     ?? throw new InvalidOperationException("未配置连接字符串 ConnectionStrings:DefaultConnection。");
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(connectionString));
+    options.UseSqlServer(connectionString, sql =>
+        sql.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.GetName().Name)));
 
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 {

@@ -220,16 +220,17 @@ public class OrderServiceTests
     }
 
     [Fact]
-    public async Task GetAllAsync_ReturnsAllOrders()
+    public async Task GetAdminOrdersPagedAsync_ReturnsOrdersAndTotalCount()
     {
         var (context, _, _) = await SeedAsync();
         context.Orders.Add(new Order { OrderNo = "OS002", Total = 100m, Status = OrderStatus.PendingShipment });
         await context.SaveChangesAsync();
         var service = new OrderService(context);
 
-        var result = await service.GetAllAsync();
+        var result = await service.GetAdminOrdersPagedAsync(1, 10);
 
-        Assert.Equal(2, result.Count);
+        Assert.Equal(2, result.TotalCount);
+        Assert.Equal(2, result.Items.Count);
     }
 
     [Fact]

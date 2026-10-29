@@ -14,13 +14,6 @@ public class ReviewService : IReviewService
         _context = context;
     }
 
-    public async Task<IReadOnlyList<Review>> GetByProductIdAsync(int productId) =>
-        await _context.Reviews
-            .AsNoTracking()
-            .Where(r => r.ProductId == productId)
-            .OrderByDescending(r => r.CreatedAt)
-            .ToListAsync();
-
     public async Task<PagedResult<Review>> GetProductReviewsPagedAsync(
         int productId,
         int page,
@@ -87,13 +80,6 @@ public class ReviewService : IReviewService
             ratingCounts);
     }
 
-    public async Task<IReadOnlyList<Review>> GetAllAsync() =>
-        await _context.Reviews
-            .AsNoTracking()
-            .Include(r => r.Product)
-            .OrderByDescending(r => r.CreatedAt)
-            .ToListAsync();
-
     public async Task<PagedResult<Review>> GetPagedAsync(int page, int pageSize)
     {
         pageSize = Math.Clamp(pageSize, 1, 100);
@@ -150,5 +136,4 @@ public class ReviewService : IReviewService
         }
     }
 
-    public Task<int> CountAsync() => _context.Reviews.CountAsync();
 }

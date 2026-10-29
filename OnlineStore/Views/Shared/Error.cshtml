@@ -1,5 +1,6 @@
 @model ErrorViewModel
 @{
+    Layout = "_ErrorLayout";
     ViewData["Title"] = Loc["ErrorOccurred"].Value;
     var status = Model.StatusCode;
     var title = status == 404 ? Loc["PageNotFound"].Value : Loc["ErrorOccurred"].Value;

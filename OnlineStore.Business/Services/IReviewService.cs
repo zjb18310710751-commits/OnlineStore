@@ -6,8 +6,6 @@ namespace OnlineStore.Services;
 public interface IReviewService
 {
 
-    Task<IReadOnlyList<Review>> GetByProductIdAsync(int productId);
-
     Task<PagedResult<Review>> GetProductReviewsPagedAsync(
         int productId,
         int page,
@@ -17,7 +15,6 @@ public interface IReviewService
 
     Task<ReviewSummary> GetProductSummaryAsync(int productId);
 
-    Task<IReadOnlyList<Review>> GetAllAsync();
     Task<PagedResult<Review>> GetPagedAsync(int page, int pageSize);
 
     Task<IReadOnlyList<Review>> GetByUserAsync(string userId);
@@ -26,7 +23,6 @@ public interface IReviewService
 
     Task DeleteAsync(int id);
 
-    Task<int> CountAsync();
 }
 
 public sealed record ReviewSummary(
