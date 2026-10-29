@@ -53,11 +53,24 @@ public class OrderService : IOrderService
 
     public async Task<Order> CreateAsync(Order order)
     {
-        await using var transaction = _context.Database.IsRelational()
-            ? await _context.Database.BeginTransactionAsync(IsolationLevel.Serializable)
-            : null;
         try
         {
+            return await ExecuteInTransactionAsync(() => CreateOrderCoreAsync(order));
+        }
+        catch (Exception exception) when (IsConcurrencyFailure(exception))
+        {
+            _context.ChangeTracker.Clear();
+            throw new OrderValidationException("CheckoutRetry", exception);
+        }
+        catch
+        {
+            _context.ChangeTracker.Clear();
+            throw;
+        }
+    }
+
+    private async Task<Order> CreateOrderCoreAsync(Order order)
+    {
             if (order.Items.Count == 0 || order.Items.Any(i => i.Quantity <= 0))
             {
                 throw new OrderValidationException("CheckoutQuantityInvalid");
@@ -176,22 +189,7 @@ public class OrderService : IOrderService
                 });
             }
             await _context.SaveChangesAsync();
-            if (transaction is not null)
-            {
-                await transaction.CommitAsync();
-            }
             return order;
-        }
-        catch (Exception exception) when (IsConcurrencyFailure(exception))
-        {
-            _context.ChangeTracker.Clear();
-            throw new OrderValidationException("CheckoutRetry", exception);
-        }
-        catch
-        {
-            _context.ChangeTracker.Clear();
-            throw;
-        }
     }
 
     public Task<bool> CancelAsync(int id) =>
@@ -385,45 +383,41 @@ public class OrderService : IOrderService
                 "The after-sales reason must contain 1 to 1,000 characters."));
         }
 
-        await using var transaction = _context.Database.IsRelational()
-            ? await _context.Database.BeginTransactionAsync(IsolationLevel.Serializable)
-            : null;
         try
         {
-            var order = await GetByIdAsync(orderId);
-            if (order is null || !string.Equals(order.UserId, userId, StringComparison.Ordinal)
-                || order.Status != OrderStatus.Completed)
+            return await ExecuteInTransactionAsync(async () =>
             {
-                throw new InvalidOperationException(L10n.Text(
-                    "当前订单不能申请售后。",
-                    "This order is not eligible for after-sales."));
-            }
+                var order = await GetByIdAsync(orderId);
+                if (order is null || !string.Equals(order.UserId, userId, StringComparison.Ordinal)
+                    || order.Status != OrderStatus.Completed)
+                {
+                    throw new InvalidOperationException(L10n.Text(
+                        "当前订单不能申请售后。",
+                        "This order is not eligible for after-sales."));
+                }
 
-            var hasActiveRequest = await _context.AfterSalesRequests.AnyAsync(request =>
-                request.OrderId == orderId && request.Status != AfterSalesStatus.Rejected);
-            if (hasActiveRequest)
-            {
-                throw new InvalidOperationException(L10n.Text(
-                    "该订单已有有效售后申请。",
-                    "This order already has an active after-sales request."));
-            }
+                var hasActiveRequest = await _context.AfterSalesRequests.AnyAsync(request =>
+                    request.OrderId == orderId && request.Status != AfterSalesStatus.Rejected);
+                if (hasActiveRequest)
+                {
+                    throw new InvalidOperationException(L10n.Text(
+                        "该订单已有有效售后申请。",
+                        "This order already has an active after-sales request."));
+                }
 
-            var request = new AfterSalesRequest
-            {
-                OrderId = order.Id,
-                UserId = userId,
-                Type = type,
-                Reason = normalizedReason,
-                Status = AfterSalesStatus.Pending,
-                RequestedAt = UtcNow
-            };
-            _context.AfterSalesRequests.Add(request);
-            await _context.SaveChangesAsync();
-            if (transaction is not null)
-            {
-                await transaction.CommitAsync();
-            }
-            return request;
+                var request = new AfterSalesRequest
+                {
+                    OrderId = order.Id,
+                    UserId = userId,
+                    Type = type,
+                    Reason = normalizedReason,
+                    Status = AfterSalesStatus.Pending,
+                    RequestedAt = UtcNow
+                };
+                _context.AfterSalesRequests.Add(request);
+                await _context.SaveChangesAsync();
+                return request;
+            });
         }
         catch (DbUpdateException exception) when (IsUniqueConstraintFailure(exception))
         {
@@ -477,44 +471,40 @@ public class OrderService : IOrderService
 
     public async Task<bool> CompleteAfterSalesAsync(int id)
     {
-        await using var transaction = _context.Database.IsRelational()
-            ? await _context.Database.BeginTransactionAsync(IsolationLevel.Serializable)
-            : null;
         try
         {
-            var request = await _context.AfterSalesRequests
-                .Include(a => a.Order)
-                .ThenInclude(o => o!.Items)
-                .FirstOrDefaultAsync(a => a.Id == id);
-            if (request is null || request.Status != AfterSalesStatus.Received || request.Order is null)
+            return await ExecuteInTransactionAsync(async () =>
             {
-                return false;
-            }
-
-            if (request.Type == AfterSalesType.Return)
-            {
-                await RestoreStockAsync(request.Order);
-            }
-            else if (request.Type == AfterSalesType.Exchange)
-            {
-                await RestoreStockAsync(request.Order);
-                var replacement = BuildReplacementOrder(request.Order);
-                if (!await ReserveStockAsync(replacement))
+                var request = await _context.AfterSalesRequests
+                    .Include(a => a.Order)
+                    .ThenInclude(o => o!.Items)
+                    .FirstOrDefaultAsync(a => a.Id == id);
+                if (request is null || request.Status != AfterSalesStatus.Received || request.Order is null)
                 {
-                    _context.ChangeTracker.Clear();
                     return false;
                 }
-                _context.Orders.Add(replacement);
-            }
 
-            request.Status = AfterSalesStatus.Completed;
-            request.CompletedAt = UtcNow;
-            await _context.SaveChangesAsync();
-            if (transaction is not null)
-            {
-                await transaction.CommitAsync();
-            }
-            return true;
+                if (request.Type == AfterSalesType.Return)
+                {
+                    await RestoreStockAsync(request.Order);
+                }
+                else if (request.Type == AfterSalesType.Exchange)
+                {
+                    await RestoreStockAsync(request.Order);
+                    var replacement = BuildReplacementOrder(request.Order);
+                    if (!await ReserveStockAsync(replacement))
+                    {
+                        _context.ChangeTracker.Clear();
+                        return false;
+                    }
+                    _context.Orders.Add(replacement);
+                }
+
+                request.Status = AfterSalesStatus.Completed;
+                request.CompletedAt = UtcNow;
+                await _context.SaveChangesAsync();
+                return true;
+            });
         }
         catch (Exception exception) when (IsConcurrencyFailure(exception)
             || IsUniqueConstraintFailure(exception)
@@ -646,6 +636,32 @@ public class OrderService : IOrderService
         return match.Success && int.TryParse(match.Value, out var hours) ? hours : 72;
     }
 
+    private async Task<T> ExecuteInTransactionAsync<T>(Func<Task<T>> operation)
+    {
+        if (!_context.Database.IsRelational())
+        {
+            return await operation();
+        }
+
+        var strategy = _context.Database.CreateExecutionStrategy();
+        return await strategy.ExecuteAsync(async () =>
+        {
+            await using var transaction =
+                await _context.Database.BeginTransactionAsync(IsolationLevel.Serializable);
+            try
+            {
+                var result = await operation();
+                await transaction.CommitAsync();
+                return result;
+            }
+            catch
+            {
+                _context.ChangeTracker.Clear();
+                throw;
+            }
+        });
+    }
+
     private async Task<Coupon?> GetTrackedCouponAsync(Order order)
     {
         if (string.IsNullOrWhiteSpace(order.CouponCode))
@@ -672,33 +688,29 @@ public class OrderService : IOrderService
 
     private async Task<bool> TransitionAsync(int id, string nextStatus, bool restoreStock, params string[] allowedStatuses)
     {
-        await using var transaction = _context.Database.IsRelational()
-            ? await _context.Database.BeginTransactionAsync(IsolationLevel.Serializable)
-            : null;
         try
         {
-            var order = await GetByIdAsync(id);
-            if (order is null)
+            return await ExecuteInTransactionAsync(async () =>
             {
-                return false;
-            }
-            await _context.Entry(order).ReloadAsync();
-            if (_context.Entry(order).State == EntityState.Detached || !allowedStatuses.Contains(order.Status))
-            {
-                return false;
-            }
-            if (restoreStock)
-            {
-                await RestoreStockAsync(order);
-                await ReleaseCouponAsync(order);
-            }
-            order.Status = nextStatus;
-            await _context.SaveChangesAsync();
-            if (transaction is not null)
-            {
-                await transaction.CommitAsync();
-            }
-            return true;
+                var order = await GetByIdAsync(id);
+                if (order is null)
+                {
+                    return false;
+                }
+                await _context.Entry(order).ReloadAsync();
+                if (_context.Entry(order).State == EntityState.Detached || !allowedStatuses.Contains(order.Status))
+                {
+                    return false;
+                }
+                if (restoreStock)
+                {
+                    await RestoreStockAsync(order);
+                    await ReleaseCouponAsync(order);
+                }
+                order.Status = nextStatus;
+                await _context.SaveChangesAsync();
+                return true;
+            });
         }
         catch (Exception exception) when (IsConcurrencyFailure(exception) || exception is OverflowException)
         {
