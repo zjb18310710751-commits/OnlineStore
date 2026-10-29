@@ -14,12 +14,22 @@ public class OrderService : IOrderService
 
     private readonly ApplicationDbContext _context;
     private readonly ICouponService _couponService;
+    private readonly IOrderNumberGenerator _orderNumberGenerator;
+    private readonly TimeProvider _timeProvider;
 
-    public OrderService(ApplicationDbContext context, ICouponService? couponService = null)
+    public OrderService(
+        ApplicationDbContext context,
+        ICouponService? couponService = null,
+        IOrderNumberGenerator? orderNumberGenerator = null,
+        TimeProvider? timeProvider = null)
     {
         _context = context;
         _couponService = couponService ?? new CouponService(context);
+        _timeProvider = timeProvider ?? TimeProvider.System;
+        _orderNumberGenerator = orderNumberGenerator ?? new OrderNumberGenerator(_timeProvider);
     }
+
+    private DateTime UtcNow => _timeProvider.GetUtcNow().UtcDateTime;
 
     public Task<Order?> GetByIdAsync(int id) =>
         _context.Orders
@@ -150,7 +160,7 @@ public class OrderService : IOrderService
             order.CouponCode = coupon?.Code;
             order.CouponName = coupon?.CampaignName;
             order.Status = OrderStatus.PendingShipment;
-            order.CreatedAt = DateTime.UtcNow;
+            order.CreatedAt = UtcNow;
             _context.Orders.Add(order);
             if (coupon is not null)
             {
@@ -162,7 +172,7 @@ public class OrderService : IOrderService
                     Code = coupon.Code,
                     DiscountAmount = discount,
                     ShippingWaived = freeShipping,
-                    CreatedAt = DateTime.UtcNow
+                    CreatedAt = UtcNow
                 });
             }
             await _context.SaveChangesAsync();
@@ -208,7 +218,7 @@ public class OrderService : IOrderService
 
         order.Carrier = carrier.Trim();
         order.TrackingNumber = trackingNumber.Trim();
-        order.ShippedAt = DateTime.UtcNow;
+        order.ShippedAt = UtcNow;
         order.DeliveredAt = null;
         order.SignedAt = null;
         order.Status = OrderStatus.Shipped;
@@ -229,7 +239,7 @@ public class OrderService : IOrderService
 
         await AdvanceDeliveryAsync(order);
 
-        var now = DateTime.UtcNow;
+        var now = UtcNow;
         var shippedAt = order.ShippedAt!.Value;
         var deliveredAt = shippedAt.Add(DeliveryThreshold);
         var signed = order.Status == OrderStatus.Completed || order.SignedAt.HasValue;
@@ -308,7 +318,7 @@ public class OrderService : IOrderService
         }
 
         order.Status = OrderStatus.Completed;
-        order.SignedAt = DateTime.UtcNow;
+        order.SignedAt = UtcNow;
         await _context.SaveChangesAsync();
         return true;
     }
@@ -336,7 +346,7 @@ public class OrderService : IOrderService
             return false;
         }
 
-        order.UserDeletedAt = DateTime.UtcNow;
+        order.UserDeletedAt = UtcNow;
         await _context.SaveChangesAsync();
         return true;
     }
@@ -405,7 +415,7 @@ public class OrderService : IOrderService
                 Type = type,
                 Reason = normalizedReason,
                 Status = AfterSalesStatus.Pending,
-                RequestedAt = DateTime.UtcNow
+                RequestedAt = UtcNow
             };
             _context.AfterSalesRequests.Add(request);
             await _context.SaveChangesAsync();
@@ -446,7 +456,7 @@ public class OrderService : IOrderService
 
         request.Status = approved ? AfterSalesStatus.Approved : AfterSalesStatus.Rejected;
         request.AdminNote = string.IsNullOrWhiteSpace(note) ? null : note.Trim();
-        request.ReviewedAt = DateTime.UtcNow;
+        request.ReviewedAt = UtcNow;
         await _context.SaveChangesAsync();
         return true;
     }
@@ -460,7 +470,7 @@ public class OrderService : IOrderService
         }
 
         request.Status = AfterSalesStatus.Received;
-        request.ReceivedAt = DateTime.UtcNow;
+        request.ReceivedAt = UtcNow;
         await _context.SaveChangesAsync();
         return true;
     }
@@ -498,7 +508,7 @@ public class OrderService : IOrderService
             }
 
             request.Status = AfterSalesStatus.Completed;
-            request.CompletedAt = DateTime.UtcNow;
+            request.CompletedAt = UtcNow;
             await _context.SaveChangesAsync();
             if (transaction is not null)
             {
@@ -524,7 +534,7 @@ public class OrderService : IOrderService
             return;
         }
 
-        if (DateTime.UtcNow < order.ShippedAt.Value.Add(DeliveryThreshold))
+        if (UtcNow < order.ShippedAt.Value.Add(DeliveryThreshold))
         {
             return;
         }
@@ -553,7 +563,7 @@ public class OrderService : IOrderService
             IsFutureEstimated = isFutureEstimated
         };
 
-    private static void ApplyShippingSnapshot(Order order, IReadOnlyList<Product> products)
+    private void ApplyShippingSnapshot(Order order, IReadOnlyList<Product> products)
     {
         if (products.Count == 0)
         {
@@ -571,7 +581,7 @@ public class OrderService : IOrderService
             .Select(p => ParseDispatchHours(p.DeliveryTime))
             .DefaultIfEmpty(72)
             .Max();
-        order.ExpectedDispatchAt = DateTime.UtcNow.AddHours(dispatchHours);
+        order.ExpectedDispatchAt = UtcNow.AddHours(dispatchHours);
     }
 
     private static decimal CalculateShippingAmount(IReadOnlyList<Product> products, bool freeShipping) =>
@@ -582,9 +592,9 @@ public class OrderService : IOrderService
                 .Where(amount => amount > 0)
                 .Sum();
 
-    private static Order BuildReplacementOrder(Order source) => new()
+    private Order BuildReplacementOrder(Order source) => new()
     {
-        OrderNo = OrderNumberGenerator.Generate(),
+        OrderNo = _orderNumberGenerator.Generate(),
         UserId = source.UserId,
         UserName = source.UserName,
         Phone = source.Phone,
@@ -601,9 +611,9 @@ public class OrderService : IOrderService
         ShippingFeeTextEn = source.ShippingFeeTextEn,
         DispatchTimeText = source.DispatchTimeText,
         DispatchTimeTextEn = source.DispatchTimeTextEn,
-        ExpectedDispatchAt = DateTime.UtcNow.AddHours(48),
+        ExpectedDispatchAt = UtcNow.AddHours(48),
         ReplacementForOrderId = source.Id,
-        CreatedAt = DateTime.UtcNow,
+        CreatedAt = UtcNow,
         Items = source.Items.Select(item => new OrderItem
         {
             ProductId = item.ProductId,
@@ -704,7 +714,7 @@ public class OrderService : IOrderService
             return;
         }
 
-        order.InventoryRestoredAt = DateTime.UtcNow;
+        order.InventoryRestoredAt = UtcNow;
         var productIds = order.Items.Select(i => i.ProductId).Distinct().ToList();
         if (productIds.Count == 0)
         {
@@ -782,7 +792,7 @@ public class OrderService : IOrderService
             return;
         }
 
-        redemption.ReleasedAt = DateTime.UtcNow;
+        redemption.ReleasedAt = UtcNow;
         if (redemption.Coupon is not null && redemption.Coupon.UsedCount > 0)
         {
             redemption.Coupon.UsedCount--;

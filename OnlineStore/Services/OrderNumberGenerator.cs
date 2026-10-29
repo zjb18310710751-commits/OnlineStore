@@ -1,7 +1,14 @@
 namespace OnlineStore.Services;
 
-public static class OrderNumberGenerator
+public sealed class OrderNumberGenerator : IOrderNumberGenerator
 {
-    public static string Generate() =>
-        $"OS{DateTime.UtcNow:yyyyMMddHHmmss}{Guid.NewGuid():N}".ToUpperInvariant()[..24];
+    private readonly TimeProvider _timeProvider;
+
+    public OrderNumberGenerator(TimeProvider timeProvider)
+    {
+        _timeProvider = timeProvider;
+    }
+
+    public string Generate() =>
+        $"OS{_timeProvider.GetUtcNow():yyyyMMddHHmmss}{Guid.NewGuid():N}".ToUpperInvariant()[..24];
 }

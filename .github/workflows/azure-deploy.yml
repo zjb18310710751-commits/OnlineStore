@@ -43,10 +43,17 @@ jobs:
         run: dotnet build OnlineStore.sln --configuration Release --no-restore
 
       - name: Backend tests
-        run: dotnet test OnlineStore.Tests/OnlineStore.Tests.csproj --configuration Release --no-build --no-restore
+        run: dotnet test OnlineStore.Tests/OnlineStore.Tests.csproj --configuration Release --no-build --no-restore --settings coverlet.runsettings --collect:"XPlat Code Coverage" --results-directory "${{ github.workspace }}/TestResults/coverage"
 
       - name: Frontend regression tests
         run: node --test OnlineStore.Tests/Frontend/*.test.cjs
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: backend-coverage
+          path: "${{ github.workspace }}/TestResults/coverage/**/coverage.cobertura.xml"
 
       - name: Publish
         run: dotnet publish OnlineStore/OnlineStore.csproj --configuration Release --no-restore --output "$PUBLISH_PATH"

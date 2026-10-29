@@ -18,6 +18,7 @@ public class OrdersController : Controller
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly IStringLocalizer<SharedResource> _loc;
     private readonly IReviewService? _reviewService;
+    private readonly IOrderNumberGenerator _orderNumberGenerator;
 
     public OrdersController(
         IOrderService orderService,
@@ -26,7 +27,8 @@ public class OrdersController : Controller
         IDeliveryAddressService deliveryAddressService,
         UserManager<ApplicationUser> userManager,
         IStringLocalizer<SharedResource> localizer,
-        IReviewService? reviewService = null)
+        IReviewService? reviewService = null,
+        IOrderNumberGenerator? orderNumberGenerator = null)
     {
         _orderService = orderService;
         _cartService = cartService;
@@ -35,6 +37,8 @@ public class OrdersController : Controller
         _userManager = userManager;
         _loc = localizer;
         _reviewService = reviewService;
+        _orderNumberGenerator = orderNumberGenerator
+            ?? new OrderNumberGenerator(TimeProvider.System);
     }
 
     [HttpGet]
@@ -190,7 +194,7 @@ public class OrdersController : Controller
 
         var order = new Order
         {
-            OrderNo = OrderNumberGenerator.Generate(),
+            OrderNo = _orderNumberGenerator.Generate(),
             UserId = user.Id,
             UserName = vm.UserName!.Trim(),
             Phone = vm.Phone?.Trim(),
