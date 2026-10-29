@@ -43,6 +43,76 @@
 .admin-order-section-nav a.is-active { border-color: var(--admin-ink); background: var(--admin-ink); color: #fff; }
 .admin-order-section-nav a span { display: inline-flex; align-items: center; justify-content: center; min-width: 20px; height: 20px; padding-inline: 5px; border-radius: 999px; background: var(--admin-surface); color: var(--admin-ink); font-size: 10px; }
 .admin-order-section-nav a.is-active span { background: #fff; color: var(--admin-ink); }
+
+.admin-order-product-list {
+    display: grid;
+    gap: 8px;
+    min-width: 270px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.admin-order-product {
+    display: grid;
+    grid-template-columns: 40px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 10px;
+}
+
+.admin-order-product-media {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    overflow: hidden;
+    border-radius: 6px;
+    background: var(--admin-surface);
+    color: var(--admin-muted);
+    font-size: 16px;
+}
+
+.admin-order-product-media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.admin-order-product-copy {
+    min-width: 0;
+}
+
+.admin-order-product-name {
+    display: block;
+    overflow-wrap: anywhere;
+    color: var(--admin-ink);
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.4;
+    text-decoration: none;
+}
+
+.admin-order-product-name:hover {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+.admin-order-product-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px 8px;
+    margin-top: 2px;
+    color: var(--admin-muted);
+    font-size: 12px;
+    line-height: 1.4;
+}
+
+.admin-order-product-price {
+    color: var(--admin-ink);
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
 .admin-app .admin-sidebar-footer { margin-top: auto; padding: 16px; border-top: 1px solid var(--admin-line); }
 .admin-app .admin-main { min-width: 0; padding: 0; }
 .admin-app .admin-topbar { position: sticky; top: 0; z-index: 1000; display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: var(--admin-header-height); padding: 12px var(--admin-gutter); border-bottom: 1px solid var(--admin-line); background: #fff; }

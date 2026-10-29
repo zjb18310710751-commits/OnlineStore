@@ -33,6 +33,7 @@
             <thead class="table-light">
                 <tr>
                     <th>@Loc["OrderNo"]</th>
+                    <th>@L10n.Text("商品与规格", "Items and variants")</th>
                     <th>@Loc["Receiver"]</th>
                     <th class="text-end">@Loc["Total"]</th>
                     <th>@Loc["OrderStatus"]</th>
@@ -43,7 +44,7 @@
             <tbody>
                 @if (Model.Orders.Count == 0)
                 {
-                    <tr><td colspan="6" class="text-center text-muted py-4">@Loc["NoOrders"]</td></tr>
+                    <tr><td colspan="7" class="text-center text-muted py-4">@Loc["NoOrders"]</td></tr>
                 }
                 @foreach (var o in Model.Orders)
                 {
@@ -54,6 +55,42 @@
                             {
                                 <span class="badge bg-white text-dark border ms-1">@L10n.Text("换货补发", "Exchange replacement")</span>
                             }
+                        </td>
+                        <td>
+                            <ul class="admin-order-product-list">
+                                @foreach (var item in o.Items)
+                                {
+                                    <li class="admin-order-product">
+                                        <span class="admin-order-product-media">
+                                            @if (!string.IsNullOrWhiteSpace(item.ImageUrl))
+                                            {
+                                                <img src="@item.ImageUrl" alt="" loading="lazy" />
+                                            }
+                                            else
+                                            {
+                                                <i class="bi bi-image" aria-hidden="true"></i>
+                                            }
+                                        </span>
+                                        <span class="admin-order-product-copy">
+                                            <a asp-area="Admin" asp-controller="Products" asp-action="Details" asp-route-id="@item.ProductId" class="admin-order-product-name">
+                                                @L10n.Text(item.ProductName, item.ProductNameEn)
+                                            </a>
+                                            <span class="admin-order-product-meta">
+                                                @if (!string.IsNullOrWhiteSpace(item.Color))
+                                                {
+                                                    <span>@L10n.Text("颜色", "Color")：@L10n.Text(item.Color, item.ColorEn)</span>
+                                                }
+                                                @if (!string.IsNullOrWhiteSpace(item.Spec))
+                                                {
+                                                    <span>@L10n.Text("规格", "Variant")：@L10n.Text(item.Spec, item.SpecEn)</span>
+                                                }
+                                                <span>× @item.Quantity</span>
+                                            </span>
+                                        </span>
+                                        <span class="admin-order-product-price">¥@item.LineTotal.ToString("F2")</span>
+                                    </li>
+                                }
+                            </ul>
                         </td>
                         <td class="small">
                             @o.UserName<br />
