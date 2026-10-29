@@ -119,10 +119,77 @@ public class ProductServiceTests
         await SeedAsync(context);
         var service = new ProductService(context);
 
-        var result = await service.GetPagedAsync(new ProductQuery { MinRating = 4.5 });
+        var result = await service.GetPagedAsync(new ProductQuery { RatingBand = "4.5-5" });
 
         Assert.Single(result.Items);
         Assert.Equal(1, result.Items[0].Id);
+        Assert.Equal(2, result.Items[0].ReviewCount);
+        Assert.Equal(4.5, result.Items[0].AverageRating);
+    }
+
+    [Theory]
+    [InlineData("4.5-5", 1)]
+    [InlineData("4.0-4.4", 5)]
+    [InlineData("3.0-3.9", 2)]
+    [InlineData("2.0-2.9", 6)]
+    [InlineData("1.0-1.9", 7)]
+    [InlineData("none", 3)]
+    public async Task GetPagedAsync_UsesMutuallyExclusiveRatingBands(
+        string ratingBand,
+        int expectedProductId)
+    {
+        using var context = CreateContext();
+        await SeedAsync(context);
+        context.Products.AddRange(
+            new Product
+            {
+                Id = 5,
+                Name = "四星商品",
+                Price = 20m,
+                Stock = 2,
+                IsActive = true,
+                ShopId = 1,
+                Reviews = new List<Review>
+                {
+                    new() { Rating = 4, UserName = "四星用户一" },
+                    new() { Rating = 4, UserName = "四星用户二" }
+                }
+            },
+            new Product
+            {
+                Id = 6,
+                Name = "两星半商品",
+                Price = 20m,
+                Stock = 2,
+                IsActive = true,
+                ShopId = 1,
+                Reviews = new List<Review>
+                {
+                    new() { Rating = 2, UserName = "两星用户" },
+                    new() { Rating = 3, UserName = "三星用户" }
+                }
+            },
+            new Product
+            {
+                Id = 7,
+                Name = "低评分商品",
+                Price = 20m,
+                Stock = 2,
+                IsActive = true,
+                ShopId = 1,
+                Reviews = new List<Review>
+                {
+                    new() { Rating = 1, UserName = "低分用户" },
+                    new() { Rating = 2, UserName = "两分用户" }
+                }
+            });
+        await context.SaveChangesAsync();
+        var service = new ProductService(context);
+
+        var result = await service.GetPagedAsync(new ProductQuery { RatingBand = ratingBand });
+
+        Assert.Single(result.Items);
+        Assert.Equal(expectedProductId, result.Items[0].Id);
     }
 
     [Fact]

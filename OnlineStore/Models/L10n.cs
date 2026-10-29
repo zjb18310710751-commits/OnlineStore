@@ -81,6 +81,22 @@ public static class L10n
         };
     }
 
+    public static string AfterSalesTypeLabel(string type)
+    {
+        if (!IsEnglish)
+        {
+            return type;
+        }
+
+        return type switch
+        {
+            AfterSalesType.Return => "Return",
+            AfterSalesType.Exchange => "Exchange",
+            AfterSalesType.TransitCancellation => "Refund / interception",
+            _ => type
+        };
+    }
+
     public static string Status(string zh) =>
         IsEnglish
             ? zh switch
@@ -88,6 +104,7 @@ public static class L10n
                 OrderStatus.PendingShipment => "Pending shipment",
                 OrderStatus.Shipped => "Shipped",
                 OrderStatus.Delivered => "Delivered",
+                OrderStatus.ReceiptException => "Receipt exception",
                 OrderStatus.Completed => "Completed",
                 OrderStatus.Cancelled => "Cancelled",
                 OrderStatus.Refunded => "Refunded",

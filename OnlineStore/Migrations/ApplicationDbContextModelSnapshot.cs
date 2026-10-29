@@ -243,6 +243,17 @@ namespace OnlineStore.Migrations
                     b.Property<DateTime?>("ReviewedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("ReturnCarrier")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime?>("ReturnShippedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ReturnTrackingNumber")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
                     b.Property<string>("Status")
                         .IsConcurrencyToken()
                         .IsRequired()
@@ -730,6 +741,9 @@ namespace OnlineStore.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
+                    b.Property<DateTime?>("AutoConfirmAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Carrier")
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
@@ -783,6 +797,20 @@ namespace OnlineStore.Migrations
                     b.Property<string>("Phone")
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
+
+                    b.Property<bool>("ReceiptConfirmedAutomatically")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("ReceiptExceptionReason")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<DateTime?>("ReceiptExceptionReportedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ReceiptExceptionReportedBy")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
 
                     b.Property<int?>("ReplacementForOrderId")
                         .HasColumnType("int");

@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Reflection;
 using System.Security.Claims;
 using System.Text.Json;
 using Microsoft.AspNetCore.DataProtection;
@@ -154,10 +155,18 @@ public class AccountSafetyTests
         var user = await fixture.AddUser();
         fixture.SignIn(user);
         fixture.Context.Products.Add(new Product { Id = 1, Name = "Product" });
+        fixture.Context.Orders.Add(new Order
+        {
+            Id = 10,
+            OrderNo = "ORDER-10",
+            UserId = user.Id,
+            Status = OrderStatus.Completed,
+            Items = new List<OrderItem> { new() { ProductId = 1, ProductName = "Product", Quantity = 1 } }
+        });
         await fixture.Context.SaveChangesAsync();
         var controller = fixture.Reviews();
 
-        await controller.Create(1, 5, new string('x', 1001), null);
+        await controller.Create(1, 5, new string('x', 1001), null, 10);
 
         Assert.Empty(await fixture.Context.Reviews.ToListAsync());
         Assert.True(controller.TempData.ContainsKey("Error"));
@@ -173,13 +182,79 @@ public class AccountSafetyTests
         await fixture.Users.UpdateAsync(user);
         fixture.SignIn(user);
         fixture.Context.Products.Add(new Product { Id = 1, Name = "Product" });
+        fixture.Context.Orders.Add(new Order
+        {
+            Id = 10,
+            OrderNo = "ORDER-10",
+            UserId = user.Id,
+            Status = OrderStatus.Completed,
+            Items = new List<OrderItem> { new() { ProductId = 1, ProductName = "Product", Quantity = 1 } }
+        });
         await fixture.Context.SaveChangesAsync();
 
-        await fixture.Reviews().Create(1, 5, "Good", null);
+        await fixture.Reviews().Create(1, 5, "Good", null, 10);
 
         var review = await fixture.Context.Reviews.SingleAsync();
         Assert.InRange(review.UserName.Length, 1, 50);
         Assert.Equal("Good", review.Comment);
+    }
+
+    [Fact]
+    public async Task Review_RejectsMissingOrder()
+    {
+        using var fixture = new Fixture();
+        var user = await fixture.AddUser();
+        fixture.SignIn(user);
+        fixture.Context.Products.Add(new Product { Id = 1, Name = "Product" });
+        await fixture.Context.SaveChangesAsync();
+        var controller = fixture.Reviews();
+
+        var result = await controller.Create(1, 5, "Good", null, 999);
+
+        Assert.IsType<RedirectToActionResult>(result);
+        Assert.Empty(await fixture.Context.Reviews.ToListAsync());
+        Assert.True(controller.TempData.ContainsKey("Error"));
+    }
+
+    [Theory]
+    [InlineData(false, OrderStatus.Completed)]
+    [InlineData(true, OrderStatus.PendingShipment)]
+    public async Task Review_RejectsOrderOwnedByAnotherUserOrNotCompleted(bool ownedByBuyer, string status)
+    {
+        using var fixture = new Fixture();
+        var user = await fixture.AddUser();
+        fixture.SignIn(user);
+        fixture.Context.Products.Add(new Product { Id = 1, Name = "Product" });
+        fixture.Context.Orders.Add(new Order
+        {
+            Id = 10,
+            OrderNo = "ORDER-10",
+            UserId = ownedByBuyer ? user.Id : "another-user",
+            Status = status,
+            Items = new List<OrderItem> { new() { ProductId = 1, ProductName = "Product", Quantity = 1 } }
+        });
+        await fixture.Context.SaveChangesAsync();
+        var controller = fixture.Reviews();
+
+        await controller.Create(1, 5, "Good", null, 10);
+
+        Assert.Empty(await fixture.Context.Reviews.ToListAsync());
+        Assert.True(controller.TempData.ContainsKey("Error"));
+    }
+
+    [Fact]
+    public void Reviews_BuyersCannotDeleteWhileAdminCanDelete()
+    {
+        var buyerActions = typeof(ReviewsController)
+            .GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly)
+            .Select(method => method.Name);
+        Assert.DoesNotContain("Delete", buyerActions, StringComparer.OrdinalIgnoreCase);
+
+        var adminDelete = Assert.Single(typeof(OnlineStore.Areas.Admin.Controllers.ReviewsController)
+            .GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+            method => method.Name == "Delete");
+        Assert.NotNull(adminDelete.GetCustomAttribute<HttpPostAttribute>());
+        Assert.NotNull(adminDelete.GetCustomAttribute<ValidateAntiForgeryTokenAttribute>());
     }
 
     private static RegisterViewModel Registration(string email) => new()
@@ -234,7 +309,13 @@ public class AccountSafetyTests
         public void SignIn(ApplicationUser user) => _http.User = new ClaimsPrincipal(new ClaimsIdentity(
             new[] { new Claim(ClaimTypes.NameIdentifier, user.Id) }, "test"));
 
-        public ReviewsController Reviews() => new(new ReviewService(Context), new ProductService(Context), null!, Users, _loc)
+        public ReviewsController Reviews() => new(
+            new ReviewService(Context),
+            new ProductService(Context),
+            null!,
+            new OrderService(Context),
+            Users,
+            _loc)
         {
             ControllerContext = new ControllerContext { HttpContext = _http },
             Url = new UrlHelper(new ActionContext(_http, new RouteData(), new ActionDescriptor())),

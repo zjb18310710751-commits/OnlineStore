@@ -1,6 +1,7 @@
-@model IReadOnlyList<Shop>
+@model PagedResult<Shop>
 @{
     ViewData["Title"] = Loc["ShopManagement"].Value;
+    var pagination = new AdminPaginationViewModel { Action = "Index", Controller = "Shops", Page = Model.Page, TotalPages = Model.TotalPages };
 }
 <div class="admin-store-heading">
     <div>
@@ -23,11 +24,11 @@
                 </tr>
             </thead>
             <tbody>
-                @if (Model.Count == 0)
+                @if (Model.TotalCount == 0)
                 {
                     <tr><td colspan="5" class="text-center text-muted py-4">@Loc["NoShops"]</td></tr>
                 }
-                @foreach (var s in Model)
+                @foreach (var s in Model.Items)
                 {
                     <tr>
                         <td>
@@ -49,10 +50,20 @@
                         <td>@s.SalesCount</td>
                         <td class="text-muted">@L10n.Description(s)</td>
                         <td class="text-end text-nowrap">
-                            <a asp-action="Edit" asp-route-id="@s.Id" class="btn btn-sm btn-outline-primary" title="@Loc["Edit"]"><i class="bi bi-pencil"></i></a>
-                            <form asp-action="Delete" asp-route-id="@s.Id" method="post" class="d-inline" data-confirm="@Loc["ConfirmDeleteShop"]" onsubmit="return confirm(this.dataset.confirm);">
-                                <button type="submit" class="btn btn-sm btn-outline-danger" title="@Loc["Delete"]"><i class="bi bi-trash"></i></button>
-                            </form>
+                            <div class="admin-icon-actions">
+                                <a asp-action="Edit" asp-route-id="@s.Id"
+                                   class="admin-icon-action" title="@Loc["Edit"]" aria-label="@Loc["Edit"]">
+                                    <i class="bi bi-pencil-square" aria-hidden="true"></i>
+                                </a>
+                                <form asp-action="Delete" asp-route-id="@s.Id" method="post"
+                                      class="d-inline" data-confirm="@Loc["ConfirmDeleteShop"]"
+                                      onsubmit="return confirm(this.dataset.confirm);">
+                                    <button type="submit" class="admin-icon-action is-danger"
+                                            title="@Loc["Delete"]" aria-label="@Loc["Delete"]">
+                                        <i class="bi bi-trash3" aria-hidden="true"></i>
+                                    </button>
+                                </form>
+                            </div>
                         </td>
                     </tr>
                 }
@@ -60,3 +71,4 @@
         </table>
     </div>
 </div>
+<partial name="_AdminPagination" model="pagination" />

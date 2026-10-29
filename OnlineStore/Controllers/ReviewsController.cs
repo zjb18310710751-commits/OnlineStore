@@ -13,7 +13,7 @@ public class ReviewsController : Controller
     private readonly IReviewService _reviewService;
     private readonly IProductService _productService;
     private readonly IImageStorageService _imageStorage;
-    private readonly IOrderService? _orderService;
+    private readonly IOrderService _orderService;
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly IStringLocalizer<SharedResource> _loc;
 
@@ -21,16 +21,16 @@ public class ReviewsController : Controller
         IReviewService reviewService,
         IProductService productService,
         IImageStorageService imageStorage,
+        IOrderService orderService,
         UserManager<ApplicationUser> userManager,
-        IStringLocalizer<SharedResource> localizer,
-        IOrderService? orderService = null)
+        IStringLocalizer<SharedResource> localizer)
     {
         _reviewService = reviewService;
         _productService = productService;
         _imageStorage = imageStorage;
+        _orderService = orderService;
         _userManager = userManager;
         _loc = localizer;
-        _orderService = orderService;
     }
 
     [HttpPost]
@@ -40,7 +40,7 @@ public class ReviewsController : Controller
         int rating,
         string? comment,
         IFormFile? image,
-        int? orderId = null)
+        int orderId)
     {
         var product = await _productService.GetByIdAsync(productId);
         if (product is null)
@@ -51,27 +51,16 @@ public class ReviewsController : Controller
         var user = await _userManager.GetUserAsync(User);
         if (user is null) return Challenge();
 
-        if (orderId.HasValue)
+        var order = await _orderService.GetByIdAsync(orderId);
+        if (order is null
+            || order.UserId != user.Id
+            || order.Status != OrderStatus.Completed
+            || order.Items.All(item => item.ProductId != productId))
         {
-            if (_orderService is null)
-            {
-                TempData["Error"] = L10n.Text(
-                    "当前订单不能评价。",
-                    "This order cannot be reviewed.");
-                return RedirectToAction("Details", "Products", new { id = productId });
-            }
-
-            var order = await _orderService.GetByIdAsync(orderId.Value);
-            if (order is null
-                || order.UserId != user.Id
-                || order.Status != OrderStatus.Completed
-                || order.Items.All(item => item.ProductId != productId))
-            {
-                TempData["Error"] = L10n.Text(
-                    "只有已完成订单中的商品可以评价。",
-                    "Only products from completed orders can be reviewed.");
-                return RedirectToAction("Details", "Products", new { id = productId });
-            }
+            TempData["Error"] = L10n.Text(
+                "只有已完成订单中的商品可以评价。",
+                "Only products from completed orders can be reviewed.");
+            return RedirectToAction("Details", "Products", new { id = productId });
         }
 
         comment = string.IsNullOrWhiteSpace(comment) ? null : comment.Trim();

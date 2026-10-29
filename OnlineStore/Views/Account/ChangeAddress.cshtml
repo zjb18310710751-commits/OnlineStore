@@ -5,7 +5,7 @@
     var embedded = ViewData["Embedded"] as bool? == true;
 }
 
-<div class="@(embedded ? "p-2 p-md-3" : "container py-4")">
+<div class="@(embedded ? "p-2 p-md-3" : "container py-4 profile-account-page")">
     <div class="row g-4">
         @if (!embedded)
         {
@@ -14,7 +14,7 @@
             </div>
         }
         <div class="@(embedded ? "col-12" : "col-lg-9")">
-            <section class="card shadow-sm profile-section-card" aria-labelledby="addressBookTitle"
+            <section class="card shadow-sm profile-section-card @(embedded ? "" : "profile-account-panel")" aria-labelledby="addressBookTitle"
                      data-has-addresses="@(Model.Addresses.Count > 0 ? "true" : "false")">
                 <div class="card-header bg-white">
                     <div class="profile-section-heading address-section-heading">
@@ -22,13 +22,10 @@
                             <h1 id="addressBookTitle" class="profile-section-title">@Loc["AddressBookTitle"]</h1>
                             <p class="profile-section-subtitle mb-0">@Loc["AddressBookHint"]</p>
                         </div>
-                        @if (!embedded)
-                        {
-                            <button type="button" class="btn btn-primary address-book-primary-action"
-                                    data-address-add>
-                                <i class="bi bi-plus-lg me-2"></i>@Loc["AddAddress"]
-                            </button>
-                        }
+                        <button type="button" class="btn btn-primary address-book-primary-action"
+                                data-address-add>
+                            <i class="bi bi-plus-lg me-2"></i>@Loc["AddAddress"]
+                        </button>
                     </div>
                 </div>
                 <div class="card-body">

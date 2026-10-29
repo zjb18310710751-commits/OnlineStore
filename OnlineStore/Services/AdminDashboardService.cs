@@ -68,7 +68,7 @@ public class AdminDashboardService : IAdminDashboardService
             Trend = trend,
             RecentOrders = orders
                 .OrderByDescending(o => o.CreatedAt)
-                .Take(6)
+                .Take(10)
                 .ToList(),
             TopProducts = topProducts,
             LatestReviews = latestReviews
@@ -122,7 +122,7 @@ public class AdminDashboardService : IAdminDashboardService
             .AsNoTracking()
             .Include(r => r.Product)
             .OrderByDescending(r => r.CreatedAt)
-            .Take(5)
+            .Take(10)
             .ToListAsync();
 
         return reviews

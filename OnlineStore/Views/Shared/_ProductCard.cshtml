@@ -1,4 +1,13 @@
 @model Product
+@{
+    var roundedStars = Model.ReviewCount > 0
+        ? Math.Clamp((int)Math.Round(Model.AverageRating ?? 0, MidpointRounding.AwayFromZero), 1, 5)
+        : 0;
+    var starDisplay = new string('★', roundedStars) + new string('☆', 5 - roundedStars);
+    var reviewCountLabel = L10n.Text(
+        $"{Model.ReviewCount} 条评价",
+        $"{Model.ReviewCount} {(Model.ReviewCount == 1 ? "review" : "reviews")}");
+}
 <div class="col">
     <article class="product-card sf-product-card">
         <a asp-controller="Products" asp-action="Details" asp-route-id="@Model.Id" class="product-thumb">
@@ -12,19 +21,38 @@
             }
         </a>
         <div class="sf-product-info">
-            @if (Model.IsOnSale)
-            {
-                <p class="sf-product-note">@Loc["LimitedTimeDiscount"]</p>
-            }
-            <h3 class="sf-product-title"><a asp-controller="Products" asp-action="Details" asp-route-id="@Model.Id">@L10n.Name(Model)</a></h3>
-            <p class="sf-product-category">@L10n.Name(Model.Categories.FirstOrDefault())</p>
-            <div class="sf-product-price">
-                <span>¥@Model.Price.ToString("F2")</span>
+            <div class="sf-product-title-row">
+                <h3 class="sf-product-title"><a asp-controller="Products" asp-action="Details" asp-route-id="@Model.Id">@L10n.Name(Model)</a></h3>
                 @if (Model.IsOnSale)
                 {
-                    <del>¥@Model.OriginalPrice!.Value.ToString("F2")</del>
-                    <span class="sf-product-discount">@Loc["DiscountPercent", Model.DiscountPercent ?? 0]</span>
+                    <span class="sf-product-note">@Loc["LimitedTimeDiscount"]</span>
                 }
+            </div>
+            <p class="sf-product-category">@L10n.Name(Model.Categories.FirstOrDefault())</p>
+            <div class="sf-product-price-row">
+                <div class="sf-product-price">
+                    <span>¥@Model.Price.ToString("F2")</span>
+                    @if (Model.IsOnSale)
+                    {
+                        <del>¥@Model.OriginalPrice!.Value.ToString("F2")</del>
+                        <span class="sf-product-discount">@Loc["DiscountPercent", Model.DiscountPercent ?? 0]</span>
+                    }
+                </div>
+                <div class="sf-product-rating"
+                     aria-label="@(Model.ReviewCount > 0
+                         ? L10n.Text($"平均 {Model.AverageRating:0.0} 星，{reviewCountLabel}", $"{Model.AverageRating:0.0} out of 5 stars, {reviewCountLabel}")
+                         : L10n.Text("暂无评价", "No reviews yet"))">
+                    <span class="sf-product-rating-stars" aria-hidden="true">@starDisplay</span>
+                    @if (Model.ReviewCount > 0)
+                    {
+                        <strong class="sf-product-rating-value">@Model.AverageRating?.ToString("0.0")</strong>
+                        <span class="sf-product-rating-count">(@Model.ReviewCount)</span>
+                    }
+                    else
+                    {
+                        <span class="sf-product-rating-count">@L10n.Text("暂无评价", "No reviews yet")</span>
+                    }
+                </div>
             </div>
             @if (Model.Stock > 0)
             {

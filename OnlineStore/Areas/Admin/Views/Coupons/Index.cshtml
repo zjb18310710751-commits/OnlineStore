@@ -1,6 +1,7 @@
-@model IReadOnlyList<Coupon>
+@model PagedResult<Coupon>
 @{
     ViewData["Title"] = Loc["CouponManagement"].Value;
+    var pagination = new AdminPaginationViewModel { Action = "Index", Controller = "Coupons", Page = Model.Page, TotalPages = Model.TotalPages };
 }
 
 <div class="coupon-admin-page">
@@ -16,7 +17,7 @@
         </div>
     </div>
 
-    @if (Model.Count == 0)
+    @if (Model.TotalCount == 0)
     {
         <div class="card coupon-admin-empty">
             <i class="bi bi-ticket-perforated"></i>
@@ -42,7 +43,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach (var coupon in Model)
+                        @foreach (var coupon in Model.Items)
                         {
                             var status = !coupon.IsActive
                                 ? Loc["Disabled"].Value
@@ -105,15 +106,26 @@
                                 </td>
                                 <td><span class="coupon-admin-status @statusClass"><i></i>@status</span></td>
                                 <td class="text-end text-nowrap">
-                                    <button type="button" class="btn btn-sm btn-outline-secondary" title="@Loc["BatchGenerate"]"
-                                            data-bs-toggle="modal" data-bs-target="#couponBatchModal"
-                                            data-coupon-batch="@coupon.Id" data-coupon-name="@CouponDisplayName(coupon)">
-                                        <i class="bi bi-collection"></i>
-                                    </button>
-                                    <a asp-action="Edit" asp-route-id="@coupon.Id" class="btn btn-sm btn-outline-primary" title="@Loc["Edit"]"><i class="bi bi-pencil"></i></a>
-                                    <form asp-action="Delete" asp-route-id="@coupon.Id" method="post" class="d-inline" data-confirm="@Loc["ConfirmDeleteCoupon"]" onsubmit="return confirm(this.dataset.confirm);">
-                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="@Loc["Delete"]"><i class="bi bi-trash"></i></button>
-                                    </form>
+                                    <div class="admin-icon-actions">
+                                        <button type="button" class="admin-icon-action" title="@Loc["BatchGenerate"]"
+                                                aria-label="@Loc["BatchGenerate"]"
+                                                data-bs-toggle="modal" data-bs-target="#couponBatchModal"
+                                                data-coupon-batch="@coupon.Id" data-coupon-name="@CouponDisplayName(coupon)">
+                                            <i class="bi bi-copy" aria-hidden="true"></i>
+                                        </button>
+                                        <a asp-action="Edit" asp-route-id="@coupon.Id"
+                                           class="admin-icon-action" title="@Loc["Edit"]" aria-label="@Loc["Edit"]">
+                                            <i class="bi bi-pencil-square" aria-hidden="true"></i>
+                                        </a>
+                                        <form asp-action="Delete" asp-route-id="@coupon.Id" method="post"
+                                              class="d-inline" data-confirm="@Loc["ConfirmDeleteCoupon"]"
+                                              onsubmit="return confirm(this.dataset.confirm);">
+                                            <button type="submit" class="admin-icon-action is-danger"
+                                                    title="@Loc["Delete"]" aria-label="@Loc["Delete"]">
+                                                <i class="bi bi-trash3" aria-hidden="true"></i>
+                                            </button>
+                                        </form>
+                                    </div>
                                 </td>
                             </tr>
                         }
@@ -122,6 +134,7 @@
             </div>
         </div>
     }
+    <partial name="_AdminPagination" model="pagination" />
 </div>
 
 <div class="modal fade coupon-batch-modal" id="couponBatchModal" tabindex="-1" aria-labelledby="couponBatchTitle" aria-hidden="true">

@@ -81,6 +81,18 @@ public class Order
 
     public DateTime? SignedAt { get; set; }
 
+    public DateTime? AutoConfirmAt { get; set; }
+
+    public bool ReceiptConfirmedAutomatically { get; set; }
+
+    [StringLength(500)]
+    public string? ReceiptExceptionReason { get; set; }
+
+    public DateTime? ReceiptExceptionReportedAt { get; set; }
+
+    [StringLength(256)]
+    public string? ReceiptExceptionReportedBy { get; set; }
+
     public DateTime? UserDeletedAt { get; set; }
 
     public DateTime? InventoryRestoredAt { get; set; }

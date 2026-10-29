@@ -7,6 +7,18 @@
     var total = Model.Total;
     var search = Model.Search;
     var categoryId = Model.CategoryId;
+    var pagination = new AdminPaginationViewModel
+    {
+        Action = "Index",
+        Controller = "Products",
+        Page = page,
+        TotalPages = totalPages,
+        RouteValues = new()
+        {
+            ["search"] = search,
+            ["categoryId"] = categoryId?.ToString()
+        }
+    };
 }
 <div class="admin-store-heading">
     <div>
@@ -80,13 +92,32 @@
                             <span class="badge @(p.IsActive ? "bg-success-subtle text-success" : "bg-secondary-subtle text-secondary")">@(p.IsActive ? Loc["Active"].Value : Loc["Inactive"].Value)</span>
                         </td>
                         <td class="text-end text-nowrap">
-                            <a asp-area="Admin" asp-controller="Products" asp-action="Details" asp-route-id="@p.Id" class="btn btn-sm btn-outline-secondary" title="@Loc["View"]"><i class="bi bi-eye"></i></a>
-                            <a asp-area="Admin" asp-controller="Products" asp-action="Edit" asp-route-id="@p.Id" class="btn btn-sm btn-outline-primary" title="@Loc["Edit"]"><i class="bi bi-pencil"></i></a>
-                            <a asp-area="Admin" asp-controller="ProductSkus" asp-action="Index" asp-route-productId="@p.Id" class="btn btn-sm btn-outline-info" title="@Loc["SkuManagement"]"><i class="bi bi-palette"></i></a>
-                            <a asp-area="Admin" asp-controller="ProductSpecs" asp-action="Index" asp-route-productId="@p.Id" class="btn btn-sm btn-outline-info" title="@Loc["SpecManagement"]"><i class="bi bi-list-ul"></i></a>
-                            <form asp-area="Admin" asp-controller="Products" asp-action="Delete" asp-route-id="@p.Id" method="post" class="d-inline" data-confirm="@Loc["ConfirmDeleteProduct"]" onsubmit="return confirm(this.dataset.confirm);">
-                                <button type="submit" class="btn btn-sm btn-outline-danger" title="@Loc["Delete"]"><i class="bi bi-trash"></i></button>
-                            </form>
+                            <div class="admin-icon-actions">
+                                <a asp-area="Admin" asp-controller="Products" asp-action="Details" asp-route-id="@p.Id"
+                                   class="admin-icon-action" title="@Loc["View"]" aria-label="@Loc["View"]">
+                                    <i class="bi bi-eye" aria-hidden="true"></i>
+                                </a>
+                                <a asp-area="Admin" asp-controller="Products" asp-action="Edit" asp-route-id="@p.Id"
+                                   class="admin-icon-action" title="@Loc["Edit"]" aria-label="@Loc["Edit"]">
+                                    <i class="bi bi-pencil-square" aria-hidden="true"></i>
+                                </a>
+                                <a asp-area="Admin" asp-controller="ProductSkus" asp-action="Index" asp-route-productId="@p.Id"
+                                   class="admin-icon-action" title="@Loc["SkuManagement"]" aria-label="@Loc["SkuManagement"]">
+                                    <i class="bi bi-layers" aria-hidden="true"></i>
+                                </a>
+                                <a asp-area="Admin" asp-controller="ProductSpecs" asp-action="Index" asp-route-productId="@p.Id"
+                                   class="admin-icon-action" title="@Loc["SpecManagement"]" aria-label="@Loc["SpecManagement"]">
+                                    <i class="bi bi-sliders" aria-hidden="true"></i>
+                                </a>
+                                <form asp-area="Admin" asp-controller="Products" asp-action="Delete" asp-route-id="@p.Id"
+                                      method="post" class="d-inline" data-confirm="@Loc["ConfirmDeleteProduct"]"
+                                      onsubmit="return confirm(this.dataset.confirm);">
+                                    <button type="submit" class="admin-icon-action is-danger"
+                                            title="@Loc["Delete"]" aria-label="@Loc["Delete"]">
+                                        <i class="bi bi-trash3" aria-hidden="true"></i>
+                                    </button>
+                                </form>
+                            </div>
                         </td>
                     </tr>
                 }
@@ -95,22 +126,4 @@
     </div>
 </div>
 
-@if (totalPages > 1)
-{
-    <nav class="mt-3">
-        <ul class="pagination justify-content-center">
-            <li class="page-item @(page <= 1 ? "disabled" : "")">
-                <a class="page-link" asp-area="Admin" asp-controller="Products" asp-action="Index" asp-route-search="@search" asp-route-categoryId="@categoryId" asp-route-page="@(page - 1)">@Loc["Previous"]</a>
-            </li>
-            @for (var i = 1; i <= totalPages; i++)
-            {
-                <li class="page-item @(i == page ? "active" : "")">
-                    <a class="page-link" asp-area="Admin" asp-controller="Products" asp-action="Index" asp-route-search="@search" asp-route-categoryId="@categoryId" asp-route-page="@i">@i</a>
-                </li>
-            }
-            <li class="page-item @(page >= totalPages ? "disabled" : "")">
-                <a class="page-link" asp-area="Admin" asp-controller="Products" asp-action="Index" asp-route-search="@search" asp-route-categoryId="@categoryId" asp-route-page="@(page + 1)">@Loc["Next"]</a>
-            </li>
-        </ul>
-    </nav>
-}
+<partial name="_AdminPagination" model="pagination" />

@@ -40,7 +40,7 @@ public sealed class StorefrontHeaderService : IStorefrontHeaderService
         }
 
         var favoriteCount = await _favoriteService.CountAsync(currentUser.Id);
-        var deliveredItemCount = await _orderService.GetDeliveredItemCountAsync(currentUser.Id);
+        var activeItemCount = await _orderService.GetActiveItemCountAsync(currentUser.Id);
         var availableCouponCount = (await _couponService.GetCustomerCouponsAsync(currentUser.Id))
             .Count(item => item.Status == CouponWalletStatus.Available);
 
@@ -49,7 +49,7 @@ public sealed class StorefrontHeaderService : IStorefrontHeaderService
             Categories = categories,
             CurrentUser = currentUser,
             FavoriteCount = favoriteCount,
-            DeliveredItemCount = deliveredItemCount,
+            ActiveItemCount = activeItemCount,
             AvailableCouponCount = availableCouponCount
         };
     }

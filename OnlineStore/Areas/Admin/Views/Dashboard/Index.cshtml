@@ -108,7 +108,7 @@
                 }
             </div>
         </section>
-        <section class="overview-panel overview-orders-panel" aria-labelledby="recent-orders-heading">
+        <section class="overview-panel overview-orders-panel overview-feed-panel" aria-labelledby="recent-orders-heading">
             <div class="overview-panel-head"><div><h2 id="recent-orders-heading">@Loc["RecentOrders"]</h2><p>@L10n.Text("最新订单与处理状态", "Latest activity and order status")</p></div><a asp-area="Admin" asp-controller="Orders" asp-action="Index">@Loc["ViewAll"] <i class="bi bi-arrow-up-right" aria-hidden="true"></i></a></div>
             <div class="overview-panel-body overview-orders-body">
                 @if (Model.RecentOrders.Count == 0)
@@ -131,7 +131,7 @@
                 }
             </div>
         </section>
-        <section class="overview-panel" aria-labelledby="latest-reviews-heading">
+        <section class="overview-panel overview-reviews-panel overview-feed-panel" aria-labelledby="latest-reviews-heading">
             <div class="overview-panel-head"><div><h2 id="latest-reviews-heading">@Loc["LatestReviews"]</h2><p>@L10n.Text("倾听顾客的真实反馈", "The latest from your customers")</p></div><a asp-area="Admin" asp-controller="Reviews" asp-action="Index">@Loc["ViewAll"] <i class="bi bi-arrow-up-right" aria-hidden="true"></i></a></div>
             <div class="overview-panel-body">
                 @if (Model.LatestReviews.Count == 0)

@@ -1,0 +1,26 @@
+@model AdminPaginationViewModel
+@if (Model.TotalPages > 1)
+{
+    <nav class="admin-pagination" aria-label="@L10n.Text("列表分页", "List pages")">
+        @if (Model.Page > 1)
+        {
+            <a class="admin-pagination-link is-direction"
+               asp-action="@Model.Action" asp-controller="@Model.Controller"
+               asp-all-route-data="@Model.RouteValues" asp-route-page="@(Model.Page - 1)">@Loc["Previous"]</a>
+        }
+        @for (var page = 1; page <= Model.TotalPages; page++)
+        {
+            <a class="admin-pagination-link @(page == Model.Page ? "is-current" : "")"
+               asp-action="@Model.Action" asp-controller="@Model.Controller"
+               asp-all-route-data="@Model.RouteValues" asp-route-page="@(page)"
+               aria-label="@L10n.Text($"第 {page} 页", $"Page {page}")"
+               aria-current="@(page == Model.Page ? "page" : null)">@(page)</a>
+        }
+        @if (Model.Page < Model.TotalPages)
+        {
+            <a class="admin-pagination-link is-direction"
+               asp-action="@Model.Action" asp-controller="@Model.Controller"
+               asp-all-route-data="@Model.RouteValues" asp-route-page="@(Model.Page + 1)">@Loc["Next"]</a>
+        }
+    </nav>
+}

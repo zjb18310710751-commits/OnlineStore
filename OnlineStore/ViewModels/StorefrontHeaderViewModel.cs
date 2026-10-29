@@ -10,7 +10,7 @@ public sealed class StorefrontHeaderViewModel
 
     public int FavoriteCount { get; init; }
 
-    public int DeliveredItemCount { get; init; }
+    public int ActiveItemCount { get; init; }
 
     public int AvailableCouponCount { get; init; }
 }

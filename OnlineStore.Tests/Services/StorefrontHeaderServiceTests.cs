@@ -30,7 +30,7 @@ public class StorefrontHeaderServiceTests
         Assert.Equal("Books", Assert.Single(header.Categories).Name);
         Assert.Null(header.CurrentUser);
         Assert.Equal(0, header.FavoriteCount);
-        Assert.Equal(0, header.DeliveredItemCount);
+        Assert.Equal(0, header.ActiveItemCount);
         Assert.Equal(0, header.AvailableCouponCount);
     }
 }

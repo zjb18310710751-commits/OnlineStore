@@ -700,12 +700,40 @@
     text-align: left;
 }
 
+.member-order-confirmation {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px 14px;
+    margin-top: 14px;
+    padding: 12px 14px;
+    border: 1px solid var(--sf-line, #e3e3e3);
+    border-radius: 8px;
+    background: #fafafa;
+    color: var(--sf-muted, #646464);
+    font-size: 12px;
+}
+
+.member-order-confirmation strong {
+    color: var(--sf-ink, #171717);
+    font-weight: 600;
+}
+
+.member-order-confirmation .btn {
+    margin-left: auto;
+}
+
 .checkout-coupon-clear:hover {
     border-bottom-color: currentColor;
     color: #111;
 }
 
 @media (max-width: 767px) {
+    .member-order-confirmation .btn {
+        width: 100%;
+        margin-left: 0;
+    }
+
     .coupon-admin-page .coupon-admin-heading {
         align-items: flex-start;
         flex-direction: column;

@@ -1,4 +1,5 @@
 using OnlineStore.Models;
+using OnlineStore.ViewModels;
 
 namespace OnlineStore.Services;
 
@@ -7,8 +8,14 @@ public interface IOrderService
     Task<Order?> GetByIdAsync(int id);
 
     Task<IReadOnlyList<Order>> GetByUserAsync(string userId);
+    Task<IReadOnlyList<CustomerOrderUpdateViewModel>> GetCustomerOrderUpdatesAsync(
+        string userId,
+        IReadOnlyCollection<int> orderIds);
+    Task<IReadOnlyDictionary<int, OrderItemPreviewViewModel>> GetOrderItemPreviewsAsync(IEnumerable<OrderItem> items);
 
     Task<IReadOnlyList<Order>> GetAllAsync();
+    Task<PagedResult<Order>> GetAdminOrdersPagedAsync(int page, int pageSize);
+    Task<IReadOnlyList<Order>> GetAdminOrderUpdatesAsync(IReadOnlyCollection<int> orderIds);
 
     Task<Order> CreateAsync(Order order);
 
@@ -18,21 +25,36 @@ public interface IOrderService
 
     Task<bool> ShipAsync(int id, string? carrier, string? trackingNumber);
 
-    Task<bool> CompleteAsync(int id);
-
     Task<OrderTrackingView?> GetTrackingAsync(int id);
 
     Task<bool> ConfirmReceiptAsync(int id, string userId);
 
-    Task<int> GetDeliveredItemCountAsync(string userId);
+    Task<bool> ReportReceiptExceptionAsync(int id, string reason, string reportedBy);
+
+    Task<int> ProcessPendingOrderStatesAsync();
+
+    Task<int> GetActiveItemCountAsync(string userId);
 
     Task<bool> DeleteForUserAsync(int id, string userId);
 
     Task<AfterSalesRequest> CreateAfterSalesAsync(int orderId, string userId, string type, string reason);
 
     Task<IReadOnlyList<AfterSalesRequest>> GetAfterSalesAllAsync();
+    Task<PagedResult<AfterSalesRequest>> GetAfterSalesPagedAsync(int page, int pageSize);
+    Task<IReadOnlyList<AfterSalesUpdateViewModel>> GetAfterSalesUpdatesAsync(IReadOnlyCollection<int> ids);
+    Task<int> CountOpenAfterSalesAsync();
 
     Task<bool> ReviewAfterSalesAsync(int id, bool approved, string? note);
+
+    Task<bool> ResolveTransitCancellationAsync(int id, bool intercepted, string? note);
+
+    Task<bool> SubmitReturnShipmentAsync(
+        int id,
+        string userId,
+        string? carrier,
+        string? trackingNumber);
+
+    Task<OrderTrackingView?> GetReturnTrackingAsync(int id, string? userId = null);
 
     Task<bool> MarkAfterSalesReceivedAsync(int id);
 

@@ -249,6 +249,12 @@ public class HeroSlidesControllerTests
         public bool FailWrites { get; init; }
         public Task<IReadOnlyList<HeroSlide>> GetAllAsync(bool activeOnly = false) =>
             Task.FromResult<IReadOnlyList<HeroSlide>>(Existing is null ? Array.Empty<HeroSlide>() : new[] { Existing });
+        public Task<PagedResult<HeroSlide>> GetPagedAsync(int page, int pageSize)
+        {
+            var items = Existing is null ? Array.Empty<HeroSlide>() : new[] { Existing };
+            return Task.FromResult(new PagedResult<HeroSlide>(items, page, pageSize, items.Length));
+        }
+        public Task<int> CountActiveAsync() => Task.FromResult(Existing?.IsActive == true ? 1 : 0);
         public Task<HeroSlide?> GetByIdAsync(int id) => Task.FromResult(Existing?.Id == id ? Existing : null);
         public Task<HeroSlide> CreateAsync(HeroSlide slide)
         {

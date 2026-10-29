@@ -190,6 +190,8 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
             entity.Property(o => o.OrderNotes).HasMaxLength(500);
             entity.Property(o => o.Carrier).HasMaxLength(50);
             entity.Property(o => o.TrackingNumber).HasMaxLength(50);
+            entity.Property(o => o.ReceiptExceptionReason).HasMaxLength(500);
+            entity.Property(o => o.ReceiptExceptionReportedBy).HasMaxLength(256);
             entity.Property(o => o.ShippingOrigin).HasMaxLength(200);
             entity.Property(o => o.ShippingOriginEn).HasMaxLength(200);
             entity.Property(o => o.ShippingFeeText).HasMaxLength(100);
@@ -222,6 +224,8 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
             entity.Property(a => a.Status).HasMaxLength(20);
             entity.Property(a => a.Reason).HasMaxLength(1000);
             entity.Property(a => a.AdminNote).HasMaxLength(500);
+            entity.Property(a => a.ReturnCarrier).HasMaxLength(50);
+            entity.Property(a => a.ReturnTrackingNumber).HasMaxLength(50);
         });
 
         builder.Entity<OrderItem>(entity =>

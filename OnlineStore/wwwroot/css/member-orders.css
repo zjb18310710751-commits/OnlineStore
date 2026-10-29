@@ -1,0 +1,273 @@
+.storefront .member-orders-page {
+    --order-thumb-size: 112px;
+    --order-product-title: 20px;
+    --order-body-size: 14px;
+    --order-meta-size: 13px;
+    --order-item-total-size: 21px;
+    --order-total-size: 23px;
+    --order-gap: 20px;
+    --order-card-padding: 24px;
+    --order-card-radius: 14px;
+}
+
+.storefront .member-orders-card {
+    overflow: visible;
+    border: 0;
+    background: transparent;
+}
+
+.storefront .member-orders-card > .list-group {
+    gap: var(--order-gap);
+}
+
+.storefront .member-orders-page .member-order-item {
+    min-width: 0;
+    padding: var(--order-card-padding) !important;
+    border: 1px solid var(--sf-line) !important;
+    border-radius: var(--order-card-radius) !important;
+    background: #fff;
+}
+
+.member-order-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: var(--order-gap);
+}
+
+.member-order-heading > div {
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+.storefront .member-orders-page .member-order-status {
+    flex-shrink: 0;
+    padding: 8px 12px;
+    font-size: var(--order-body-size);
+    line-height: 1.3;
+}
+
+.storefront .member-orders-page .member-order-lines {
+    margin-top: var(--order-gap);
+}
+
+.storefront .member-orders-page .member-order-line {
+    padding-block: var(--order-gap);
+    border-top: 1px solid var(--sf-line);
+    font-size: var(--order-body-size);
+}
+
+.member-order-product {
+    display: grid;
+    grid-template-columns: var(--order-thumb-size) minmax(0, 1fr) auto;
+    align-items: center;
+    gap: var(--order-gap);
+}
+
+.member-order-product-image {
+    display: grid;
+    place-items: center;
+    width: var(--order-thumb-size);
+    height: var(--order-thumb-size);
+    overflow: hidden;
+    border-radius: 10px;
+    background: var(--sf-surface);
+}
+
+.member-order-product-image img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+
+.member-order-product-image [hidden] {
+    display: none !important;
+}
+
+.member-order-image-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 8px;
+    color: var(--sf-muted);
+    font-size: var(--order-meta-size);
+    text-align: center;
+}
+
+.member-order-image-empty i {
+    font-size: 25px;
+}
+
+.member-order-product-info {
+    min-width: 0;
+}
+
+.storefront .member-order-product-name {
+    margin: 0 0 10px;
+    font-size: var(--order-product-title);
+    font-weight: 700;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+}
+
+.member-order-product-name a {
+    text-decoration: none;
+    text-underline-offset: 4px;
+}
+
+.member-order-product-name a:hover {
+    text-decoration: underline;
+}
+
+.member-order-product-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 16px;
+    margin: 0 0 8px;
+    color: var(--sf-muted);
+    font-size: var(--order-body-size);
+    overflow-wrap: anywhere;
+}
+
+.member-order-product-quantity {
+    margin: 0;
+    color: var(--sf-muted);
+    font-size: var(--order-body-size);
+}
+
+.member-order-product-quantity strong {
+    margin-left: 6px;
+    color: var(--sf-ink);
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.member-order-product-amount {
+    align-self: center;
+    text-align: right;
+    white-space: nowrap;
+}
+
+.member-order-product-amount > span {
+    display: block;
+    margin-bottom: 4px;
+    color: var(--sf-muted);
+    font-size: var(--order-meta-size);
+}
+
+.member-order-product-amount strong {
+    font-size: var(--order-item-total-size);
+    font-weight: 650;
+}
+
+.member-order-footer {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px var(--order-gap);
+    padding-top: var(--order-gap);
+    border-top: 1px solid var(--sf-line);
+}
+
+.member-order-after-sales {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: var(--order-gap);
+}
+
+.member-order-after-sales .badge {
+    font-size: var(--order-meta-size);
+}
+
+.member-order-after-sales .small.d-block {
+    width: 100%;
+}
+
+.storefront .member-orders-page .member-order-total {
+    margin-left: auto;
+    font-size: var(--order-total-size);
+    white-space: nowrap;
+}
+
+.member-orders-page .member-order-actions--stacked {
+    display: flex !important;
+    flex-wrap: wrap;
+}
+
+.member-orders-page .member-order-actions--stacked > form,
+.member-orders-page .member-order-actions--stacked > .btn {
+    width: auto;
+}
+
+.member-orders-page .member-order-actions .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: 9px 16px;
+    font-size: var(--order-body-size);
+}
+
+.member-orders-page .member-order-my-review {
+    margin-top: 16px;
+    font-size: var(--order-body-size);
+}
+
+.member-orders-page .member-order-my-review-head strong,
+.member-orders-page .member-order-review-image {
+    font-size: var(--order-meta-size);
+}
+
+.member-orders-page .member-order-my-review-head time {
+    font-size: 12px;
+}
+
+@media (max-width: 767px) {
+    .storefront .member-orders-page {
+        --order-thumb-size: 88px;
+        --order-product-title: 18px;
+        --order-item-total-size: 19px;
+        --order-total-size: 21px;
+        --order-gap: 14px;
+        --order-card-padding: 16px;
+    }
+
+    .member-order-heading {
+        gap: 10px;
+    }
+
+    .member-order-product {
+        grid-template-columns: var(--order-thumb-size) minmax(0, 1fr);
+        align-items: start;
+        row-gap: 8px;
+    }
+
+    .member-order-product-image {
+        grid-row: span 2;
+    }
+
+    .member-order-product-amount {
+        grid-column: 2;
+        text-align: left;
+    }
+
+    .member-order-product-amount > span {
+        display: inline;
+        margin-right: 8px;
+    }
+
+    .member-order-footer {
+        flex-direction: column-reverse;
+        align-items: stretch;
+    }
+
+    .storefront .member-orders-page .member-order-total {
+        align-self: flex-end;
+    }
+}

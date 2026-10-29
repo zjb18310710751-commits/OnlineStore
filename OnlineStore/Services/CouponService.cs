@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
 using OnlineStore.Data;
 using OnlineStore.Models;
+using OnlineStore.ViewModels;
 
 namespace OnlineStore.Services;
 
@@ -25,6 +26,19 @@ public class CouponService : ICouponService
             .Where(c => !c.IsDeleted)
             .OrderByDescending(c => c.CreatedAt)
             .ToListAsync();
+
+    public async Task<PagedResult<Coupon>> GetPagedAsync(int page, int pageSize)
+    {
+        var query = CouponQuery()
+            .AsNoTracking()
+            .Where(coupon => !coupon.IsDeleted)
+            .OrderByDescending(coupon => coupon.CreatedAt);
+        var total = await query.CountAsync();
+        var totalPages = Math.Max(1, (int)Math.Ceiling(total / (double)pageSize));
+        page = Math.Clamp(page, 1, totalPages);
+        var items = await query.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
+        return new PagedResult<Coupon>(items, page, pageSize, total);
+    }
 
     public Task<Coupon?> GetByIdAsync(int id) =>
         CouponQuery().FirstOrDefaultAsync(c => c.Id == id && !c.IsDeleted);

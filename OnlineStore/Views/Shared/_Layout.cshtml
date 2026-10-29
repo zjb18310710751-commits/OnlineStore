@@ -4,7 +4,7 @@
     var categories = header.Categories;
     var currentUser = header.CurrentUser;
     var favoriteCount = header.FavoriteCount;
-    var deliveredItemCount = header.DeliveredItemCount;
+    var activeItemCount = header.ActiveItemCount;
     var availableCouponCount = header.AvailableCouponCount;
     var isAdmin = User.IsInRole("Admin");
     var isZh = CultureInfo.CurrentUICulture.Name.StartsWith("zh", StringComparison.OrdinalIgnoreCase);
@@ -92,12 +92,15 @@
                                 {
                                     <li><a class="dropdown-item" asp-controller="Account" asp-action="Profile">@Loc["Profile"]</a></li>
                                     <li>
-                                        <a class="dropdown-item sf-account-link" asp-controller="Orders" asp-action="MyOrders">
+                                        <a class="dropdown-item sf-account-link"
+                                           asp-controller="Orders"
+                                           asp-action="MyOrders"
+                                           data-active-item-count-url="@(currentUser is null ? null : Url.Action("ActiveItemCount", "Orders"))">
                                             <span>@Loc["MyOrders"]</span>
-                                            @if (deliveredItemCount > 0)
-                                            {
-                                                <span class="sf-count-badge" aria-label="@L10n.Text($"{deliveredItemCount} 件商品已送达", $"{deliveredItemCount} delivered items")">@deliveredItemCount</span>
-                                            }
+                                            <span class="sf-count-badge"
+                                                  data-active-item-count-badge
+                                                  hidden="@(activeItemCount == 0)"
+                                                  aria-label="@L10n.Text($"{activeItemCount} 件进行中商品", $"{activeItemCount} active {(activeItemCount == 1 ? "item" : "items")}")">@activeItemCount</span>
                                         </a>
                                     </li>
                                 }
@@ -165,12 +168,13 @@
 
                 <div class="sf-footer-grid">
                     <div>
-                        <h2>@Loc["ShopByCategory"]</h2>
+                        <h2>@L10n.Text("选购", "Shop")</h2>
                         <ul>
                             @foreach (var category in categories)
                             {
                                 <li><a asp-controller="Products" asp-action="Index" asp-route-categoryId="@category.Id">@L10n.Name(category)</a></li>
                             }
+                            <li><a asp-controller="Products" asp-action="Index">@L10n.Text("全部商品", "All products")</a></li>
                         </ul>
                     </div>
                     <div>
@@ -194,6 +198,12 @@
                             <li><a asp-controller="Products" asp-action="Index">@L10n.Text("继续选购", "Keep shopping")</a></li>
                         </ul>
                     </div>
+                    <div class="sf-footer-brand">
+                        <a class="sf-wordmark" asp-controller="Home" asp-action="Index" aria-label="ZHY · @Loc["Home"]">ZHY.</a>
+                        <h2>@L10n.Text("为日常，选更好的。", "A little better. Every day.")</h2>
+                        <p>@L10n.Text("从数码、服饰到家居与户外，把值得长期使用的好物带到生活里。", "Useful pieces for digital life, style, home and the outdoors — chosen to last.")</p>
+                        <a class="sf-footer-shop-link" asp-controller="Products" asp-action="Index">@L10n.Text("浏览全部商品", "Browse all products") <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
+                    </div>
                 </div>
 
                 <div class="sf-footer-service" aria-label="@L10n.Text("购物服务", "Shopping services")">
@@ -211,6 +221,8 @@
     <partial name="~/Views/Shared/_ConfirmDialog.cshtml" />
     <script src="~/lib/bootstrap/js/bootstrap.bundle.min.js" asp-append-version="true"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/order-count-badge.js" asp-append-version="true"></script>
+    <script src="~/js/validation-messages.js" asp-append-version="true"></script>
     <script src="~/js/ui-feedback.js" asp-append-version="true"></script>
     <script src="~/js/confirm-dialog.js" asp-append-version="true"></script>
     <script src="~/js/catalog.js" asp-append-version="true"></script>

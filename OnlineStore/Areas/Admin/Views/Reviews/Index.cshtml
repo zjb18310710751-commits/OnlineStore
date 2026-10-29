@@ -1,8 +1,15 @@
-@model IReadOnlyList<Review>
+@model PagedResult<Review>
 @{
     ViewData["Title"] = Loc["ReviewManagement"].Value;
+    var pagination = new AdminPaginationViewModel { Action = "Index", Controller = "Reviews", Page = Model.Page, TotalPages = Model.TotalPages };
 }
-<h1 class="h4 mb-3">@Loc["ReviewManagement"] <small class="text-muted fs-6">@Loc["TotalItems", Model.Count]</small></h1>
+<div class="admin-store-heading">
+    <div>
+        <p class="admin-store-eyebrow">@L10n.Text("买家反馈", "Customer voice")</p>
+        <h1>@Loc["ReviewManagement"] <small>@Loc["TotalItems", Model.TotalCount]</small></h1>
+        <p class="admin-store-intro">@L10n.Text("查看并审核商品评价，维护商店内容质量。", "Review product feedback and keep storefront content accurate.")</p>
+    </div>
+</div>
 <div class="card shadow-sm">
     <div class="table-responsive">
         <table class="table table-hover align-middle mb-0">
@@ -17,11 +24,11 @@
                 </tr>
             </thead>
             <tbody>
-                @if (Model.Count == 0)
+                @if (Model.TotalCount == 0)
                 {
                     <tr><td colspan="6" class="text-center text-muted py-4">@Loc["NoReviews"]</td></tr>
                 }
-                @foreach (var r in Model)
+                @foreach (var r in Model.Items)
                 {
                     var comment = L10n.Text(r.Comment ?? "", r.CommentEn);
                     <tr>
@@ -31,9 +38,16 @@
                         <td class="text-muted">@(comment.Length > 30 ? comment[..30] + "…" : comment)</td>
                         <td class="text-muted small">@r.CreatedAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</td>
                         <td class="text-end">
-                            <form asp-action="Delete" asp-route-id="@r.Id" method="post" class="d-inline" data-confirm="@Loc["ConfirmDeleteReview"]" onsubmit="return confirm(this.dataset.confirm);">
-                                <button type="submit" class="btn btn-sm btn-outline-danger" title="@Loc["Delete"]"><i class="bi bi-trash"></i></button>
-                            </form>
+                            <div class="admin-icon-actions">
+                                <form asp-action="Delete" asp-route-id="@r.Id" method="post"
+                                      class="d-inline" data-confirm="@Loc["ConfirmDeleteReview"]"
+                                      onsubmit="return confirm(this.dataset.confirm);">
+                                    <button type="submit" class="admin-icon-action is-danger"
+                                            title="@Loc["Delete"]" aria-label="@Loc["Delete"]">
+                                        <i class="bi bi-trash3" aria-hidden="true"></i>
+                                    </button>
+                                </form>
+                            </div>
                         </td>
                     </tr>
                 }
@@ -41,3 +55,4 @@
         </table>
     </div>
 </div>
+<partial name="_AdminPagination" model="pagination" />

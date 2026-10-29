@@ -1,9 +1,11 @@
 @model Product
 @{
-    var reviews = Model.Reviews.OrderByDescending(r => r.CreatedAt).ToList();
-    var average = reviews.Count > 0 ? Math.Round(reviews.Average(r => r.Rating), 1) : 0;
+    var summary = ViewData["ReviewSummary"] as ReviewSummary ?? new ReviewSummary(0, 0, 0, new Dictionary<int, int>());
+    var reviews = ViewData["LatestReviews"] as IReadOnlyList<Review> ?? Array.Empty<Review>();
+    var canReview = ViewData["CanReview"] as bool? == true;
+    var reviewOrderId = ViewData["ReviewOrderId"] as int?;
+    var average = summary.Average;
     var averageFill = (Math.Clamp(average, 0, 5) * 20).ToString("0.#", System.Globalization.CultureInfo.InvariantCulture);
-    var photoCount = reviews.Count(r => !string.IsNullOrWhiteSpace(r.ImageUrl));
     var returnUrl = $"{Context.Request.Path}{Context.Request.QueryString}#write-review";
     var ratingLabel = L10n.Text("{0} 分，满分 5 分", "{0} out of 5 stars");
 }
@@ -13,62 +15,63 @@
             <header class="sf-reviews-heading">
                 <div>
                     <p class="sf-reviews-eyebrow">@L10n.Text("来自日常的真实感受", "THE EVERYDAY PERSPECTIVE")</p>
-                    <h2 id="product-reviews-title">@Loc["Reviews"]<span class="sf-reviews-total">(@reviews.Count)</span></h2>
+                    <h2 id="product-reviews-title">@Loc["Reviews"]<span class="sf-reviews-total">(@summary.TotalCount)</span></h2>
                 </div>
                 <p>@L10n.Text("看看大家怎么说，分享你的使用体验。", "Read their experience. Share your own.")</p>
             </header>
             <aside class="sf-reviews-overview" aria-label="@L10n.Text("评分概览", "Rating overview")">
                 <div class="sf-review-score">
-                    <span class="sf-review-score-value">@(reviews.Count > 0 ? average.ToString("0.0") : "—")</span>
+                    <span class="sf-review-score-value">@(summary.TotalCount > 0 ? average.ToString("0.0") : "—")</span>
                     <span class="sf-review-score-scale">/ 5</span>
                 </div>
-                <div class="sf-review-stars" role="img" aria-label="@(reviews.Count > 0 ? string.Format(ratingLabel, average.ToString("0.0")) : L10n.Text("暂无评分", "No ratings yet"))">
+                <div class="sf-review-stars" role="img" aria-label="@(summary.TotalCount > 0 ? string.Format(ratingLabel, average.ToString("0.0")) : L10n.Text("暂无评分", "No ratings yet"))">
                     <span class="sf-review-average-stars" style="--review-rating-fill: @(averageFill)%;" aria-hidden="true"><span class="sf-review-stars-empty">★★★★★</span><span class="sf-review-average-stars-fill">★★★★★</span></span>
                 </div>
-                <p class="sf-review-count">@L10n.Text($"基于 {reviews.Count} 条评价", $"Based on {reviews.Count} {(reviews.Count == 1 ? "review" : "reviews")}")</p>
+                <p class="sf-review-count">@L10n.Text($"基于 {summary.TotalCount} 条评价", $"Based on {summary.TotalCount} {(summary.TotalCount == 1 ? "review" : "reviews")}")</p>
                 <div class="sf-review-distribution">
                     @for (var star = 5; star >= 1; star--)
                     {
-                        var count = reviews.Count(r => r.Rating == star);
+                        var count = summary.RatingCounts.GetValueOrDefault(star);
                         <div class="sf-review-distribution-row">
                             <span aria-hidden="true">@star <span class="sf-review-distribution-star">★</span></span>
-                            <progress value="@count" max="@Math.Max(reviews.Count, 1)" aria-label="@L10n.Text($"{star} 星：{count} 条评价", $"{star} stars: {count} reviews")">@count</progress>
+                            <progress value="@count" max="@Math.Max(summary.TotalCount, 1)" aria-label="@L10n.Text($"{star} 星：{count} 条评价", $"{star} stars: {count} reviews")">@count</progress>
                             <span class="sf-review-distribution-count" aria-hidden="true">@count</span>
                         </div>
                     }
                 </div>
-                <a class="sf-button sf-review-write-link" href="#write-review">@L10n.Text("写下评价", "Write a review")</a>
+                @if (canReview && reviewOrderId.HasValue)
+                {
+                    <a class="sf-button sf-review-write-link" href="#write-review">@L10n.Text("写下评价", "Write a review")</a>
+                }
+                else if (User.Identity?.IsAuthenticated != true)
+                {
+                    <a class="sf-button sf-review-write-link" asp-controller="Account" asp-action="Login" asp-route-returnUrl="@returnUrl">@L10n.Text("登录并评价", "Sign in to review")</a>
+                }
+                else
+                {
+                    <p class="sf-review-purchase-note">@L10n.Text("购买并完成订单后才可以评价。", "You can review this product after a completed purchase.")</p>
+                }
+                @if (summary.TotalCount > 0)
+                {
+                    <a class="sf-review-all-link"
+                       asp-controller="Products" asp-action="Reviews" asp-route-id="@Model.Id"
+                       data-review-archive-open aria-haspopup="dialog" aria-controls="allReviewsDialog">
+                        @L10n.Text("全部评价", "All reviews") <span>(@summary.TotalCount)</span>
+                    </a>
+                }
             </aside>
         </div>
         <div class="sf-reviews-content">
             @if (reviews.Count > 0)
             {
-                <div class="sf-review-toolbar" data-review-tools hidden>
-                    <div class="sf-review-filters" aria-label="@L10n.Text("筛选评价", "Filter reviews")">
-                        <button type="button" class="sf-review-filter" data-review-filter="all" aria-pressed="true">@L10n.Text("全部评价", "All reviews")</button>
-                        @if (photoCount > 0)
-                        {
-                            <button type="button" class="sf-review-filter" data-review-filter="photos" aria-pressed="false">@L10n.Text($"有图 ({photoCount})", $"With photos ({photoCount})")</button>
-                        }
-                    </div>
-                    <div class="sf-review-sort">
-                        <label for="review-sort">@L10n.Text("排序", "Sort")</label>
-                        <select id="review-sort" data-review-sort>
-                            <option value="newest">@L10n.Text("最新发布", "Most recent")</option>
-                            <option value="highest">@L10n.Text("评分从高到低", "Highest rating")</option>
-                            <option value="lowest">@L10n.Text("评分从低到高", "Lowest rating")</option>
-                        </select>
-                    </div>
-                </div>
-                <p class="visually-hidden" data-review-status role="status" data-count-template="@L10n.Text("显示 {0} 条评价", "Showing {0} reviews")"></p>
-                <div class="sf-review-list" data-review-list>
+                <div class="sf-review-list">
                     @foreach (var review in reviews)
                     {
                         var name = L10n.Text(review.UserName, review.UserNameEn);
                         var initial = string.IsNullOrWhiteSpace(name) ? "?" : System.Globalization.StringInfo.GetNextTextElement(name.Trim()).ToUpperInvariant();
                         var comment = L10n.Text(review.Comment ?? string.Empty, review.CommentEn);
                         var photoLabel = L10n.Text($"查看 {name} 的评价图片", $"View review photo from {name}");
-                        <article class="sf-review-row" data-review-row data-rating="@review.Rating" data-has-photo="@(!string.IsNullOrWhiteSpace(review.ImageUrl) ? "true" : "false")">
+                        <article class="sf-review-row">
                             <header class="sf-review-row-header">
                                 <div class="sf-review-person">
                                     <span class="sf-review-avatar" aria-hidden="true">@initial</span>
@@ -87,7 +90,6 @@
                             {
                                 <a class="sf-review-photo" href="@review.ImageUrl" data-review-photo aria-label="@photoLabel">
                                     <img src="@review.ImageUrl" alt="@photoLabel" loading="lazy" width="104" height="104" />
-                                    <span class="sf-review-photo-icon" aria-hidden="true"><i class="bi bi-arrows-angle-expand"></i></span>
                                 </a>
                             }
                         </article>
@@ -102,17 +104,14 @@
                     <p>@L10n.Text("你的使用体验，可以帮助更多人找到适合自己的选择。", "Your everyday experience can help someone find their fit.")</p>
                 </div>
             }
-            <details class="sf-review-compose" id="write-review">
-                <summary><span>@L10n.Text("分享你的体验", "Share your experience")</span><span class="sf-review-compose-icon" aria-hidden="true">+</span></summary>
-                <div class="sf-review-compose-body">
-                    @if (User.Identity?.IsAuthenticated == true)
-                    {
+            @if (canReview && reviewOrderId.HasValue)
+            {
+                <details class="sf-review-compose" id="write-review">
+                    <summary><span>@L10n.Text("分享你的体验", "Share your experience")</span><span class="sf-review-compose-icon" aria-hidden="true">+</span></summary>
+                    <div class="sf-review-compose-body">
                         <form asp-controller="Reviews" asp-action="Create" method="post" enctype="multipart/form-data" class="sf-review-form" data-review-form>
                             <input type="hidden" name="productId" value="@Model.Id" />
-                            @if (int.TryParse(Context.Request.Query["orderId"], out var reviewOrderId))
-                            {
-                                <input type="hidden" name="orderId" value="@reviewOrderId" />
-                            }
+                            <input type="hidden" name="orderId" value="@reviewOrderId" />
                             <fieldset class="sf-review-rating">
                                 <legend>@Loc["YourRating"]</legend>
                                 <div class="sf-review-rating-options">
@@ -149,23 +148,29 @@
                                 <button type="submit" class="sf-button">@L10n.Text("发布评价", "Submit review")</button>
                             </div>
                         </form>
-                    }
-                    else
-                    {
-                        <div class="sf-review-login">
-                            <p>@L10n.Text("登录后即可评价，分享你的真实使用感受。", "Sign in to leave a review and share your experience.")</p>
-                            <a asp-controller="Account" asp-action="Login" asp-route-returnUrl="@returnUrl" class="sf-button">@L10n.Text("登录并评价", "Sign in to review")</a>
-                        </div>
-                    }
-                </div>
-            </details>
+                    </div>
+                </details>
+            }
         </div>
     </div>
-    @if (photoCount > 0)
-    {
-        <dialog class="sf-review-dialog" data-review-dialog aria-label="@L10n.Text("评价图片", "Review photo")">
-            <button type="button" class="sf-review-dialog-close" data-review-dialog-close autofocus><span>@L10n.Text("关闭", "Close")</span><span aria-hidden="true">×</span></button>
-            <img alt="" data-review-dialog-image />
-        </dialog>
-    }
+    <dialog class="sf-review-archive-dialog ui-dialog-surface" id="allReviewsDialog" data-review-archive-dialog aria-labelledby="allReviewsDialogTitle">
+        <div class="sf-review-archive-shell">
+            <header class="sf-review-archive-bar">
+                <div>
+                    <span>@L10n.Text("商品评价", "PRODUCT REVIEWS")</span>
+                    <strong id="allReviewsDialogTitle">@L10n.Name(Model)</strong>
+                </div>
+                <button type="button" class="ui-dialog-close" data-review-archive-close aria-label="@L10n.Text("关闭全部评价", "Close all reviews")">
+                    <i class="bi bi-x-lg" aria-hidden="true"></i>
+                </button>
+            </header>
+            <div class="sf-review-archive-body" data-review-archive-body
+                 data-load-error="@L10n.Text("全部评价暂时无法加载，请稍后重试。", "All reviews could not be loaded. Please try again.")">
+                <div class="sf-review-archive-loading" role="status">
+                    <span aria-hidden="true"></span>
+                    @L10n.Text("正在加载全部评价…", "Loading all reviews…")
+                </div>
+            </div>
+        </div>
+    </dialog>
 </section>

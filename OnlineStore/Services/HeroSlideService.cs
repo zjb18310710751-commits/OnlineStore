@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using OnlineStore.Data;
 using OnlineStore.Models;
+using OnlineStore.ViewModels;
 
 namespace OnlineStore.Services;
 
@@ -16,6 +17,20 @@ public class HeroSlideService : IHeroSlideService
         if (activeOnly) query = query.Where(slide => slide.IsActive);
         return await query.OrderBy(slide => slide.DisplayOrder).ThenBy(slide => slide.Id).ToListAsync();
     }
+
+    public async Task<PagedResult<HeroSlide>> GetPagedAsync(int page, int pageSize)
+    {
+        var query = _context.HeroSlides.AsNoTracking()
+            .OrderBy(slide => slide.DisplayOrder)
+            .ThenBy(slide => slide.Id);
+        var total = await query.CountAsync();
+        var totalPages = Math.Max(1, (int)Math.Ceiling(total / (double)pageSize));
+        page = Math.Clamp(page, 1, totalPages);
+        var items = await query.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
+        return new PagedResult<HeroSlide>(items, page, pageSize, total);
+    }
+
+    public Task<int> CountActiveAsync() => _context.HeroSlides.CountAsync(slide => slide.IsActive);
 
     public Task<HeroSlide?> GetByIdAsync(int id) =>
         _context.HeroSlides.FirstOrDefaultAsync(slide => slide.Id == id);

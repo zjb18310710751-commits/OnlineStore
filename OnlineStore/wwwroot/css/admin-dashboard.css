@@ -67,10 +67,15 @@
 .admin-app .overview-product-meta { color: var(--admin-muted); font-size: 10px; }
 .admin-app .overview-product-revenue { margin-left: 0; color: var(--admin-ink); font-size: 11px; font-weight: 600; font-variant-numeric: tabular-nums; }
 .admin-app .overview-orders-body { display: flex; flex-direction: column; padding: 0; }
+.admin-app .overview-feed-panel { height: 680px; }
+.admin-app .overview-orders-body > .table-responsive { flex: 1; overflow: auto; }
+.admin-app .overview-orders-body .overview-table { height: 100%; }
+.admin-app .overview-reviews-panel .overview-panel-body { overflow-y: auto; }
 .admin-app .overview-orders-body > .overview-empty { flex: 1; }
 .admin-app .overview-table { min-width: 570px; font-size: 12px; }
 .admin-app .overview-table > :not(caption) > * > * { padding-inline: 16px; }
 .admin-app .overview-table thead th { padding-top: 15px; padding-bottom: 15px; color: var(--admin-muted); background: #fafafa; font-size: 10px; font-weight: 500; letter-spacing: 0; text-transform: none; border-color: var(--admin-line); white-space: nowrap; }
+.admin-app .overview-orders-body .overview-table thead th { position: sticky; top: 0; z-index: 1; }
 .admin-app .overview-table tbody td { padding-top: 18px; padding-bottom: 18px; color: var(--admin-ink); border-bottom-color: var(--admin-line); }
 .admin-app .overview-table tbody tr:last-child td { border-bottom: 0; }
 .admin-app .overview-table .overview-order-date { color: var(--admin-muted); font-size: 10px; white-space: nowrap; }
@@ -119,6 +124,9 @@
     .admin-app .overview-task-copy > span { font-size: 11px; }
     .admin-app .overview-task > .bi-arrow-right { margin-top: 2px; font-size: 12px; }
     .admin-app .overview-grid { grid-template-columns: minmax(0, 1fr); }
+    .admin-app .overview-feed-panel { height: auto; }
+    .admin-app .overview-orders-body > .table-responsive,
+    .admin-app .overview-reviews-panel .overview-panel-body { overflow: visible; }
     .admin-app .overview-panel-head { min-height: 76px; padding-block: 12px; }
     .admin-app .overview-product-list li { grid-template-columns: 19px 40px minmax(0, 1fr) auto; }
     .admin-app .overview-product-rank, .admin-app .overview-product-thumb { grid-row: auto; }
