@@ -46,6 +46,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 function initCustomSelects() {
     var selectId = 0;
+    var validationFocusPending = false;
 
     document.querySelectorAll('select:not([multiple]):not([size])').forEach(function (select) {
         if (select.dataset.customSelectReady) return;
@@ -106,8 +107,10 @@ function initCustomSelects() {
             item.textContent = option.text;
             item.disabled = option.disabled;
             item.dataset.optionIndex = String(index);
-            item.addEventListener('mouseenter', function () {
-                highlight(index);
+            item.addEventListener('pointermove', function () {
+                // A newly opened menu can appear under a stationary pointer.
+                // Only intentional pointer movement should override keyboard focus.
+                if (!item.disabled) highlight(index);
             });
             item.addEventListener('mousedown', function (event) {
                 event.preventDefault();
@@ -120,6 +123,13 @@ function initCustomSelects() {
         });
 
         wrapper.append(trigger, menu);
+        var validationFeedback = document.createElement('span');
+        validationFeedback.id = listboxId + '-error';
+        validationFeedback.className = 'sf-select__error ui-inline-feedback';
+        validationFeedback.dataset.tone = 'error';
+        validationFeedback.setAttribute('role', 'alert');
+        validationFeedback.hidden = true;
+        wrapper.appendChild(validationFeedback);
 
         var linkedLabels = select.id
             ? Array.prototype.slice.call(document.querySelectorAll('label[for]'))
@@ -129,16 +139,23 @@ function initCustomSelects() {
             if (!label.id) label.id = listboxId + '-label-' + index;
             label.htmlFor = trigger.id;
         });
-        if (linkedLabels.length > 0) {
-            trigger.setAttribute('aria-labelledby', linkedLabels.map(function (label) { return label.id; }).join(' '));
+        var explicitLabel = select.getAttribute('aria-label');
+        var labelledBy = select.getAttribute('aria-labelledby') || (explicitLabel ? '' : linkedLabels.map(function (label) { return label.id; }).join(' '));
+        if (labelledBy) {
+            trigger.setAttribute('aria-labelledby', labelledBy);
+            menu.setAttribute('aria-labelledby', labelledBy);
+        } else if (explicitLabel) {
+            trigger.setAttribute('aria-label', explicitLabel);
+            menu.setAttribute('aria-label', explicitLabel);
         }
 
         function syncSelection() {
             var index = select.selectedIndex;
             var selected = index >= 0 ? options[index] : null;
             value.textContent = selected ? selected.text : '';
-            if (linkedLabels.length === 0) {
+            if (!labelledBy && !explicitLabel) {
                 trigger.setAttribute('aria-label', selected ? selected.text : '');
+                menu.setAttribute('aria-labelledby', trigger.id);
             }
             optionButtons.forEach(function (item, optionIndex) {
                 item.setAttribute('aria-selected', String(optionIndex === index));
@@ -146,15 +163,23 @@ function initCustomSelects() {
             });
             trigger.disabled = select.disabled;
             trigger.setAttribute('aria-required', select.required ? 'true' : 'false');
-            trigger.setAttribute('aria-invalid', select.matches(':invalid') ? 'true' : 'false');
-            if (select.getAttribute('aria-describedby')) {
-                trigger.setAttribute('aria-describedby', select.getAttribute('aria-describedby'));
+            var invalid = select.matches(':invalid') || select.getAttribute('aria-invalid') === 'true';
+            trigger.setAttribute('aria-invalid', invalid ? 'true' : 'false');
+            if (!invalid) validationFeedback.hidden = true;
+            var describedBy = select.getAttribute('aria-describedby') || '';
+            if (!validationFeedback.hidden) describedBy = (describedBy + ' ' + validationFeedback.id).trim();
+            if (describedBy) {
+                trigger.setAttribute('aria-describedby', describedBy);
             } else {
                 trigger.removeAttribute('aria-describedby');
             }
+            var errorMessage = select.getAttribute('aria-errormessage');
+            if (errorMessage) trigger.setAttribute('aria-errormessage', errorMessage);
+            else trigger.removeAttribute('aria-errormessage');
         }
 
         function highlight(index) {
+            if (index >= 0 && optionButtons[index].disabled) index = -1;
             optionButtons.forEach(function (item, optionIndex) {
                 item.classList.toggle('is-highlighted', optionIndex === index);
             });
@@ -171,11 +196,21 @@ function initCustomSelects() {
             menu.hidden = false;
             wrapper.classList.add('is-open');
             trigger.setAttribute('aria-expanded', 'true');
-            highlight(Math.max(0, select.selectedIndex));
+            var selected = select.selectedIndex;
+            highlight(selected >= 0 && !optionButtons[selected].disabled ? selected : enabledBoundary(1));
             requestAnimationFrame(function () {
                 var bounds = menu.getBoundingClientRect();
                 menu.classList.toggle('sf-select__menu--above', bounds.bottom > window.innerHeight - 12);
             });
+        }
+
+        function enabledBoundary(direction) {
+            var index = direction > 0 ? 0 : optionButtons.length - 1;
+            while (index >= 0 && index < optionButtons.length) {
+                if (!optionButtons[index].disabled) return index;
+                index += direction;
+            }
+            return -1;
         }
 
         function closeMenu(returnFocus) {
@@ -233,7 +268,7 @@ function initCustomSelects() {
             if (event.key === 'Home' || event.key === 'End') {
                 event.preventDefault();
                 if (menu.hidden) openMenu();
-                var target = event.key === 'Home' ? 0 : optionButtons.length - 1;
+                var target = enabledBoundary(event.key === 'Home' ? 1 : -1);
                 highlight(target);
                 return;
             }
@@ -268,10 +303,26 @@ function initCustomSelects() {
             if (!menu.hidden) closeMenu(false);
         });
 
-        select.addEventListener('change', syncSelection);
+        select.addEventListener('change', function () {
+            // Wait for validation adapters to clear any previous custom error.
+            requestAnimationFrame(syncSelection);
+        });
+        select.addEventListener('invalid', function (event) {
+            event.preventDefault();
+            if (!validationFocusPending) {
+                validationFocusPending = true;
+                trigger.focus();
+                requestAnimationFrame(function () { validationFocusPending = false; });
+            }
+            requestAnimationFrame(function () {
+                validationFeedback.textContent = select.validationMessage;
+                validationFeedback.hidden = false;
+                syncSelection();
+            });
+        });
         new MutationObserver(syncSelection).observe(select, {
             attributes: true,
-            attributeFilter: ['disabled', 'required', 'aria-describedby', 'class']
+            attributeFilter: ['disabled', 'required', 'aria-describedby', 'aria-errormessage', 'aria-invalid', 'class']
         });
         select.form?.addEventListener('reset', function () {
             window.setTimeout(syncSelection, 0);

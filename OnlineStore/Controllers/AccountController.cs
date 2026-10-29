@@ -3,6 +3,7 @@ using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Extensions.Localization;
 using OnlineStore.Models;
 using OnlineStore.Services;
@@ -58,6 +59,7 @@ public class AccountController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [EnableRateLimiting("account")]
     public async Task<IActionResult> Login(LoginViewModel model, string? returnUrl = null)
     {
         ViewData["ReturnUrl"] = returnUrl;
@@ -131,6 +133,7 @@ public class AccountController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [EnableRateLimiting("account")]
     public async Task<IActionResult> SendCode([FromBody] SendCodeViewModel model)
     {
         if (model is null || !ModelState.IsValid)
@@ -174,6 +177,7 @@ public class AccountController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [EnableRateLimiting("account")]
     public async Task<IActionResult> Register(RegisterViewModel model)
     {
         if (!string.Equals(model.RegisterBy, "email", StringComparison.OrdinalIgnoreCase))
@@ -269,6 +273,7 @@ public class AccountController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [EnableRateLimiting("account")]
     public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel model)
     {
         if (!ModelState.IsValid)
@@ -327,6 +332,7 @@ public class AccountController : Controller
     [HttpPost]
     [Authorize]
     [ValidateAntiForgeryToken]
+    [EnableRateLimiting("account")]
     public async Task<IActionResult> Profile(ProfileViewModel vm)
     {
         var user = await _userManager.GetUserAsync(User);
@@ -378,6 +384,7 @@ public class AccountController : Controller
     [HttpPost]
     [Authorize]
     [ValidateAntiForgeryToken]
+    [EnableRateLimiting("account")]
     public async Task<IActionResult> ChangePassword(ChangePasswordViewModel vm)
     {
         var user = await _userManager.GetUserAsync(User);
@@ -437,6 +444,7 @@ public class AccountController : Controller
     [HttpPost]
     [Authorize]
     [ValidateAntiForgeryToken]
+    [EnableRateLimiting("account")]
     public async Task<IActionResult> SendProfileEmailCode([FromBody] SendCodeViewModel model)
     {
         var user = await _userManager.GetUserAsync(User);

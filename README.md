@@ -8,6 +8,8 @@
 
 工作流需要仓库 Secret `AZURE_WEBAPP_PUBLISH_PROFILE`。应用数据库连接、邮件提供商与首次管理员凭据通过部署环境配置；不要把密码或发布配置文件加入源码。
 
+HTTPS 由反向代理终止时，在部署环境设置 `ReverseProxy__KnownProxies__0`（后续条目按序编号）为实际可信代理 IP。应用默认只信任回环代理，并只处理一层转发；上线前检查 HTTPS 跳转及客户端来源解析，避免重定向循环或把所有用户合并进同一个限流额度。不要为方便而清空代理白名单。需要自定义 Data Protection 密钥目录时使用 `DataProtection__KeyDirectory`，并为部署实例配置持久化及目录权限。
+
 ## 技术栈
 
 - ASP.NET Core 8 MVC（Razor 视图）
@@ -48,7 +50,7 @@
 | 优惠券 | 支持百分比、固定金额、免运费、最高优惠、最低消费、日期范围、全局/每用户次数、首单限制、排除促销商品、全店/分类/商品范围；后台支持优惠券名称、批量创建、CSV 导出与核销记录，系统内部唯一标识不在页面展示；个人中心“我的优惠券”展示可用/未开始/已用完/已过期状态，结算页可直接选择优惠券并默认选择最优方案 |
 | 取消订单与退款 | 买家可取消未发货订单，运输中申请拦截；后台发货、处理签收异常、审核退换货与物流拦截。退款/取消按状态恢复库存且只恢复一次；买家确认与七天自动确认在活动售后期间暂停 |
 | 完整中英双语 | 界面文案 + 商品/分类/店铺/评价/参数/SKU 颜色规格/快递/图文详情等数据库内容全部随语言切换 |
-| 自动化测试 | xUnit 覆盖商品、购物车、优惠券、订单/售后、身份与验证码、上传、查询边界及架构；Node 测试覆盖规格选择、实时更新与表单提示。具体实测结果见 `docs/coursework-audit.md` |
+| 自动化测试 | xUnit 覆盖商品、购物车、优惠券、订单/售后、身份与验证码、上传、查询边界及架构；Node 测试覆盖规格选择、实时更新与表单提示。最新实测结果见 [五项质量属性证据索引](docs/quality-evidence.md) |
 
 ## 目录结构
 
@@ -111,6 +113,8 @@ dotnet run --project OnlineStore/OnlineStore.csproj --launch-profile http
 - 商品详情与加入购物车：`/Products/Details/{id}`
 - 购物车：`/Cart`
 - 健康检查：`/health`（返回 Healthy/Unhealthy）
+- 存活探针：`/health/live`（进程开始接收请求后，不依赖数据库）
+- 就绪探针：`/health/ready`（数据库可连接时 200，不可用时 503；`/health` 保留同样的数据库检查）
 - 后台管理：`/Admin`
 - 首页轮播图管理：`/Admin/HeroSlides`。可上传 JPG、PNG、WebP 或 GIF（最大 5 MB），编辑中英文标题与说明、图片描述、Shop 站内跳转地址、显示顺序及显示开关，也可删除轮播项。未填写英文时使用主要内容；保存后首页立即读取最新数据。
 
@@ -128,7 +132,11 @@ dotnet run --project OnlineStore/OnlineStore.csproj --launch-profile http
 dotnet test
 ```
 
-全部前端回归测试：`node --test OnlineStore.Tests/Frontend/*.test.cjs`。单元/HTTP 测试使用隔离的内存数据库；它们不能替代 SQL Server 迁移、事务与并发验证。
+全部前端回归测试：`node --test OnlineStore.Tests/Frontend/*.test.cjs`。服务及控制器测试使用隔离的内存数据库，HTTP 质量测试使用受控的本地请求管线；这些检查不能替代 SQL Server 迁移、事务与并发验证。
+
+独立的 [CI 工作流](.github/workflows/ci.yml) 在 `Ethan-Yang`、`HUZHANHAO`、`main` 的 push 和目标 PR 上执行 .NET 构建与测试、Node 回归以及 SQL 工具的无数据库安全检查，上传 TRX/TAP。它不使用生产数据库或部署密钥；Azure 发布仍由单独的部署工作流负责。远程运行是否成功应查看对应 Actions 结果。
+
+真实 SQL 的九组回归、专用验证库保护及重复运行方式见 [验证工具说明](docs/verification.md)。2026-10-29 本机结果为 .NET 261/261、Node 42/42、SQL 9/9、安全输入检查 17/17；隔离数据库故障演练十个步骤通过，恢复 ONLINE 后 5.168 秒观测到就绪探针及目录恢复 200。完整结果、实际页面截图和测量边界见 [中央证据索引](docs/quality-evidence.md)。
 
 ## 账号初始化
 
@@ -147,13 +155,13 @@ dotnet test
 
 | 属性 | 实现依据 | 实际边界 |
 | --- | --- | --- |
-| Availability（可用性） | `/health` 检查数据库；初始化与后台异常记录日志；生产错误页使用不查询数据库的独立布局；后台失败后下一轮继续处理 | 单进程、单数据库仍有单点故障。友好提示和健康检查不等于数据库故障转移；重启会丢失内存 Session |
-| Modifiability（可修改性） | 独立 Models/DataAccess/Business 项目；控制器经接口协调业务；`ICartStore`、邮件及图片存储接口由 DI 选择实现 | 业务层仍使用 EF 和 ASP.NET 抽象；替换数据库或供应商仍须验证行为，不能承诺零成本替换 |
-| Testability（可测试性） | 构造函数注入、隔离状态、xUnit、真实本地 HTTP 请求和 Node 回归；SQL Server 隔离库补充迁移、约束、事务与并发验证 | InMemory 与模拟 DOM 不能替代真实 SQL 和浏览器；以本次实际执行结果为证据 |
-| Usability（易用性） | 共享响应式主题、商品筛选分页、表单提示、订单图片、状态自动更新、中英资源 | 页面依赖 CDN 样式/脚本和部分远程图片；仍需真实用户评估，自动化检查不等于完整可用性测评 |
-| Security（安全性） | Identity 哈希/锁定、Admin 角色、归属检查、防伪令牌、输入验证、上传签名校验、安全返回地址、验证码尝试限制和一次性消费 | 默认凭据只限开发种子；生产账号与邮件/数据库配置由部署管理员管理。现有外部部署的旧凭据不能靠本地源码修改自动撤销 |
+| Availability（可用性） | 区分存活和数据库就绪；识别暂态数据库故障并返回安全 503、`Retry-After: 5`；十步骤隔离演练验证故障、恢复及稳定数据保持 | 单进程、单数据库仍有单点故障；5.168 秒是一次本机观察，不是 SLA。启动迁移完成前尚未监听 HTTP；写操作不自动重放 |
+| Modifiability（可修改性） | 四个应用项目形成编译依赖边界；纯 `IOrderShippingPolicy` 接收物流事实、免邮结果和时间，替代策略可改变报价，库存及事务仍由 `OrderService` 管理 | 新增目的地、重量等计费因素仍需扩展输入；业务层仍依赖 EF，类库拆分不等于独立部署。详见 [物流策略说明](docs/quality-modifiability.md) |
+| Testability（可测试性） | 纯规则、xUnit/HTTP、Node、九组真实 SQL 分工；仓库有验证工具和 CI；旧结构升级、末件竞争及验证码单次消费有可重复案例 | InMemory、受控 DOM、真实 SQL 和浏览器各自覆盖不同边界；本地通过不代表远程 CI 或生产运行通过 |
+| Usability（易用性） | 自定义下拉保留 ARIA 名称、禁用项边界及错误焦点；订单故障有双语反馈，恢复后清除；交互控件聚焦时延后整页刷新；实际买家页及手机视口已核对 | 暂缓刷新可能延迟看到最新状态；未进行参与者实验或完整 WCAG 审计。详见 [交互验证说明](docs/quality-usability.md) |
+| Security（安全性） | 保留 Identity、角色、防伪及归属校验；七个账户写入口共享每来源每分钟十次额度；可信代理、一层转发、安全响应头；验证码最多五次预留尝试且只能成功消费一次 | 限流为单进程状态，共享出口共用额度；代理与 HTTPS 需按部署环境配置。验证码仍明文存储，富文本清洗及完整图片解码仍待完善 |
 
-答辩时可按“课程中的 pattern/tactic → 实际代码 → 可复现情景 → 权衡与限制”解释。测试通过仅证明被执行的案例；个人理解、反思和贡献必须由成员本人提供。
+每项属性的场景、可观察度量、代码与测试定位，以及答辩练习示例见 [五项质量属性证据索引](docs/quality-evidence.md)。个人理解、反思和贡献必须由成员本人提供；测试结果不代表已经验证学生掌握。
 
 ## 后续扩展
 
@@ -175,4 +183,4 @@ dotnet ef database update --project OnlineStore.DataAccess --startup-project Onl
 
 网站启动时也会执行 `MigrateAsync()`。首次运行新版本前应备份有价值的数据库；新字段迁移只在尚未应用时执行。2026-10-29 的验证码迁移为 `20261029140000_LimitVerificationCodeAttempts`，新增尝试次数，不清空已有业务表。
 
-课程依据、修复清单、删除依据和本次验证范围见 [课程代码审查记录](docs/coursework-audit.md)。
+课程依据及上一轮修复记录见 [课程代码审查记录](docs/coursework-audit.md)；本轮新增机制与最终验证见 [五项质量属性证据索引](docs/quality-evidence.md)。

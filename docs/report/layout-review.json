@@ -1,0 +1,127 @@
+{
+  "reviewed_at_utc": "2026-10-29T16:22:56.278420+00:00",
+  "status": "passed",
+  "docx": {
+    "path": "系统架构与项目反思-最终版.docx",
+    "sha256": "4eac5a09fe6aa004e221352ab0d9cbb1822cb7741c7c706537d7b40f29ebc3ec"
+  },
+  "pdf": {
+    "path": "docs/report/系统架构与项目反思-排版预览.pdf",
+    "sha256": "de4cb65219d36f7424e45c2ef8216307b2e25980cf77ef19249c99980191d96e",
+    "pages": 14,
+    "export": "User exported the final DOCX in WPS; parent copied that PDF to the E-drive review workspace."
+  },
+  "render": {
+    "engine": "pypdfium2",
+    "dpi": 150,
+    "page_images": "E:/DMU-Learning/.tmp/quality-uplift-20261029/report/final-pages",
+    "contact_sheet": "docs/report/contact-sheet.png"
+  },
+  "structural_checks": {
+    "dotnet_261": true,
+    "node_42": true,
+    "sql_9": true,
+    "guards_17": true,
+    "recovery_5168_ms": true,
+    "ef_core_8_0_11": true,
+    "recovery_evidence_path": true,
+    "personal_contribution_blank_retained": true,
+    "no_stale_version_or_pending_evidence": true,
+    "no_empty_pages": true,
+    "fourteen_pages": true
+  },
+  "visual_review": {
+    "inspected_pages": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14
+    ],
+    "figure_pages": [
+      2,
+      3,
+      4
+    ],
+    "table_page": 10,
+    "personal_contribution_page": 13,
+    "reference_page": 14,
+    "findings": [
+      "Each full-resolution page was displayed and visually inspected; text extraction alone was not used as layout evidence.",
+      "All three diagrams are complete and readable, with their captions on the same page.",
+      "No clipped text, overlapping content, missing glyphs, or blank pages were observed.",
+      "The five-quality table remains on page 10 with all rows and borders intact; the remaining whitespace is accepted.",
+      "Personal contribution blanks are intentional and do not claim unverified individual work.",
+      "Page 14 retains all S1-S8 references and the current recovery evidence path.",
+      "Parent independently inspected pages 2, 3, 4 and 10 and accepted the diagrams and table."
+    ],
+    "limitations": "This record covers the supplied WPS export and source DOCX hash. Editing the DOCX or exporting it with a different renderer requires a fresh visual review."
+  },
+  "pdf_page_dimensions_points": [
+    {
+      "width": 595.32001,
+      "height": 841.92004
+    },
+    {
+      "width": 595.32001,
+      "height": 841.92004
+    },
+    {
+      "width": 595.32001,
+      "height": 841.92004
+    },
+    {
+      "width": 595.32001,
+      "height": 841.92004
+    },
+    {
+      "width": 595.32001,
+      "height": 841.92004
+    },
+    {
+      "width": 595.32001,
+      "height": 841.92004
+    },
+    {
+      "width": 595.32001,
+      "height": 841.92004
+    },
+    {
+      "width": 595.32001,
+      "height": 841.92004
+    },
+    {
+      "width": 595.32001,
+      "height": 841.92004
+    },
+    {
+      "width": 595.32001,
+      "height": 841.92004
+    },
+    {
+      "width": 595.32001,
+      "height": 841.92004
+    },
+    {
+      "width": 595.32001,
+      "height": 841.92004
+    },
+    {
+      "width": 595.32001,
+      "height": 841.92004
+    },
+    {
+      "width": 595.32001,
+      "height": 841.92004
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+PASS local-master-connection-accepted
+PASS daily-database-rejected
+PASS missing-catalog-rejected
+PASS missing-environment-connection-rejected
+PASS remote-server-rejected
+PASS failover-server-rejected
+PASS attached-file-rejected
+PASS user-instance-rejected
+PASS read-only-connection-rejected
+PASS malformed-connection-rejected
+PASS daily-database-name-rejected
+PASS sql-identifier-injection-rejected
+PASS fresh-generated-database-names-accepted
+PASS e-drive-path-accepted
+PASS c-drive-path-rejected
+PASS relative-path-rejected
+PASS unc-path-rejected
+Safety checks: 17/17 passed; no SQL connections opened.

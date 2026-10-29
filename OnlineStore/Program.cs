@@ -6,8 +6,13 @@ using OnlineStore;
 using OnlineStore.Data;
 using OnlineStore.Models;
 using OnlineStore.Services;
+using OnlineStore.Infrastructure;
+using Microsoft.AspNetCore.DataProtection;
 
 var builder = WebApplication.CreateBuilder(args);
+var keyDirectory = builder.Configuration["DataProtection:KeyDirectory"];
+if (!string.IsNullOrWhiteSpace(keyDirectory))
+    builder.Services.AddDataProtection().PersistKeysToFileSystem(new DirectoryInfo(keyDirectory));
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
     ?? throw new InvalidOperationException("未配置连接字符串 ConnectionStrings:DefaultConnection。");
@@ -51,6 +56,7 @@ builder.Services.AddScoped<IProductSkuService, ProductSkuService>();
 builder.Services.AddScoped<IProductSpecService, ProductSpecService>();
 builder.Services.AddScoped<IReviewService, ReviewService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddSingleton<IOrderShippingPolicy, OrderShippingPolicy>();
 builder.Services.AddHostedService<OrderConfirmationBackgroundService>();
 builder.Services.AddScoped<IFavoriteService, FavoriteService>();
 builder.Services.AddScoped<IDeliveryAddressService, DeliveryAddressService>();
@@ -82,15 +88,10 @@ builder.Services.AddSession(options =>
         : CookieSecurePolicy.Always;
 });
 
-builder.Services.Configure<ForwardedHeadersOptions>(options =>
-{
-    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
-    options.KnownNetworks.Clear();
-    options.KnownProxies.Clear();
-});
+builder.Services.AddQualityProtection(builder.Configuration);
 
 builder.Services.AddHealthChecks()
-    .AddDbContextCheck<ApplicationDbContext>("database");
+    .AddCheck<DatabaseReadinessCheck>("database", tags: new[] { "ready" }, timeout: TimeSpan.FromSeconds(3));
 
 builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
 
@@ -102,12 +103,13 @@ builder.Services.AddControllersWithViews()
         options.DataAnnotationLocalizerProvider = (type, factory) => factory.Create(typeof(SharedResource)));
 
 var app = builder.Build();
+app.UseMiddleware<SecurityResponseHeadersMiddleware>();
+app.UseForwardedHeaders();
 
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
-    app.UseForwardedHeaders();
     app.UseHttpsRedirection();
 }
 else
@@ -126,6 +128,8 @@ app.UseRequestLocalization(new RequestLocalizationOptions()
     .AddSupportedUICultures(supportedCultures));
 
 app.UseRouting();
+app.UseMiddleware<DatabaseFailureMiddleware>();
+app.UseRateLimiter();
 
 app.UseSession();
 
@@ -140,7 +144,7 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
-app.MapHealthChecks("/health");
+app.MapQualityHealthChecks();
 
 try
 {

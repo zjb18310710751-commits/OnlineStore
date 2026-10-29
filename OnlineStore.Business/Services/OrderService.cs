@@ -1,5 +1,4 @@
 using System.Data;
-using System.Text.RegularExpressions;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using OnlineStore.Data;
@@ -16,11 +15,16 @@ public class OrderService : IOrderService
 
     private readonly ApplicationDbContext _context;
     private readonly ICouponService _couponService;
+    private readonly IOrderShippingPolicy _shippingPolicy;
 
-    public OrderService(ApplicationDbContext context, ICouponService? couponService = null)
+    public OrderService(
+        ApplicationDbContext context,
+        ICouponService? couponService = null,
+        IOrderShippingPolicy? shippingPolicy = null)
     {
         _context = context;
         _couponService = couponService ?? new CouponService(context);
+        _shippingPolicy = shippingPolicy ?? new OrderShippingPolicy();
     }
 
     public Task<Order?> GetByIdAsync(int id) =>
@@ -180,8 +184,6 @@ public class OrderService : IOrderService
                 item.Price = price;
             }
 
-            ApplyShippingSnapshot(order, products);
-
             var productQuantities = order.Items.GroupBy(i => i.ProductId)
                 .ToDictionary(g => g.Key, g => g.Sum(i => (long)i.Quantity));
             var skuQuantities = order.Items.Where(i => i.SkuId.HasValue).GroupBy(i => i.SkuId!.Value)
@@ -216,6 +218,25 @@ public class OrderService : IOrderService
                 }
             }
 
+            var shipping = _shippingPolicy.Quote(
+                products.Select(product => new OrderShippingProduct(
+                    product.ShippingFrom,
+                    product.ShippingFromEn,
+                    product.ShippingFee,
+                    product.ShippingFeeEn,
+                    product.DeliveryTime,
+                    product.DeliveryTimeEn,
+                    product.ShippingFeeAmount)).ToArray(),
+                freeShipping,
+                DateTime.UtcNow);
+            order.ShippingOrigin = shipping.ShippingOrigin;
+            order.ShippingOriginEn = shipping.ShippingOriginEn;
+            order.ShippingFeeText = shipping.ShippingFeeText;
+            order.ShippingFeeTextEn = shipping.ShippingFeeTextEn;
+            order.DispatchTimeText = shipping.DispatchTimeText;
+            order.DispatchTimeTextEn = shipping.DispatchTimeTextEn;
+            order.ExpectedDispatchAt = shipping.ExpectedDispatchAt;
+
             foreach (var product in products)
             {
                 product.Stock -= (int)productQuantities[product.Id];
@@ -229,7 +250,7 @@ public class OrderService : IOrderService
                 coupon.UsedCount++;
             }
 
-            var shippingAmount = CalculateShippingAmount(products, freeShipping);
+            var shippingAmount = shipping.ShippingAmount;
             order.ShippingAmount = shippingAmount;
             order.Total = subtotal + shippingAmount - discount;
             order.DiscountAmount = discount;
@@ -1010,35 +1031,6 @@ public class OrderService : IOrderService
             IsFutureEstimated = isFutureEstimated
         };
 
-    private static void ApplyShippingSnapshot(Order order, IReadOnlyList<Product> products)
-    {
-        if (products.Count == 0)
-        {
-            return;
-        }
-
-        order.ShippingOrigin = JoinDistinct(products.Select(p => p.ShippingFrom), 200);
-        order.ShippingOriginEn = JoinDistinct(products.Select(p => p.ShippingFromEn), 200);
-        order.ShippingFeeText = JoinDistinct(products.Select(p => p.ShippingFee), 100);
-        order.ShippingFeeTextEn = JoinDistinct(products.Select(p => p.ShippingFeeEn), 100);
-        order.DispatchTimeText = JoinDistinct(products.Select(p => p.DeliveryTime), 100);
-        order.DispatchTimeTextEn = JoinDistinct(products.Select(p => p.DeliveryTimeEn), 100);
-
-        var dispatchHours = products
-            .Select(p => ParseDispatchHours(p.DeliveryTime))
-            .DefaultIfEmpty(72)
-            .Max();
-        order.ExpectedDispatchAt = DateTime.UtcNow.AddHours(dispatchHours);
-    }
-
-    private static decimal CalculateShippingAmount(IReadOnlyList<Product> products, bool freeShipping) =>
-        freeShipping
-            ? 0
-            : products
-                .Select(product => product.ShippingFeeAmount)
-                .Where(amount => amount > 0)
-                .Sum();
-
     private static Order BuildReplacementOrder(Order source) => new()
     {
         OrderNo = OrderNumberGenerator.Generate(),
@@ -1075,34 +1067,6 @@ public class OrderService : IOrderService
             Quantity = item.Quantity
         }).ToList()
     };
-
-    private static string JoinDistinct(IEnumerable<string?> values, int maxLength)
-    {
-        var text = string.Join("、", values.Where(v => !string.IsNullOrWhiteSpace(v))
-            .Select(v => v!.Trim())
-            .Distinct());
-        if (text.Length <= maxLength)
-        {
-            return text;
-        }
-        var prefixLength = maxLength - 1;
-        if (char.IsHighSurrogate(text[prefixLength - 1]) && char.IsLowSurrogate(text[prefixLength]))
-        {
-            prefixLength--;
-        }
-        return text[..prefixLength] + "…";
-    }
-
-    private static int ParseDispatchHours(string? text)
-    {
-        if (string.IsNullOrWhiteSpace(text))
-        {
-            return 72;
-        }
-
-        var match = Regex.Match(text, @"\d+");
-        return match.Success && int.TryParse(match.Value, out var hours) ? hours : 72;
-    }
 
     private async Task<Coupon?> GetTrackedCouponAsync(Order order)
     {
