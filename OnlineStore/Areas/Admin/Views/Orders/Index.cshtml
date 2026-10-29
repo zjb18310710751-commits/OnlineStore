@@ -1,7 +1,7 @@
 @model AdminOrdersViewModel
 @{
     ViewData["Title"] = Loc["OrderManagement"].Value;
-    var pendingAfterSales = Model.PendingAfterSalesCount;
+    var openAfterSales = Model.OpenAfterSalesCount;
     var ordersPagination = new AdminPaginationViewModel
     {
         Action = "Index",
@@ -37,7 +37,11 @@
         @L10n.Text("订单管理", "Orders") <span>@Model.TotalOrderCount</span>
     </a>
     <a asp-action="Index" asp-route-section="after-sales" class="@(Model.ActiveSection == "after-sales" ? "is-active" : "")">
-        @L10n.Text("售后申请", "After-sales") <span>@pendingAfterSales</span>
+        @L10n.Text("售后申请", "After-sales")
+        @if (openAfterSales > 0)
+        {
+            <span>@openAfterSales</span>
+        }
     </a>
 </nav>
 
@@ -46,6 +50,7 @@
 <div class="card shadow-sm mb-4">
     <div class="table-responsive">
         <table class="table table-hover align-middle mb-0" data-admin-order-updates
+               data-admin-order-total="@Model.TotalOrderCount"
                data-order-updates-url="@(Url.Action("OrderUpdates") + "?" + string.Join("&", Model.Orders.Select(order => $"ids={order.Id}")))">
             <thead class="table-light">
                 <tr>
@@ -65,7 +70,9 @@
                 @foreach (var o in Model.Orders)
                 {
                     var state = AdminOrderUpdateViewModel.FromOrder(o);
-                    <tr data-order-id="@o.Id" data-order-status="@o.Status">
+                    <tr data-order-id="@o.Id"
+                        data-order-status="@o.Status"
+                        data-admin-order-state-key="@CustomerOrderUpdateViewModel.CreateStateKey(o)">
                         <td class="fw-semibold">
                             @o.OrderNo
                             @if (o.ReplacementForOrderId.HasValue)
@@ -114,9 +121,6 @@
                         <td class="text-end text-nowrap">
                             <span data-order-actions-status="@OrderStatus.PendingShipment" hidden="@(o.Status != OrderStatus.PendingShipment)">
                                 <button type="button" class="btn btn-sm btn-outline-dark" onclick="openDispatchModal(@o.Id, '@o.OrderNo')">@Loc["Ship"]</button>
-                                <form asp-action="Cancel" asp-route-id="@o.Id" method="post" class="d-inline" data-confirm="@Loc["ConfirmCancelOrder"]" onsubmit="return confirm(this.dataset.confirm);">
-                                    <button type="submit" class="btn btn-sm btn-outline-dark">@Loc["CancelOrder"]</button>
-                                </form>
                             </span>
                             <span data-order-actions-status="@(OrderStatus.Shipped + "," + OrderStatus.Delivered + "," + OrderStatus.ReceiptException)"
                                   hidden="@(o.Status != OrderStatus.Shipped && o.Status != OrderStatus.Delivered && o.Status != OrderStatus.ReceiptException)">
@@ -150,7 +154,11 @@
 else
 {
 <h2 class="h5 mb-3">@L10n.Text("售后申请", "After-sales requests")</h2>
-<div class="card shadow-sm">
+<div class="card shadow-sm"
+     data-admin-after-sales-updates
+     data-after-sales-total="@Model.TotalAfterSalesCount"
+     data-after-sales-open="@Model.OpenAfterSalesCount"
+     data-after-sales-updates-url="@(Url.Action("AfterSalesUpdates") + "?" + string.Join("&", Model.AfterSales.Select(request => $"ids={request.Id}")))">
     <div class="table-responsive">
         <table class="table align-middle mb-0">
             <thead class="table-light">
@@ -158,6 +166,7 @@ else
                     <th>@Loc["OrderNo"]</th>
                     <th>@L10n.Text("类型", "Type")</th>
                     <th>@L10n.Text("原因", "Reason")</th>
+                    <th>@L10n.Text("退货物流", "Return logistics")</th>
                     <th>@L10n.Text("状态", "Status")</th>
                     <th class="text-end">@Loc["Actions"]</th>
                 </tr>
@@ -165,17 +174,57 @@ else
             <tbody>
                 @if (Model.AfterSales.Count == 0)
                 {
-                    <tr><td colspan="5" class="text-center text-muted py-4">@L10n.Text("暂无售后申请", "No after-sales requests")</td></tr>
+                    <tr><td colspan="6" class="text-center text-muted py-4">@L10n.Text("暂无售后申请", "No after-sales requests")</td></tr>
                 }
                 @foreach (var a in Model.AfterSales)
                 {
-                    <tr>
+                    var isReturnFlow = a.Type is AfterSalesType.Return or AfterSalesType.Exchange;
+                    var hasReturnTracking = isReturnFlow
+                        && !string.IsNullOrWhiteSpace(a.ReturnCarrier)
+                        && !string.IsNullOrWhiteSpace(a.ReturnTrackingNumber);
+                    <tr data-after-sales-id="@a.Id"
+                        data-after-sales-state-key="@AfterSalesUpdateViewModel.FromRequest(a).StateKey">
                         <td class="fw-semibold">@a.Order?.OrderNo</td>
-                        <td>@(a.Type == AfterSalesType.Exchange ? L10n.Text("换货", "Exchange") : L10n.Text("退货", "Return"))</td>
-                        <td class="small" style="max-width:320px;">@a.Reason</td>
+                        <td>@L10n.AfterSalesTypeLabel(a.Type)</td>
+                        <td class="small" style="max-width:320px;">
+                            <div>@a.Reason</div>
+                            @if (!string.IsNullOrWhiteSpace(a.AdminNote))
+                            {
+                                <div class="text-muted mt-1">@L10n.Text("处理备注", "Admin note")：@a.AdminNote</div>
+                            }
+                        </td>
+                        <td class="small">
+                            @if (hasReturnTracking)
+                            {
+                                <div>@L10n.Carrier(a.ReturnCarrier)</div>
+                                <div class="font-monospace">@a.ReturnTrackingNumber</div>
+                            }
+                            else if (isReturnFlow && a.Status == AfterSalesStatus.Approved)
+                            {
+                                <span class="text-muted">@L10n.Text("等待买家寄回", "Awaiting buyer return")</span>
+                            }
+                            else
+                            {
+                                <span>—</span>
+                            }
+                        </td>
                         <td><span class="badge bg-white text-dark border">@L10n.AfterSalesStatusLabel(a.Status)</span></td>
                         <td class="text-end text-nowrap">
-                            @if (a.Status == AfterSalesStatus.Pending)
+                            @if (a.Status == AfterSalesStatus.Pending
+                                && a.Type == AfterSalesType.TransitCancellation)
+                            {
+                                <form asp-action="ResolveTransitCancellation" asp-route-id="@a.Id" method="post" class="d-inline-flex gap-2 align-items-center">
+                                    <input name="note" class="form-control form-control-sm" maxlength="500"
+                                           placeholder="@L10n.Text("处理备注（可选）", "Resolution note (optional)")" style="width:180px;" />
+                                    <button type="submit" name="intercepted" value="true" class="btn btn-sm btn-outline-dark">
+                                        @L10n.Text("拦截成功并退款", "Intercepted & refund")
+                                    </button>
+                                    <button type="submit" name="intercepted" value="false" class="btn btn-sm btn-outline-dark">
+                                        @L10n.Text("拦截失败", "Interception failed")
+                                    </button>
+                                </form>
+                            }
+                            else if (a.Status == AfterSalesStatus.Pending)
                             {
                                 <form asp-action="ReviewAfterSales" asp-route-id="@a.Id" method="post" class="d-inline-flex gap-2">
                                     <input type="hidden" name="approved" value="true" />
@@ -188,17 +237,43 @@ else
                                     <button type="submit" class="btn btn-sm btn-outline-dark">@L10n.Text("拒绝", "Reject")</button>
                                 </form>
                             }
-                            else if (a.Status == AfterSalesStatus.Approved)
+                            else if (a.Status == AfterSalesStatus.Approved
+                                && isReturnFlow)
                             {
-                                <form asp-action="MarkAfterSalesReceived" asp-route-id="@a.Id" method="post" class="d-inline">
-                                    <button type="submit" class="btn btn-sm btn-outline-dark">@L10n.Text("标记已收货", "Mark received")</button>
+                                <span class="text-muted small">@L10n.Text("等待买家提交退货物流", "Waiting for return tracking")</span>
+                            }
+                            else if (a.Status == AfterSalesStatus.Returning)
+                            {
+                                <button type="button" class="btn btn-sm btn-outline-dark"
+                                        onclick="openAdminReturnTrackingModal(@a.Id)">
+                                    @L10n.Text("查看退货物流", "Track return")
+                                </button>
+                                <form asp-action="MarkAfterSalesReceived" asp-route-id="@a.Id" method="post" class="d-inline"
+                                      data-confirm="@L10n.Text("确认退回商品已经到达并完成验收吗？", "Confirm the returned item has arrived and passed inspection?")">
+                                    <button type="submit" class="btn btn-sm btn-outline-dark">
+                                        @L10n.Text("标记已收货", "Mark received")
+                                    </button>
                                 </form>
                             }
                             else if (a.Status == AfterSalesStatus.Received)
                             {
+                                @if (hasReturnTracking)
+                                {
+                                    <button type="button" class="btn btn-sm btn-outline-dark me-2"
+                                            onclick="openAdminReturnTrackingModal(@a.Id)">
+                                        @L10n.Text("查看退货物流", "Track return")
+                                    </button>
+                                }
                                 <form asp-action="CompleteAfterSales" asp-route-id="@a.Id" method="post" class="d-inline">
                                     <button type="submit" class="btn btn-sm btn-outline-dark">@L10n.Text("完成售后", "Complete")</button>
                                 </form>
+                            }
+                            else if (a.Status == AfterSalesStatus.Completed && hasReturnTracking)
+                            {
+                                <button type="button" class="btn btn-sm btn-outline-dark"
+                                        onclick="openAdminReturnTrackingModal(@a.Id)">
+                                    @L10n.Text("查看退货物流", "Track return")
+                                </button>
                             }
                         </td>
                     </tr>
@@ -287,10 +362,42 @@ else
     </div>
 </div>
 
+<div class="modal fade" id="adminReturnTrackingModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div>
+                    <h2 class="modal-title fs-5 fw-bold">@L10n.Text("退货物流", "Return delivery progress")</h2>
+                    <div class="text-muted small mt-1"><span id="adminReturnTrackingMeta"></span></div>
+                    <div class="live-update-indicator mt-1">
+                        <span aria-hidden="true"></span>@L10n.Text("每秒实时更新", "Live updates every second")
+                    </div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="@Loc["Cancel"]"></button>
+            </div>
+            <div class="modal-body">
+                <div id="adminReturnTrackingTimeline" class="order-tracking-timeline"></div>
+                <a id="adminOfficialReturnTrackingLink" href="#" target="_blank" rel="noopener"
+                   class="btn btn-outline-primary w-100 mt-3">
+                    @L10n.Text("官方物流查询", "Official tracking")
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
 @section Scripts {
     <script src="~/js/admin-order-updates.js" asp-append-version="true"></script>
+    <script src="~/js/admin-after-sales-updates.js" asp-append-version="true"></script>
     <script>
         let adminTrackingPollTimer = null;
+        let adminReturnTrackingPollTimer = null;
+
+        function escapeAdminHtml(value) {
+            return String(value ?? '').replace(/[&<>"']/g, character => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+            })[character]);
+        }
 
         function openDispatchModal(orderId, orderNo) {
             document.getElementById('dispatchOrderId').value = orderId;
@@ -308,7 +415,7 @@ else
             return fetch(`/Admin/Orders/OrderTracking?id=${orderId}`)
                 .then(r => r.json())
                 .then(data => {
-                    if (!data.success) { timelineEl.innerHTML = `<div class="alert alert-warning">${data.message}</div>`; return; }
+                    if (!data.success) { timelineEl.innerHTML = `<div class="alert alert-warning">${escapeAdminHtml(data.message)}</div>`; return; }
                     const t = data.tracking;
                     metaEl.textContent = `${t.carrier} · ${t.trackingNumber}`;
                     linkEl.href = t.officialTrackingUrl || '#';
@@ -316,9 +423,9 @@ else
                         <div class="order-tracking-node ${node.isReached ? 'is-reached' : 'is-future'} ${node.isCurrentActive ? 'is-current' : ''}">
                             <div class="order-tracking-dot">${node.isReached ? '✓' : ''}</div>
                             <div class="order-tracking-body">
-                                <strong>${node.title}</strong>
-                                <span class="text-muted">${node.formattedTime || ''}</span>
-                                <p>${node.description}</p>
+                                <strong>${escapeAdminHtml(node.title)}</strong>
+                                <span class="text-muted">${escapeAdminHtml(node.formattedTime || '')}</span>
+                                <p>${escapeAdminHtml(node.description)}</p>
                             </div>
                         </div>`).join('');
                 })
@@ -343,6 +450,54 @@ else
             if (adminTrackingPollTimer) {
                 clearInterval(adminTrackingPollTimer);
                 adminTrackingPollTimer = null;
+            }
+        });
+
+        function loadAdminReturnTracking(requestId) {
+            const timelineEl = document.getElementById('adminReturnTrackingTimeline');
+            const metaEl = document.getElementById('adminReturnTrackingMeta');
+            const linkEl = document.getElementById('adminOfficialReturnTrackingLink');
+            return fetch(`/Admin/Orders/ReturnTracking?id=${requestId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.success) {
+                        timelineEl.innerHTML = `<div class="alert alert-warning">${escapeAdminHtml(data.message)}</div>`;
+                        return;
+                    }
+                    const tracking = data.tracking;
+                    metaEl.textContent = `${tracking.carrier} · ${tracking.trackingNumber}`;
+                    linkEl.href = tracking.officialTrackingUrl || '#';
+                    timelineEl.innerHTML = tracking.nodes.map(node => `
+                        <div class="order-tracking-node ${node.isReached ? 'is-reached' : 'is-future'} ${node.isCurrentActive ? 'is-current' : ''}">
+                            <div class="order-tracking-dot">${node.isReached ? '✓' : ''}</div>
+                            <div class="order-tracking-body">
+                                <strong>${escapeAdminHtml(node.title)}</strong>
+                                <span class="text-muted">${escapeAdminHtml(node.formattedTime || '')}</span>
+                                <p>${escapeAdminHtml(node.description)}</p>
+                            </div>
+                        </div>`).join('');
+                })
+                .catch(() => {
+                    timelineEl.innerHTML = '<div class="alert alert-danger">Failed to load return tracking.</div>';
+                });
+        }
+
+        function openAdminReturnTrackingModal(requestId) {
+            const timelineEl = document.getElementById('adminReturnTrackingTimeline');
+            timelineEl.innerHTML = '<div class="text-center text-muted py-4">Loading…</div>';
+            bootstrap.Modal.getOrCreateInstance(document.getElementById('adminReturnTrackingModal')).show();
+            loadAdminReturnTracking(requestId);
+            if (adminReturnTrackingPollTimer) clearInterval(adminReturnTrackingPollTimer);
+            adminReturnTrackingPollTimer = setInterval(
+                () => loadAdminReturnTracking(requestId),
+                1000
+            );
+        }
+
+        document.getElementById('adminReturnTrackingModal')?.addEventListener('hidden.bs.modal', function () {
+            if (adminReturnTrackingPollTimer) {
+                clearInterval(adminReturnTrackingPollTimer);
+                adminReturnTrackingPollTimer = null;
             }
         });
     </script>

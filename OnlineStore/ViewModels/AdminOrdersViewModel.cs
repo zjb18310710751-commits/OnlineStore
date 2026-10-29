@@ -15,5 +15,6 @@ public class AdminOrdersViewModel
     public int TotalOrderCount { get; set; }
     public int AfterSalesPage { get; set; } = 1;
     public int AfterSalesTotalPages { get; set; } = 1;
-    public int PendingAfterSalesCount { get; set; }
+    public int TotalAfterSalesCount { get; set; }
+    public int OpenAfterSalesCount { get; set; }
 }

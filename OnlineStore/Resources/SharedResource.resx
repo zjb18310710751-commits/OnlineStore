@@ -456,8 +456,6 @@
   <data name="OrderShipFailed" xml:space="preserve"><value>操作失败：订单状态不允许发货。</value></data>
   <data name="OrderCompleted" xml:space="preserve"><value>订单已完成。</value></data>
   <data name="OrderCompleteFailed" xml:space="preserve"><value>操作失败：订单状态不允许完成。</value></data>
-  <data name="OrderCancelledRestored" xml:space="preserve"><value>订单已取消，库存已恢复。</value></data>
-  <data name="OrderCancelFailedAdmin" xml:space="preserve"><value>操作失败：订单状态不允许取消。</value></data>
   <data name="OrderRefunded" xml:space="preserve"><value>订单已退款，库存已恢复。</value></data>
   <data name="OrderRefundFailed" xml:space="preserve"><value>操作失败：订单状态不允许退款。</value></data>
   <data name="CouponNotFound" xml:space="preserve"><value>优惠券不存在。</value></data>

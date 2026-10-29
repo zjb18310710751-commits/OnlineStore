@@ -106,7 +106,7 @@
                     <nav class="sf-catalog-pagination reviews-archive-pagination" aria-label="@L10n.Text("评价分页", "Review pages")">
                         @if (Model.HasPrevious)
                         {
-                            <a asp-action="Reviews" asp-route-id="@Model.Product.Id" asp-route-page="@(Model.Page - 1)" asp-route-filter="@Model.Filter" asp-route-sort="@Model.Sort">@Loc["Previous"]</a>
+                            <a class="sf-page-direction" asp-action="Reviews" asp-route-id="@Model.Product.Id" asp-route-page="@(Model.Page - 1)" asp-route-filter="@Model.Filter" asp-route-sort="@Model.Sort">@Loc["Previous"]</a>
                         }
                         @for (var page = 1; page <= Model.TotalPages; page++)
                         {
@@ -114,7 +114,7 @@
                         }
                         @if (Model.HasNext)
                         {
-                            <a asp-action="Reviews" asp-route-id="@Model.Product.Id" asp-route-page="@(Model.Page + 1)" asp-route-filter="@Model.Filter" asp-route-sort="@Model.Sort">@Loc["Next"]</a>
+                            <a class="sf-page-direction" asp-action="Reviews" asp-route-id="@Model.Product.Id" asp-route-page="@(Model.Page + 1)" asp-route-filter="@Model.Filter" asp-route-sort="@Model.Sort">@Loc["Next"]</a>
                         }
                     </nav>
                 }

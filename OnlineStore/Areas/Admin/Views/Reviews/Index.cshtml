@@ -38,9 +38,16 @@
                         <td class="text-muted">@(comment.Length > 30 ? comment[..30] + "…" : comment)</td>
                         <td class="text-muted small">@r.CreatedAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</td>
                         <td class="text-end">
-                            <form asp-action="Delete" asp-route-id="@r.Id" method="post" class="d-inline" data-confirm="@Loc["ConfirmDeleteReview"]" onsubmit="return confirm(this.dataset.confirm);">
-                                <button type="submit" class="btn btn-sm btn-outline-danger" title="@Loc["Delete"]"><i class="bi bi-trash"></i></button>
-                            </form>
+                            <div class="admin-icon-actions">
+                                <form asp-action="Delete" asp-route-id="@r.Id" method="post"
+                                      class="d-inline" data-confirm="@Loc["ConfirmDeleteReview"]"
+                                      onsubmit="return confirm(this.dataset.confirm);">
+                                    <button type="submit" class="admin-icon-action is-danger"
+                                            title="@Loc["Delete"]" aria-label="@Loc["Delete"]">
+                                        <i class="bi bi-trash3" aria-hidden="true"></i>
+                                    </button>
+                                </form>
+                            </div>
                         </td>
                     </tr>
                 }

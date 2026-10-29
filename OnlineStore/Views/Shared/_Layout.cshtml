@@ -7,7 +7,7 @@
     var categories = (await CategoryService.GetAllAsync()).ToList();
     var currentUser = User.Identity?.IsAuthenticated == true ? await UserManager.GetUserAsync(User) : null;
     var favoriteCount = currentUser is null ? 0 : await FavoriteService.CountAsync(currentUser.Id);
-    var deliveredItemCount = currentUser is null ? 0 : await OrderService.GetDeliveredItemCountAsync(currentUser.Id);
+    var activeItemCount = currentUser is null ? 0 : await OrderService.GetActiveItemCountAsync(currentUser.Id);
     var availableCouponCount = currentUser is null
         ? 0
         : (await CouponService.GetCustomerCouponsAsync(currentUser.Id))
@@ -98,12 +98,15 @@
                                 {
                                     <li><a class="dropdown-item" asp-controller="Account" asp-action="Profile">@Loc["Profile"]</a></li>
                                     <li>
-                                        <a class="dropdown-item sf-account-link" asp-controller="Orders" asp-action="MyOrders">
+                                        <a class="dropdown-item sf-account-link"
+                                           asp-controller="Orders"
+                                           asp-action="MyOrders"
+                                           data-active-item-count-url="@(currentUser is null ? null : Url.Action("ActiveItemCount", "Orders"))">
                                             <span>@Loc["MyOrders"]</span>
-                                            @if (deliveredItemCount > 0)
-                                            {
-                                                <span class="sf-count-badge" aria-label="@L10n.Text($"{deliveredItemCount} 件商品已送达", $"{deliveredItemCount} delivered items")">@deliveredItemCount</span>
-                                            }
+                                            <span class="sf-count-badge"
+                                                  data-active-item-count-badge
+                                                  hidden="@(activeItemCount == 0)"
+                                                  aria-label="@L10n.Text($"{activeItemCount} 件进行中商品", $"{activeItemCount} active {(activeItemCount == 1 ? "item" : "items")}")">@activeItemCount</span>
                                         </a>
                                     </li>
                                 }
@@ -208,6 +211,8 @@
     <partial name="~/Views/Shared/_ConfirmDialog.cshtml" />
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/order-count-badge.js" asp-append-version="true"></script>
+    <script src="~/js/validation-messages.js" asp-append-version="true"></script>
     <script src="~/js/ui-feedback.js" asp-append-version="true"></script>
     <script src="~/js/confirm-dialog.js" asp-append-version="true"></script>
     <script src="~/js/catalog.js" asp-append-version="true"></script>

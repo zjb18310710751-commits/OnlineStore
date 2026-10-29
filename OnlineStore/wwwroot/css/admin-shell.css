@@ -110,14 +110,24 @@
 .admin-app .table thead th { color: var(--admin-muted); font-size: 11px; font-weight: 600; letter-spacing: .03em; white-space: nowrap; }
 .admin-app .table tbody tr:last-child td { border-bottom: 0; }
 .admin-app .table .btn-sm { min-width: 40px; padding: 9px 12px; }
+.admin-app .admin-icon-actions { display: inline-flex; align-items: center; gap: 2px; padding: 3px; border: 1px solid var(--admin-line); border-radius: 999px; background: #fafafa; }
+.admin-app .admin-icon-action { display: inline-grid; place-items: center; width: 34px; height: 34px; padding: 0; border: 0; border-radius: 50%; background: transparent; color: #666; font-size: 15px; line-height: 1; text-decoration: none; transition: background-color 150ms ease, color 150ms ease; }
+.admin-app .admin-icon-action:hover { background: #ededed; color: var(--admin-ink); }
+.admin-app .admin-icon-action.is-danger:hover { background: #fbecec; color: #a52b24; }
+.admin-app .admin-icon-action:focus-visible { outline: 2px solid var(--admin-ink); outline-offset: 1px; }
 .admin-app .badge { padding: 6px 9px; font-size: 11px; font-weight: 600; }
 .admin-app .page-link { display: grid; min-width: 44px; min-height: 44px; place-items: center; border-color: var(--admin-line); color: var(--admin-ink); font-size: 13px; }
 .admin-app .active > .page-link { background: var(--admin-ink); border-color: var(--admin-ink); color: #fff; }
-.admin-app .admin-pagination { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 6px; margin-top: 24px; }
-.admin-app .admin-pagination-link { display: inline-flex; align-items: center; justify-content: center; min-width: 42px; min-height: 42px; padding: 8px 12px; border: 1px solid var(--admin-line); border-radius: 6px; background: #fff; color: var(--admin-ink); font-size: 12px; font-weight: 600; text-decoration: none; }
-.admin-app .admin-pagination-link:hover { border-color: var(--admin-ink); }
-.admin-app .admin-pagination-link.is-current { border-color: var(--admin-ink); background: var(--admin-ink); color: #fff; }
-.admin-app .admin-pagination-link.is-disabled { border-color: #ededed; color: #aaa; pointer-events: none; }
+.admin-app .admin-pagination { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 4px; margin-top: 24px; }
+.admin-app .admin-pagination-link { display: inline-flex; align-items: center; justify-content: center; min-width: 42px; min-height: 42px; padding: 8px 10px; border: 0; border-radius: 50%; background: transparent; color: var(--admin-ink); font-size: 14px; font-weight: 500; text-decoration: none; cursor: pointer; transition: background-color 150ms ease, color 150ms ease; }
+.admin-app .admin-pagination-link:hover { background: #ededed; }
+.admin-app .admin-pagination .admin-pagination-link:not(.is-current):not(.is-direction):hover,
+.admin-app .admin-pagination .admin-pagination-link:not(.is-current):not(.is-direction):focus-visible {
+    background: #ededed !important;
+}
+.admin-app .admin-pagination-link.is-current { background: #111; color: #fff; }
+.admin-app .admin-pagination-link.is-current:hover { background: #383838; }
+.admin-app .admin-pagination-link.is-direction { min-width: 0; padding-inline: 14px; border-radius: 999px; }
 .admin-app .admin-product-img { width: 44px; height: 44px; border-radius: 4px; }
 .admin-app .admin-shop-logo {
     display: inline-grid;

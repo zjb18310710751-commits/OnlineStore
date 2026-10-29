@@ -8,6 +8,9 @@ public interface IOrderService
     Task<Order?> GetByIdAsync(int id);
 
     Task<IReadOnlyList<Order>> GetByUserAsync(string userId);
+    Task<IReadOnlyList<CustomerOrderUpdateViewModel>> GetCustomerOrderUpdatesAsync(
+        string userId,
+        IReadOnlyCollection<int> orderIds);
     Task<IReadOnlyDictionary<int, OrderItemPreviewViewModel>> GetOrderItemPreviewsAsync(IEnumerable<OrderItem> items);
 
     Task<IReadOnlyList<Order>> GetAllAsync();
@@ -30,7 +33,7 @@ public interface IOrderService
 
     Task<int> ProcessPendingOrderStatesAsync();
 
-    Task<int> GetDeliveredItemCountAsync(string userId);
+    Task<int> GetActiveItemCountAsync(string userId);
 
     Task<bool> DeleteForUserAsync(int id, string userId);
 
@@ -38,9 +41,20 @@ public interface IOrderService
 
     Task<IReadOnlyList<AfterSalesRequest>> GetAfterSalesAllAsync();
     Task<PagedResult<AfterSalesRequest>> GetAfterSalesPagedAsync(int page, int pageSize);
-    Task<int> CountPendingAfterSalesAsync();
+    Task<IReadOnlyList<AfterSalesUpdateViewModel>> GetAfterSalesUpdatesAsync(IReadOnlyCollection<int> ids);
+    Task<int> CountOpenAfterSalesAsync();
 
     Task<bool> ReviewAfterSalesAsync(int id, bool approved, string? note);
+
+    Task<bool> ResolveTransitCancellationAsync(int id, bool intercepted, string? note);
+
+    Task<bool> SubmitReturnShipmentAsync(
+        int id,
+        string userId,
+        string? carrier,
+        string? trackingNumber);
+
+    Task<OrderTrackingView?> GetReturnTrackingAsync(int id, string? userId = null);
 
     Task<bool> MarkAfterSalesReceivedAsync(int id);
 

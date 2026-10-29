@@ -28,7 +28,9 @@
 
     @if (Model.Count == 0)
     {
-        <section class="coupon-wallet-empty">
+        <section class="coupon-wallet-empty"
+                 data-customer-order-updates
+                 data-order-updates-url="@Url.Action("OrderUpdates")">
             <i class="bi bi-inbox"></i>
             <h2>@Loc["NoOrders"]</h2>
             <p>@L10n.Text("还没有订单记录，去看看今天的精选商品。", "You have no orders yet. Explore today's picks.")</p>
@@ -37,11 +39,21 @@
     }
     else
     {
-        <div class="card member-orders-card">
+        <div class="card member-orders-card"
+             data-customer-order-updates
+             data-order-updates-url="@Url.Action("OrderUpdates")">
             <div class="list-group list-group-flush">
                 @foreach (var o in Model)
                 {
-                    <div class="list-group-item member-order-item" data-order-id="@o.Id">
+                    var hasActiveAfterSales = o.AfterSalesRequests.Any(request =>
+                        request.Status != AfterSalesStatus.Completed
+                        && request.Status != AfterSalesStatus.Rejected);
+                    var hasTransitRequest = o.AfterSalesRequests.Any(request =>
+                        request.Type == AfterSalesType.TransitCancellation);
+                    <div class="list-group-item member-order-item"
+                         data-order-id="@o.Id"
+                         data-order-status="@o.Status"
+                         data-order-state-key="@CustomerOrderUpdateViewModel.CreateStateKey(o)">
                         <div class="member-order-heading">
                             <div>
                                 <span class="text-muted member-order-meta me-2">@Loc["OrderNo"]：@o.OrderNo</span>
@@ -71,7 +83,7 @@
                                     <div class="member-order-meta mt-1">@L10n.Text("备注", "Notes")：@o.OrderNotes</div>
                                 }
                             </div>
-                            <span class="badge member-order-status @StatusBadge(o.Status)">@L10n.Status(o.Status)</span>
+                            <span class="badge member-order-status @StatusBadge(o.Status)" data-order-status-label>@L10n.Status(o.Status)</span>
                         </div>
 
                         <ul class="list-unstyled member-order-lines mb-2">
@@ -156,10 +168,61 @@
                             <div class="member-order-after-sales">
                                 @foreach (var request in o.AfterSalesRequests)
                                 {
+                                    var isReturnFlow = request.Type is AfterSalesType.Return or AfterSalesType.Exchange;
+                                    var hasReturnTracking = !string.IsNullOrWhiteSpace(request.ReturnCarrier)
+                                        && !string.IsNullOrWhiteSpace(request.ReturnTrackingNumber);
                                     <span class="badge bg-white text-dark border">
-                                        @(request.Type == AfterSalesType.Exchange ? L10n.Text("换货", "Exchange") : L10n.Text("退货", "Return"))
+                                        @L10n.AfterSalesTypeLabel(request.Type)
                                         · @L10n.AfterSalesStatusLabel(request.Status)
                                     </span>
+                                    @if (!string.IsNullOrWhiteSpace(request.AdminNote))
+                                    {
+                                        <span class="text-muted small">@request.AdminNote</span>
+                                    }
+                                    @if (request.Type == AfterSalesType.TransitCancellation
+                                        && request.Status == AfterSalesStatus.Pending)
+                                    {
+                                        <span class="text-muted small d-block mt-1">
+                                            @L10n.Text(
+                                                "管理员正在处理物流拦截；若拦截失败，包裹送达后可继续申请退货。",
+                                                "An administrator is reviewing the interception. If it fails, you can request a return after delivery.")
+                                        </span>
+                                    }
+                                    @if (isReturnFlow && request.Status == AfterSalesStatus.Approved)
+                                    {
+                                        <span class="text-muted small d-block mt-1">
+                                            @L10n.Text(
+                                                "管理员已同意。请寄回商品并填写退货承运商和运单号。",
+                                                "Approved. Send the item back and enter the return carrier and tracking number.")
+                                        </span>
+                                        <button type="button" class="btn btn-sm btn-outline-dark"
+                                                onclick="openReturnShipmentModal(@request.Id)">
+                                            @L10n.Text("填写退货物流", "Add return tracking")
+                                        </button>
+                                    }
+                                    @if (isReturnFlow && hasReturnTracking)
+                                    {
+                                        @if (request.Status == AfterSalesStatus.Returning)
+                                        {
+                                            <span class="text-muted small d-block mt-1">
+                                                @L10n.Text(
+                                                    "退货包裹正在运往原发货地，请留意物流进度。",
+                                                    "The return parcel is travelling to the original dispatch location.")
+                                            </span>
+                                        }
+                                        else if (request.Status == AfterSalesStatus.Received)
+                                        {
+                                            <span class="text-muted small d-block mt-1">
+                                                @L10n.Text(
+                                                    "退回商品已到仓，管理员正在完成售后。",
+                                                    "The returned item has reached the warehouse while after-sales is completed.")
+                                            </span>
+                                        }
+                                        <button type="button" class="btn btn-sm btn-outline-dark"
+                                                onclick="openReturnTrackingModal(@request.Id)">
+                                            @L10n.Text("查看退货物流", "Track return")
+                                        </button>
+                                    }
                                 }
                             </div>
                         }
@@ -176,13 +239,23 @@
                                 else if (o.Status == OrderStatus.Shipped)
                                 {
                                     <button type="button" class="btn btn-sm btn-outline-dark" onclick="openTrackingModal(@o.Id, '@o.OrderNo')">@L10n.Text("查看物流", "Track parcel")</button>
+                                    @if (!hasTransitRequest)
+                                    {
+                                        <button type="button" class="btn btn-sm btn-outline-dark" onclick="openTransitCancellationModal(@o.Id)">
+                                            @L10n.Text("申请退款 / 物流拦截", "Request refund / interception")
+                                        </button>
+                                    }
                                 }
                                 else if (o.Status == OrderStatus.Delivered)
                                 {
                                     <button type="button" class="btn btn-sm btn-outline-dark" onclick="openTrackingModal(@o.Id, '@o.OrderNo')">@L10n.Text("查看物流", "Track parcel")</button>
-                                    <button type="button" class="btn btn-sm btn-outline-dark" onclick="confirmReceipt(@o.Id, '@o.OrderNo')">@L10n.Text("确认收货", "Confirm receipt")</button>
+                                    @if (!hasActiveAfterSales)
+                                    {
+                                        <button type="button" class="btn btn-sm btn-outline-dark" onclick="confirmReceipt(@o.Id, '@o.OrderNo')">@L10n.Text("确认收货", "Confirm receipt")</button>
+                                        <button type="button" class="btn btn-sm btn-outline-dark" onclick="openAfterSalesModal(@o.Id)">@L10n.Text("申请退货 / 退款", "Return / refund")</button>
+                                    }
                                 }
-                                else if (o.Status == OrderStatus.Completed)
+                                else if (o.Status == OrderStatus.Completed && !hasActiveAfterSales)
                                 {
                                     <button type="button" class="btn btn-sm btn-outline-dark" onclick="openAfterSalesModal(@o.Id)">@L10n.Text("申请售后", "Return / Exchange")</button>
                                 }
@@ -254,6 +327,37 @@
     </div>
 </div>
 
+<div class="modal fade" id="transitCancellationModal" tabindex="-1" aria-labelledby="transitCancellationModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form asp-controller="Orders" asp-action="RequestTransitCancellation" method="post">
+                <input type="hidden" name="orderId" id="transitCancellationOrderId" />
+                <div class="modal-header">
+                    <h2 class="modal-title fs-5 fw-bold" id="transitCancellationModalLabel">
+                        @L10n.Text("申请退款 / 物流拦截", "Request refund / interception")
+                    </h2>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="@Loc["Cancel"]"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="text-muted small">
+                        @L10n.Text(
+                            "包裹已在运输中，提交后需由管理员尝试拦截。拦截成功将退款并恢复库存；拦截失败时订单将继续运输。",
+                            "The parcel is already in transit. An administrator will try to intercept it. If successful, the order will be refunded; otherwise it will continue to delivery.")
+                    </p>
+                    <div class="mb-3">
+                        <label class="form-label">@L10n.Text("原因说明", "Reason")</label>
+                        <textarea name="reason" class="form-control" rows="3" required maxlength="1000"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">@Loc["Cancel"]</button>
+                    <button type="submit" class="btn btn-primary">@L10n.Text("提交申请", "Submit")</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <div class="modal fade" id="afterSalesModal" tabindex="-1" aria-labelledby="afterSalesModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -285,10 +389,81 @@
     </div>
 </div>
 
+<div class="modal fade" id="returnShipmentModal" tabindex="-1" aria-labelledby="returnShipmentModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form asp-controller="Orders" asp-action="SubmitReturnShipment" method="post">
+                <input type="hidden" name="id" id="returnShipmentRequestId" />
+                <div class="modal-header">
+                    <h2 class="modal-title fs-5 fw-bold" id="returnShipmentModalLabel">
+                        @L10n.Text("填写退货物流", "Add return tracking")
+                    </h2>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="@Loc["Cancel"]"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="text-muted small">
+                        @L10n.Text(
+                            "请使用可追踪的承运商寄回商品。提交后，你和管理员都能查看退货物流。",
+                            "Use a trackable carrier to return the item. You and the administrator will be able to follow the return shipment.")
+                    </p>
+                    <div class="mb-3">
+                        <label class="form-label">@L10n.Text("退货承运商", "Return carrier")</label>
+                        <select name="carrier" class="form-select" required>
+                            <option value="">@L10n.Text("请选择承运商", "Select carrier")</option>
+                            <option value="顺丰速运">@L10n.Text("顺丰速运", "SF Express")</option>
+                            <option value="中通快递">@L10n.Text("中通快递", "ZTO Express")</option>
+                            <option value="圆通速递">@L10n.Text("圆通速递", "YTO Express")</option>
+                            <option value="邮政 EMS">@L10n.Text("邮政 EMS", "EMS")</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">@L10n.Text("退货运单号", "Return tracking number")</label>
+                        <input name="trackingNumber" class="form-control" required maxlength="50" />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">@Loc["Cancel"]</button>
+                    <button type="submit" class="btn btn-primary">@L10n.Text("提交退货物流", "Submit return tracking")</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="returnTrackingModal" tabindex="-1" aria-labelledby="returnTrackingModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div>
+                    <h2 class="modal-title fs-5 fw-bold" id="returnTrackingModalLabel">
+                        @L10n.Text("退货物流", "Return delivery progress")
+                    </h2>
+                    <div class="text-muted small mt-1">
+                        <span id="returnTrackingCarrier"></span> · <span id="returnTrackingNumber" class="font-monospace"></span>
+                    </div>
+                    <div class="live-update-indicator mt-1">
+                        <span aria-hidden="true"></span>@L10n.Text("每秒实时更新", "Live updates every second")
+                    </div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="@Loc["Cancel"]"></button>
+            </div>
+            <div class="modal-body">
+                <div id="returnTrackingTimeline" class="order-tracking-timeline"></div>
+                <a id="officialReturnTrackingLink" href="#" target="_blank" rel="noopener"
+                   class="btn btn-outline-dark w-100 mt-3">
+                    @L10n.Text("官方物流查询", "Official tracking")
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
 @section Scripts {
+    <script src="~/js/customer-order-updates.js" asp-append-version="true"></script>
     <script>
         const orderToken = document.querySelector('input[name="__RequestVerificationToken"]')?.value || '';
         let buyerTrackingPollTimer = null;
+        let returnTrackingPollTimer = null;
         let activeTrackingOrderId = null;
         let activeTrackingOrderNo = '';
         const autoConfirmTemplate = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
@@ -337,6 +512,12 @@
             setTimeout(() => el.classList.add('d-none'), 2000);
         }
 
+        function escapeHtml(value) {
+            return String(value ?? '').replace(/[&<>"']/g, character => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+            })[character]);
+        }
+
         function loadBuyerTracking(orderId) {
             const timeline = document.getElementById('trackingTimeline');
             return fetch(`/Orders/GetOrderTracking?orderId=${orderId}`)
@@ -362,9 +543,9 @@
                         <div class="order-tracking-node ${node.isReached ? 'is-reached' : 'is-future'} ${node.isCurrentActive ? 'is-current' : ''}">
                             <div class="order-tracking-dot">${node.isReached ? '✓' : ''}</div>
                             <div class="order-tracking-body">
-                                <strong>${node.title}</strong>
-                                <span class="text-muted">${node.formattedTime || ''}</span>
-                                <p>${node.description}</p>
+                                <strong>${escapeHtml(node.title)}</strong>
+                                <span class="text-muted">${escapeHtml(node.formattedTime || '')}</span>
+                                <p>${escapeHtml(node.description)}</p>
                             </div>
                         </div>`).join('');
                 })
@@ -410,6 +591,60 @@
         function openAfterSalesModal(orderId) {
             document.getElementById('afterSalesOrderId').value = orderId;
             bootstrap.Modal.getOrCreateInstance(document.getElementById('afterSalesModal')).show();
+        }
+
+        function openReturnShipmentModal(requestId) {
+            document.getElementById('returnShipmentRequestId').value = requestId;
+            bootstrap.Modal.getOrCreateInstance(document.getElementById('returnShipmentModal')).show();
+        }
+
+        function loadReturnTracking(requestId) {
+            const timeline = document.getElementById('returnTrackingTimeline');
+            return fetch(`/Orders/GetReturnTracking?afterSalesId=${requestId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.success) {
+                        timeline.innerHTML = `<div class="alert alert-warning">${escapeHtml(data.message)}</div>`;
+                        return;
+                    }
+                    const tracking = data.tracking;
+                    document.getElementById('returnTrackingCarrier').textContent = tracking.carrier || 'Carrier';
+                    document.getElementById('returnTrackingNumber').textContent = tracking.trackingNumber || 'Pending';
+                    document.getElementById('officialReturnTrackingLink').href = tracking.officialTrackingUrl || '#';
+                    timeline.innerHTML = tracking.nodes.map(node => `
+                        <div class="order-tracking-node ${node.isReached ? 'is-reached' : 'is-future'} ${node.isCurrentActive ? 'is-current' : ''}">
+                            <div class="order-tracking-dot">${node.isReached ? '✓' : ''}</div>
+                            <div class="order-tracking-body">
+                                <strong>${escapeHtml(node.title)}</strong>
+                                <span class="text-muted">${escapeHtml(node.formattedTime || '')}</span>
+                                <p>${escapeHtml(node.description)}</p>
+                            </div>
+                        </div>`).join('');
+                })
+                .catch(() => {
+                    timeline.innerHTML = '<div class="alert alert-danger">Failed to load return tracking.</div>';
+                });
+        }
+
+        function openReturnTrackingModal(requestId) {
+            const timeline = document.getElementById('returnTrackingTimeline');
+            timeline.innerHTML = '<div class="text-center text-muted py-4">Loading…</div>';
+            bootstrap.Modal.getOrCreateInstance(document.getElementById('returnTrackingModal')).show();
+            loadReturnTracking(requestId);
+            if (returnTrackingPollTimer) clearInterval(returnTrackingPollTimer);
+            returnTrackingPollTimer = setInterval(() => loadReturnTracking(requestId), 1000);
+        }
+
+        document.getElementById('returnTrackingModal')?.addEventListener('hidden.bs.modal', function () {
+            if (returnTrackingPollTimer) {
+                clearInterval(returnTrackingPollTimer);
+                returnTrackingPollTimer = null;
+            }
+        });
+
+        function openTransitCancellationModal(orderId) {
+            document.getElementById('transitCancellationOrderId').value = orderId;
+            bootstrap.Modal.getOrCreateInstance(document.getElementById('transitCancellationModal')).show();
         }
 
         updateAutoConfirmCountdowns();

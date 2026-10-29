@@ -50,9 +50,9 @@
                         <p class="ac-slide-destination"><span>Shop</span><i class="bi bi-arrow-right" aria-hidden="true"></i><span>@slide.LinkUrl</span></p>
                     </div>
                     <div class="ac-row-actions">
-                        <a asp-action="Edit" asp-route-id="@slide.Id" class="btn btn-outline-secondary" aria-label="@L10n.Text("编辑", "Edit") · @title"><i class="bi bi-pencil" aria-hidden="true"></i>@Loc["Edit"]</a>
+                        <a asp-action="Edit" asp-route-id="@slide.Id" class="btn btn-outline-secondary" aria-label="@L10n.Text("编辑", "Edit") · @title"><i class="bi bi-pencil-square" aria-hidden="true"></i>@Loc["Edit"]</a>
                         <form asp-action="Delete" asp-route-id="@slide.Id" method="post" data-confirm="@L10n.Text($"删除“{title}”？删除后，首页将不再显示这张轮播图。", $"Delete “{title}”? This slide will be removed from the homepage.")" onsubmit="return confirm(this.dataset.confirm);">
-                            <button type="submit" class="btn ac-delete-button" aria-label="@L10n.Text("删除", "Delete") · @title"><i class="bi bi-trash" aria-hidden="true"></i>@Loc["Delete"]</button>
+                            <button type="submit" class="btn ac-delete-button" aria-label="@L10n.Text("删除", "Delete") · @title"><i class="bi bi-trash3" aria-hidden="true"></i>@Loc["Delete"]</button>
                         </form>
                     </div>
                 </article>

@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace OnlineStore.Models;
 
@@ -99,6 +100,12 @@ public class Product
     public ICollection<Review> Reviews { get; set; } = new List<Review>();
 
     public ICollection<ProductImage> Images { get; set; } = new List<ProductImage>();
+
+    [NotMapped]
+    public double? AverageRating { get; set; }
+
+    [NotMapped]
+    public int ReviewCount { get; set; }
 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 

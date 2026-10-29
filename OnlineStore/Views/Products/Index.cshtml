@@ -10,7 +10,7 @@
         ["shopId"] = q.ShopId?.ToString() ?? "",
         ["minPrice"] = q.MinPrice?.ToString(CultureInfo.InvariantCulture) ?? "",
         ["maxPrice"] = q.MaxPrice?.ToString(CultureInfo.InvariantCulture) ?? "",
-        ["minRating"] = q.MinRating?.ToString(CultureInfo.InvariantCulture) ?? "",
+        ["ratingBand"] = q.RatingBand ?? "",
         ["inStockOnly"] = q.InStockOnly ? "true" : "",
         ["sortBy"] = q.SortBy ?? "newest"
     };
@@ -33,7 +33,7 @@
                     <input type="hidden" name="shopId" value="@q.ShopId" />
                     <input type="hidden" name="minPrice" value="@q.MinPrice?.ToString(CultureInfo.InvariantCulture)" />
                     <input type="hidden" name="maxPrice" value="@q.MaxPrice?.ToString(CultureInfo.InvariantCulture)" />
-                    <input type="hidden" name="minRating" value="@q.MinRating?.ToString(CultureInfo.InvariantCulture)" />
+                    <input type="hidden" name="ratingBand" value="@q.RatingBand" />
                     @if (q.InStockOnly)
                     {
                         <input type="hidden" name="inStockOnly" value="true" />
@@ -106,12 +106,15 @@
                 </fieldset>
 
                 <div class="sf-filter-section">
-                    <label class="sf-filter-title" for="filterRating">@Loc["MinRating"]</label>
-                    <select id="filterRating" name="minRating" class="sf-filter-input">
-                        <option value="" selected="@(!q.MinRating.HasValue)">@Loc["NoRatingLimit"]</option>
-                        <option value="3" selected="@(q.MinRating == 3)">@Loc["RatingStars", 3]</option>
-                        <option value="4" selected="@(q.MinRating == 4)">@Loc["RatingStars", 4]</option>
-                        <option value="4.5" selected="@(q.MinRating == 4.5)">@Loc["RatingStars", "4.5"]</option>
+                    <label class="sf-filter-title" for="filterRating">@L10n.Text("评分区间", "Rating range")</label>
+                    <select id="filterRating" name="ratingBand" class="sf-filter-input">
+                        <option value="" selected="@(string.IsNullOrWhiteSpace(q.RatingBand))">@L10n.Text("不限评分（含暂无评价）", "Any rating (including no reviews)")</option>
+                        <option value="4.5-5" selected="@(q.RatingBand == "4.5-5")">@L10n.Text("4.5–5.0 星", "4.5–5.0 stars")</option>
+                        <option value="4.0-4.4" selected="@(q.RatingBand == "4.0-4.4")">@L10n.Text("4.0–4.4 星", "4.0–4.4 stars")</option>
+                        <option value="3.0-3.9" selected="@(q.RatingBand == "3.0-3.9")">@L10n.Text("3.0–3.9 星", "3.0–3.9 stars")</option>
+                        <option value="2.0-2.9" selected="@(q.RatingBand == "2.0-2.9")">@L10n.Text("2.0–2.9 星", "2.0–2.9 stars")</option>
+                        <option value="1.0-1.9" selected="@(q.RatingBand == "1.0-1.9")">@L10n.Text("1.0–1.9 星", "1.0–1.9 stars")</option>
+                        <option value="none" selected="@(q.RatingBand == "none")">@L10n.Text("暂无评价", "No reviews")</option>
                     </select>
                 </div>
 

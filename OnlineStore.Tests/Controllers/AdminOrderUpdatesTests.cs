@@ -1,5 +1,6 @@
 using System.Net;
 using System.Net.Http.Json;
+using System.Reflection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Hosting.Server;
@@ -16,6 +17,16 @@ namespace OnlineStore.Tests.Controllers;
 
 public class AdminOrderUpdatesTests
 {
+    [Fact]
+    public void AdminOrdersController_DoesNotExposeCancelAction()
+    {
+        var cancelAction = typeof(AdminOrdersController).GetMethod(
+            "Cancel",
+            BindingFlags.Public | BindingFlags.Instance);
+
+        Assert.Null(cancelAction);
+    }
+
     [Theory]
     [InlineData(25, 10)]
     [InlineData(15, 10)]

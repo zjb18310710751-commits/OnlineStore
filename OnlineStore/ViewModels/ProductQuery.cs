@@ -18,7 +18,7 @@ public class ProductQuery
 
     public decimal? MaxPrice { get; set; }
 
-    public double? MinRating { get; set; }
+    public string? RatingBand { get; set; }
 
     public bool InStockOnly { get; set; }
 
@@ -27,7 +27,7 @@ public class ProductQuery
         || ShopId.HasValue
         || MinPrice.HasValue
         || MaxPrice.HasValue
-        || MinRating.HasValue
+        || !string.IsNullOrWhiteSpace(RatingBand)
         || InStockOnly
         || !string.IsNullOrWhiteSpace(SearchTerm)
         || (!string.IsNullOrWhiteSpace(SortBy) && SortBy != "newest");

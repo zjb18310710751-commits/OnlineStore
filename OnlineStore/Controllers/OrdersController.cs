@@ -341,6 +341,38 @@ public class OrdersController : Controller
         return View(orders);
     }
 
+    [HttpGet]
+    [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
+    public async Task<IActionResult> ActiveItemCount()
+    {
+        var user = await _userManager.GetUserAsync(User);
+        if (user is null)
+        {
+            return Unauthorized();
+        }
+
+        return Json(new { success = true, count = await _orderService.GetActiveItemCountAsync(user.Id) });
+    }
+
+    [HttpGet]
+    [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
+    public async Task<IActionResult> OrderUpdates([FromQuery] int[] ids)
+    {
+        if (ids.Length > 200 || ids.Any(id => id <= 0))
+        {
+            return BadRequest();
+        }
+
+        var user = await _userManager.GetUserAsync(User);
+        if (user is null)
+        {
+            return Unauthorized();
+        }
+
+        var orders = await _orderService.GetCustomerOrderUpdatesAsync(user.Id, ids.Distinct().ToArray());
+        return Json(new { success = true, orders });
+    }
+
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Cancel(int id)
@@ -371,6 +403,29 @@ public class OrdersController : Controller
         if (tracking is null)
         {
             return Json(new { success = false, message = L10n.Text("物流信息尚未生成。", "Tracking is not available yet.") });
+        }
+
+        return Json(new { success = true, tracking });
+    }
+
+    [HttpGet]
+    [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
+    public async Task<IActionResult> GetReturnTracking(int afterSalesId)
+    {
+        var user = await _userManager.GetUserAsync(User);
+        if (user is null)
+        {
+            return Unauthorized();
+        }
+
+        var tracking = await _orderService.GetReturnTrackingAsync(afterSalesId, user.Id);
+        if (tracking is null)
+        {
+            return Json(new
+            {
+                success = false,
+                message = L10n.Text("退货物流尚未生成。", "Return tracking is not available yet.")
+            });
         }
 
         return Json(new { success = true, tracking });
@@ -416,6 +471,58 @@ public class OrdersController : Controller
         {
             await _orderService.CreateAfterSalesAsync(orderId, user.Id, type, reason);
             TempData["Success"] = L10n.Text("售后申请已提交，等待审核。", "After-sales request submitted.");
+        }
+        catch (InvalidOperationException ex)
+        {
+            TempData["Error"] = ex.Message;
+        }
+
+        return RedirectToAction(nameof(MyOrders));
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> SubmitReturnShipment(int id, string carrier, string trackingNumber)
+    {
+        var user = await _userManager.GetUserAsync(User);
+        if (user is null)
+        {
+            return RedirectToAction("Login", "Account");
+        }
+
+        var ok = await _orderService.SubmitReturnShipmentAsync(id, user.Id, carrier, trackingNumber);
+        TempData[ok ? "Success" : "Error"] = ok
+            ? L10n.Text("退货物流已提交，管理员可以查看运输进度。", "Return tracking submitted. An administrator can now follow its progress.")
+            : L10n.Text("退货物流提交失败，请确认售后已获批准并检查承运商和单号。", "Could not submit return tracking. Confirm the request is approved and check the carrier and tracking number.");
+        return RedirectToAction(nameof(MyOrders));
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> RequestTransitCancellation(int orderId, string reason)
+    {
+        var user = await _userManager.GetUserAsync(User);
+        if (user is null)
+        {
+            return RedirectToAction("Login", "Account");
+        }
+
+        if (string.IsNullOrWhiteSpace(reason))
+        {
+            TempData["Error"] = L10n.Text("请说明退款或物流拦截原因。", "Please enter a reason for the refund or interception.");
+            return RedirectToAction(nameof(MyOrders));
+        }
+
+        try
+        {
+            await _orderService.CreateAfterSalesAsync(
+                orderId,
+                user.Id,
+                AfterSalesType.TransitCancellation,
+                reason);
+            TempData["Success"] = L10n.Text(
+                "退款/物流拦截申请已提交，等待管理员处理。",
+                "Refund and interception request submitted for review.");
         }
         catch (InvalidOperationException ex)
         {

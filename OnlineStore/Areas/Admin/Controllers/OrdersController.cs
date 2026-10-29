@@ -35,7 +35,8 @@ public class OrdersController : Controller
             TotalOrderCount = orders.TotalCount,
             AfterSalesPage = afterSales.Page,
             AfterSalesTotalPages = afterSales.TotalPages,
-            PendingAfterSalesCount = await _orderService.CountPendingAfterSalesAsync()
+            TotalAfterSalesCount = afterSales.TotalCount,
+            OpenAfterSalesCount = await _orderService.CountOpenAfterSalesAsync()
         });
     }
 
@@ -56,7 +57,12 @@ public class OrdersController : Controller
         var orders = ids.Length == 0
             ? Array.Empty<Order>()
             : await _orderService.GetAdminOrderUpdatesAsync(ids.Distinct().ToArray());
-        return Json(new { success = true, orders = orders.Select(AdminOrderUpdateViewModel.FromOrder) });
+        return Json(new
+        {
+            success = true,
+            totalCount = await _orderService.CountAsync(),
+            orders = orders.Select(AdminOrderUpdateViewModel.FromOrder)
+        });
     }
 
     [HttpGet]
@@ -71,6 +77,42 @@ public class OrdersController : Controller
         return Json(new { success = true, tracking });
     }
 
+    [HttpGet]
+    [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
+    public async Task<IActionResult> ReturnTracking(int id)
+    {
+        var tracking = await _orderService.GetReturnTrackingAsync(id);
+        if (tracking is null)
+        {
+            return Json(new
+            {
+                success = false,
+                message = L10n.Text("买家尚未提交退货物流。", "The buyer has not submitted return tracking yet.")
+            });
+        }
+
+        return Json(new { success = true, tracking });
+    }
+
+    [HttpGet]
+    [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
+    public async Task<IActionResult> AfterSalesUpdates([FromQuery] int[] ids)
+    {
+        if (ids.Length > 20 || ids.Any(id => id <= 0))
+        {
+            return BadRequest();
+        }
+
+        var requests = await _orderService.GetAfterSalesUpdatesAsync(ids.Distinct().ToArray());
+        return Json(new
+        {
+            success = true,
+            totalCount = (await _orderService.GetAfterSalesPagedAsync(1, 1)).TotalCount,
+            openCount = await _orderService.CountOpenAfterSalesAsync(),
+            requests
+        });
+    }
+
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> ReportReceiptException(int id, string reason)
@@ -80,15 +122,6 @@ public class OrdersController : Controller
         TempData[ok ? "Success" : "Error"] = ok
             ? L10n.Text("签收异常已记录并暂停自动确认。", "Receipt exception recorded. Auto-confirmation is paused.")
             : L10n.Text("签收异常记录失败，请检查原因和订单状态。", "Could not record the receipt exception. Check the reason and order status.");
-        return RedirectToAction(nameof(Index));
-    }
-
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Cancel(int id)
-    {
-        var ok = await _orderService.CancelAsync(id);
-        TempData[ok ? "Success" : "Error"] = ok ? _loc["OrderCancelledRestored"].Value : _loc["OrderCancelFailedAdmin"].Value;
         return RedirectToAction(nameof(Index));
     }
 
@@ -109,6 +142,19 @@ public class OrdersController : Controller
         TempData[ok ? "Success" : "Error"] = ok
             ? L10n.Text("售后申请已处理。", "After-sales request reviewed.")
             : L10n.Text("售后申请处理失败。", "Could not review the request.");
+        return RedirectToAction(nameof(Index), new { section = "after-sales" });
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ResolveTransitCancellation(int id, bool intercepted, string? note)
+    {
+        var ok = await _orderService.ResolveTransitCancellationAsync(id, intercepted, note);
+        TempData[ok ? "Success" : "Error"] = ok
+            ? intercepted
+                ? L10n.Text("包裹已成功拦截，订单已退款并恢复库存。", "Parcel intercepted, order refunded and stock restored.")
+                : L10n.Text("已记录物流拦截失败，订单将继续运输。", "Interception failed. The order will continue in transit.")
+            : L10n.Text("物流拦截申请处理失败。", "Could not process the interception request.");
         return RedirectToAction(nameof(Index), new { section = "after-sales" });
     }
 

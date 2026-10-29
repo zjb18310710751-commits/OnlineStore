@@ -456,8 +456,6 @@
   <data name="OrderShipFailed" xml:space="preserve"><value>Operation failed: the order cannot be shipped in its current state.</value></data>
   <data name="OrderCompleted" xml:space="preserve"><value>Order completed.</value></data>
   <data name="OrderCompleteFailed" xml:space="preserve"><value>Operation failed: the order cannot be completed in its current state.</value></data>
-  <data name="OrderCancelledRestored" xml:space="preserve"><value>Order cancelled and stock restored.</value></data>
-  <data name="OrderCancelFailedAdmin" xml:space="preserve"><value>Operation failed: the order cannot be cancelled in its current state.</value></data>
   <data name="OrderRefunded" xml:space="preserve"><value>Order refunded and stock restored.</value></data>
   <data name="OrderRefundFailed" xml:space="preserve"><value>Operation failed: the order cannot be refunded in its current state.</value></data>
   <data name="CouponNotFound" xml:space="preserve"><value>Coupon does not exist.</value></data>

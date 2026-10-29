@@ -48,11 +48,27 @@ public class ProductService : IProductService
             q = q.Where(p => p.Price <= query.MaxPrice.Value);
         }
 
-        if (query.MinRating.HasValue)
+        if (!string.IsNullOrWhiteSpace(query.RatingBand))
         {
-            var minRating = query.MinRating.Value;
-            q = q.Where(p => p.Reviews.Any()
-                          && p.Reviews.Average(r => (double)r.Rating) >= minRating);
+            q = query.RatingBand switch
+            {
+                "4.5-5" => q.Where(p => p.Reviews.Any()
+                    && p.Reviews.Average(r => (double)r.Rating) >= 4.5),
+                "4.0-4.4" => q.Where(p => p.Reviews.Any()
+                    && p.Reviews.Average(r => (double)r.Rating) >= 4.0
+                    && p.Reviews.Average(r => (double)r.Rating) < 4.5),
+                "3.0-3.9" => q.Where(p => p.Reviews.Any()
+                    && p.Reviews.Average(r => (double)r.Rating) >= 3.0
+                    && p.Reviews.Average(r => (double)r.Rating) < 4.0),
+                "2.0-2.9" => q.Where(p => p.Reviews.Any()
+                    && p.Reviews.Average(r => (double)r.Rating) >= 2.0
+                    && p.Reviews.Average(r => (double)r.Rating) < 3.0),
+                "1.0-1.9" => q.Where(p => p.Reviews.Any()
+                    && p.Reviews.Average(r => (double)r.Rating) >= 1.0
+                    && p.Reviews.Average(r => (double)r.Rating) < 2.0),
+                "none" => q.Where(p => !p.Reviews.Any()),
+                _ => q
+            };
         }
 
         if (query.InStockOnly)
@@ -78,6 +94,7 @@ public class ProductService : IProductService
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();
+        await AttachRatingSummariesAsync(items);
 
         var recommendations = new List<Product>();
         if (total == 0 && !string.IsNullOrWhiteSpace(query.SearchTerm))
@@ -89,6 +106,7 @@ public class ProductService : IProductService
                 .OrderByDescending(p => p.CreatedAt)
                 .Take(8)
                 .ToListAsync();
+            await AttachRatingSummariesAsync(recommendations);
         }
 
         var categories = await _context.Categories
@@ -207,22 +225,30 @@ public class ProductService : IProductService
         }
     }
 
-    public async Task<IReadOnlyList<Product>> GetByShopAsync(int shopId) =>
-        await _context.Products
+    public async Task<IReadOnlyList<Product>> GetByShopAsync(int shopId)
+    {
+        var products = await _context.Products
             .AsNoTracking()
             .Where(p => p.ShopId == shopId && p.IsActive)
             .Include(p => p.Categories)
             .OrderByDescending(p => p.CreatedAt)
             .ToListAsync();
+        await AttachRatingSummariesAsync(products);
+        return products;
+    }
 
-    public async Task<IReadOnlyList<Product>> GetSaleItemsAsync(int count = 8) =>
-        await _context.Products
+    public async Task<IReadOnlyList<Product>> GetSaleItemsAsync(int count = 8)
+    {
+        var products = await _context.Products
             .AsNoTracking()
             .Where(p => p.IsActive && p.OriginalPrice != null && p.OriginalPrice > p.Price)
             .Include(p => p.Categories)
             .OrderByDescending(p => p.UpdatedAt)
             .Take(count)
             .ToListAsync();
+        await AttachRatingSummariesAsync(products);
+        return products;
+    }
 
     public Task<int> CountAsync() => _context.Products.CountAsync();
 
@@ -230,4 +256,34 @@ public class ProductService : IProductService
 
     public Task<int> CountLowStockAsync(int threshold = 5) =>
         _context.Products.CountAsync(p => p.Stock < threshold);
+
+    private async Task AttachRatingSummariesAsync(IReadOnlyList<Product> products)
+    {
+        if (products.Count == 0)
+        {
+            return;
+        }
+
+        var productIds = products.Select(product => product.Id).ToList();
+        var summaries = await _context.Reviews
+            .AsNoTracking()
+            .Where(review => productIds.Contains(review.ProductId))
+            .GroupBy(review => review.ProductId)
+            .Select(group => new
+            {
+                ProductId = group.Key,
+                ReviewCount = group.Count(),
+                AverageRating = group.Average(review => (double)review.Rating)
+            })
+            .ToDictionaryAsync(summary => summary.ProductId);
+
+        foreach (var product in products)
+        {
+            if (summaries.TryGetValue(product.Id, out var summary))
+            {
+                product.ReviewCount = summary.ReviewCount;
+                product.AverageRating = summary.AverageRating;
+            }
+        }
+    }
 }

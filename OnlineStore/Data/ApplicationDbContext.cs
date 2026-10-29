@@ -213,6 +213,8 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
             entity.Property(a => a.Status).HasMaxLength(20);
             entity.Property(a => a.Reason).HasMaxLength(1000);
             entity.Property(a => a.AdminNote).HasMaxLength(500);
+            entity.Property(a => a.ReturnCarrier).HasMaxLength(50);
+            entity.Property(a => a.ReturnTrackingNumber).HasMaxLength(50);
         });
 
         builder.Entity<OrderItem>(entity =>

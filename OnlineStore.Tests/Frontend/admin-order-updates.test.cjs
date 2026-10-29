@@ -9,7 +9,22 @@ function setup() {
     const timers = new Map();
     let nextTimer = 0;
     let calls = 0;
-    let response = async () => ({ ok: true, json: async () => ({ success: true, orders: [] }) });
+    let reloads = 0;
+    let response = async () => ({
+        ok: true,
+        json: async () => ({
+            success: true,
+            totalCount: 1,
+            orders: [{
+                id: 8,
+                status: 'shipped',
+                statusLabel: 'Shipped',
+                receiptNote: '',
+                isReceiptException: false,
+                stateKey: 'shipped|'
+            }]
+        })
+    });
     const label = { textContent: 'Shipped' };
     const note = { textContent: '', classList: { toggle() {} } };
     const actions = ['shipped,delivered,exception', 'delivered', 'exception,completed'].map(statuses => ({
@@ -17,19 +32,31 @@ function setup() {
     }));
     const row = {
         dataset: { orderId: '8', orderStatus: 'shipped' },
+        attributes: { 'data-admin-order-state-key': 'shipped|' },
+        getAttribute(name) {
+            return this.attributes[name] ?? null;
+        },
         querySelector: selector => selector === '[data-order-status-label]' ? label : note,
         querySelectorAll: () => actions
     };
     const table = {
-        dataset: { orderUpdatesUrl: '/Admin/Orders/OrderUpdates?ids=8' },
+        dataset: { orderUpdatesUrl: '/Admin/Orders/OrderUpdates?ids=8', adminOrderTotal: '1' },
         querySelectorAll: () => [row]
     };
     const document = {
         hidden: false,
-        querySelector: () => table,
+        openEditor: false,
+        querySelector(selector) {
+            if (selector === '[data-admin-order-updates]') return table;
+            if (selector === '.modal.show, input:focus, select:focus, textarea:focus') {
+                return this.openEditor ? {} : null;
+            }
+            return null;
+        },
         addEventListener: (name, handler) => { handlers[name] = handler; }
     };
     const window = {
+        location: { reload: () => { reloads += 1; } },
         setInterval: handler => { timers.set(++nextTimer, handler); return nextTimer; },
         clearInterval: id => timers.delete(id),
         addEventListener: (name, handler) => { handlers[name] = handler; }
@@ -43,6 +70,7 @@ function setup() {
     const flush = () => new Promise(resolve => setImmediate(resolve));
     return { row, label, note, actions, document, timers, handlers, flush,
         calls: () => calls,
+        reloads: () => reloads,
         respond: callback => { response = callback; },
         tick: async () => { for (const callback of timers.values()) callback(); await flush(); }
     };
@@ -51,27 +79,30 @@ function setup() {
 test('delivery shows receipt exception action and updates status without refreshing or opening a modal', async () => {
     const view = setup();
     await view.flush();
-    view.respond(async () => ({ ok: true, json: async () => ({ success: true, orders: [
-        { id: 8, status: 'delivered', statusLabel: 'Delivered', receiptNote: '', isReceiptException: false }
+    view.respond(async () => ({ ok: true, json: async () => ({ success: true, totalCount: 1, orders: [
+        { id: 8, status: 'delivered', statusLabel: 'Delivered', receiptNote: '', isReceiptException: false, stateKey: 'delivered|' }
     ] }) }));
     await view.tick();
     assert.equal(view.label.textContent, 'Delivered');
     assert.equal(view.actions[1].hidden, false);
     assert.equal(view.actions[0].hidden, false);
     assert.equal(view.actions[2].hidden, true);
+    assert.equal(view.reloads(), 1);
+    assert.equal(view.row.attributes['data-admin-order-state-key'], 'shipped|');
 });
 
 test('later completion hides receipt exception and exposes refund without replacing open form input', async () => {
     const view = setup();
     await view.flush();
-    view.respond(async () => ({ ok: true, json: async () => ({ success: true, orders: [
-        { id: 8, status: 'completed', statusLabel: 'Completed', receiptNote: 'Automatically confirmed', isReceiptException: false }
+    view.respond(async () => ({ ok: true, json: async () => ({ success: true, totalCount: 1, orders: [
+        { id: 8, status: 'completed', statusLabel: 'Completed', receiptNote: 'Automatically confirmed', isReceiptException: false, stateKey: 'completed|' }
     ] }) }));
     await view.tick();
     assert.equal(view.label.textContent, 'Completed');
     assert.equal(view.actions[1].hidden, true);
     assert.equal(view.actions[2].hidden, false);
     assert.equal(view.note.textContent, 'Automatically confirmed');
+    assert.equal(view.reloads(), 1);
 });
 
 test('hidden tabs pause requests and resuming the tab checks immediately', async () => {
@@ -99,8 +130,8 @@ test('a slow response is not overlapped and a network failure preserves current 
     await view.flush();
     assert.equal(view.label.textContent, 'Shipped');
     assert.equal(view.actions[1].hidden, true);
-    view.respond(async () => ({ ok: true, json: async () => ({ success: true, orders: [
-        { id: 8, status: 'delivered', statusLabel: 'Delivered' }
+    view.respond(async () => ({ ok: true, json: async () => ({ success: true, totalCount: 1, orders: [
+        { id: 8, status: 'delivered', statusLabel: 'Delivered', stateKey: 'delivered|' }
     ] }) }));
     await view.tick();
     assert.equal(view.label.textContent, 'Delivered');

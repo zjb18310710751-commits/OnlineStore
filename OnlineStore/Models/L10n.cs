@@ -81,6 +81,22 @@ public static class L10n
         };
     }
 
+    public static string AfterSalesTypeLabel(string type)
+    {
+        if (!IsEnglish)
+        {
+            return type;
+        }
+
+        return type switch
+        {
+            AfterSalesType.Return => "Return",
+            AfterSalesType.Exchange => "Exchange",
+            AfterSalesType.TransitCancellation => "Refund / interception",
+            _ => type
+        };
+    }
+
     public static string Status(string zh) =>
         IsEnglish
             ? zh switch

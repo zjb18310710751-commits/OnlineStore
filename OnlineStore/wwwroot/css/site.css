@@ -314,6 +314,33 @@ body {
     border-radius: .75rem;
 }
 
+.profile-account-panel {
+    display: flex;
+    flex-direction: column;
+    height: 520px;
+}
+
+.profile-account-panel .card-header {
+    flex: 0 0 auto;
+}
+
+.profile-account-panel .card-body {
+    min-height: 0;
+    flex: 1 1 auto;
+    overflow-y: auto;
+}
+
+.profile-account-panel .card-body > form {
+    display: flex;
+    min-height: 100%;
+    flex-direction: column;
+}
+
+.profile-account-panel .card-body > form > .d-flex.justify-content-end {
+    margin-top: auto !important;
+    padding-top: 1.5rem;
+}
+
 .profile-section-card .card-header {
     padding: 1.2rem 1.35rem;
     border-bottom-color: #eef1f5;
@@ -794,6 +821,15 @@ body {
 @media (max-width: 991.98px) {
     .profile-sidebar {
         position: static;
+    }
+
+    .profile-account-panel {
+        height: auto;
+        min-height: 0;
+    }
+
+    .profile-account-panel .card-body {
+        overflow-y: visible;
     }
 }
 

@@ -217,6 +217,17 @@ namespace OnlineStore.Migrations
                     b.Property<DateTime?>("ReviewedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("ReturnCarrier")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime?>("ReturnShippedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ReturnTrackingNumber")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
                     b.Property<string>("Status")
                         .IsConcurrencyToken()
                         .IsRequired()
