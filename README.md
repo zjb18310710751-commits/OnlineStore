@@ -24,7 +24,7 @@ az group delete --name rg-onlinestore-demo --yes --no-wait
 
 ### 自动化部署
 
-- 推送到 `main` 后，GitHub Actions 会依次执行依赖审计、还原、构建、166 个后端测试、6 个前端回归测试，并发布到 Azure App Service。
+- 推送到 `main` 后，GitHub Actions 会依次执行依赖审计、还原、构建、168 个后端测试、6 个前端回归测试，并发布到 Azure App Service。
 - 工作流使用生产并发锁，旧运行会被新运行取消；部署完成后自动验证 `/health`，未恢复健康会使工作流失败。
 - 仓库的 Actions Secrets 需要配置 `AZURE_WEBAPP_PUBLISH_PROFILE`，内容来自 Azure App Service 概览页的「获取发布配置文件 / Get publish profile」。
 - 本地仓库配置了 `post-commit` hook：在 `main` 分支提交后会自动执行 `git push origin main`；未提交的修改不会自动推送。
@@ -35,9 +35,9 @@ az group delete --name rg-onlinestore-demo --yes --no-wait
 - Entity Framework Core 8.0.33 + **Microsoft.EntityFrameworkCore.SqlServer**（SQL Server Express / Azure SQL，SSMS 管理）
 - Azure SQL Database（Azure 演示环境，通过 App Service 连接串配置）
 - ASP.NET Core Identity（Cookie 认证 + 角色授权）
-- Bootstrap 5.3 + Bootstrap Icons（前端主题）
+- Bootstrap 5.3 + Bootstrap Icons（本地静态资源，不依赖运行时 CDN）
 - ASP.NET Core Health Checks（健康检查）
-- ASP.NET Core Session（购物车会话存储）
+- ASP.NET Core Session（开发环境内存缓存，生产环境 SQL Server 分布式缓存）
 - xUnit + EF Core InMemory（单元测试）
 - NuGet Audit（构建时检查已知漏洞）
 
@@ -71,7 +71,7 @@ az group delete --name rg-onlinestore-demo --yes --no-wait
 | 优惠券 | 支持百分比、固定金额、免运费、最高优惠、最低消费、日期范围、全局/每用户次数、首单限制、排除促销商品、全店/分类/商品范围；后台支持优惠券名称、批量创建、CSV 导出与核销记录，系统内部唯一标识不在页面展示；个人中心“我的优惠券”展示可用/未开始/已用完/已过期状态，结算页可直接选择优惠券并默认选择最优方案 |
 | 取消订单与退款 | 用户取消自己的订单；后台订单管理（发货/完成/取消/退款）；取消/退款自动恢复库存 |
 | 完整中英双语 | 界面文案 + 商品/分类/店铺/评价/参数/SKU 颜色规格/快递/图文详情等数据库内容全部随语言切换 |
-| 单元测试 | xUnit 测试项目：商品筛选/分页/排序、购物车增删改清空、图片上传校验、优惠券计算/校验/核销、订单评价关联、邮箱/手机号验证码、订单状态流转与库存扣减/恢复、记住账号密码、支付方式目录与 Header 服务（共 166 个 .NET 用例，另有 6 个前端规格选择与自定义选择器回归用例） |
+| 单元测试 | xUnit 测试项目：商品筛选/分页/排序、购物车增删改清空、图片上传校验、优惠券计算/校验/核销、订单评价关联、邮箱/手机号验证码、订单状态流转与库存扣减/恢复、记住账号密码、支付方式目录与 Header 服务（共 168 个 .NET 用例，另有 6 个前端规格选择与自定义选择器回归用例） |
 
 ## 目录结构
 
@@ -85,7 +85,7 @@ OnlineStore/
 ├── Controllers/    前台控制器（Home、Products、Cart、Reviews、Account、Language、Shops、Favorites、Orders）
 ├── Areas/Admin/    后台管理区（Dashboard、Products、Categories、Shops、ProductSkus、ProductSpecs、Reviews、Orders、Coupons、Images、HeroSlides，管理员角色授权）
 ├── Views/          Razor 视图（前台，含 Home/_HeroCarousel、Products/_ProductReviews、_ProductStory、Shared 反馈与确认组件）
-└── wwwroot/        静态资源（site/storefront/catalog/hero-carousel/admin 等 CSS 与对应 JS）
+└── wwwroot/        静态资源（本地 Bootstrap/Bootstrap Icons、商城主题 CSS 与对应 JS）
 
 OnlineStore.Tests/  xUnit 单元测试项目（引用 OnlineStore，使用 EF Core InMemory）
 ```
@@ -193,6 +193,10 @@ dotnet test
 | 配置项 | 默认值 | 说明 |
 | --- | --- | --- |
 | `Initialization__ApplyMigrationsOnStartup` | `true` | 启动时是否执行 EF Migrations |
+| `Initialization__RunOnStartup` | `true` | 是否在应用启动时执行数据库初始化；关闭后可先启动静态页面 |
+| `Initialization__InitializationRetryCount` | `2` | 初始化整体重试次数 |
+| `Initialization__InitializationRetryDelaySeconds` | `2` | 每次初始化重试间隔 |
+| `Initialization__FailFastOnInitializationFailure` | Development 为 `false`，Production 为 `true` | 初始化最终失败后是否终止启动 |
 | `Initialization__SeedSampleCatalogOnEmpty` | `true` | 空数据库是否写入示例分类、商品和店铺 |
 | `Initialization__AdminEmail` | 空 | 首次创建管理员时使用的邮箱 |
 | `Initialization__AdminPassword` | 空 | 首次创建管理员时使用的密码 |
@@ -209,13 +213,22 @@ dotnet user-secrets set "Initialization:AdminPassword" "<strong-password>" --pro
 
 管理员只在对应邮箱不存在时创建，应用不会在后续启动中覆盖已有密码。密码策略要求至少 6 位，并包含大小写字母、数字和特殊字符。
 
+## 可用性配置
+
+- `Database__RetryCount`：SQL Server 瞬时故障重试次数，默认 `3`。
+- `Database__MaxRetryDelaySeconds`：单次数据库重试最大等待时间，默认 `3` 秒。
+- `Storage__UploadsPath`：用户上传文件保存目录。留空时，生产环境使用 App Service 的 `$HOME/data/uploads`，开发环境使用 `wwwroot/uploads`。启动时会自动复制旧目录中尚未迁移的文件。
+- `Session__Provider`：`Memory` 或 `SqlServer`。生产环境默认使用 SQL Server 分布式 Session，使购物车在重启和多实例部署后仍可恢复。
+- `Session__SchemaName`、`Session__TableName`：数据库 Session 表结构，默认 `dbo.SessionCache`。
+- Bootstrap CSS、JavaScript 和图标字体已经保存在 `wwwroot/lib`，Azure 运行时不再依赖 jsDelivr。
+
 ## 质量属性如何落地（属性 → 关键代码片段）
 
 | 质量属性 | 关键代码片段（位置） | 如何保证 |
 | --- | --- | --- |
-| **可用性 Availability** | `Program.cs` 的 `/health`、SQL Server 瞬时故障重试和 `Initialization` 配置；`DbInitializer` 用 try/catch 包裹初始化；统一的异常处理器和状态码页面 | 应用可被探活、数据库暂时不可用时可自动重试，初始化失败可观测 |
+| **可用性 Availability** | `Program.cs` 的 `/health`、可配置 SQL Server 重试、初始化重试与生产失败保护；SQL Server 分布式 Session；持久化上传目录；本地 Bootstrap；统一的异常处理器和状态码页面 | 应用可被探活，数据库瞬断可恢复，购物车和用户图片不因重启或部署丢失，启动失败不会以部分初始化状态继续运行 |
 | **可修改性 Modifiability** | `Services/*` 接口抽象经 DI 注入；`PaymentMethods` 集中支付方式定义；`StorefrontHeaderService` 隔离导航数据查询；`ViewModels` 与 `Models` 分离；`SessionCartStore` 和 `IImageStorageService` 可替换实现 | 面向接口和单一配置源组织代码，新增支付方式或替换存储时不改动多个页面 |
-| **可测试性 Testability** | 覆盖面包括产品、购物车、订单、优惠券、账户安全、图片上传、支付方式目录、商城 Header 服务等；使用 EF Core InMemory、服务替身和前端 Node 回归测试 | `dotnet test` 运行 166 个 .NET 用例，`node --test` 运行 6 个前端用例 |
+| **可测试性 Testability** | 覆盖面包括产品、购物车、订单、优惠券、账户安全、图片上传、上传目录迁移、支付方式目录、商城 Header 服务等；使用 EF Core InMemory、服务替身和前端 Node 回归测试 | `dotnet test` 运行 168 个 .NET 用例，`node --test` 运行 6 个前端用例 |
 | **易用性 Usability** | Bootstrap 5.3 响应式主题（`Views/Shared/_Layout.cshtml`、`wwwroot/css/site.css`）；商品卡片 `_ProductCard.cshtml`、详情页数量步进器 `js/site.js` 的 `stepQty`；中英多语言（`Resources/*.resx`）；购物车徽标 `ViewComponents/CartSummaryViewComponent` | 界面一致美观、导航清晰、交互直观，减少用户操作成本 |
 | **安全性 Security** | Identity 密码哈希 + Cookie 认证；后台统一要求 Admin 角色；Razor 默认 HTML 编码、EF Core 参数化查询、CSRF 防护和站内重定向校验；上传图片校验扩展名、大小、Content-Type 与文件头；管理员和演示买家凭据只从外部配置读取；NuGet Audit 在构建阶段阻断已知高危依赖 | 认证、授权、输入编码、上传校验、秘密管理和依赖审计形成纵深防御 |
 

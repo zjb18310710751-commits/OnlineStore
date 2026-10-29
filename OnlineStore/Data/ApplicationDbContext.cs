@@ -27,6 +27,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<EmailVerificationCode> EmailVerificationCodes => Set<EmailVerificationCode>();
     public DbSet<DeliveryAddress> DeliveryAddresses => Set<DeliveryAddress>();
     public DbSet<HeroSlide> HeroSlides => Set<HeroSlide>();
+    public DbSet<SessionCacheEntry> SessionCache => Set<SessionCacheEntry>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -59,6 +60,16 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
         builder.Entity<HeroSlide>(entity =>
         {
             entity.HasIndex(s => new { s.IsActive, s.DisplayOrder });
+        });
+
+        builder.Entity<SessionCacheEntry>(entity =>
+        {
+            entity.ToTable("SessionCache", "dbo");
+            entity.HasKey(entry => entry.Id);
+            entity.Property(entry => entry.Id).HasMaxLength(449);
+            entity.Property(entry => entry.Value).IsRequired();
+            entity.Property(entry => entry.ExpiresAtTime).IsRequired();
+            entity.HasIndex(entry => entry.ExpiresAtTime);
         });
 
         builder.Entity<ApplicationUser>(entity =>

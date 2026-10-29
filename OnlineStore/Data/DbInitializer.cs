@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using OnlineStore.Models;
 
@@ -10,6 +11,36 @@ public static class DbInitializer
     private const string AdminRole = "Admin";
 
     public static async Task InitializeAsync(IServiceProvider services)
+    {
+        var logger = services.GetRequiredService<ILoggerFactory>().CreateLogger(nameof(DbInitializer));
+        var options = services.GetRequiredService<IOptions<InitializationOptions>>().Value;
+        var attempts = Math.Max(1, options.InitializationRetryCount);
+
+        for (var attempt = 1; attempt <= attempts; attempt++)
+        {
+            try
+            {
+                await InitializeOnceAsync(services);
+                return;
+            }
+            catch (Exception ex) when (attempt < attempts)
+            {
+                var delay = TimeSpan.FromSeconds(Math.Max(0, options.InitializationRetryDelaySeconds));
+                logger.LogWarning(
+                    ex,
+                    "Database initialization attempt {Attempt}/{Attempts} failed; retrying in {DelaySeconds} seconds.",
+                    attempt,
+                    attempts,
+                    delay.TotalSeconds);
+                if (delay > TimeSpan.Zero)
+                {
+                    await Task.Delay(delay);
+                }
+            }
+        }
+    }
+
+    private static async Task InitializeOnceAsync(IServiceProvider services)
     {
         using var scope = services.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();

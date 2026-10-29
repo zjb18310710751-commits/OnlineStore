@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using OnlineStore;
 using OnlineStore.Data;
 using OnlineStore.Models;
@@ -12,10 +13,12 @@ var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
     ?? throw new InvalidOperationException("未配置连接字符串 ConnectionStrings:DefaultConnection。");
 
+var databaseRetryCount = builder.Configuration.GetValue("Database:RetryCount", 3);
+var databaseRetryDelaySeconds = builder.Configuration.GetValue("Database:MaxRetryDelaySeconds", 3);
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString, sql => sql.EnableRetryOnFailure(
-        maxRetryCount: 5,
-        maxRetryDelay: TimeSpan.FromSeconds(10),
+        maxRetryCount: Math.Max(0, databaseRetryCount),
+        maxRetryDelay: TimeSpan.FromSeconds(Math.Max(0, databaseRetryDelaySeconds)),
         errorNumbersToAdd: null)));
 
 builder.Services.Configure<InitializationOptions>(
@@ -80,7 +83,22 @@ builder.Services.AddScoped<IVerificationCodeService, VerificationCodeService>();
 builder.Services.AddScoped<ICouponService, CouponService>();
 builder.Services.AddScoped<IRememberedLoginService, RememberedLoginCookieService>();
 
-builder.Services.AddDistributedMemoryCache();
+var sessionProvider = builder.Configuration["Session:Provider"]?.Trim();
+var useSqlServerSession = string.Equals(sessionProvider, "SqlServer", StringComparison.OrdinalIgnoreCase)
+    || (string.IsNullOrWhiteSpace(sessionProvider) && builder.Environment.IsProduction());
+if (useSqlServerSession)
+{
+    builder.Services.AddDistributedSqlServerCache(options =>
+    {
+        options.ConnectionString = connectionString;
+        options.SchemaName = builder.Configuration["Session:SchemaName"] ?? "dbo";
+        options.TableName = builder.Configuration["Session:TableName"] ?? "SessionCache";
+    });
+}
+else
+{
+    builder.Services.AddDistributedMemoryCache();
+}
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddSession(options =>
 {
@@ -127,6 +145,13 @@ else
 
 app.UseStatusCodePagesWithReExecute("/Home/Error", "?code={0}");
 
+var startupLogger = app.Services.GetRequiredService<ILoggerFactory>().CreateLogger("Startup");
+var uploadsRoot = UploadStoragePath.Prepare(app.Environment, app.Configuration, startupLogger);
+app.UseStaticFiles(new StaticFileOptions
+{
+    RequestPath = UploadStoragePath.RequestPath,
+    FileProvider = new PhysicalFileProvider(uploadsRoot)
+});
 app.UseStaticFiles();
 
 var supportedCultures = new[] { "zh-CN", "en" };
@@ -152,14 +177,23 @@ app.MapControllerRoute(
 
 app.MapHealthChecks("/health");
 
-try
+if (app.Configuration.GetValue("Initialization:RunOnStartup", true))
 {
-    await DbInitializer.InitializeAsync(app.Services);
-}
-catch (Exception ex)
-{
-    var logger = app.Services.GetRequiredService<ILoggerFactory>().CreateLogger("DbInitializer");
-    logger.LogError(ex, "数据库初始化失败：请检查 SQL Server (SQLEXPRESS) 服务是否已启动，以及连接串/凭据是否正确。");
+    try
+    {
+        await DbInitializer.InitializeAsync(app.Services);
+    }
+    catch (Exception ex)
+    {
+        var logger = app.Services.GetRequiredService<ILoggerFactory>().CreateLogger("DbInitializer");
+        logger.LogError(ex, "数据库初始化失败：请检查 SQL Server (SQLEXPRESS) 服务是否已启动，以及连接串/凭据是否正确。");
+        var failFast = app.Configuration.GetValue<bool?>("Initialization:FailFastOnInitializationFailure")
+            ?? app.Environment.IsProduction();
+        if (failFast)
+        {
+            throw;
+        }
+    }
 }
 
 app.Run();

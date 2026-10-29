@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Localization;
 
 namespace OnlineStore.Services;
@@ -13,12 +14,15 @@ public class ImageStorageService : IImageStorageService
 
     private const long MaxFileSizeBytes = 5 * 1024 * 1024;
 
-    private readonly IWebHostEnvironment _env;
+    private readonly string _uploadsRoot;
     private readonly IStringLocalizer<SharedResource> _loc;
 
-    public ImageStorageService(IWebHostEnvironment env, IStringLocalizer<SharedResource>? localizer = null)
+    public ImageStorageService(
+        IWebHostEnvironment env,
+        IStringLocalizer<SharedResource>? localizer = null,
+        IConfiguration? configuration = null)
     {
-        _env = env;
+        _uploadsRoot = UploadStoragePath.Resolve(env, configuration);
         _loc = localizer ?? FallbackStringLocalizer<SharedResource>.Instance;
     }
 
@@ -54,11 +58,10 @@ public class ImageStorageService : IImageStorageService
             }
         }
 
-        var uploadsDir = Path.Combine(_env.WebRootPath, "uploads");
-        Directory.CreateDirectory(uploadsDir);
+        Directory.CreateDirectory(_uploadsRoot);
 
         var fileName = $"{Guid.NewGuid():N}{ext.ToLowerInvariant()}";
-        var fullPath = Path.Combine(uploadsDir, fileName);
+        var fullPath = Path.Combine(_uploadsRoot, fileName);
 
         await using var stream = new FileStream(fullPath, FileMode.CreateNew);
         await file.CopyToAsync(stream, cancellationToken);
@@ -108,7 +111,7 @@ public class ImageStorageService : IImageStorageService
             return;
         }
 
-        var fullPath = Path.Combine(_env.WebRootPath, "uploads", fileName);
+        var fullPath = Path.Combine(_uploadsRoot, fileName);
         if (File.Exists(fullPath))
         {
             File.Delete(fullPath);

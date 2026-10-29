@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.FileProviders;
 using OnlineStore.Services;
 
@@ -79,6 +80,71 @@ public class ImageStorageServiceTests
         finally
         {
             Directory.Delete(webRoot, recursive: true);
+        }
+    }
+
+    [Fact]
+    public async Task SaveAsync_UsesConfiguredPersistentUploadDirectory()
+    {
+        var webRoot = CreateTempWebRoot();
+        var uploadRoot = CreateTempWebRoot();
+        try
+        {
+            var configuration = new ConfigurationBuilder()
+                .AddInMemoryCollection(new Dictionary<string, string?>
+                {
+                    ["Storage:UploadsPath"] = uploadRoot
+                })
+                .Build();
+            var environment = new FakeWebHostEnvironment(webRoot)
+            {
+                ContentRootPath = webRoot
+            };
+            var service = new ImageStorageService(environment, configuration: configuration);
+
+            var url = await service.SaveAsync(new FakeFormFile("photo.jpg", ValidJpeg()));
+
+            Assert.StartsWith("/uploads/", url);
+            Assert.True(File.Exists(Path.Combine(uploadRoot, Path.GetFileName(url))));
+            Assert.False(File.Exists(Path.Combine(webRoot, "uploads", Path.GetFileName(url))));
+        }
+        finally
+        {
+            Directory.Delete(webRoot, recursive: true);
+            Directory.Delete(uploadRoot, recursive: true);
+        }
+    }
+
+    [Fact]
+    public void Prepare_CopiesLegacyUploadsToConfiguredPersistentDirectory()
+    {
+        var webRoot = CreateTempWebRoot();
+        var uploadRoot = CreateTempWebRoot();
+        try
+        {
+            var legacyDirectory = Path.Combine(webRoot, "uploads");
+            Directory.CreateDirectory(legacyDirectory);
+            var legacyFile = Path.Combine(legacyDirectory, "legacy.jpg");
+            File.WriteAllBytes(legacyFile, ValidJpeg());
+            var configuration = new ConfigurationBuilder()
+                .AddInMemoryCollection(new Dictionary<string, string?>
+                {
+                    ["Storage:UploadsPath"] = uploadRoot
+                })
+                .Build();
+            var environment = new FakeWebHostEnvironment(webRoot)
+            {
+                ContentRootPath = webRoot
+            };
+
+            UploadStoragePath.Prepare(environment, configuration);
+
+            Assert.True(File.Exists(Path.Combine(uploadRoot, "legacy.jpg")));
+        }
+        finally
+        {
+            Directory.Delete(webRoot, recursive: true);
+            Directory.Delete(uploadRoot, recursive: true);
         }
     }
 
