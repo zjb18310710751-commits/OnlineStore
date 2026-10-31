@@ -1,0 +1,978 @@
+{
+  "purpose": "Source fingerprint for the locally verified quality improvement; generated before commit",
+  "baseCommit": "4bfdc48d88235a7f388bed75c33df95510696e2c",
+  "files": [
+    {
+      "path": "OnlineStore/OnlineStore.csproj",
+      "sha256": "366e5e911988408b6bf04cd84916ad7d97bbf8e60ca4d440b9e354c06a307937"
+    },
+    {
+      "path": "OnlineStore/Program.cs",
+      "sha256": "fd9f8779bfbaf8e27f7b37cef0bc8a23452b296f7c016a536d90b1a8f5ca7851"
+    },
+    {
+      "path": "OnlineStore/Areas/Admin/Controllers/CategoriesController.cs",
+      "sha256": "598445a96f37b9347330da5cbdf0417c9f70b0142415c237d2279fb05c2a2919"
+    },
+    {
+      "path": "OnlineStore/Areas/Admin/Controllers/CouponsController.cs",
+      "sha256": "a4b0c0708153373ccb648fdec15dd5d6299a73b6cb19e8ea094205249e35f08f"
+    },
+    {
+      "path": "OnlineStore/Areas/Admin/Controllers/DashboardController.cs",
+      "sha256": "69e89c8f97d068708e447755b376e1ce84177d108fb5376aeafceecb2c75c036"
+    },
+    {
+      "path": "OnlineStore/Areas/Admin/Controllers/HeroSlidesController.cs",
+      "sha256": "69a5609d830a09b19c45b666b5c76e78cd75cbe2421233b42460597c5ceff496"
+    },
+    {
+      "path": "OnlineStore/Areas/Admin/Controllers/ImagesController.cs",
+      "sha256": "94f54ccc1ebdb2bb46d82677a5fe6c175482f3e697205fb37fd70532b3c99e62"
+    },
+    {
+      "path": "OnlineStore/Areas/Admin/Controllers/OrdersController.cs",
+      "sha256": "cfdec012b8a5656b942389c06bcb4b518bf874d80a5597a1dec93f9a78b333cb"
+    },
+    {
+      "path": "OnlineStore/Areas/Admin/Controllers/ProductsController.cs",
+      "sha256": "0dadca88ec66a84597579a0e4c3a5919900d3ce839d2891463da4bfc3fba0900"
+    },
+    {
+      "path": "OnlineStore/Areas/Admin/Controllers/ProductSkusController.cs",
+      "sha256": "eb7ce0426e44f837c6910cde1dfc5ce9d8496af53f6886c1f9d63bc4fe24c724"
+    },
+    {
+      "path": "OnlineStore/Areas/Admin/Controllers/ProductSpecsController.cs",
+      "sha256": "a263b83b397d7c3f540f49fae139d519c69b26c4969b18e8e5f35194565ca6d5"
+    },
+    {
+      "path": "OnlineStore/Areas/Admin/Controllers/ReviewsController.cs",
+      "sha256": "92b543f135bb81d92c9e256585237898a567d9210b8cd4667d732b3cf45c0c94"
+    },
+    {
+      "path": "OnlineStore/Areas/Admin/Controllers/ShopsController.cs",
+      "sha256": "0331b73deebab9518ef1b5dd1ca71c783bc335047bf1ac35a008414649a0d5e3"
+    },
+    {
+      "path": "OnlineStore/Controllers/AccountController.cs",
+      "sha256": "223cb7192fa1fa022389da294a992b79068a854cf1f135e6a630b6fe4dd3822b"
+    },
+    {
+      "path": "OnlineStore/Controllers/CartController.cs",
+      "sha256": "c6f66b2c93406054aee407aebf32c1ca09aa94431f3656aefab1246634c27b16"
+    },
+    {
+      "path": "OnlineStore/Controllers/CouponsController.cs",
+      "sha256": "321c36e51d2070ead936e76b9d2a25cc2bb7b26f10b30f1c083a7bccfcd124bc"
+    },
+    {
+      "path": "OnlineStore/Controllers/FavoritesController.cs",
+      "sha256": "e63799aad2efd79e00c62f64580366d63bc0d0795e11f04ec36ad96ca007360e"
+    },
+    {
+      "path": "OnlineStore/Controllers/HomeController.cs",
+      "sha256": "f5e632c8ebfd346eec3f0275bc201ff049755ab7ee5744d9a62cb374990c6ec7"
+    },
+    {
+      "path": "OnlineStore/Controllers/LanguageController.cs",
+      "sha256": "1b4fdd4a21efb15964f8d70898833cd1064b388070f2861359624ce66bbb00a6"
+    },
+    {
+      "path": "OnlineStore/Controllers/OrdersController.cs",
+      "sha256": "847f48f2e034d41b98c5a0f24309798fb71474230942071ea1f9f07a3038f98f"
+    },
+    {
+      "path": "OnlineStore/Controllers/ProductsController.cs",
+      "sha256": "f83b493f3ad01cdf26074e8c587cd954ba336e61be0797d33399ae30a151f7b6"
+    },
+    {
+      "path": "OnlineStore/Controllers/ReviewsController.cs",
+      "sha256": "3f8d1917a8f2579ec64c5d8df4786f87a5170ff5f7a82d149743a021aa09e487"
+    },
+    {
+      "path": "OnlineStore/Controllers/ShopsController.cs",
+      "sha256": "f9281c398783848e0f3e0dfe6ea1603602c3ef851f76b6840d08206f003e26d0"
+    },
+    {
+      "path": "OnlineStore/Infrastructure/DatabaseFailureMiddleware.cs",
+      "sha256": "057785101b0bcb2e3db75f1a2c6cae3490b2efb47971b45e110feef7b8c21a8a"
+    },
+    {
+      "path": "OnlineStore/Infrastructure/DatabaseReadinessCheck.cs",
+      "sha256": "2f8b7c4f88471cc48d941f5015940ae3adaeca385adf94134a069202b51d7b7f"
+    },
+    {
+      "path": "OnlineStore/Infrastructure/FailureResponse.cs",
+      "sha256": "a682715efa7b4a5e35d90f2a73f80c9e8eee1dbc852a7538818e70b3a9ab0b52"
+    },
+    {
+      "path": "OnlineStore/Infrastructure/QualityProtectionExtensions.cs",
+      "sha256": "191d5e8a778f2d663d239273276b45687721d61d4fafd5be630098853f1a2967"
+    },
+    {
+      "path": "OnlineStore/Infrastructure/SecurityResponseHeadersMiddleware.cs",
+      "sha256": "6b5e4b6b72a7bef1df051a06928bd56ebf7f80d4f40cd406be44e99dcad0ad03"
+    },
+    {
+      "path": "OnlineStore/ViewComponents/CartSummaryViewComponent.cs",
+      "sha256": "c5082904b3f1119759bfe0487a6cffb97b38807746763616612e927749df9a93"
+    },
+    {
+      "path": "OnlineStore/ViewComponents/CategoryNavigationViewComponent.cs",
+      "sha256": "4cfdbfdba8b268ba97f7314d0db7fb76efcb9a97b9a89a209df496427ea578b1"
+    },
+    {
+      "path": "OnlineStore/ViewComponents/HeroCarouselViewComponent.cs",
+      "sha256": "be012763e4daa037dd81dc7aee1b21f9d21da32327fe3dce1bf8657627dfcd62"
+    },
+    {
+      "path": "OnlineStore/wwwroot/css/admin-carousel.css",
+      "sha256": "2d008172ddc89cc670969df0d3f3a88b73d58142eea68f8e64fa0fb4a56553fc"
+    },
+    {
+      "path": "OnlineStore/wwwroot/css/admin-dashboard.css",
+      "sha256": "419580edd0e326bf4ec1298fce53fd8c558ff2872b26d3cd409f1bfa83e52b86"
+    },
+    {
+      "path": "OnlineStore/wwwroot/css/admin-shell.css",
+      "sha256": "b5685d3143a31ff7e476b6cadbd21c04909e2bda926e58ee47bf87aa6e7d365f"
+    },
+    {
+      "path": "OnlineStore/wwwroot/css/auth.css",
+      "sha256": "240ffb1f220606e6b9a70ac8b339bb5d56839428250a8a980273c7b4be862915"
+    },
+    {
+      "path": "OnlineStore/wwwroot/css/catalog.css",
+      "sha256": "11bd8cdd63839c98d88c89edda4da37af4855fbb297cc74dc488cf3b9d6d0f9b"
+    },
+    {
+      "path": "OnlineStore/wwwroot/css/category-navigation.css",
+      "sha256": "e502a396be85088b65083cd826cc352841d7b50aae882d83d5bc58ad958bf393"
+    },
+    {
+      "path": "OnlineStore/wwwroot/css/coupons.css",
+      "sha256": "32be8e328bd7ef1a1814d75a353ff8715e035ee4f8b0f9e72491decdf355ea85"
+    },
+    {
+      "path": "OnlineStore/wwwroot/css/hero-carousel.css",
+      "sha256": "83e7e6b2563caa243c164f2cb9594a79fc1410b496587a5f74cd668cf44e9dcf"
+    },
+    {
+      "path": "OnlineStore/wwwroot/css/member-orders.css",
+      "sha256": "2e50363020bdfee429825685186bcddd91e2fd8abbc290e6bc17fccc6c4f2ed0"
+    },
+    {
+      "path": "OnlineStore/wwwroot/css/product-reviews.css",
+      "sha256": "243832a58a96382c227a126fbfe9c2a187b01914ee952482a709fffe560572c0"
+    },
+    {
+      "path": "OnlineStore/wwwroot/css/product-story.css",
+      "sha256": "15b24d8c061295cb9faa63f6fba0ad597caa44d21458b19162b8d18f63fbb3be"
+    },
+    {
+      "path": "OnlineStore/wwwroot/css/site.css",
+      "sha256": "5048dce3423a437c4fcc67544e932c770da162427c4cf14c847af15c09e67780"
+    },
+    {
+      "path": "OnlineStore/wwwroot/css/storefront.css",
+      "sha256": "f8f13d577bdc746d42c4b7e2bf02dc38faa35de0133d7c5af2dad8a55d3c72a4"
+    },
+    {
+      "path": "OnlineStore/wwwroot/css/ui-feedback.css",
+      "sha256": "c930b6df51f540811dbf7bfe6b1be51b06266b208d99fd219f85fd68477f9316"
+    },
+    {
+      "path": "OnlineStore/wwwroot/js/admin-after-sales-updates.js",
+      "sha256": "1ca59ba8c0983c8de143b3c1734a8e4f2a8ee6c754198ad0c7b2f3a556b48be0"
+    },
+    {
+      "path": "OnlineStore/wwwroot/js/admin-carousel.js",
+      "sha256": "13699ddccc2ce04007555c28f905d1defe771407e00884772991c2e6b2bc2835"
+    },
+    {
+      "path": "OnlineStore/wwwroot/js/admin-dashboard.js",
+      "sha256": "afe9decfb5188475d66f1db5495091958c67c207f0d7b4016fba03438cd8466c"
+    },
+    {
+      "path": "OnlineStore/wwwroot/js/admin-order-updates.js",
+      "sha256": "f13a65650734e2581beaec38d092f67691a3877faaed88cb633ce7243305698f"
+    },
+    {
+      "path": "OnlineStore/wwwroot/js/catalog.js",
+      "sha256": "ecc4318d4b5636c40f6aece606932fdb9f9a9a35089a40bc6a2b6f7c4653d14c"
+    },
+    {
+      "path": "OnlineStore/wwwroot/js/category-navigation.js",
+      "sha256": "cc193dfc1f6da84d4166235747edc712ddf751b049fe984a33cb84df3657a7bd"
+    },
+    {
+      "path": "OnlineStore/wwwroot/js/confirm-dialog.js",
+      "sha256": "a8cdf9ff07a4562bf7b5ab639f409fc166a2733fc436b4dee3fd91854420872b"
+    },
+    {
+      "path": "OnlineStore/wwwroot/js/customer-order-updates.js",
+      "sha256": "44f81b620c865a290950884506a5bd77ae213e3a16c0b9f76f09aa878ea98af7"
+    },
+    {
+      "path": "OnlineStore/wwwroot/js/hero-carousel.js",
+      "sha256": "9e65262ba06e18cff2cdc9636c00cb17aae74c4ad6784207d12108019be7a731"
+    },
+    {
+      "path": "OnlineStore/wwwroot/js/order-count-badge.js",
+      "sha256": "0549768e8bdd6cc3169611f6aa4267e0cda6d40bdeffa1ecaf6dfdac8076e8fe"
+    },
+    {
+      "path": "OnlineStore/wwwroot/js/product-reviews.js",
+      "sha256": "07b622a6ffb18a5a812234dd3b1799315efe5185d9a8bab4432297733dc2f1b4"
+    },
+    {
+      "path": "OnlineStore/wwwroot/js/site.js",
+      "sha256": "ba5a0a67c8ebfa0e89f95c8651c086c2408b99e877bc3220adf48eed3a3aaa2c"
+    },
+    {
+      "path": "OnlineStore/wwwroot/js/ui-feedback.js",
+      "sha256": "a2b39011afb1a50989485b59e50ba39d8c01ec746db3b5052bd35dd16c4dbb4c"
+    },
+    {
+      "path": "OnlineStore/wwwroot/js/validation-messages.js",
+      "sha256": "6be15669f28d2c5970b14d485e4a6e5d8a9204473533bd618cf4bd228348456a"
+    },
+    {
+      "path": "OnlineStore.Business/FallbackStringLocalizer.cs",
+      "sha256": "0f7087402f5904173e3c4ea9b92eb05e6f237d29cf03308ab79bc1eb94bd4424"
+    },
+    {
+      "path": "OnlineStore.Business/GlobalUsings.cs",
+      "sha256": "477543a3a3554dc7f9048da805635b8bce7ea860c6f097880f11f18bd644dfd6"
+    },
+    {
+      "path": "OnlineStore.Business/OnlineStore.Business.csproj",
+      "sha256": "948f9a98695090d9ceb6d89240c9e2aee6cd617754cfa6cd0e07471aed00d49a"
+    },
+    {
+      "path": "OnlineStore.Business/Services/AddressFormatter.cs",
+      "sha256": "d8c7ec81e8aaaa9b69ff1de039bdbe933962dfc68cae5164aa9268e53c737f2a"
+    },
+    {
+      "path": "OnlineStore.Business/Services/AdminDashboardService.cs",
+      "sha256": "6bd109ba11b967b9bafc5b99e948e712c3a8a9ea0b7f7a0d35a44c0a627e3d1f"
+    },
+    {
+      "path": "OnlineStore.Business/Services/BrevoApiEmailService.cs",
+      "sha256": "9be49c42a628bf938dd334a9aa36946b368f6fae5ed8d85265c49cf654d5c237"
+    },
+    {
+      "path": "OnlineStore.Business/Services/CartService.cs",
+      "sha256": "baf9213386657cd4a94e78f6276dd36573dc27e1e7e70aa68663cab33177f736"
+    },
+    {
+      "path": "OnlineStore.Business/Services/CategoryService.cs",
+      "sha256": "a200b92876b5c703d7287fcc178d780e8744bf1cc47e2f7c99c87db6409f5d4f"
+    },
+    {
+      "path": "OnlineStore.Business/Services/CouponCalculator.cs",
+      "sha256": "491c9f050a95c7631a3a62a7fc0f2a9f0863bdabe9e2eff39f76319fe91d0427"
+    },
+    {
+      "path": "OnlineStore.Business/Services/CouponService.cs",
+      "sha256": "0a2dfe7c00e402542d793816882f072bf1a239c49985635bff92eee7075ca446"
+    },
+    {
+      "path": "OnlineStore.Business/Services/DeliveryAddressService.cs",
+      "sha256": "71e7a2debc0898f88197d2888f529297e18e84134fe1dcc5aa43c3b819fd73b2"
+    },
+    {
+      "path": "OnlineStore.Business/Services/EmailTemplateBuilder.cs",
+      "sha256": "2c5e49dbef5b578d271b2137ae23f716f511a5d5dda9ec16c0afee7393f702ad"
+    },
+    {
+      "path": "OnlineStore.Business/Services/FavoriteService.cs",
+      "sha256": "68f4a9ec3d32b56514738119910db32297ad7bb5d6b7c6da79783a4d4c5b2aed"
+    },
+    {
+      "path": "OnlineStore.Business/Services/HeroSlideService.cs",
+      "sha256": "4b00d99b3b682f2f6188da4262a97805c4637b6f42e34fa17ccdf8090c1ccdd5"
+    },
+    {
+      "path": "OnlineStore.Business/Services/IAdminDashboardService.cs",
+      "sha256": "f4a63a93424884b84ca4c0aa804f62d80d8a85570d9ddc2e28719c448c5eca1d"
+    },
+    {
+      "path": "OnlineStore.Business/Services/ICartService.cs",
+      "sha256": "c8f3c34949098646c31056f22bf0d7064899b1508032afbeb05dbffb3eb72902"
+    },
+    {
+      "path": "OnlineStore.Business/Services/ICartStore.cs",
+      "sha256": "48a665252d262038895a27038c8fa70ded2608aaf3888c7c0c3b0f6d3ed8c6ef"
+    },
+    {
+      "path": "OnlineStore.Business/Services/ICategoryService.cs",
+      "sha256": "b5ff0b764be13d93ba7b54eba6a2a06775a1084f9943f44be2bb947e795d2861"
+    },
+    {
+      "path": "OnlineStore.Business/Services/ICouponService.cs",
+      "sha256": "47bdf036432f11e8515251d7472951f7adc69008b6bfd8c7545dda69e3d0e0b5"
+    },
+    {
+      "path": "OnlineStore.Business/Services/IDeliveryAddressService.cs",
+      "sha256": "a98fe213e911d6c5a52a49fd3ad814ff60ae2e2323ccd2a352b0f641f8186472"
+    },
+    {
+      "path": "OnlineStore.Business/Services/IEmailService.cs",
+      "sha256": "8e764b2ad3f248edb5a8c04c42fef0068053d0ef31afd2c4ff3cd08811bcec0f"
+    },
+    {
+      "path": "OnlineStore.Business/Services/IFavoriteService.cs",
+      "sha256": "332300c7f0fa4fa978eb4a53297aed39b3156114438a621671840ce8442838aa"
+    },
+    {
+      "path": "OnlineStore.Business/Services/IHeroSlideService.cs",
+      "sha256": "1d1cfdfadac366b4ee680b71f4733c28e9925c3fcb64a0f886a576da0dcc46bc"
+    },
+    {
+      "path": "OnlineStore.Business/Services/IImageStorageService.cs",
+      "sha256": "d4f9c32aa94dd239a62983e2a05a590f7d7d01b85752ab5ad43ac086e11136bf"
+    },
+    {
+      "path": "OnlineStore.Business/Services/ImageStorageService.cs",
+      "sha256": "ff12fad3535055c712c9fb81075bab11e8fc5066c83a4b51b246399705724263"
+    },
+    {
+      "path": "OnlineStore.Business/Services/IOrderService.cs",
+      "sha256": "b96e810da5ca4b9f23418d6921a1f57bc3586c4744d4689c5ee00a142d641200"
+    },
+    {
+      "path": "OnlineStore.Business/Services/IProductService.cs",
+      "sha256": "53b58159fa9a3b4505cc666326cc4e8424e3b9bf5558c1817186d84201fa4f7e"
+    },
+    {
+      "path": "OnlineStore.Business/Services/IProductSkuService.cs",
+      "sha256": "70f66fefc08eec9b250da38c83fa9c153c3eb824fe320978c5a14c2c0ace0a70"
+    },
+    {
+      "path": "OnlineStore.Business/Services/IProductSpecService.cs",
+      "sha256": "6a4769551d5bbc67cb0629da9075035c8863eac803bacf4bc1038f2447d06580"
+    },
+    {
+      "path": "OnlineStore.Business/Services/IRememberedLoginService.cs",
+      "sha256": "a7a765d734deacb78fff9d99b15972018567d313aff9870b5731c182d0c7b646"
+    },
+    {
+      "path": "OnlineStore.Business/Services/IReviewService.cs",
+      "sha256": "260e9180b1e9b7dfce5057ea947f4b1412e62c92348bf1593c03612f46d3adaa"
+    },
+    {
+      "path": "OnlineStore.Business/Services/IShopService.cs",
+      "sha256": "378da60d6059ccf1904db091db34304a7459c2177f1e8b0f0053e18902d5caa8"
+    },
+    {
+      "path": "OnlineStore.Business/Services/IVerificationCodeService.cs",
+      "sha256": "933af90701aa4f93bc3d6c3912b86797210bcee33f3f660c0e3eef8106cfc03e"
+    },
+    {
+      "path": "OnlineStore.Business/Services/OrderConfirmationBackgroundService.cs",
+      "sha256": "756fe5ea935e3044da68138d20829342e1477e62213f3ba5b875532098450b8f"
+    },
+    {
+      "path": "OnlineStore.Business/Services/OrderNumberGenerator.cs",
+      "sha256": "49ec04ced84b27851eb3af3207610557a4c1310fddd6114d495b1a0b7b9d1d15"
+    },
+    {
+      "path": "OnlineStore.Business/Services/OrderService.cs",
+      "sha256": "df8edb6b88484c70380019630f633516fccda282b66ec38f8fab1b717cd87c29"
+    },
+    {
+      "path": "OnlineStore.Business/Services/OrderTrackingModels.cs",
+      "sha256": "e84734b9d8d47b2c0bbc05102bfb9bbd2d474c8af1d24158187371e9f2b130e3"
+    },
+    {
+      "path": "OnlineStore.Business/Services/OrderValidationException.cs",
+      "sha256": "8aef174cd639de53d92de40dafce278f9a5282db16d6faacd79e24fb115b0f56"
+    },
+    {
+      "path": "OnlineStore.Business/Services/ProductService.cs",
+      "sha256": "1b5af49ec27e12c73f137393372149fdfa0c113e81aa6a59605f658558df448f"
+    },
+    {
+      "path": "OnlineStore.Business/Services/ProductSkuService.cs",
+      "sha256": "2932c8e7f7fe14afc53063d108b11e86ea4220a45da3fbcf0e7a7a6f5fcbd13c"
+    },
+    {
+      "path": "OnlineStore.Business/Services/ProductSpecService.cs",
+      "sha256": "4acf1b7a132bf78c887dad7d2f72e0f79e6158390993205131dd8b1a3dafae54"
+    },
+    {
+      "path": "OnlineStore.Business/Services/RememberedLoginCookieService.cs",
+      "sha256": "34baca2861cda30a99c007d4e85d57cca6cdaf3dccb3c6415d8b1887565129ce"
+    },
+    {
+      "path": "OnlineStore.Business/Services/ReviewService.cs",
+      "sha256": "628d7259241d661fcf4f5305847cecb2934ea3df9dfec971e3c42f1856f4b3ea"
+    },
+    {
+      "path": "OnlineStore.Business/Services/SessionCartStore.cs",
+      "sha256": "7bb97f260edeeaf86f84d31bc671cb020986e7f574dbc867d2d953f15ddd0e12"
+    },
+    {
+      "path": "OnlineStore.Business/Services/ShopService.cs",
+      "sha256": "a82f9ceba8b91bfe8879e18fdcb6378e20e9dc28b2662ff1a6b41559adda0d33"
+    },
+    {
+      "path": "OnlineStore.Business/Services/SlugHelper.cs",
+      "sha256": "16866d6cd952cabe76a5439a06d30ba32637eeaba3da5c4a3a719846a48934af"
+    },
+    {
+      "path": "OnlineStore.Business/Services/SmtpEmailService.cs",
+      "sha256": "d0209c0b00adb6c47ab30337434b31cd8285f36fee1a72086db12d7809638357"
+    },
+    {
+      "path": "OnlineStore.Business/Services/VerificationCodeService.cs",
+      "sha256": "156132583fae92e9abe82a66e18ab66305b2c2d0008c16b9860f13622a947ddd"
+    },
+    {
+      "path": "OnlineStore.Business/Services/Shipping/IOrderShippingPolicy.cs",
+      "sha256": "1808d6df42dd468ba17885fac81ed52b59311c57d1917f7b81678f3f7bfcd9c6"
+    },
+    {
+      "path": "OnlineStore.Business/Services/Shipping/OrderShippingPolicy.cs",
+      "sha256": "19e7eeec79f6f8fbc333114820ed28f8c9b73af4288fae4aebd6d2c74c24a85c"
+    },
+    {
+      "path": "OnlineStore.Business/Services/Shipping/OrderShippingProduct.cs",
+      "sha256": "1343690a2480e4c39a8cffd44cba54c005cfb6273d7c5707cdf5323eaefb5d00"
+    },
+    {
+      "path": "OnlineStore.Business/Services/Shipping/OrderShippingQuote.cs",
+      "sha256": "e5df6bab665e608f368fdb8cd147bccc65405aa790e1d7d5b7ee9368fed6178d"
+    },
+    {
+      "path": "OnlineStore.DataAccess/GlobalUsings.cs",
+      "sha256": "f4e0ae497e3b844643aed6df31ecbff6d78908ffca0e2e7998fbbd6cbf4697ad"
+    },
+    {
+      "path": "OnlineStore.DataAccess/OnlineStore.DataAccess.csproj",
+      "sha256": "b6da3bf168e7b976da6d4f96c2971647d26342f6d570698ca64c78642305c0f5"
+    },
+    {
+      "path": "OnlineStore.DataAccess/Data/ApplicationDbContext.cs",
+      "sha256": "92fa0f744773728bf51e9e927162852c8d0b47be25183904af9c9fd8a6ea6b10"
+    },
+    {
+      "path": "OnlineStore.DataAccess/Data/DbInitializer.cs",
+      "sha256": "0c5ae5a9b6ede2b81173cf7780b27a81a1f6de42256e40be18d2b8c97b10a80e"
+    },
+    {
+      "path": "OnlineStore.DataAccess/Migrations/20261020140733_InitialCreate.cs",
+      "sha256": "340329981288a8be9c4d0c2e6d24cec7f3cf31a164be7d4b8489e6f9fc52672d"
+    },
+    {
+      "path": "OnlineStore.DataAccess/Migrations/20261020140733_InitialCreate.Designer.cs",
+      "sha256": "d06c43fa985295eec9f246c5b98744167139017f4f7a7e2a493b2db3cd226b49"
+    },
+    {
+      "path": "OnlineStore.DataAccess/Migrations/20261023234500_AddUserAvatar.cs",
+      "sha256": "54f56949c0009824fa0b06ea79cf9e20c160a04b646ee629edb92d2ab49158d5"
+    },
+    {
+      "path": "OnlineStore.DataAccess/Migrations/20261024090000_AddCategoryDescriptionEn.cs",
+      "sha256": "9d1d2d138f9f982b698a3ecf01c91486429b96115035e7fed58cfd0d08d0945a"
+    },
+    {
+      "path": "OnlineStore.DataAccess/Migrations/20261024103000_AddDeliveryAddressBook.cs",
+      "sha256": "749a304d3a7ced4dc94196377bad8c1c2cbc625298dcc8cb3018e441ad560f1d"
+    },
+    {
+      "path": "OnlineStore.DataAccess/Migrations/20261025170000_AddHeroSlides.cs",
+      "sha256": "d72b92918789613f6e930260ab502721788a7df53c57e38e4d9056f1c0cf43f0"
+    },
+    {
+      "path": "OnlineStore.DataAccess/Migrations/20261025180000_AddOrderItemSku.cs",
+      "sha256": "4a56c2b362444f23fb44a990a89e26a219958e7b62b62b9a7c57e50490423744"
+    },
+    {
+      "path": "OnlineStore.DataAccess/Migrations/20261026001008_AddCouponRules.cs",
+      "sha256": "81222c200f8fdb6a0f97bb42ed49c2ba5a69701557c3f992ede6daad970a4bce"
+    },
+    {
+      "path": "OnlineStore.DataAccess/Migrations/20261026001008_AddCouponRules.Designer.cs",
+      "sha256": "9d92fd1a7e175cc0a4b2a22a252bc475d8af756c827946cca50675692c74f8f4"
+    },
+    {
+      "path": "OnlineStore.DataAccess/Migrations/20261026004942_AddOrderCouponName.cs",
+      "sha256": "70fdafc65892ffecdea3323db9ff3a408e5e90dd3955c1d78dc094bc71115848"
+    },
+    {
+      "path": "OnlineStore.DataAccess/Migrations/20261026004942_AddOrderCouponName.Designer.cs",
+      "sha256": "1090ef6e8a3dd9352d05eef7872e46e8649687b9f790cc7e8315c913496fe733"
+    },
+    {
+      "path": "OnlineStore.DataAccess/Migrations/20261026162808_AddOrderFulfillmentAndAfterSales.cs",
+      "sha256": "c53c8d8127d738ba211ab116fc5fd30306541476d6163939902d9756af901368"
+    },
+    {
+      "path": "OnlineStore.DataAccess/Migrations/20261026162808_AddOrderFulfillmentAndAfterSales.Designer.cs",
+      "sha256": "ae9afe2b9d7fd343d06a3b5a083ad7e518534df8681192094d6459474f29a928"
+    },
+    {
+      "path": "OnlineStore.DataAccess/Migrations/20261026170416_AddOrderUserDeletion.cs",
+      "sha256": "ef7646739f18a33ed0f5bdbb25a9779bb078be57da8f77b3e755ff4c131492ce"
+    },
+    {
+      "path": "OnlineStore.DataAccess/Migrations/20261026170416_AddOrderUserDeletion.Designer.cs",
+      "sha256": "4a55eea85ab66d873abf5803ed7864bf026e8e1fe32330143177bf079132a095"
+    },
+    {
+      "path": "OnlineStore.DataAccess/Migrations/20261026172851_AddOrderShippingSnapshot.cs",
+      "sha256": "8d15b06fe6ffd30b8ef0dc88a9a8ad800a9fe7991596cb1ee96a70119d3b7af9"
+    },
+    {
+      "path": "OnlineStore.DataAccess/Migrations/20261026172851_AddOrderShippingSnapshot.Designer.cs",
+      "sha256": "71bf125ebab702faee2b400e72164d93db6db9dfaba69b6edcaf37dc6f623ee0"
+    },
+    {
+      "path": "OnlineStore.DataAccess/Migrations/20261026182849_AddReviewOrderLink.cs",
+      "sha256": "68d506e2efc067f68e6eb9ac5e3dcc979591959b8f5d013270ffea9c386c130e"
+    },
+    {
+      "path": "OnlineStore.DataAccess/Migrations/20261026182849_AddReviewOrderLink.Designer.cs",
+      "sha256": "6e25464ffe84382b163a830336af94933a966c2d15f3c5e0147499a311b7431d"
+    },
+    {
+      "path": "OnlineStore.DataAccess/Migrations/20261026200000_SetUkProductShippingOrigins.cs",
+      "sha256": "e0f055786dac0a610c9fd1b9be5215077dad7fd407ae4566d5d0bfae7a968b7b"
+    },
+    {
+      "path": "OnlineStore.DataAccess/Migrations/20261026222048_FixInventoryCheckoutAndOrderConstraints.cs",
+      "sha256": "bb67e1595a7210bf4b39dd56c8eaf9dbd61ca51443e598b36e8453cf8fa6a7ef"
+    },
+    {
+      "path": "OnlineStore.DataAccess/Migrations/20261026222048_FixInventoryCheckoutAndOrderConstraints.Designer.cs",
+      "sha256": "4dd8e028931776809678003cff2d1b7b0d5801b3a96bb8212bb58f8e1105a385"
+    },
+    {
+      "path": "OnlineStore.DataAccess/Migrations/20261026231833_AddShopLogoUrl.cs",
+      "sha256": "b0db90b0ad7de7fef71cd0511ac4af0c2b794228769228a9696749091e6bad70"
+    },
+    {
+      "path": "OnlineStore.DataAccess/Migrations/20261026231833_AddShopLogoUrl.Designer.cs",
+      "sha256": "29fa8b2750282be185f567d999284fe5c5ea7895a0e2681bd155b95cdfbe7757"
+    },
+    {
+      "path": "OnlineStore.DataAccess/Migrations/20261028213537_AddReceiptConfirmationWorkflow.cs",
+      "sha256": "75fa8766a69b0bd0e55439272367ba67056d701642e801c8714a04a8ca1969de"
+    },
+    {
+      "path": "OnlineStore.DataAccess/Migrations/20261028213537_AddReceiptConfirmationWorkflow.Designer.cs",
+      "sha256": "a3c56a5abfa6aad0e64629b1392ebe54e22514f64341e28652971c49180c3f7f"
+    },
+    {
+      "path": "OnlineStore.DataAccess/Migrations/20261028231500_AddReturnShipmentTracking.cs",
+      "sha256": "e7a8f6f83c3a5e4d71242206904582b5757991afb78690cc00640366298aa7a4"
+    },
+    {
+      "path": "OnlineStore.DataAccess/Migrations/20261029140000_LimitVerificationCodeAttempts.cs",
+      "sha256": "ac97388e0c359151c3a00b08a66ed92520f1d8a4147664727c9f5b045991cf22"
+    },
+    {
+      "path": "OnlineStore.DataAccess/Migrations/ApplicationDbContextModelSnapshot.cs",
+      "sha256": "afdc65e06db8718bec229b2939e57ca3bf05e67668ce479aa2f8930a6dfa9635"
+    },
+    {
+      "path": "OnlineStore.Models/AssemblyInfo.cs",
+      "sha256": "9dca1b269c80a8b984e0629abbb1e0ceae842997adb4328bc54bfdd003fa039d"
+    },
+    {
+      "path": "OnlineStore.Models/GlobalUsings.cs",
+      "sha256": "b0056f2aa1f00809200cd289b43c8a836916e810446d3f469e335711e2633bc9"
+    },
+    {
+      "path": "OnlineStore.Models/OnlineStore.Models.csproj",
+      "sha256": "97b8f7e262e3aa7d27cb977318943efa246c8630c0a8f5f10e9fd5bb436e5c2b"
+    },
+    {
+      "path": "OnlineStore.Models/SharedResource.cs",
+      "sha256": "1e6740ad0a8ec65971822c760523f3efd943e97e9e238fd0dc3df5f35a551c73"
+    },
+    {
+      "path": "OnlineStore.Models/Models/AfterSalesRequest.cs",
+      "sha256": "53c2e87d9b6b5709cefaed6ced2771889d8548cf063e157ce0c827da5c43cf39"
+    },
+    {
+      "path": "OnlineStore.Models/Models/AfterSalesStatus.cs",
+      "sha256": "6a20bdb999377cc45582094c29a42ae79c9955d77e08d54c476f898da86edd5b"
+    },
+    {
+      "path": "OnlineStore.Models/Models/AfterSalesType.cs",
+      "sha256": "457408ddf2f2031080cd430e37842c7e741cc84ef83491d74c8e92bd98b68153"
+    },
+    {
+      "path": "OnlineStore.Models/Models/ApplicationUser.cs",
+      "sha256": "4d2d192208d14b7b48911f9f32e508a9d7939555ed65be53141d9040d078e03b"
+    },
+    {
+      "path": "OnlineStore.Models/Models/Cart.cs",
+      "sha256": "8ed32c87fefbe44c22aca4103abe6f7930612f7522edc8aab092cb66af925df3"
+    },
+    {
+      "path": "OnlineStore.Models/Models/CartItem.cs",
+      "sha256": "4cbd53d0843743179946198d9504cc6ff904b4d22cade36db8ea43d724c80833"
+    },
+    {
+      "path": "OnlineStore.Models/Models/Category.cs",
+      "sha256": "1e8b7d200317c80be1f1fb245cde87f41694c17fc5e0390519cf91096cadb860"
+    },
+    {
+      "path": "OnlineStore.Models/Models/Coupon.cs",
+      "sha256": "51d942567574a7c503dacd3386d44f87b7d81ef6b04c6de17427d254f63c29d9"
+    },
+    {
+      "path": "OnlineStore.Models/Models/CouponRedemption.cs",
+      "sha256": "91453974971cd899e023eaa206d9b8a7505b3ff2f3d0b5453d2c61ea2292c52e"
+    },
+    {
+      "path": "OnlineStore.Models/Models/DeliveryAddress.cs",
+      "sha256": "11cda312f24ee912ccd09ab2b86f69355e76b911e441d8e2596537701583e4e3"
+    },
+    {
+      "path": "OnlineStore.Models/Models/EmailVerificationCode.cs",
+      "sha256": "cb98387123959670eb787490a1751dd7aa3135e35e9bb67071ae02c3107143d3"
+    },
+    {
+      "path": "OnlineStore.Models/Models/Favorite.cs",
+      "sha256": "a9cbf1fccaf155de1e282f33a787aacd06afa32f2a1c876a251c442870762af1"
+    },
+    {
+      "path": "OnlineStore.Models/Models/HeroSlide.cs",
+      "sha256": "455a911203bdefdcb30f7d739024d6a47b7d04e5bd6fa1e80b6f98cdb42a755b"
+    },
+    {
+      "path": "OnlineStore.Models/Models/L10n.cs",
+      "sha256": "6ae53acdaa291ead963ee05b758330daa3cebc34b0073144c7334dd1677b25fd"
+    },
+    {
+      "path": "OnlineStore.Models/Models/Order.cs",
+      "sha256": "53c50b5c4fbf77af05490f805bf06c37dd426cbbdf9f32e789a7b9d90ffee38c"
+    },
+    {
+      "path": "OnlineStore.Models/Models/OrderItem.cs",
+      "sha256": "171dda032b18cfbe1ff279bf70ab047f5ff24e9da8f09f71cbf1bc7c0b902d17"
+    },
+    {
+      "path": "OnlineStore.Models/Models/OrderStatus.cs",
+      "sha256": "c8b3b6506fe583d33737afec714885410033210c3fcc9f7442d6954d557199e0"
+    },
+    {
+      "path": "OnlineStore.Models/Models/Product.cs",
+      "sha256": "17863eac24e43c5269d242a87a91d4b3cc2e1499928c14ea7ef6b17b3c204cf4"
+    },
+    {
+      "path": "OnlineStore.Models/Models/ProductImage.cs",
+      "sha256": "18de2e83df54feb339098958ded56e84ed837d8b299af6466b718a24e01615ed"
+    },
+    {
+      "path": "OnlineStore.Models/Models/ProductSku.cs",
+      "sha256": "a2c4146bb8aa6f39c87718671f58e89c708af8223d2f9d4b0e2f04302c556007"
+    },
+    {
+      "path": "OnlineStore.Models/Models/ProductSpec.cs",
+      "sha256": "3564472f5e11cb47bc40dc783d27ce81e97ec8e3d7516473996a81edc1f2ad4c"
+    },
+    {
+      "path": "OnlineStore.Models/Models/Review.cs",
+      "sha256": "68f38728316f2b8b057936eae80986b5a9e3f02bcbb4e76a60f507652c9c9635"
+    },
+    {
+      "path": "OnlineStore.Models/Models/Shop.cs",
+      "sha256": "d783f076030912ec9cb4719c179f59f9367560b1e7fe602ec2fb1e048af62e29"
+    },
+    {
+      "path": "OnlineStore.Models/Validation/PasswordPolicy.cs",
+      "sha256": "8187af73e8d6a88899e0faefe03117eec861f6a9631781995e29239aee768325"
+    },
+    {
+      "path": "OnlineStore.Models/ViewModels/AddressViewModel.cs",
+      "sha256": "d8152fda06719b0c092aca6d02061d5284d30144e4159f8aa2161720d1629eb7"
+    },
+    {
+      "path": "OnlineStore.Models/ViewModels/AdminOrdersViewModel.cs",
+      "sha256": "daf5cc3f8f2a3bc3658deb9fb586dfc2e797ba80190754c56f451b2a343c5802"
+    },
+    {
+      "path": "OnlineStore.Models/ViewModels/AdminOrderUpdateViewModel.cs",
+      "sha256": "77d301bcab3f7fe267c70cfdc6208098706ed65e78756b240caf1458a06fee48"
+    },
+    {
+      "path": "OnlineStore.Models/ViewModels/AfterSalesUpdateViewModel.cs",
+      "sha256": "bbbf21482cd99eb514d1461f859563a9add35065b961e1c550fb910e72ee9b59"
+    },
+    {
+      "path": "OnlineStore.Models/ViewModels/CategoryFormViewModel.cs",
+      "sha256": "b340bb97d1e9b6c924634da2a4c165ae70780235908c4cab8f5374beaaa38d8e"
+    },
+    {
+      "path": "OnlineStore.Models/ViewModels/CategoryNavigationViewModel.cs",
+      "sha256": "a7ef62700901a38f3cc5944e2ae756268f62e727b2ed2950f332e7fe4262736f"
+    },
+    {
+      "path": "OnlineStore.Models/ViewModels/ChangePasswordViewModel.cs",
+      "sha256": "cde38ec6f87d066180d88057fbd7938de59c9190a44b05d3f2a23c4f7b98be7f"
+    },
+    {
+      "path": "OnlineStore.Models/ViewModels/CheckoutViewModel.cs",
+      "sha256": "8efb1bd824ebe2e096601426757276e50525139357ad991946415103ff3a5535"
+    },
+    {
+      "path": "OnlineStore.Models/ViewModels/CouponChoiceViewModel.cs",
+      "sha256": "0b9e704051e3c9f8bc9446e6281cf33d7ba45c8ac3ef43a439c672d6903c8222"
+    },
+    {
+      "path": "OnlineStore.Models/ViewModels/CouponFormViewModel.cs",
+      "sha256": "4a947a7243a2b97f8fbca79c3f5752f7a285d8cf934e10504fe7f84d18ed29b2"
+    },
+    {
+      "path": "OnlineStore.Models/ViewModels/CustomerOrderUpdateViewModel.cs",
+      "sha256": "dca40a9b3af5df6582b100867f43733b1bf1f654721ee03339e50d055af31495"
+    },
+    {
+      "path": "OnlineStore.Models/ViewModels/ErrorViewModel.cs",
+      "sha256": "a235ad7ecfa3465ef96871a55f2ecd2d6a193b2f0ac2f05934e7c741a9301a64"
+    },
+    {
+      "path": "OnlineStore.Models/ViewModels/ForgotPasswordViewModel.cs",
+      "sha256": "1981ab53ca06a1179afee0c66f9c2e8db5898f0ca395186dffc9a759edc39f28"
+    },
+    {
+      "path": "OnlineStore.Models/ViewModels/HeroSlideFormViewModel.cs",
+      "sha256": "d5e3dd9f296d5ff97ac745e8b7c6363ac82c49069e651e19bacb13e9e73070d9"
+    },
+    {
+      "path": "OnlineStore.Models/ViewModels/LoginViewModel.cs",
+      "sha256": "03b75100dc6669402f299754ef243598215306ec3b8459af31946d1ac3bf087c"
+    },
+    {
+      "path": "OnlineStore.Models/ViewModels/OrderItemPreviewViewModel.cs",
+      "sha256": "4c45ed0b24188202aa8310bbcfac5e5f93999e9991ec4c57d44f7fd517cc13c2"
+    },
+    {
+      "path": "OnlineStore.Models/ViewModels/PagedResult.cs",
+      "sha256": "91f8cc4cc5641ee79ebb5b230188fc8826b33630c99a2db4532646d98c9b687e"
+    },
+    {
+      "path": "OnlineStore.Models/ViewModels/ProductFormViewModel.cs",
+      "sha256": "ec7aab9d90f8840901ac9f08198fd080fdfe2c90a68813f2288847c50de4155f"
+    },
+    {
+      "path": "OnlineStore.Models/ViewModels/ProductListViewModel.cs",
+      "sha256": "33e7dbda1bb4d21851fc4855674634ebe14726d11fd0f3a9a994d8061906fc8f"
+    },
+    {
+      "path": "OnlineStore.Models/ViewModels/ProductQuery.cs",
+      "sha256": "86068267fb20184ec6c1bb91d241f326dd34e27b6e92de7dd5838e02b2ce3f86"
+    },
+    {
+      "path": "OnlineStore.Models/ViewModels/ProductReviewsPageViewModel.cs",
+      "sha256": "76ed500267ada61a5ab8daa7c546196d10ed083658e428c631061defa3da000a"
+    },
+    {
+      "path": "OnlineStore.Models/ViewModels/ProfileViewModel.cs",
+      "sha256": "d256c8ab178f7e14561dd974c9014eba2a2338e706cb63176fa753d1bd9de80f"
+    },
+    {
+      "path": "OnlineStore.Models/ViewModels/RegisterViewModel.cs",
+      "sha256": "d792922cd307aa761f67813745a05a9db59650dc516c5b1d54077cb77cc156b5"
+    },
+    {
+      "path": "OnlineStore.Models/ViewModels/SendCodeViewModel.cs",
+      "sha256": "e79607fee03a0308848056b8a151422716b060341120f173efb8c680525df0e2"
+    },
+    {
+      "path": "OnlineStore.Models/ViewModels/ShopViewModel.cs",
+      "sha256": "678891c16f4e5e364da65615093d46d2db2e2f4bc2d94e483f30afbf48fea82e"
+    },
+    {
+      "path": "OnlineStore.Tests/GlobalUsings.cs",
+      "sha256": "4f0cb26b0733a20ff984c30257ff4c75ab0d56da01579abc879f477c3f75cef6"
+    },
+    {
+      "path": "OnlineStore.Tests/OnlineStore.Tests.csproj",
+      "sha256": "47355811805b2467374c643d8311c6e204882a998f1ac13258bad320a499d0fd"
+    },
+    {
+      "path": "OnlineStore.Tests/Architecture/LayerBoundaryTests.cs",
+      "sha256": "69bc626bb035fdf7aa8de0c4c109c6e0457653aa8d8b054d090ec7e187c3dc4a"
+    },
+    {
+      "path": "OnlineStore.Tests/Controllers/AccountLoginTests.cs",
+      "sha256": "54e977aa43c0129218db2bec73a95aaeef568cceb1fe19fcf85e39c79ae3f7a6"
+    },
+    {
+      "path": "OnlineStore.Tests/Controllers/AccountSafetyTests.cs",
+      "sha256": "0e39d5d1fe686161b476191c1cad16884975f4252056c46d47f5d30e4ad6a369"
+    },
+    {
+      "path": "OnlineStore.Tests/Controllers/AdminOrderPaginationTests.cs",
+      "sha256": "4fc6e9da56a4a09f7f96f5c5b868564d1dea3f549006586ac03d561f7900155c"
+    },
+    {
+      "path": "OnlineStore.Tests/Controllers/AdminOrderUpdatesTests.cs",
+      "sha256": "c6091abaa74dc9838e8563cfcc9e6d4ff8832d9694372735f3e37dd8623c72ed"
+    },
+    {
+      "path": "OnlineStore.Tests/Controllers/CartControllerTests.cs",
+      "sha256": "61dd394618fe521ebbd1f658135c44465c0b7f21c4ec7e2fb937b900d2fff636"
+    },
+    {
+      "path": "OnlineStore.Tests/Controllers/HeroSlidesControllerTests.cs",
+      "sha256": "226f9d99910b3d058065ef088442964854b404222f4afc5ce92176d3b0267b8e"
+    },
+    {
+      "path": "OnlineStore.Tests/Controllers/ProductReviewsControllerTests.cs",
+      "sha256": "201a6444d32c69ddeec850e2581552cf8caa9e4d1bf9169303be2718eeab76b6"
+    },
+    {
+      "path": "OnlineStore.Tests/Controllers/PublicRequestSafetyTests.cs",
+      "sha256": "e4369adcb519e81a15b583a73b3bb993dab35cc287db89384008bf9c84daef44"
+    },
+    {
+      "path": "OnlineStore.Tests/Controllers/QualityPipelineTests.cs",
+      "sha256": "4cdbf7f51b31cb58f867ef3dee60c137aedc3b31525d9015d85b066476bd6e40"
+    },
+    {
+      "path": "OnlineStore.Tests/Frontend/admin-after-sales-updates.test.cjs",
+      "sha256": "4b90bc43418bdb084e29e548cb98e407ec4fb757b675c6964f941b95367008a2"
+    },
+    {
+      "path": "OnlineStore.Tests/Frontend/admin-order-updates.test.cjs",
+      "sha256": "d71fe01634869d0d3f61f402c3b6420f0f10bdf61383ca5a1a6514c5d87c39f7"
+    },
+    {
+      "path": "OnlineStore.Tests/Frontend/custom-select.test.cjs",
+      "sha256": "388f92b794116e94d7234eb633151ef28c338dbfa4336095ea931d090c8f29e7"
+    },
+    {
+      "path": "OnlineStore.Tests/Frontend/customer-order-updates.test.cjs",
+      "sha256": "05e13ac9929dafa31b752ce88b3f82e7ef3ac467094f2940068ba3c8feffcf1d"
+    },
+    {
+      "path": "OnlineStore.Tests/Frontend/order-count-badge.test.cjs",
+      "sha256": "40f26cb5557e119cbbb6f9f5c1b7c4170d46daed6d21d7d0b84ba523fd12c78a"
+    },
+    {
+      "path": "OnlineStore.Tests/Frontend/product-details.test.cjs",
+      "sha256": "e63032b5ee52b82b30291385cbaef1159ec45a8986ba5e2d054653e23a116770"
+    },
+    {
+      "path": "OnlineStore.Tests/Frontend/validation-messages.test.cjs",
+      "sha256": "e639f56734d4b45f0f6bae1fac9c03d0f5a3368d3608927ead0cf9b20c7fa6a4"
+    },
+    {
+      "path": "OnlineStore.Tests/Models/L10nPaymentMethodTests.cs",
+      "sha256": "26432a4945ecc8907e43edacf37b8038bd343740b773d6774f113e3ededcb593"
+    },
+    {
+      "path": "OnlineStore.Tests/Services/CartServiceTests.cs",
+      "sha256": "e80194073e25a3fea6315d3ca6be9f20e87a494bd4045c6e3f0ee842cad3c773"
+    },
+    {
+      "path": "OnlineStore.Tests/Services/CatalogPresentationQueryTests.cs",
+      "sha256": "1c41a8b3eda1e542e90fb27ae035ac647e0b0531da096849afe5b4fdc64a514d"
+    },
+    {
+      "path": "OnlineStore.Tests/Services/CommerceRegressionTests.cs",
+      "sha256": "3eae1c96590171e6109f54e0a2dfa69ca628ac722ef29609fe09856ad4c2939b"
+    },
+    {
+      "path": "OnlineStore.Tests/Services/CouponCalculatorTests.cs",
+      "sha256": "425dacb4c8ed476566d7fe8bd3901719e904244f642ebeb5815e641845b9eff6"
+    },
+    {
+      "path": "OnlineStore.Tests/Services/CouponServiceTests.cs",
+      "sha256": "e807513bd5194ad7fec95a84def8c6406a3ee901ee528f6ad941f2f4786a54e4"
+    },
+    {
+      "path": "OnlineStore.Tests/Services/DbInitializerSafetyTests.cs",
+      "sha256": "a1e25310f15ccdf1503bcaa92caa8b2f2ecbf551bff899d52e64b3415858a091"
+    },
+    {
+      "path": "OnlineStore.Tests/Services/DeliveryAddressServiceTests.cs",
+      "sha256": "1781d1277d745489b31029b7c91166647375542ca2903a14eacc9f85e946043b"
+    },
+    {
+      "path": "OnlineStore.Tests/Services/HeroSlideServiceTests.cs",
+      "sha256": "4e324f6a92c73f147a3bad568e72e5b12e20898f8cdd5074736a5d5404d2826e"
+    },
+    {
+      "path": "OnlineStore.Tests/Services/ImageDeletionSafetyTests.cs",
+      "sha256": "c3bf5461280a3dce20f54e89581d43c92eb655c607391054e9bf3dd9d2305ff8"
+    },
+    {
+      "path": "OnlineStore.Tests/Services/ImageStorageServiceTests.cs",
+      "sha256": "e9d4ee265fba8efadabbefe8688929c318c84580ff5702afdbe48a225e1cae9a"
+    },
+    {
+      "path": "OnlineStore.Tests/Services/OrderItemPreviewTests.cs",
+      "sha256": "62b9308c483f99c28be28d832d31153771acbf945cc2269322d015cb8f43003d"
+    },
+    {
+      "path": "OnlineStore.Tests/Services/OrderReceiptSafetyTests.cs",
+      "sha256": "d91ec1d743625d2667c68e260635af2edd128bbd827c30ea194037b3853ca045"
+    },
+    {
+      "path": "OnlineStore.Tests/Services/OrderServiceTests.cs",
+      "sha256": "ab9b5b7d63cb4833277e07277ff484030ef0f2490f72bea07ad9b4f4051e9376"
+    },
+    {
+      "path": "OnlineStore.Tests/Services/OrderShippingPolicyIntegrationTests.cs",
+      "sha256": "169f06d04e91b25a24d444670911e8769abb911039129059df0c4ddb40456e93"
+    },
+    {
+      "path": "OnlineStore.Tests/Services/OrderShippingPolicyTests.cs",
+      "sha256": "9d258a733f31cd2393c48e05b28dba3c4bbb98ba83e9c1e88414c097e9656d32"
+    },
+    {
+      "path": "OnlineStore.Tests/Services/OrderShippingSnapshotTests.cs",
+      "sha256": "f141dbd69028f00aec08144830dd0112dbd2dbaaa03a941919a1f537469a10c4"
+    },
+    {
+      "path": "OnlineStore.Tests/Services/ProductServiceTests.cs",
+      "sha256": "70c50b99847656398b4275e97c9c0767c621eb6c4ed29e867c65615e180a3a1c"
+    },
+    {
+      "path": "OnlineStore.Tests/Services/RememberedLoginCookieServiceTests.cs",
+      "sha256": "32eaff98d44ede0ac37b8e500eba412eb114d407b3a8815961171c1bf17fba09"
+    },
+    {
+      "path": "OnlineStore.Tests/Services/ReviewOrderTests.cs",
+      "sha256": "ea0d0b4cd5a88306eda61071d6fbc2f701258236d4d3c1725b25d15a01bd6cb4"
+    },
+    {
+      "path": "OnlineStore.Tests/Services/VerificationCodeServiceTests.cs",
+      "sha256": "744cebd068b76c97635af16e716fe1e49559adcaf381dc395baf94083d15ef37"
+    },
+    {
+      "path": "tools/verification/run-sql-checks.ps1",
+      "sha256": "9059179e338668c957fa5528f6c57ca2a9ccc4054571a45c777bf0eec73ce405"
+    },
+    {
+      "path": "tools/verification/SqlChecks/Program.cs",
+      "sha256": "625e0c004bec015c4218f4ad661c24fbd5a6bd312b82df7951342942cdcf3719"
+    },
+    {
+      "path": "tools/verification/SqlChecks/RecoveryDemo.cs",
+      "sha256": "fe2f332d90f068915a7a7123d1aefdf74476e7580609bc5adb392b73b4d125b6"
+    },
+    {
+      "path": "tools/verification/SqlChecks/SafetyChecks.cs",
+      "sha256": "1aade5be7631f39fda5f24bfb08dc21093628865047f4774f40b9bcd679b8e3f"
+    },
+    {
+      "path": "tools/verification/SqlChecks/SqlChecks.csproj",
+      "sha256": "6295bef56ac10ccb7fe3d75265a866f2cce2945e9933aa434cc81c920a77e2bc"
+    },
+    {
+      "path": "tools/verification/SqlChecks/VerificationSettings.cs",
+      "sha256": "3f6bab3c112a82bef56fb9a375442176071b52be9f1c473dfff062e163e48a8d"
+    }
+  ]
+}

@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
-using OnlineStore.Data;
 using OnlineStore.Models;
 using OnlineStore.Services;
 using OnlineStore.ViewModels;
@@ -16,16 +15,13 @@ namespace OnlineStore.Areas.Admin.Controllers;
 public class CouponsController : Controller
 {
     private readonly ICouponService _couponService;
-    private readonly ApplicationDbContext _context;
     private readonly IStringLocalizer<SharedResource> _loc;
 
     public CouponsController(
         ICouponService couponService,
-        ApplicationDbContext context,
         IStringLocalizer<SharedResource> localizer)
     {
         _couponService = couponService;
-        _context = context;
         _loc = localizer;
     }
 
@@ -191,20 +187,12 @@ public class CouponsController : Controller
 
     private async Task PopulateOptionsAsync(CouponFormViewModel form)
     {
-        var categories = await _context.Categories
-            .AsNoTracking()
-            .OrderBy(category => category.DisplayOrder)
-            .ThenBy(category => category.Name)
-            .ToListAsync();
-        var products = await _context.Products
-            .AsNoTracking()
-            .OrderBy(product => product.Name)
-            .ToListAsync();
+        var options = await _couponService.GetFormOptionsAsync(HttpContext.RequestAborted);
 
-        form.CategoryOptions = categories
+        form.CategoryOptions = options.Categories
             .Select(category => new SelectListItem(L10n.Name(category), category.Id.ToString()))
             .ToList();
-        form.ProductOptions = products
+        form.ProductOptions = options.Products
             .Select(product => new SelectListItem(
                 $"{L10n.Name(product)} · {product.Sku}".TrimEnd(' ', '·'),
                 product.Id.ToString()))

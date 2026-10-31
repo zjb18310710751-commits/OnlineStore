@@ -1,0 +1,79 @@
+name: Continuous integration
+
+on:
+  push:
+    branches: [Ethan-Yang, HUZHANHAO, main]
+  pull_request:
+    branches: [Ethan-Yang, HUZHANHAO, main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  dotnet:
+    name: .NET build and tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Restore
+        run: dotnet restore OnlineStore.sln
+
+      - name: Build
+        run: dotnet build OnlineStore.sln --configuration Release --no-restore
+
+      - name: Test
+        run: dotnet test OnlineStore.sln --configuration Release --no-build --no-restore --logger "trx;LogFileName=dotnet-tests.trx" --results-directory artifacts/dotnet
+
+      - name: Compile SQL verification tool
+        run: dotnet build tools/verification/SqlChecks/SqlChecks.csproj --configuration Release
+
+      - name: Check SQL verification safety guards without a database
+        run: dotnet run --project tools/verification/SqlChecks/SqlChecks.csproj --configuration Release --no-build --no-restore -- --safety-checks
+
+      - name: Upload .NET test evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dotnet-test-results
+          path: artifacts/dotnet/*.trx
+          if-no-files-found: warn
+
+  frontend:
+    name: Node frontend tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Test frontend behavior
+        shell: bash
+        run: |
+          mkdir -p artifacts/frontend
+          node --test --test-reporter=tap OnlineStore.Tests/Frontend/*.test.cjs | tee artifacts/frontend/frontend-tests.tap
+
+      - name: Upload frontend test evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-test-results
+          path: artifacts/frontend/*.tap
+          if-no-files-found: warn

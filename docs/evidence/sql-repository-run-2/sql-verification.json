@@ -1,0 +1,169 @@
+{
+  "schemaVersion": 1,
+  "provider": "Microsoft.EntityFrameworkCore.SqlServer",
+  "startedAtUtc": "2026-10-29T15:50:07.2220971Z",
+  "completedAtUtc": "2026-10-29T15:50:14.7438107Z",
+  "expectedChecks": 9,
+  "completedChecks": 9,
+  "failures": 0,
+  "setupFailure": null,
+  "passed": true,
+  "databasePolicy": "New generated databases only; master is used for creation; no application database is read or written; no automatic drop.",
+  "databases": [
+    {
+      "purpose": "fresh-schema-and-service-checks",
+      "name": "OnlineStore_Verification_20261029_155007_a7b56c61ec4c49aaab372e7342c9eee9",
+      "dataPath": "E:\\DMU-Learning\\.tmp\\coursework-audit-20261029\\database\\OnlineStore_Verification_20261029_155007_a7b56c61ec4c49aaab372e7342c9eee9.mdf",
+      "logPath": "E:\\DMU-Learning\\.tmp\\coursework-audit-20261029\\database\\OnlineStore_Verification_20261029_155007_a7b56c61ec4c49aaab372e7342c9eee9_log.ldf",
+      "creationAttempted": true
+    },
+    {
+      "purpose": "old-schema-upgrade",
+      "name": "OnlineStore_Verification_20261029_155008_f3e025d420c94e748936935dbea07fbf",
+      "dataPath": "E:\\DMU-Learning\\.tmp\\coursework-audit-20261029\\database\\OnlineStore_Verification_20261029_155008_f3e025d420c94e748936935dbea07fbf.mdf",
+      "logPath": "E:\\DMU-Learning\\.tmp\\coursework-audit-20261029\\database\\OnlineStore_Verification_20261029_155008_f3e025d420c94e748936935dbea07fbf_log.ldf",
+      "creationAttempted": true
+    }
+  ],
+  "results": [
+    {
+      "name": "all-migrations-and-verification-attempt-column",
+      "passed": true,
+      "elapsedMilliseconds": 1028,
+      "evidence": {
+        "provider": "Microsoft.EntityFrameworkCore.SqlServer",
+        "migrations": [
+          "20261020140733_InitialCreate",
+          "20261023234500_AddUserAvatar",
+          "20261024090000_AddCategoryDescriptionEn",
+          "20261024103000_AddDeliveryAddressBook",
+          "20261025170000_AddHeroSlides",
+          "20261025180000_AddOrderItemSku",
+          "20261026001008_AddCouponRules",
+          "20261026004942_AddOrderCouponName",
+          "20261026162808_AddOrderFulfillmentAndAfterSales",
+          "20261026170416_AddOrderUserDeletion",
+          "20261026172851_AddOrderShippingSnapshot",
+          "20261026182849_AddReviewOrderLink",
+          "20261026200000_SetUkProductShippingOrigins",
+          "20261026222048_FixInventoryCheckoutAndOrderConstraints",
+          "20261026231833_AddShopLogoUrl",
+          "20261028213537_AddReceiptConfirmationWorkflow",
+          "20261028231500_AddReturnShipmentTracking",
+          "20261029140000_LimitVerificationCodeAttempts"
+        ],
+        "failedAttemptsColumn": true
+      }
+    },
+    {
+      "name": "old-migration-upgrade-preserves-existing-verification-code",
+      "passed": true,
+      "elapsedMilliseconds": 626,
+      "evidence": {
+        "previousMigration": "20261028231500_AddReturnShipmentTracking",
+        "applied": [
+          "20261020140733_InitialCreate",
+          "20261023234500_AddUserAvatar",
+          "20261024090000_AddCategoryDescriptionEn",
+          "20261024103000_AddDeliveryAddressBook",
+          "20261025170000_AddHeroSlides",
+          "20261025180000_AddOrderItemSku",
+          "20261026001008_AddCouponRules",
+          "20261026004942_AddOrderCouponName",
+          "20261026162808_AddOrderFulfillmentAndAfterSales",
+          "20261026170416_AddOrderUserDeletion",
+          "20261026172851_AddOrderShippingSnapshot",
+          "20261026182849_AddReviewOrderLink",
+          "20261026200000_SetUkProductShippingOrigins",
+          "20261026222048_FixInventoryCheckoutAndOrderConstraints",
+          "20261026231833_AddShopLogoUrl",
+          "20261028213537_AddReceiptConfirmationWorkflow",
+          "20261028231500_AddReturnShipmentTracking",
+          "20261029140000_LimitVerificationCodeAttempts"
+        ],
+        "oldRowPreserved": true,
+        "failedAttemptsDefault": 0,
+        "codeConsumed": true
+      }
+    },
+    {
+      "name": "development-seeding-isolated-database",
+      "passed": true,
+      "elapsedMilliseconds": 1258,
+      "evidence": {
+        "products": 100,
+        "orders": 5,
+        "accounts": 2
+      }
+    },
+    {
+      "name": "verification-concurrent-wrong-attempts-capped-at-five",
+      "passed": true,
+      "elapsedMilliseconds": 45,
+      "evidence": {
+        "requests": 12,
+        "failedAttempts": 5,
+        "correctCodeAfterLimitRejected": true
+      }
+    },
+    {
+      "name": "verification-correct-code-single-consumption",
+      "passed": true,
+      "elapsedMilliseconds": 25,
+      "evidence": {
+        "requests": 8,
+        "accepted": 1,
+        "codeRemoved": true
+      }
+    },
+    {
+      "name": "product-crud-filtering-pagination",
+      "passed": true,
+      "elapsedMilliseconds": 310,
+      "evidence": {
+        "created": 3,
+        "filteredTotal": 2,
+        "pagination": true,
+        "updated": true,
+        "deleted": true
+      }
+    },
+    {
+      "name": "order-stock-cancellation-refund-restored-once",
+      "passed": true,
+      "elapsedMilliseconds": 380,
+      "evidence": {
+        "initialStock": 10,
+        "afterCancellation": 10,
+        "afterRefund": 10,
+        "duplicateOperationsRejected": true
+      }
+    },
+    {
+      "name": "competing-orders-cannot-oversell-last-item",
+      "passed": true,
+      "elapsedMilliseconds": 3472,
+      "evidence": {
+        "accepted": 1,
+        "finalStock": 0,
+        "orderItems": 1
+      }
+    },
+    {
+      "name": "long-multilingual-shipping-snapshot-persists-in-sql",
+      "passed": true,
+      "elapsedMilliseconds": 49,
+      "evidence": {
+        "persisted": true,
+        "lengths": {
+          "ShippingOrigin": 200,
+          "ShippingOriginEn": 200,
+          "ShippingFeeText": 100,
+          "ShippingFeeTextEn": 100,
+          "DispatchTimeText": 100,
+          "DispatchTimeTextEn": 100
+        }
+      }
+    }
+  ]
+}

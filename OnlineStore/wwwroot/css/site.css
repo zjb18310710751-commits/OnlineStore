@@ -1780,6 +1780,7 @@ body {
 .sf-select {
     position: relative;
     display: inline-flex;
+    flex-direction: column;
     max-width: 100%;
     vertical-align: middle;
 }

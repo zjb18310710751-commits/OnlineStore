@@ -1,0 +1,19 @@
+{
+  "output": "E:\\Daily\\team work\\系统架构与项目反思-最终版.docx",
+  "sha256": "4eac5a09fe6aa004e221352ab0d9cbb1822cb7741c7c706537d7b40f29ebc3ec",
+  "reference_sha256": "65e127f24136e0157ed961c81bde760b6c7368e1b30dc7da191a05a498b4d456",
+  "preserve_only_parts_unchanged": true,
+  "changed_parts": [
+    "docProps/core.xml",
+    "word/document.xml",
+    "word/settings.xml",
+    "word/media/image4.png",
+    "word/media/image5.png",
+    "word/media/image6.png"
+  ],
+  "embedded_images": 3,
+  "cjk_characters": 6771,
+  "ascii_word_tokens": 602,
+  "contains_unverified_placeholders": false,
+  "render_visual_review": "required separately"
+}

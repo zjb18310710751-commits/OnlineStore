@@ -1,0 +1,9 @@
+{
+  "TEST_SUMMARY": "2026年10月29日的 Release 验证中，261 项 .NET 测试与 42 项 Node 测试全部通过；SQL 工具的 17 项隔离检查也全部通过。",
+  "SQL_SUMMARY": "本轮九组真实 SQL 检查全部通过，JSON 中 completedChecks 为 9、failures 为 0、passed 为 true。",
+  "RECOVERY_SUMMARY": "隔离演练的十个步骤全部通过：断库期间 live 返回 200，ready 与目录返回 503，目录带 Retry-After 5 且没有 SQL 细节；数据库 ONLINE 完成后 5168 毫秒内 ready 与目录恢复 200。稳定业务字段前后比较相同，数据库已恢复在线，工具启动的进程已停止。",
+  "USABILITY_SUMMARY": "本轮 42 项 Node 测试通过。实际浏览器中，End 加 Enter 完成排序选择；订单页在隔离数据库不可用时自动显示错误提示，恢复后自动移除。桌面和移动页面留有截图，未开展参与者实验。",
+  "SECURITY_SUMMARY": "本机 Kestrel 流水线测试确认，改变不可信转发地址不能绕过第十一次请求的 429；可信代理地址可保留独立预算，早期宽松代理配置也被收紧。失败写入只调用一次，JSON 请求无 Accept 头时仍收到结构化错误，内部异常不出现在响应中。",
+  "CI_SUMMARY": "报告生成时，新增工作流尚无远程运行结果；后续以 GitHub Actions 记录为准。",
+  "EVIDENCE_LOCATION": "docs/quality-evidence.md；docs/evidence/recovery-run-2/recovery-verification.json；原始结果位于 E:/DMU-Learning/.tmp/quality-uplift-20261029 下的 test-results/quality-final-261.trx、frontend-final.log、sql-repository-run-2/sql-verification.json"
+}

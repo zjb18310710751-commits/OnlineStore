@@ -14,4 +14,6 @@
 OnlineStore/wwwroot/uploads/
 appsettings.*.local.json
 secrets.json
+.artifacts/
+artifacts/
 ~$*

@@ -2,46 +2,23 @@
 
 基于 **ASP.NET Core 8 MVC** 的在线商店演示项目，采用分层架构与 SQL Server 数据库。系统围绕五项质量属性设计：**可用性（Availability）、可修改性（Modifiability）、可测试性（Testability）、易用性（Usability）、安全性（Security）**。
 
-## 在线演示
+## 部署配置
 
-- Azure App Service：<https://zhy-onlinestore-31072.azurewebsites.net/>
-- 部署环境：Azure App Service（Linux F1）+ Azure SQL Database（Basic）
-- 首次访问可能需要等待片刻（F1 免费档冷启动）；是否在启动时应用迁移和写入示例目录由 `Initialization` 配置控制。
-- 资源组：`rg-onlinestore-demo`；删除该资源组会同时删除 Azure 网站和 Azure SQL，停止相关计费（本地数据库不受影响）。
-- 推送到 `main` 后由 GitHub Actions 自动发布，也可在 Actions 页面手动运行工作流。
+版本化配置以 `.github/workflows/azure-deploy.yml` 为准：推送到 `main` 或手动触发工作流后，执行还原、构建、全部 .NET 与前端测试，再发布到 `zhy-onlinestore-31072` 并检查 `/health`。配置的目标地址为 https://zhy-onlinestore-31072.azurewebsites.net；本地测试不代表已部署或已核验线上状态。
 
-```bash
-# 在 Azure Cloud Shell 中重新部署（先完成 az login）
-az webapp deploy \
-  --resource-group rg-onlinestore-demo \
-  --name zhy-onlinestore-31072 \
-  --src-path ./app.zip \
-  --type zip
+工作流需要仓库 Secret `AZURE_WEBAPP_PUBLISH_PROFILE`。应用数据库连接、邮件提供商与首次管理员凭据通过部署环境配置；不要把密码或发布配置文件加入源码。
 
-# 回滚：删除整个演示资源组
-az group delete --name rg-onlinestore-demo --yes --no-wait
-```
-
-### 自动化部署
-
-- 推送到 `main` 后，GitHub Actions 会依次执行依赖审计、还原、构建、214 个后端测试、29 个前端回归测试，并发布到 Azure App Service。
-- 后端测试使用 Coverlet 采集覆盖率；报告排除自动生成的 Razor、迁移和演示数据初始化代码，并作为构建产物上传。
-- 工作流使用生产并发锁，旧运行会被新运行取消；部署完成后自动验证 `/health`，未恢复健康会使工作流失败。
-- 仓库的 Actions Secrets 需要配置 `AZURE_WEBAPP_PUBLISH_PROFILE`，内容来自 Azure App Service 概览页的「获取发布配置文件 / Get publish profile」。
-- 本地仓库配置了 `post-commit` hook：在 `main` 分支提交后会自动执行 `git push origin main`；未提交的修改不会自动推送。
+HTTPS 由反向代理终止时，在部署环境设置 `ReverseProxy__KnownProxies__0`（后续条目按序编号）为实际可信代理 IP。应用默认只信任回环代理，并只处理一层转发；上线前检查 HTTPS 跳转及客户端来源解析，避免重定向循环或把所有用户合并进同一个限流额度。不要为方便而清空代理白名单。需要自定义 Data Protection 密钥目录时使用 `DataProtection__KeyDirectory`，并为部署实例配置持久化及目录权限。
 
 ## 技术栈
 
 - ASP.NET Core 8 MVC（Razor 视图）
-- Entity Framework Core 8.0.33 + **Microsoft.EntityFrameworkCore.SqlServer**（SQL Server Express / Azure SQL，SSMS 管理）
-- Azure SQL Database（Azure 演示环境，通过 App Service 连接串配置）
+- Entity Framework Core 8 + **Microsoft.EntityFrameworkCore.SqlServer**（SQL Server Express，SSMS 管理）
 - ASP.NET Core Identity（Cookie 认证 + 角色授权）
-- Bootstrap 5.3 + Bootstrap Icons（本地静态资源，不依赖运行时 CDN）
+- Bootstrap 5.3 + Bootstrap Icons（前端主题）
 - ASP.NET Core Health Checks（健康检查）
-- ASP.NET Core Session（开发环境内存缓存，生产环境 SQL Server 分布式缓存）
+- ASP.NET Core Session（购物车会话存储）
 - xUnit + EF Core InMemory（单元测试）
-- Coverlet 测试覆盖率采集
-- NuGet Audit（构建时检查已知漏洞）
 
 ## 已实现功能
 
@@ -60,9 +37,7 @@ az group delete --name rg-onlinestore-demo --yes --no-wait
 | 多收货地址 | 个人中心地址簿的新增、编辑、删除；结算页选择默认地址并支持保存为默认地址 |
 | 首页轮播管理 | 后台 HeroSlides 管理轮播图、中英文标题/说明、跳转地址、排序与显示开关；首页自动轮播 |
 | 订单明细与结算校验 | 订单明细保存 SKU 颜色/规格快照；下单时复核价格、库存、商品状态和优惠券，取消/退款恢复库存 |
-| 收货确认与异常签收 | 买家可查看物流进度并确认收货；签收时间满七天后由后台任务自动确认；配送异常可登记原因，商品送达后仍可完成签收 |
-| 订单售后闭环 | 支持运输中取消、已送达商品退货/换货；买家填写退货物流，后台审核、接收退货、完成退款；换货完成后自动生成补发订单，已结束订单可从列表隐藏 |
-| 后台订单与评价 | 后台订单支持分页、实时刷新和商品/规格明细；订单与售后状态变化会同步更新数量徽标，历史评价可进入独立归档页查看 |
+| 订单物流与售后 | 买家可查看物流进度、确认收货、申请退货/换货并从列表隐藏已结束订单；后台支持填写承运商与运单号、审核售后、接收退货和完成退款流程 |
 | 订单评价 | 买家可在已完成订单中为对应商品写评价；同一订单商品再次提交会更新原评价，评分、评论、图片和日期直接显示在“我的订单”中 |
 | 多分类 | 一个商品可属于多个分类（多对多） |
 | 购物车 | 加入（支持所选颜色/规格）、查看、更新数量、移除、清空（基于 Session） |
@@ -70,34 +45,29 @@ az group delete --name rg-onlinestore-demo --yes --no-wait
 | 记住账号 | 统一登录页勾选后，仅将账号（邮箱或手机号）经 Data Protection 加密写入 HttpOnly 持久化 Cookie，下次打开登录页自动回填；密码不会写入 Cookie，取消勾选即清除 |
 | 数据库连接与数据操作 | EF Core + SQL Server，首次运行经 EF Migrations 自动建库建表并写入种子数据 |
 | 商店主题界面 | 简洁黑白响应式主题、固定分类导航与下拉菜单、三图自动轮播、商品卡片、自定义细线购物袋图标、完整商店页脚、商品详情与评价区域 |
-| 验证码注册/找回 | 邮箱注册、找回密码与修改资料通过 6 位邮件验证码验证；仅邮件发送成功后返回成功提示，接口和页面不回显验证码；发送失败保留错误提示 |
+| 验证码注册/找回 | 6 位邮件验证码，10 分钟有效、60 秒重发间隔、最多 5 次验证尝试；并发请求共享数据库计数，正确码仅可使用一次。邮件发送失败会提示错误，接口不回显验证码 |
 | 促销价（划线价） | 商品可设「原价」，前端显示划线原价 + 折扣标签，首页「限时折扣」专区 |
 | 优惠券 | 支持百分比、固定金额、免运费、最高优惠、最低消费、日期范围、全局/每用户次数、首单限制、排除促销商品、全店/分类/商品范围；后台支持优惠券名称、批量创建、CSV 导出与核销记录，系统内部唯一标识不在页面展示；个人中心“我的优惠券”展示可用/未开始/已用完/已过期状态，结算页可直接选择优惠券并默认选择最优方案 |
-| 取消订单与退款 | 用户取消自己的订单；后台订单管理（发货/完成/取消/退款）；取消/退款自动恢复库存 |
+| 取消订单与退款 | 买家可取消未发货订单，运输中申请拦截；后台发货、处理签收异常、审核退换货与物流拦截。退款/取消按状态恢复库存且只恢复一次；买家确认与七天自动确认在活动售后期间暂停 |
 | 完整中英双语 | 界面文案 + 商品/分类/店铺/评价/参数/SKU 颜色规格/快递/图文详情等数据库内容全部随语言切换 |
-| 单元测试 | xUnit 测试项目：商品筛选/分页/排序、购物车增删改清空、图片上传校验、优惠券计算/校验/核销、订单评价关联、邮箱验证码错误锁定、收货确认、异常签收、售后状态流转、后台订单分页、订单图片快照、库存扣减/恢复、记住账号密码、支付方式目录、Header 服务、可注入时间与订单号、中英文资源一致性（共 214 个 .NET 用例，另有 29 个前端规格选择、订单实时刷新与页面反馈回归用例） |
+| 自动化测试 | xUnit 覆盖商品、购物车、优惠券、订单/售后、身份与验证码、上传、查询边界及架构；Node 测试覆盖规格选择、实时更新与表单提示。最新实测结果见 [五项质量属性证据索引](docs/quality-evidence.md) |
 
 ## 目录结构
 
 ```
-OnlineStore/
-├── Models/         领域实体（Product、Category、Shop、ProductSku、ProductSpec、Review、CartItem、Cart、Order、Coupon、DeliveryAddress、HeroSlide、ApplicationUser）
-├── Data/           数据上下文（ApplicationDbContext）、初始化配置与数据库初始化（DbInitializer）
-├── Services/       业务抽象层（产品、购物车、订单、优惠券、商城 Header、图片存储等接口 + 实现）
-├── ViewModels/     表单与列表视图模型
-├── ViewComponents/ 购物车徽标、首页轮播与分类导航组件（CartSummary、HeroCarousel、CategoryNavigation）
-├── Controllers/    前台控制器（Home、Products、Cart、Reviews、Account、Language、Shops、Favorites、Orders）
-├── Areas/Admin/    后台管理区（Dashboard、Products、Categories、Shops、ProductSkus、ProductSpecs、Reviews、Orders、Coupons、Images、HeroSlides，管理员角色授权）
-├── Views/          Razor 视图（前台，含 Home/_HeroCarousel、Products/_ProductReviews、_ProductStory、Shared 反馈与确认组件）
-└── wwwroot/        静态资源（本地 Bootstrap/Bootstrap Icons、商城主题 CSS 与对应 JS）
-
-OnlineStore.Tests/  xUnit 单元测试项目（引用 OnlineStore，使用 EF Core InMemory）
+OnlineStore/             Web 启动项目：Controllers、ViewComponents、Areas/Admin、Views、wwwroot
+OnlineStore.Business/    业务类库：Services 接口和实现、备用本地化器
+OnlineStore.DataAccess/  数据类库：ApplicationDbContext、初始化、EF Migrations
+OnlineStore.Models/      共享模型类库：实体、DTO/表单模型、验证规则、中英文资源
+OnlineStore.Tests/       xUnit 服务、HTTP 与架构回归测试；Frontend 下为 Node 测试
 ```
+
+引用方向为 Web → Business → DataAccess → Models，Web 与业务层也直接使用共享模型。业务类库不引用 Web，原命名空间保持不变。这些是独立编译的层；运行时仍由一个 ASP.NET Core 进程配合 SQL Server 提供服务，不代表分布式多服务器部署。
 
 ## 多语言 / 国际化（中英切换）
 
 - 采用 ASP.NET Core 本地化（`IStringLocalizer<SharedResource>` + 资源文件）。
-- 资源文件位于 `Resources/SharedResource.resx`（中文/默认）与 `Resources/SharedResource.en.resx`（英文）。
+- 资源文件位于 `OnlineStore.Models/Resources/SharedResource.resx`（中文/默认）与 `SharedResource.en.resx`（英文），资源标记类保留 `OnlineStore.SharedResource` 命名空间。
 - 前台导航栏与后台侧边栏均有「中文 / EN」切换按钮，点击写入本地化 Cookie 并刷新当前页。
 - 也可通过查询串临时切换：`/?culture=en` 或 `/?culture=zh-CN`。
 - 默认语言：中文（zh-CN）；支持语言列表在 `Program.cs` 的 `supportedCultures` 中配置。
@@ -116,53 +86,25 @@ OnlineStore.Tests/  xUnit 单元测试项目（引用 OnlineStore，使用 EF Co
 
 ## 配置数据库连接（SQL Server）
 
-默认连接串已在 `OnlineStore/appsettings.json` 中配置为 SQL Server Express（Windows 集成认证）：
+版本化配置使用 `localhost` 实例。本机 SQL Server Express 实例如为 `localhost\SQLEXPRESS`，需要用开发配置或 User Secrets 覆盖；连接到学校电脑时应使用该电脑的实际实例和权限。示例：
 
 ```json
-"DefaultConnection": "Server=localhost\\SQLEXPRESS;Database=OnlineStore_Main;Trusted_Connection=True;TrustServerCertificate=True;"
+"DefaultConnection": "Server=localhost\\SQLEXPRESS;Database=OnlineStore;Trusted_Connection=True;TrustServerCertificate=True;Encrypt=False;"
 ```
 
-首次运行会经 EF Migrations 自动创建 `OnlineStore_Main` 数据库与全部表。示例目录、管理员和演示买家由 `Initialization` 配置控制。用 SSMS 连接 `localhost\SQLEXPRESS` 即可查看/管理数据库。
-
-> `appsettings.json` 与 `appsettings.Development.json` 默认都指向 `OnlineStore_Main`。如果你使用其他数据库名，请同时修改这两个文件，或通过环境变量覆盖连接串。
-
-## 配置真实邮箱发送验证码
-
-项目支持两种真实邮件发送方式：个人邮箱 SMTP 和 Brevo API。当前默认使用 SMTP；不要把邮箱密码或授权码写入 `appsettings.json` 或提交到 GitHub。
-
-在 Azure App Service 的 **Configuration → Environment variables** 中添加以下应用设置（双下划线对应配置层级）：
-
-| 应用设置 | 示例 | 说明 |
-| --- | --- | --- |
-| `Email__Provider` | `Smtp` | 使用个人邮箱 SMTP |
-| `Email__Host` | `smtp.gmail.com` | 邮箱服务商的 SMTP 地址 |
-| `Email__Port` | `587` | 通常使用 STARTTLS 的 587 端口 |
-| `Email__EnableSsl` | `true` | 启用 TLS 加密 |
-| `Email__SenderEmail` | `yourname@gmail.com` | 收件人看到的发件邮箱 |
-| `Email__SenderName` | `ZHY Store` | 收件人看到的发件人名称 |
-| `Email__Username` | `yourname@gmail.com` | SMTP 登录账号 |
-| `Email__Password` | 邮箱授权码 | Gmail/QQ 邮箱应填写应用专用密码，不是网页登录密码 |
-
-常见服务商配置：
-
-- Gmail：`smtp.gmail.com`、端口 `587`，需先在 Google 账号中开启两步验证并创建“应用专用密码”。
-- QQ 邮箱：`smtp.qq.com`、端口 `587`，需在邮箱设置中开启 SMTP 服务并生成“授权码”。
-- Outlook/学校邮箱：`smtp-mail.outlook.com`、端口 `587`；部分学校或组织会禁止 SMTP 登录，需要管理员开放。
-- 如继续使用 Brevo：把 `Email__Provider` 设为 `Brevo`，并配置 `Email__ApiKey`、`Email__SenderEmail` 和 `Email__SenderName`。
-
-配置后，注册、找回密码和修改资料时发送的 6 位验证码会从所配置的邮箱发出。发件凭据只存放在部署环境的 App Settings 中，不会随源码上传。
+应用启动会执行 EF Migrations，因此连接账号需要相应建库/更新表结构权限。已有数据库保留数据，未应用的迁移按顺序补齐；首次初始化加入示例目录。开发演示账号与生产管理员初始化规则见下文。本机未提交的数据库配置不能作为其他组员电脑的通用配置。
 
 ## 运行
 
-命令行（在项目目录 `OnlineStore` 下）：
+命令行（在解决方案根目录）：
 
 ```bash
-dotnet restore
-dotnet build
-dotnet run
+dotnet restore OnlineStore.sln
+dotnet build OnlineStore.sln
+dotnet run --project OnlineStore/OnlineStore.csproj --launch-profile http
 ```
 
-或直接用 Visual Studio 打开 `OnlineStore.sln`，按 F5 运行。
+或用 Visual Studio 打开 `OnlineStore.sln`，将 **OnlineStore** Web 项目设为启动项目，选择 `http` 后按 F5。其余项目为类库或测试项目。
 
 启动后浏览器访问（默认 http 配置）：**http://localhost:5080**
 
@@ -171,12 +113,14 @@ dotnet run
 - 商品详情与加入购物车：`/Products/Details/{id}`
 - 购物车：`/Cart`
 - 健康检查：`/health`（返回 Healthy/Unhealthy）
+- 存活探针：`/health/live`（进程开始接收请求后，不依赖数据库）
+- 就绪探针：`/health/ready`（数据库可连接时 200，不可用时 503；`/health` 保留同样的数据库检查）
 - 后台管理：`/Admin`
 - 首页轮播图管理：`/Admin/HeroSlides`。可上传 JPG、PNG、WebP 或 GIF（最大 5 MB），编辑中英文标题与说明、图片描述、Shop 站内跳转地址、显示顺序及显示开关，也可删除轮播项。未填写英文时使用主要内容；保存后首页立即读取最新数据。
 
 轮播图迁移 `20261025170000_AddHeroSlides` 会在首次应用时导入现有三张宣传图。管理员删除后，重新启动不会恢复已删除的轮播项；全部隐藏或删除时，首页直接展示商品区。编辑时未选择新图片会保留原图。
 
-订单迁移 `20261025180000_AddOrderItemSku` 为订单明细保留规格编号。结算时重新验证价格、商品状态、库存与优惠券；订单、商品/规格库存及优惠券用量在同一事务中保存。手动事务统一通过 EF Core 执行策略运行，因此数据库瞬时故障时可以安全地整体重试。价格变化时会刷新购物车并要求重新确认，取消或退款会恢复对应库存。
+订单迁移 `20261025180000_AddOrderItemSku` 为订单明细保留规格编号。结算时重新验证价格、商品状态、库存与优惠券；订单、商品/规格库存及优惠券用量在同一事务中保存。价格变化时会刷新购物车并要求重新确认，取消或退款会恢复对应库存。
 
 优惠券迁移 `20261026001008_AddCouponRules` 新增活动备注、最高优惠、每用户限用、首单限制、促销商品排除、分类/商品适用范围和核销记录；既有优惠券会回填为每人限用 1 次，结束日期会规范为当天 23:59:59。
 
@@ -188,84 +132,55 @@ dotnet run
 dotnet test
 ```
 
-生成核心业务覆盖率报告：
+全部前端回归测试：`node --test OnlineStore.Tests/Frontend/*.test.cjs`。服务及控制器测试使用隔离的内存数据库，HTTP 质量测试使用受控的本地请求管线；这些检查不能替代 SQL Server 迁移、事务与并发验证。
 
-```bash
-dotnet test OnlineStore.Tests/OnlineStore.Tests.csproj \
-  --settings coverlet.runsettings \
-  --collect:"XPlat Code Coverage"
-```
+独立的 [CI 工作流](.github/workflows/ci.yml) 在 `Ethan-Yang`、`HUZHANHAO`、`main` 的 push 和目标 PR 上执行 .NET 构建与测试、Node 回归以及 SQL 工具的无数据库安全检查，上传 TRX/TAP。它不使用生产数据库或部署密钥；Azure 发布仍由单独的部署工作流负责。远程运行是否成功应查看对应 Actions 结果。
 
-前端回归测试：`node --test OnlineStore.Tests/Frontend/*.test.cjs`。
+真实 SQL 的九组回归、专用验证库保护及重复运行方式见 [验证工具说明](docs/verification.md)。2026-10-29 原分支证据记录为 .NET 261/261、Node 42/42、SQL 9/9、安全输入检查 17/17；2026-10-31 合并后本机验证为 .NET 270/270、Node 42/42。隔离数据库故障演练十个步骤通过，恢复 ONLINE 后 5.168 秒观测到就绪探针及目录恢复 200。完整结果、实际页面截图和测量边界见 [中央证据索引](docs/quality-evidence.md)。
 
-## 初始化与管理员配置
+## 账号初始化
 
-源码不再包含管理员或演示买家的默认凭据。通过环境变量、Azure App Service 配置或用户机密提供初始化值：
+仅 `Development` 环境在账号不存在时创建本地演示管理员：
 
-| 配置项 | 默认值 | 说明 |
+- 邮箱：`admin@store.com`
+- 密码：`Admin@123456`
+
+新开发库的演示买家为 `buyer@store.example`，初始密码同上。重启不会重置任何已有账号的密码，也不会删除或重新分配旧演示订单。
+
+非开发环境不自动创建上述演示账号或虚构订单。首次创建管理员需要在受保护的环境配置中同时提供 `Bootstrap:AdminEmail` 与 `Bootstrap:AdminPassword`（环境变量名称为 `Bootstrap__AdminEmail` / `Bootstrap__AdminPassword`）；缺少任一项就跳过创建。已存在的同邮箱账号不会被自动授予管理员角色或重置密码。已有部署中的旧演示账号不会因更新代码自动删除，应由部署管理员检查并更换其公开初始密码。
+
+密码策略：至少 6 位，含大小写字母、数字与特殊字符；验证发生在页面和 Identity 服务端。真实邮件仍需配置 SMTP 或 Brevo，缺少有效配置时不会伪造发送成功。
+
+## 质量属性的代码依据与边界
+
+| 属性 | 实现依据 | 实际边界 |
 | --- | --- | --- |
-| `Initialization__ApplyMigrationsOnStartup` | `true` | 启动时是否执行 EF Migrations |
-| `Initialization__RunOnStartup` | `true` | 是否在应用启动时执行数据库初始化；关闭后可先启动静态页面 |
-| `Initialization__InitializationRetryCount` | `2` | 初始化整体重试次数 |
-| `Initialization__InitializationRetryDelaySeconds` | `2` | 每次初始化重试间隔 |
-| `Initialization__FailFastOnInitializationFailure` | Development 为 `false`，Production 为 `true` | 初始化最终失败后是否终止启动 |
-| `Initialization__SeedSampleCatalogOnEmpty` | `true` | 空数据库是否写入示例分类、商品和店铺 |
-| `Initialization__AdminEmail` | 空 | 首次创建管理员时使用的邮箱 |
-| `Initialization__AdminPassword` | 空 | 首次创建管理员时使用的密码 |
-| `Initialization__SeedDemoData` | `false` | 是否创建演示买家与演示订单 |
-| `Initialization__DemoBuyerEmail` | 空 | 演示买家邮箱 |
-| `Initialization__DemoBuyerPassword` | 空 | 演示买家密码 |
+| Availability（可用性） | 区分存活和数据库就绪；识别暂态数据库故障并返回安全 503、`Retry-After: 5`；十步骤隔离演练验证故障、恢复及稳定数据保持 | 单进程、单数据库仍有单点故障；5.168 秒是一次本机观察，不是 SLA。启动迁移完成前尚未监听 HTTP；写操作不自动重放 |
+| Modifiability（可修改性） | 四个应用项目形成编译依赖边界；纯 `IOrderShippingPolicy` 接收物流事实、免邮结果和时间，替代策略可改变报价，库存及事务仍由 `OrderService` 管理 | 新增目的地、重量等计费因素仍需扩展输入；业务层仍依赖 EF，类库拆分不等于独立部署。详见 [物流策略说明](docs/quality-modifiability.md) |
+| Testability（可测试性） | 纯规则、xUnit/HTTP、Node、九组真实 SQL 分工；仓库有验证工具和 CI；旧结构升级、末件竞争及验证码单次消费有可重复案例 | InMemory、受控 DOM、真实 SQL 和浏览器各自覆盖不同边界；本地通过不代表远程 CI 或生产运行通过 |
+| Usability（易用性） | 自定义下拉保留 ARIA 名称、禁用项边界及错误焦点；订单故障有双语反馈，恢复后清除；交互控件聚焦时延后整页刷新；实际买家页及手机视口已核对 | 暂缓刷新可能延迟看到最新状态；未进行参与者实验或完整 WCAG 审计。详见 [交互验证说明](docs/quality-usability.md) |
+| Security（安全性） | 保留 Identity、角色、防伪及归属校验；七个账户写入口共享每来源每分钟十次额度；可信代理、一层转发、安全响应头；验证码最多五次预留尝试且只能成功消费一次 | 限流为单进程状态，共享出口共用额度；代理与 HTTPS 需按部署环境配置。验证码仍明文存储，富文本清洗及完整图片解码仍待完善 |
 
-本地开发可使用 .NET User Secrets：
-
-```bash
-dotnet user-secrets set "Initialization:AdminEmail" "admin@example.com" --project OnlineStore
-dotnet user-secrets set "Initialization:AdminPassword" "<strong-password>" --project OnlineStore
-```
-
-管理员只在对应邮箱不存在时创建，应用不会在后续启动中覆盖已有密码。密码策略要求至少 6 位，并包含大小写字母、数字和特殊字符。
-
-## 可用性配置
-
-- `Database__RetryCount`：SQL Server 瞬时故障重试次数，默认 `3`。
-- `Database__MaxRetryDelaySeconds`：单次数据库重试最大等待时间，默认 `3` 秒。
-- `Storage__UploadsPath`：用户上传文件保存目录。留空时，生产环境使用 App Service 的 `$HOME/data/uploads`，开发环境使用 `wwwroot/uploads`。启动时会自动复制旧目录中尚未迁移的文件。
-- `Session__Provider`：`Memory` 或 `SqlServer`。生产环境默认使用 SQL Server 分布式 Session，使购物车在重启和多实例部署后仍可恢复。
-- `Session__SchemaName`、`Session__TableName`：数据库 Session 表结构，默认 `dbo.SessionCache`。
-- Bootstrap CSS、JavaScript 和图标字体已经保存在 `wwwroot/lib`，Azure 运行时不再依赖 jsDelivr。
-- `Security__AuthenticationRateLimit__PermitLimit`：认证相关接口在单个窗口内的允许请求数，默认 `10`。
-- `Security__AuthenticationRateLimit__WindowSeconds`：认证限流窗口，默认 `60` 秒。
-
-验证码连续错误 5 次后会立即失效，需要重新申请；登录、注册、找回密码和验证码接口同时使用 IP 固定窗口限流。
-
-## 质量属性如何落地（属性 → 关键代码片段）
-
-| 质量属性 | 关键代码片段（位置） | 如何保证 |
-| --- | --- | --- |
-| **可用性 Availability** | `Program.cs` 的 `/health`、可配置 SQL Server 重试、初始化重试与生产失败保护；SQL Server 分布式 Session；持久化上传目录；本地 Bootstrap；统一的异常处理器和状态码页面 | 应用可被探活，数据库瞬断可恢复，购物车和用户图片不因重启或部署丢失，启动失败不会以部分初始化状态继续运行 |
-| **可修改性 Modifiability** | `Services/*` 接口抽象经 DI 注入；`PaymentMethods` 集中支付方式定义；`StorefrontHeaderService` 隔离导航数据查询；`ViewModels` 与 `Models` 分离；`SessionCartStore` 和 `IImageStorageService` 可替换实现 | 面向接口和单一配置源组织代码，新增支付方式或替换存储时不改动多个页面 |
-| **可测试性 Testability** | 覆盖面包括产品、购物车、订单、优惠券、账户安全、验证码错误锁定、收货确认、异常签收、售后流转、后台分页、订单图片快照、图片上传、上传目录迁移、支付方式、Header、时间与订单号、资源一致性；使用 EF Core InMemory、服务替身、固定 `TimeProvider` 和前端 Node 回归测试 | `dotnet test` 运行 214 个 .NET 用例；Coverlet 输出过滤后的覆盖率并上传 CI 产物；`node --test` 运行 29 个前端用例 |
-| **易用性 Usability** | 响应式主题与本地 Bootstrap；统一表单提交锁定和 `aria-busy` 状态；商品卡片、数量步进器、中英多语言、购物车徽标和自定义确认对话框 | 减少重复提交和误操作，界面反馈清晰，关键资源不受 CDN 中断影响 |
-| **安全性 Security** | Identity 密码哈希 + Cookie 认证；后台 Admin 角色；认证与验证码接口 IP 限流；验证码错误 5 次失效；统一安全响应头；Razor 编码、参数化查询、CSRF 和站内重定向校验；上传文件多重校验；外部秘密配置；NuGet Audit | 认证、授权、限流、输入编码、上传校验、秘密管理和依赖审计形成纵深防御 |
-
-> **答辩提示（Question Handling）**：上述表格即"每个属性由哪些代码体现"的索引。被问及时，建议按「**属性 → 落在哪个文件哪一段 → 解决了什么问题 → 若去掉会怎样**」的思路回答，例如：
-> - 问"如何保证可修改性"→ 指 `Services/ICartStore.cs` + `SessionCartStore.cs`：换存储只需新增一个 `ICartStore` 实现并在 `Program.cs` 改一行注册，业务层零改动。
-> - 问"购物车怎么防越权/防篡改"→ 会话隔离 + 防伪令牌 + `AddAsync` 内校验商品是否上架、库存是否大于 0。
-> - 问"如何证明可测试"→ `dotnet test` 运行 214 个用例；固定 `TimeProvider` 与订单号生成器可验证时间敏感逻辑；另有 29 个前端回归用例。
+每项属性的场景、可观察度量、代码与测试定位，以及答辩练习示例见 [五项质量属性证据索引](docs/quality-evidence.md)。个人理解、反思和贡献必须由成员本人提供；测试结果不代表已经验证学生掌握。
 
 ## 后续扩展
 
 当前未包含（可按需加入，服务层与模型已预留扩展点）：
 
-- 支付宝、微信、银行卡和货到付款流程已提供演示选项；真实支付网关与回调验签仍需按商户配置接入
+- 支付（下单已实现，支付环节为模拟，未接入真实支付网关）
 - 分类层级（父子分类）
 - 购物车从 Session 持久化到数据库/Redis（实现 `ICartStore` 接口即可）
-- 真实邮件发送需要在 Azure App Settings 中配置个人邮箱 SMTP 授权码，或配置 Brevo API
+- 真实邮件发送需配置 SMTP 服务器/凭据，或 Brevo API 与已验证发件人；不提供绕过验证码的生产注册入口
 
 ## 数据库迁移（EF Core Migrations）
 
-项目已采用 EF Core Migrations（`Data/DbInitializer.cs` 中调用 `Database.MigrateAsync()`），首个迁移为 `Migrations/*_InitialCreate`。模型变更时：
+数据库上下文与迁移位于 `OnlineStore.DataAccess`，启动配置位于 `OnlineStore`。迁移编号保持不变；不要因为分层移动文件而删除旧迁移或重建现有数据库。使用 EF Core 8 对应工具，并在解决方案目录显式指定项目：
 
-1. 安装工具（如未安装）：`dotnet tool install --global dotnet-ef`
-2. 新增迁移：在 `OnlineStore/` 目录下执行 `dotnet ef migrations add Xxx`
-3. 应用迁移：`dotnet ef database update`（或直接 `dotnet run`，启动时会自动 `MigrateAsync()`）
+```bash
+dotnet ef migrations add ChangeName --project OnlineStore.DataAccess --startup-project OnlineStore -- --environment Development
+dotnet ef database update --project OnlineStore.DataAccess --startup-project OnlineStore -- --environment Development
+```
+
+网站启动时也会执行 `MigrateAsync()`。首次运行新版本前应备份有价值的数据库；新字段迁移只在尚未应用时执行。验证码尝试次数使用已部署到现有数据库的 `20261029010511_AddVerificationCodeAttempts` 迁移，不清空已有业务表；Ethan-Yang 分支中同义的重复迁移已在合并时去除，避免 Azure SQL 重复添加字段。
+
+课程依据及上一轮修复记录见 [课程代码审查记录](docs/coursework-audit.md)；本轮新增机制与最终验证见 [五项质量属性证据索引](docs/quality-evidence.md)。

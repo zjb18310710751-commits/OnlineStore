@@ -21,6 +21,9 @@
 
   <ItemGroup>
     <ProjectReference Include="..\OnlineStore\OnlineStore.csproj" />
+    <ProjectReference Include="..\OnlineStore.Models\OnlineStore.Models.csproj" />
+    <ProjectReference Include="..\OnlineStore.DataAccess\OnlineStore.DataAccess.csproj" />
+    <ProjectReference Include="..\OnlineStore.Business\OnlineStore.Business.csproj" />
   </ItemGroup>
 
 </Project>

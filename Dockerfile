@@ -1,6 +1,9 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 COPY ["OnlineStore/OnlineStore.csproj", "OnlineStore/"]
+COPY ["OnlineStore.Models/OnlineStore.Models.csproj", "OnlineStore.Models/"]
+COPY ["OnlineStore.DataAccess/OnlineStore.DataAccess.csproj", "OnlineStore.DataAccess/"]
+COPY ["OnlineStore.Business/OnlineStore.Business.csproj", "OnlineStore.Business/"]
 RUN dotnet restore "OnlineStore/OnlineStore.csproj"
 COPY . .
 WORKDIR /src/OnlineStore
