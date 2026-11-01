@@ -343,7 +343,7 @@ public class OrdersController : Controller
 
     [HttpGet]
     [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
-    public async Task<IActionResult> ActiveItemCount()
+    public async Task<IActionResult> ActiveOrderCount()
     {
         var user = await _userManager.GetUserAsync(User);
         if (user is null)
@@ -351,7 +351,7 @@ public class OrdersController : Controller
             return Unauthorized();
         }
 
-        return Json(new { success = true, count = await _orderService.GetActiveItemCountAsync(user.Id) });
+        return Json(new { success = true, count = await _orderService.GetActiveOrderCountAsync(user.Id) });
     }
 
     [HttpGet]

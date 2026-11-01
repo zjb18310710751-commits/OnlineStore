@@ -32,7 +32,7 @@ public interface IOrderService
 
     Task<int> ProcessPendingOrderStatesAsync();
 
-    Task<int> GetActiveItemCountAsync(string userId);
+    Task<int> GetActiveOrderCountAsync(string userId);
 
     Task<bool> DeleteForUserAsync(int id, string userId);
 

@@ -525,12 +525,11 @@ public class OrderService : IOrderService
         return true;
     }
 
-    public async Task<int> GetActiveItemCountAsync(string userId)
+    public async Task<int> GetActiveOrderCountAsync(string userId)
     {
         await ProcessPendingOrderStatesAsync(userId);
-        var orders = await _context.Orders
+        return await _context.Orders
             .AsNoTracking()
-            .Include(order => order.Items)
             .Where(order =>
                 order.UserId == userId
                 && order.UserDeletedAt == null
@@ -540,8 +539,7 @@ public class OrderService : IOrderService
                     || order.AfterSalesRequests.Any(request =>
                         request.Status != AfterSalesStatus.Completed
                         && request.Status != AfterSalesStatus.Rejected)))
-            .ToListAsync();
-        return orders.Sum(order => order.Items.Sum(item => item.Quantity));
+            .CountAsync();
     }
 
     public async Task<AfterSalesRequest> CreateAfterSalesAsync(int orderId, string userId, string type, string reason)

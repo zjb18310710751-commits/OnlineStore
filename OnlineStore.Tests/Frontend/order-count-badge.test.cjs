@@ -10,7 +10,7 @@ function setup() {
     let nextTimer = 0;
     let calls = 0;
     let response = async () => ({ ok: true, json: async () => ({ success: true, count: 1 }) });
-    const link = { dataset: { activeItemCountUrl: '/Orders/ActiveItemCount' } };
+    const link = { dataset: { activeOrderCountUrl: '/Orders/ActiveOrderCount' } };
     const badge = {
         textContent: '1',
         hidden: false,
@@ -21,8 +21,8 @@ function setup() {
         hidden: false,
         documentElement: { lang: 'en' },
         querySelector(selector) {
-            if (selector === '[data-active-item-count-url]') return link;
-            if (selector === '[data-active-item-count-badge]') return badge;
+            if (selector === '[data-active-order-count-url]') return link;
+            if (selector === '[data-active-order-count-badge]') return badge;
             return null;
         },
         addEventListener: (name, handler) => { handlers[name] = handler; }
@@ -39,7 +39,7 @@ function setup() {
         AbortController,
         fetch: async (url, options) => {
             calls += 1;
-            assert.equal(url, link.dataset.activeItemCountUrl);
+            assert.equal(url, link.dataset.activeOrderCountUrl);
             return response(options);
         }
     });
@@ -59,7 +59,7 @@ function setup() {
     };
 }
 
-test('updates the active item count for a newly placed order', async () => {
+test('updates the active order count for a newly placed order', async () => {
     const view = setup();
     await view.flush();
     view.respond(async () => ({ ok: true, json: async () => ({ success: true, count: 2 }) }));
@@ -67,7 +67,7 @@ test('updates the active item count for a newly placed order', async () => {
 
     assert.equal(view.badge.textContent, '2');
     assert.equal(view.badge.hidden, false);
-    assert.equal(view.badge.attributes['aria-label'], '2 active items');
+    assert.equal(view.badge.attributes['aria-label'], '2 active orders');
 });
 
 test('hides the badge when the order is fully completed', async () => {

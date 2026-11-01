@@ -1,7 +1,7 @@
 (() => {
-    const link = document.querySelector('[data-active-item-count-url]');
-    const badge = document.querySelector('[data-active-item-count-badge]');
-    if (!link || !badge || !link.dataset.activeItemCountUrl) return;
+    const link = document.querySelector('[data-active-order-count-url]');
+    const badge = document.querySelector('[data-active-order-count-badge]');
+    if (!link || !badge || !link.dataset.activeOrderCountUrl) return;
 
     const isChinese = (document.documentElement?.lang || '').toLowerCase().startsWith('zh');
     let inFlight = false;
@@ -24,8 +24,8 @@
             badge.setAttribute(
                 'aria-label',
                 isChinese
-                    ? `${normalized} 件进行中商品`
-                    : `${normalized} active ${normalized === 1 ? 'item' : 'items'}`);
+                    ? `${normalized} 个进行中订单`
+                    : `${normalized} active ${normalized === 1 ? 'order' : 'orders'}`);
         }
     }
 
@@ -34,7 +34,7 @@
         inFlight = true;
         request = new AbortController();
         try {
-            const response = await fetch(link.dataset.activeItemCountUrl, {
+            const response = await fetch(link.dataset.activeOrderCountUrl, {
                 cache: 'no-store',
                 credentials: 'same-origin',
                 signal: request.signal

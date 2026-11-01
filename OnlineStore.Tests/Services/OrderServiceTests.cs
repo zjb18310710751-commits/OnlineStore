@@ -264,12 +264,12 @@ public class OrderServiceTests
     }
 
     [Fact]
-    public async Task ActiveItemCount_CountsQuantitiesFromOrderCreationUntilAfterSalesIsClosed()
+    public async Task ActiveOrderCount_CountsOrdersFromCreationUntilAfterSalesIsClosed()
     {
         var (context, order, _) = await SeedAsync();
         var service = new OrderService(context);
 
-        Assert.Equal(2, await service.GetActiveItemCountAsync(order.UserId!));
+        Assert.Equal(1, await service.GetActiveOrderCountAsync(order.UserId!));
         order.Status = OrderStatus.Delivered;
         await context.SaveChangesAsync();
         var request = await service.CreateAfterSalesAsync(
@@ -280,10 +280,10 @@ public class OrderServiceTests
 
         order.Status = OrderStatus.Completed;
         await context.SaveChangesAsync();
-        Assert.Equal(2, await service.GetActiveItemCountAsync(order.UserId!));
+        Assert.Equal(1, await service.GetActiveOrderCountAsync(order.UserId!));
 
         Assert.True(await service.ReviewAfterSalesAsync(request.Id, false, "Closed"));
-        Assert.Equal(0, await service.GetActiveItemCountAsync(order.UserId!));
+        Assert.Equal(0, await service.GetActiveOrderCountAsync(order.UserId!));
     }
 
     [Fact]
@@ -365,7 +365,7 @@ public class OrderServiceTests
         var replacement = await context.Orders.SingleAsync(item => item.ReplacementForOrderId == order.Id);
         Assert.Equal(OrderStatus.PendingShipment, replacement.Status);
         Assert.Equal(OrderStatus.Completed, order.Status);
-        Assert.Equal(2, await service.GetActiveItemCountAsync(order.UserId!));
+        Assert.Equal(1, await service.GetActiveOrderCountAsync(order.UserId!));
         Assert.Equal(0, replacement.Total);
         Assert.Equal(5, product.Stock);
     }

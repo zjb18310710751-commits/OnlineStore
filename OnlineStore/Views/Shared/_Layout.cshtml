@@ -7,7 +7,7 @@
     var categories = (await CategoryService.GetAllAsync()).ToList();
     var currentUser = User.Identity?.IsAuthenticated == true ? await UserManager.GetUserAsync(User) : null;
     var favoriteCount = currentUser is null ? 0 : await FavoriteService.CountAsync(currentUser.Id);
-    var activeItemCount = currentUser is null ? 0 : await OrderService.GetActiveItemCountAsync(currentUser.Id);
+    var activeOrderCount = currentUser is null ? 0 : await OrderService.GetActiveOrderCountAsync(currentUser.Id);
     var availableCouponCount = currentUser is null
         ? 0
         : (await CouponService.GetCustomerCouponsAsync(currentUser.Id))
@@ -101,12 +101,12 @@
                                         <a class="dropdown-item sf-account-link"
                                            asp-controller="Orders"
                                            asp-action="MyOrders"
-                                           data-active-item-count-url="@(currentUser is null ? null : Url.Action("ActiveItemCount", "Orders"))">
+                                           data-active-order-count-url="@(currentUser is null ? null : Url.Action("ActiveOrderCount", "Orders"))">
                                             <span>@Loc["MyOrders"]</span>
                                             <span class="sf-count-badge"
-                                                  data-active-item-count-badge
-                                                  hidden="@(activeItemCount == 0)"
-                                                  aria-label="@L10n.Text($"{activeItemCount} 件进行中商品", $"{activeItemCount} active {(activeItemCount == 1 ? "item" : "items")}")">@activeItemCount</span>
+                                                  data-active-order-count-badge
+                                                  hidden="@(activeOrderCount == 0)"
+                                                  aria-label="@L10n.Text($"{activeOrderCount} 个进行中订单", $"{activeOrderCount} active {(activeOrderCount == 1 ? "order" : "orders")}")">@activeOrderCount</span>
                                         </a>
                                     </li>
                                 }
