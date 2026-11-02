@@ -11,6 +11,8 @@ public static class DbInitializer
 {
     private const string DevelopmentAdminEmail = "admin@store.com";
     private const string DevelopmentPassword = "Admin@123456";
+    private const int ProductsPerCategory = 10;
+    private const int ExpectedCatalogCategoryCount = 5;
     public const string AdminRole = "Admin";
 
     public static async Task InitializeAsync(IServiceProvider services)
@@ -382,6 +384,8 @@ public static class DbInitializer
             });
         }
 
+        products = SelectBalancedCatalog(products, categories);
+
         foreach (var p in products)
         {
             p.ImageUrl = $"https://picsum.photos/seed/{p.Sku}/600/400";
@@ -432,6 +436,46 @@ public static class DbInitializer
         {
             await SeedDemoOrdersAsync(context, userManager, options, environment);
         }
+    }
+
+    private static List<Product> SelectBalancedCatalog(
+        IReadOnlyList<Product> allProducts,
+        IReadOnlyList<Category> categories)
+    {
+        if (categories.Count != ExpectedCatalogCategoryCount)
+        {
+            throw new InvalidOperationException(
+                $"The sample catalog requires {ExpectedCatalogCategoryCount} categories.");
+        }
+
+        var assignments = new Dictionary<Product, Category>();
+        foreach (var category in categories.OrderBy(category => category.DisplayOrder))
+        {
+            var selected = allProducts
+                .Where(product => !assignments.ContainsKey(product) &&
+                                  product.Categories.Contains(category))
+                .Take(ProductsPerCategory)
+                .ToArray();
+
+            if (selected.Length != ProductsPerCategory)
+            {
+                throw new InvalidOperationException(
+                    $"Category '{category.Name}' does not contain enough unique sample products.");
+            }
+
+            foreach (var product in selected)
+            {
+                assignments.Add(product, category);
+            }
+        }
+
+        foreach (var (product, category) in assignments)
+        {
+            product.Categories.Clear();
+            product.Categories.Add(category);
+        }
+
+        return assignments.Keys.ToList();
     }
 
     private static async Task SeedAdministratorAsync(
