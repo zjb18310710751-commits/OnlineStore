@@ -13,6 +13,8 @@ public static class DbInitializer
     private const string DevelopmentPassword = "Admin@123456";
     private const int ProductsPerCategory = 10;
     private const int ExpectedCatalogCategoryCount = 5;
+    private const string FoldingChairSku = "EXT-079";
+    private const string FoldingChairPreviewImageUrl = "/images/products/folding-chair-preview.jpg";
     public const string AdminRole = "Admin";
 
     public static async Task InitializeAsync(IServiceProvider services)
@@ -388,12 +390,26 @@ public static class DbInitializer
 
         foreach (var p in products)
         {
-            p.ImageUrl = $"https://picsum.photos/seed/{p.Sku}/600/400";
+            p.ImageUrl = p.Sku == FoldingChairSku
+                ? FoldingChairPreviewImageUrl
+                : $"https://picsum.photos/seed/{p.Sku}/600/400";
             var images = new List<ProductImage>
             {
                 new() { ImageUrl = p.ImageUrl, SortOrder = 0 },
-                new() { ImageUrl = $"https://picsum.photos/seed/{p.Sku}-b/600/400", SortOrder = 1 },
-                new() { ImageUrl = $"https://picsum.photos/seed/{p.Sku}-c/600/400", SortOrder = 2 }
+                new()
+                {
+                    ImageUrl = p.Sku == FoldingChairSku
+                        ? FoldingChairPreviewImageUrl
+                        : $"https://picsum.photos/seed/{p.Sku}-b/600/400",
+                    SortOrder = 1
+                },
+                new()
+                {
+                    ImageUrl = p.Sku == FoldingChairSku
+                        ? FoldingChairPreviewImageUrl
+                        : $"https://picsum.photos/seed/{p.Sku}-c/600/400",
+                    SortOrder = 2
+                }
             };
             p.Images = images;
             p.DetailHtml = BuildDetailHtml(p.Name, p.Description ?? "", images[0].ImageUrl, images[1].ImageUrl);
@@ -402,7 +418,9 @@ public static class DbInitializer
             var skuIndex = 0;
             foreach (var sku in p.Skus)
             {
-                sku.ImageUrl = $"https://picsum.photos/seed/{p.Sku}-s{skuIndex++}/600/400";
+                sku.ImageUrl = p.Sku == FoldingChairSku
+                    ? FoldingChairPreviewImageUrl
+                    : $"https://picsum.photos/seed/{p.Sku}-s{skuIndex++}/600/400";
             }
         }
 
