@@ -13,8 +13,60 @@ public static class DbInitializer
     private const string DevelopmentPassword = "Admin@123456";
     private const int ProductsPerCategory = 10;
     private const int ExpectedCatalogCategoryCount = 5;
-    private const string FoldingChairSku = "EXT-079";
-    private const string FoldingChairPreviewImageUrl = "/images/products/folding-chair-preview.jpg";
+    private static readonly IReadOnlyDictionary<string, string> ProductImageOverrides =
+        new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+        {
+            ["ELEC-001"] = "/images/products/elec-001.jpg",
+            ["ELEC-002"] = "/images/products/elec-002.jpg",
+            ["ELEC-003"] = "/images/products/elec-003.jpg",
+            ["CLOTH-001"] = "/images/products/cloth-001.jpg",
+            ["CLOTH-002"] = "/images/products/cloth-002.jpg",
+            ["BOOK-001"] = "/images/products/book-001.jpg",
+            ["BOOK-002"] = "/images/products/book-002.jpg",
+            ["HOME-001"] = "/images/products/home-001.jpg",
+            ["HOME-002"] = "/images/products/home-002.jpg",
+            ["SPORT-001"] = "/images/products/sport-001.jpg",
+            ["SPORT-002"] = "/images/products/sport-002.jpg",
+            ["SPORT-003"] = "/images/products/sport-003.jpg",
+            ["EXT-001"] = "/images/products/ext-001.jpg",
+            ["EXT-002"] = "/images/products/ext-002.jpg",
+            ["EXT-003"] = "/images/products/ext-003.jpg",
+            ["EXT-004"] = "/images/products/ext-004.jpg",
+            ["EXT-005"] = "/images/products/ext-005.jpg",
+            ["EXT-006"] = "/images/products/ext-006.jpg",
+            ["EXT-007"] = "/images/products/ext-007.jpg",
+            ["EXT-021"] = "/images/products/ext-021.jpg",
+            ["EXT-022"] = "/images/products/ext-022.jpg",
+            ["EXT-023"] = "/images/products/ext-023.jpg",
+            ["EXT-024"] = "/images/products/ext-024.jpg",
+            ["EXT-025"] = "/images/products/ext-025.jpg",
+            ["EXT-026"] = "/images/products/ext-026.jpg",
+            ["EXT-027"] = "/images/products/ext-027.jpg",
+            ["EXT-028"] = "/images/products/ext-028.jpg",
+            ["EXT-039"] = "/images/products/ext-039.jpg",
+            ["EXT-040"] = "/images/products/ext-040.jpg",
+            ["EXT-041"] = "/images/products/ext-041.jpg",
+            ["EXT-042"] = "/images/products/ext-042.jpg",
+            ["EXT-043"] = "/images/products/ext-043.jpg",
+            ["EXT-044"] = "/images/products/ext-044.jpg",
+            ["EXT-045"] = "/images/products/ext-045.jpg",
+            ["EXT-046"] = "/images/products/ext-046.jpg",
+            ["EXT-051"] = "/images/products/ext-051.jpg",
+            ["EXT-052"] = "/images/products/ext-052.jpg",
+            ["EXT-053"] = "/images/products/ext-053.jpg",
+            ["EXT-054"] = "/images/products/ext-054.jpg",
+            ["EXT-055"] = "/images/products/ext-055.jpg",
+            ["EXT-056"] = "/images/products/ext-056.jpg",
+            ["EXT-071"] = "/images/products/ext-071.jpg",
+            ["EXT-072"] = "/images/products/ext-072.jpg",
+            ["EXT-073"] = "/images/products/ext-073.jpg",
+            ["EXT-074"] = "/images/products/ext-074.jpg",
+            ["EXT-075"] = "/images/products/ext-075.jpg",
+            ["EXT-076"] = "/images/products/ext-076.jpg",
+            ["EXT-077"] = "/images/products/ext-077.jpg",
+            ["EXT-078"] = "/images/products/ext-078.jpg",
+            ["EXT-079"] = "/images/products/folding-chair-preview.jpg"
+        };
     public const string AdminRole = "Admin";
 
     public static async Task InitializeAsync(IServiceProvider services)
@@ -390,24 +442,22 @@ public static class DbInitializer
 
         foreach (var p in products)
         {
-            p.ImageUrl = p.Sku == FoldingChairSku
-                ? FoldingChairPreviewImageUrl
-                : $"https://picsum.photos/seed/{p.Sku}/600/400";
+            var productSku = p.Sku ?? string.Empty;
+            ProductImageOverrides.TryGetValue(productSku, out var overrideImageUrl);
+            p.ImageUrl = overrideImageUrl ?? $"https://picsum.photos/seed/{productSku}/600/400";
             var images = new List<ProductImage>
             {
                 new() { ImageUrl = p.ImageUrl, SortOrder = 0 },
                 new()
                 {
-                    ImageUrl = p.Sku == FoldingChairSku
-                        ? FoldingChairPreviewImageUrl
-                        : $"https://picsum.photos/seed/{p.Sku}-b/600/400",
+                    ImageUrl = overrideImageUrl ??
+                               $"https://picsum.photos/seed/{productSku}-b/600/400",
                     SortOrder = 1
                 },
                 new()
                 {
-                    ImageUrl = p.Sku == FoldingChairSku
-                        ? FoldingChairPreviewImageUrl
-                        : $"https://picsum.photos/seed/{p.Sku}-c/600/400",
+                    ImageUrl = overrideImageUrl ??
+                               $"https://picsum.photos/seed/{productSku}-c/600/400",
                     SortOrder = 2
                 }
             };
@@ -418,9 +468,8 @@ public static class DbInitializer
             var skuIndex = 0;
             foreach (var sku in p.Skus)
             {
-                sku.ImageUrl = p.Sku == FoldingChairSku
-                    ? FoldingChairPreviewImageUrl
-                    : $"https://picsum.photos/seed/{p.Sku}-s{skuIndex++}/600/400";
+                sku.ImageUrl = overrideImageUrl ??
+                               $"https://picsum.photos/seed/{productSku}-s{skuIndex++}/600/400";
             }
         }
 
